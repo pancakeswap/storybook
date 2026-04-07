@@ -1,0 +1,226 @@
+/* ── Navbar root ───────────────────────────────────────────── */
+.nb-root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 16px;
+  background: var(--pcs-colors-surface-card);
+  border-bottom: 1px solid var(--pcs-colors-border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+
+/* ── Left side ─────────────────────────────────────────────── */
+.nb-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+}
+
+.nb-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.nb-logo-text {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--pcs-colors-text);
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+/* ── Nav items ─────────────────────────────────────────────── */
+.nb-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.nb-nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--pcs-colors-text-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+}
+.nb-nav-item:hover {
+  background: var(--pcs-colors-surface-subtle);
+  color: var(--pcs-colors-text);
+}
+.nb-nav-item.active {
+  color: var(--pcs-colors-brand);
+  font-weight: 600;
+}
+.nb-nav-item.active:hover {
+  background: var(--pcs-colors-brand-muted);
+}
+
+.nb-chevron {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+/* ── Right side ────────────────────────────────────────────── */
+.nb-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ── Icon buttons ──────────────────────────────────────────── */
+.nb-icon-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--pcs-colors-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+.nb-icon-btn:hover {
+  background: var(--pcs-colors-surface-subtle);
+  color: var(--pcs-colors-text);
+}
+
+
+/* ── Divider ───────────────────────────────────────────────── */
+.nb-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--pcs-colors-border);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ── Deposit button ────────────────────────────────────────── */
+.nb-deposit-btn {
+  height: 34px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--pcs-colors-brand);
+  color: var(--pcs-colors-text-on-brand);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: filter 0.15s;
+  flex-shrink: 0;
+}
+.nb-deposit-btn:hover { filter: brightness(1.1); }
+.nb-deposit-btn:active { filter: brightness(0.9); }
+
+/* ── Wallet button ─────────────────────────────────────────── */
+.nb-wallet-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--pcs-colors-border);
+  border-radius: 8px;
+  background: var(--pcs-colors-surface-subtle);
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+.nb-wallet-btn:hover {
+  border-color: var(--pcs-colors-border-hover);
+  background: var(--pcs-colors-surface-subtle);
+}
+
+.nb-wallet-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pcs-colors-long);
+  flex-shrink: 0;
+}
+
+/* ── Wallet dropdown ───────────────────────────────────────── */
+.nb-wallet-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--pcs-colors-surface-card);
+  border: 1px solid var(--pcs-colors-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--pcs-shadows-dropdown);
+  z-index: 200;
+}
+
+.nb-wallet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 16px;
+  border: none;
+  background: transparent;
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.1s;
+  text-align: left;
+}
+.nb-wallet-item:hover { background: var(--pcs-colors-surface-subtle); }
+
+.nb-wallet-divider {
+  height: 1px;
+  background: var(--pcs-colors-border);
+  margin: 2px 0;
+}
+
+.nb-wallet-disconnect {
+  color: var(--pcs-colors-short);
+}
+.nb-wallet-disconnect:hover {
+  background: var(--pcs-colors-short-muted);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile  ≤ 768px
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .nb-root { padding: 0 12px; }
+
+  /* Hide nav links */
+  .nb-nav { display: none; }
+
+  /* Hide icon buttons and dividers */
+  .nb-icon-btn { display: none; }
+  .nb-divider { display: none; }
+}

@@ -1,0 +1,82 @@
+/*
+ * Global dark/light mode styles for the Storybook preview iframe.
+ * Applied to body and the Storybook docs shell so the background
+ * follows our theme when the toolbar switches dark ↔ light.
+ *
+ * Chakra v3 injects --pcs-colors-* at :root / .dark, so the vars
+ * are available globally without a .perps-root wrapper.
+ */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--pcs-colors-bg, #f0f2f5);
+  transition: background 0.15s;
+}
+
+html.dark, html.dark body {
+  background: var(--pcs-colors-bg, #1a2035);
+  color-scheme: dark;
+}
+
+/* ── Storybook docs page shell ───────────────────────────────── */
+
+/* Outer docs wrapper */
+html.dark .sbdocs-wrapper,
+html.dark #storybook-docs {
+  background: var(--pcs-colors-bg, #1a2035) !important;
+}
+
+/* Docs content area */
+html.dark .sbdocs-content {
+  background: var(--pcs-colors-bg, #1a2035) !important;
+  color: var(--pcs-colors-text, #e8edf5) !important;
+}
+
+/* Story heading rows (h1/h2/h3 in autodocs) */
+html.dark .sbdocs-wrapper h1,
+html.dark .sbdocs-wrapper h2,
+html.dark .sbdocs-wrapper h3,
+html.dark .sbdocs-wrapper h4,
+html.dark .sbdocs-wrapper p {
+  color: var(--pcs-colors-text, #e8edf5) !important;
+}
+
+/* "STORIES" section label */
+html.dark .sbdocs-wrapper .sb-section-title {
+  color: var(--pcs-colors-text-muted, #7d8ea8) !important;
+}
+
+/* Args / props table */
+html.dark .docblock-argstable-body,
+html.dark .docblock-argstable {
+  background: var(--pcs-colors-surface-card, #1c2233) !important;
+  color: var(--pcs-colors-text, #e8edf5) !important;
+}
+
+html.dark .docblock-argstable-body tr,
+html.dark .docblock-argstable-body td,
+html.dark .docblock-argstable-body th {
+  background: transparent !important;
+  color: var(--pcs-colors-text, #e8edf5) !important;
+  border-color: var(--pcs-colors-border, #242d3f) !important;
+}
+
+html.dark .docblock-argstable-body span {
+  color: var(--pcs-colors-text, #e8edf5) !important;
+}
+
+/* Story canvas toolbar (show code / copy code buttons) */
+html.dark .docs-story > div:first-child {
+  background: var(--pcs-colors-surface-card, #1c2233) !important;
+  border-color: var(--pcs-colors-border, #242d3f) !important;
+}
+
+/* Story canvas area wrapper */
+html.dark .docs-story {
+  border-color: var(--pcs-colors-border, #242d3f) !important;
+}
+
+html.dark .docs-story .innerZoomElementWrapper {
+  background: var(--pcs-colors-bg, #1a2035) !important;
+}
