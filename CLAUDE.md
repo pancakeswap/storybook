@@ -1,3 +1,26 @@
+## Workflow Commands
+
+This project has custom slash commands in `.claude/commands/`:
+
+- **`/new-task`** — Start a new task: asks for name, handles local changes, checks out main, pulls latest, creates a feature branch, starts Storybook
+- **`/switch-task`** — Switch between existing task branches
+- **`/submit`** — Commit + PR + Linear ticket
+
+### Submit intent detection
+
+When the user says any of the following (or similar phrasing), treat it as a `/submit` command:
+- "push the changes"
+- "create a PR"
+- "submit the changes"
+- "send the changes to FE"
+- "save the changes"
+- "send it to review"
+- "ship it"
+
+In these cases, run the `/submit` workflow: commit all changes, create a PR to main, create a Linear ticket with the PR link assigned to Ryan.
+
+---
+
 ## Storybook MCP
 
 When working on UI components, always use the `storybook` MCP tools to access Storybook's component and documentation knowledge before answering or taking any action.
