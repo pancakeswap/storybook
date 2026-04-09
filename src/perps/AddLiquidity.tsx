@@ -6,20 +6,38 @@ const TOKENS = [
   { symbol: 'USDT', icon: '💵' },
 ]
 
+const DEFAULT_CHAINS = ['BNB Chain', 'Ethereum', 'Arbitrum', 'Base']
+
 export interface AddLiquidityProps {
   tokenBalances?: Record<string, string>
   alpPerToken?: Record<string, string>
+  chains?: string[]
+  selectedChain?: string
+  onChainChange?: (chain: string) => void
   onMint?: (token: string, amount: string) => void
 }
 
 export function AddLiquidity({
   tokenBalances = { USDC: '5,000.00', USDT: '2,500.00' },
   alpPerToken = { USDC: '0.9812', USDT: '0.9808' },
+  chains = DEFAULT_CHAINS,
+  selectedChain: controlledChain,
+  onChainChange,
   onMint,
 }: AddLiquidityProps) {
   const [selectedToken, setSelectedToken] = useState('USDC')
   const [amount, setAmount] = useState('')
   const [showTokenList, setShowTokenList] = useState(false)
+  const [internalChain, setInternalChain] = useState(chains[0] ?? 'BNB Chain')
+  const [showChainList, setShowChainList] = useState(false)
+
+  const activeChain = controlledChain ?? internalChain
+
+  const handleChainSelect = (chain: string) => {
+    setInternalChain(chain)
+    setShowChainList(false)
+    onChainChange?.(chain)
+  }
 
   const balance = tokenBalances[selectedToken] ?? '0'
   const rawBalance = parseFloat(balance.replace(/,/g, '')) || 0
@@ -35,7 +53,35 @@ export function AddLiquidity({
   return (
     <div className="perps-root" style={{ padding: 24, maxWidth: 420 }}>
       <div className="p-card">
-        <p className="p-section-title">Add Liquidity</p>
+        <div className="al-header">
+          <p className="p-section-title">Add Liquidity</p>
+
+          {/* Chain selector */}
+          <div className="al-chain-wrap">
+            <button
+              className="al-chain-btn"
+              onClick={() => setShowChainList((v) => !v)}
+            >
+              <span className="al-chain-dot" />
+              <span>{activeChain}</span>
+              <span className="al-chain-chevron">▼</span>
+            </button>
+            {showChainList && (
+              <div className="al-chain-dropdown">
+                {chains.map((c) => (
+                  <button
+                    key={c}
+                    className={`al-chain-item${c === activeChain ? ' active' : ''}`}
+                    onClick={() => handleChainSelect(c)}
+                  >
+                    <span className="al-chain-dot" />
+                    {c}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Token + amount input */}
         <p className="p-label" style={{ marginBottom: 6 }}>

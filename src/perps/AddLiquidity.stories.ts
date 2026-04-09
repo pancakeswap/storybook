@@ -9,6 +9,7 @@ const meta = {
   parameters: { layout: 'centered' },
   args: {
     onMint: fn(),
+    onChainChange: fn(),
   },
 } satisfies Meta<typeof AddLiquidity>
 
@@ -35,5 +36,15 @@ export const ZeroBalance: Story = {
   args: {
     tokenBalances: { USDC: '0.00', USDT: '0.00' },
     alpPerToken: { USDC: '0.9812', USDT: '0.9808' },
+  },
+}
+
+export const CustomChains: Story = {
+  name: 'Custom Chains',
+  args: {
+    tokenBalances: { USDC: '5,000.00', USDT: '2,500.00' },
+    alpPerToken: { USDC: '0.9812', USDT: '0.9808' },
+    chains: ['Ethereum', 'Arbitrum'],
+    selectedChain: 'Arbitrum',
   },
 }
