@@ -11,7 +11,7 @@
  */
 
 /* ── Google Fonts ────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap');
 
 /* ════════════════════════════════════════════════════════════════
    PRIMITIVE STRUCTURAL TOKENS
@@ -83,8 +83,8 @@
 .perps-root {
 
   /* ── Typography ─────────────────────────────────────────── */
-  --p-font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --p-font-mono:   'SF Mono', 'Fira Code', 'Consolas', monospace;
+  --p-font-family: 'Kanit', sans-serif;
+  --p-font-mono:   SFMono, ui-monospace, monospace;
 
   --p-text-2xs:  var(--prim-fs-2xs);  /* 10px  meta / badge label   */
   --p-text-xs:   var(--prim-fs-xs);   /* 11px  table header / label */

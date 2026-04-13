@@ -1,5 +1,5 @@
-export { Button } from './Button'
-export type { ButtonProps, ButtonVariant, ButtonSize } from './Button'
+export { Button } from './components/Button'
+export type { ButtonProps, ButtonVariant, ButtonSize } from './components/Button'
 
 export { Badge } from './Badge'
 export type { BadgeProps, BadgeVariant } from './Badge'

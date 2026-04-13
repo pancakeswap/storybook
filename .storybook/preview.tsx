@@ -1,16 +1,19 @@
 import type { Preview, Decorator } from '@storybook/react-vite'
+import { ThemeProvider as SCThemeProvider } from 'styled-components'
 import { ThemeProvider } from '../src/ui/ThemeProvider'
+import { pcsTheme } from '../src/ui/components/theme'
 import { PhoneFrame, TabletFrame } from './DeviceFrame'
 import './preview.css'
 
 const withTheme: Decorator = (Story, context) => {
-  const theme = (context.globals['theme'] as string) ?? 'dark'
+  const theme = (context.globals['theme'] as string) ?? 'light'
   return (
     <ThemeProvider forcedTheme={theme}>
-      {/* Wrapper ensures canvas areas in docs mode get the correct background */}
-      <div style={{ background: 'var(--pcs-colors-bg)', minHeight: '100%' }}>
-        <Story />
-      </div>
+      <SCThemeProvider theme={pcsTheme}>
+        <div style={{ background: 'var(--pcs-colors-background)', minHeight: '100%' }}>
+          <Story />
+        </div>
+      </SCThemeProvider>
     </ThemeProvider>
   )
 }
@@ -41,7 +44,7 @@ const preview: Preview = {
   decorators: [withDeviceFrame, withTheme],
 
   globals: {
-    theme: 'dark',
+    theme: 'light',
   },
 
   globalTypes: {

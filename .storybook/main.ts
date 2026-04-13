@@ -17,5 +17,16 @@ const config: StorybookConfig = {
   refs: {
     '@chakra-ui/react': { disable: true },
   },
+  viteFinal(config) {
+    config.optimizeDeps = config.optimizeDeps || {};
+    config.optimizeDeps.include = [
+      ...(config.optimizeDeps.include || []),
+      'styled-components',
+      'styled-system',
+      '@styled-system/should-forward-prop',
+      'clsx',
+    ];
+    return config;
+  },
 };
 export default config;

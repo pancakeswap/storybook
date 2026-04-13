@@ -1,3 +1,56 @@
+## Implementation Rules
+
+### Reuse first — never re-implement
+
+When implementing any feature or UI:
+
+1. **Use existing components** — `Button`, `Card`, `Text`, `TabMenu`, `TableView` live in `src/ui/components/`. Import and compose them. Do NOT create ad-hoc styled buttons, cards, text wrappers, tables, or tabs.
+2. **Use existing design tokens** — colors, shadows, spacing, radii, fonts are defined in `src/ui/tokens.ts` and exposed as CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`). Never hardcode hex values, pixel sizes, or shadows that already have a token.
+3. **Use existing icons** — 241 icons live in `src/ui/Icons.tsx`. Check there before adding any SVG.
+4. **Do NOT modify the design system or base components** unless the user explicitly asks to change them. This includes: `tokens.ts`, `theme.ts`, `design-system.css`, `Icons.tsx`, and everything in `src/ui/components/{Button,Card,Text,TabMenu,TableView}/`.
+5. **Follow PancakeSwap's design language** — see section below.
+
+---
+
+## PancakeSwap Design Language
+
+### Color identity
+- **Purple-tinted neutrals** — backgrounds and text use warm purple undertones, not gray. Light bg `#FAF9FA`, dark bg `#08060B`, dark card `#27262C`. Text is deep purple `#280D5F` (light) / pale lavender `#F4EEFF` (dark).
+- **Teal primary** `#1FC7D4` — CTAs, links, active states, brand.
+- **Purple secondary** — `#7645D9` (light) / `#A881FC` (dark). Focus rings, accents.
+- **Pink for failure** `#ED4B9E` — not red. Short/loss/error/danger all use this magenta-pink. This is PCS's most distinctive trait.
+- **Minty green for success** `#31D0AA` — more teal-green than pure green.
+- **Amber warning** `#FFB237`.
+- **Purple-tinted overlays** — `rgba(40, 13, 95, 0.60)`, not pure black.
+
+### Shape & surface
+- **Generous radius** — 16px on buttons (`radii.default`), 24px on cards (`radii.card`). No sharp corners.
+- **Card border trick** — outer div = border color, inner div = background, `padding: 1px 1px 3px 1px`. Subtle bottom-heavy border.
+- **Inset bottom shadow on solid buttons** — `0px -1px 0px 0px rgba(14, 14, 44, 0.4) inset`. Gives physical "press" depth. Removed on outline/flat variants (secondary, tertiary, text, light, bubblegum).
+
+### Typography
+- **Kanit** — Google Font, weights 400 / 600 / 800. Rounded, friendly sans-serif.
+- **Mono** — SFMono, ui-monospace, monospace.
+- **Sizes** — 10, 12, 14, 16, 20, 40px only. No intermediate values.
+- **Letter-spacing** `0.03em` on buttons.
+- **Tabular numerals** everywhere for aligned numeric columns.
+
+### Interaction
+- **Hover** — opacity 0.65 (not a color shift).
+- **Active press** — `translateY(1px)` + shadow removed.
+- **Focus ring** — violet `#7645D9` with 4px spread.
+- **State cards** — animated gradient border (primaryBright → secondary) for active, solid colored borders for success/warning.
+- **Disabled** — `backgroundDisabled` bg + `textDisabled` color + no shadow.
+
+### Spacing
+- Token scale: 0, 1, 2, 4, 6, 8, 12, 14, 16, 20, 24, 32, 48, 56, 64px.
+- Card body: 24px. Button md: 48px height, 0 24px padding. Button sm: 32px / 0 16px. Button xs: 20px / 0 8px.
+
+### Breakpoints
+- xs: 370, sm: 576, md: 852, lg: 968, xl: 1080, xxl: 1200px (site width).
+
+---
+
 ## Workflow Commands
 
 This project has custom slash commands in `.claude/commands/`:
@@ -9,138 +62,94 @@ This project has custom slash commands in `.claude/commands/`:
 ### Submit intent detection
 
 When the user says any of the following (or similar phrasing), treat it as a `/submit` command:
-- "push the changes"
-- "create a PR"
-- "submit the changes"
-- "send the changes to FE"
-- "save the changes"
-- "send it to review"
-- "ship it"
+- "push the changes", "create a PR", "submit the changes", "send the changes to FE", "save the changes", "send it to review", "ship it"
 
-In these cases, run the `/submit` workflow: commit all changes, create a PR to main, create a Linear ticket with the PR link assigned to Ryan.
+---
+
+## Design System Architecture
+
+The design system is ported from **PancakeSwap UIKit** (`pancake-frontend/packages/uikit`).
+
+### Token layers
+
+| Layer | File | Purpose |
+|---|---|---|
+| Raw values | `src/ui/tokens.ts` | All PCS colors (lightColors, darkColors, v2 scales), shadows, fonts, space, radii, fontSizes |
+| Chakra theme | `src/ui/theme.ts` | Maps tokens → CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`) with light/dark switching |
+| Structural CSS | `src/ui/design-system.css` | Font import (Kanit), font sizes, spacing, radius, z-index, motion primitives |
+| styled-components theme | `src/ui/components/theme.ts` | Provides `pcsTheme` object for styled-components `ThemeProvider` — maps `theme.colors.*` to CSS variable references |
+
+### Key color tokens (PCS naming)
+
+| Token | CSS variable | Usage |
+|---|---|---|
+| `primary` | `--pcs-colors-primary` | Brand teal `#1FC7D4` |
+| `secondary` | `--pcs-colors-secondary` | Accent purple (light: `#7645D9`, dark: `#A881FC`) |
+| `success` | `--pcs-colors-success` | Profit / long `#31D0AA` |
+| `failure` | `--pcs-colors-failure` | Loss / short `#ED4B9E` |
+| `warning` | `--pcs-colors-warning` | Caution `#FFB237` |
+| `text` | `--pcs-colors-text` | Primary text |
+| `textSubtle` | `--pcs-colors-text-subtle` | Secondary text |
+| `textDisabled` | `--pcs-colors-text-disabled` | Placeholder / disabled |
+| `background` | `--pcs-colors-background` | Page background |
+| `card` | `--pcs-colors-card` | Card surface |
+| `cardBorder` | `--pcs-colors-card-border` | Card/section borders |
+| `input` | `--pcs-colors-input` | Input / depressed backgrounds |
+| `invertedContrast` | `--pcs-colors-inverted-contrast` | Text on brand-colored backgrounds |
+
+### Components (from PCS UIKit, styled-components)
+
+All in `src/ui/components/`:
+
+- **Button** — `variant`: primary, secondary, tertiary, text, danger, dangerOutline, subtle, success, light, bubblegum. `scale`: md (48px), sm (32px), xs (20px). Inset bottom shadow on solid variants.
+- **Card** — `isActive`, `isSuccess`, `isWarning`, `isDisabled`. Sub-components: `CardBody` (24px padding), `CardHeader` (variants: default, blue, bubblegum, violet, pale), `CardFooter`, `CardRibbon`.
+- **Text** — `color` (PCS named colors), `bold`, `small`, `fontSize`, `ellipsis`, `textTransform`, `strikeThrough`. Polymorphic `as` prop.
+- **TabMenu** + **Tab** — `activeIndex`, `onItemClick`, `fullWidth`, `gap`, `isShowBorderBottom`. Tab `scale`: md, lg.
+- **TableView** — Generic `TableView<T>` with `columns`, `data`, `onSort`, `sortOrder`, `sortField`, `onRowClick`. PCS sort arrow buttons.
+
+### Icons
+
+241 PCS icons + custom additions in `src/ui/Icons.tsx`. All use `fill="currentColor"`, default 20x20.
 
 ---
 
 ## Storybook MCP
 
-When working on UI components, always use the `storybook` MCP tools to access Storybook's component and documentation knowledge before answering or taking any action.
+When working on UI components, use the `storybook` MCP tools:
 
-- **CRITICAL: Never hallucinate component properties!** Before using ANY property on a component from a design system (including common-sounding ones like `shadow`, etc.), you MUST use the MCP tools to check if the property is actually documented for that component.
-- Query `list-all-documentation` to get a list of all components
-- Query `get-documentation` for that component to see all available properties and examples
-- Only use properties that are explicitly documented or shown in example stories
-- If a property isn't documented, do not assume properties based on naming conventions or common patterns from other libraries. Check back with the user in these cases.
-- Use the `get-storybook-story-instructions` tool to fetch the latest instructions for creating or updating stories. This will ensure you follow current conventions and recommendations.
-- Check your work by running `run-story-tests`.
-
-Remember: A story name might not reflect the property name correctly, so always verify properties through documentation or example stories before using them.
+- Query `list-all-documentation` to discover components
+- Query `get-documentation` for props and examples
+- Use `get-storybook-story-instructions` before creating stories
+- Run `run-story-tests` before reporting completion
+- Never assume component props — verify through docs first
 
 ---
 
-## Design Token Usage
+## Typography (PCS)
 
-Tokens live in `src/ui/design-system.css`. Always use semantic tokens — never raw hex values or hardcoded pixels that map to a token.
-
-| Category | Token prefix | Example |
-|---|---|---|
-| Colors | `--pcs-colors-*` | `var(--pcs-colors-brand)`, `var(--pcs-colors-text-muted)` |
-| Shadows | `--pcs-shadows-*` | `var(--pcs-shadows-modal)`, `var(--pcs-shadows-focus)` |
-| Border radius | `--p-radius-*` | `var(--p-radius-md)`, `var(--p-radius-xl)` |
-| Spacing | `--p-space-*` | `var(--p-space-4)` = 16px |
-
-**Key color tokens:**
-
-- `--pcs-colors-bg` — page background
-- `--pcs-colors-surface-card` — card / panel surface
-- `--pcs-colors-surface-subtle` — input / subtle background
-- `--pcs-colors-border` / `--pcs-colors-border-hover` — borders
-- `--pcs-colors-text` / `--pcs-colors-text-muted` — text hierarchy
-- `--pcs-colors-brand` — primary teal action color
-- `--pcs-colors-brand-muted` — teal at low opacity (hover backgrounds)
-- `--pcs-colors-accent` — violet (used for focus rings)
-- `--pcs-colors-accent-muted` — violet at low opacity
-- `--pcs-colors-long` — green (profit / long position)
-- `--pcs-colors-short` — red/pink (loss / short position)
-- `--pcs-colors-text-on-brand` — text on brand-colored backgrounds
-
----
-
-## CSS Conventions
-
-- Every component that renders UI imports `../ui/perps.css` (which pulls in `design-system.css`); components in `src/ui/` import `./perps.css` directly
-- Prefer `className` with token-mapped CSS classes over inline `style` props
-- Use inline `style` only for dynamic values that can't be expressed as a class (e.g. computed widths, conditional colors)
-- Class naming uses short BEM-like prefixes per component:
-  - `p-*` — shared primitives (card, label, btn, input)
-  - `nb-*` — Navbar
-  - `pp-*` — PerpsPage layout
-  - `op-*` — OrderPanel
-  - `dw-*` — DepositWithdraw
-  - `al-*` — AddLiquidity
-
-**Shared utility classes** (from `perps.css`):
-
-- `.p-card` — standard card with border + radius + surface background
-- `.p-card-alt` — inset card (darker background, used inside cards)
-- `.p-label` — muted 11px uppercase label
-- `.p-value-sm` — 12px tabular-nums value
-- `.p-btn-full` — full-width pill button
-
----
-
-## Numeric & Typography Rules
-
-- All prices and quantities must use `font-variant-numeric: tabular-nums` so columns stay aligned as values update
-- Positive PnL → `var(--pcs-colors-long)` (green); negative → `var(--pcs-colors-short)` (red/pink). Never swapped.
-- Price formatting: ≥$100 → 2 decimal places; <$100 → 4 decimal places
-- Font size hierarchy:
-  - 22px — oracle / headline price
-  - 16px — section title
-  - 14px — emphasized body
-  - 13px — body default
-  - 12px — table cell
-  - 11px — label / tag
-  - 10px — badge / micro
-
----
-
-## Responsive Layout
-
-Breakpoints:
-- `≤ 768px` — mobile: stack layout, hide nav links and icon buttons in Navbar, `Modal` renders as bottom drawer
-- `≤ 1024px` — tablet: right panel narrows to 260px
-
-Rules:
-- Write styles desktop-first in this codebase (existing components use `max-width` media queries)
-- `PerpsPage` uses CSS grid on desktop (`1fr 300px`), switches to `flex-direction: column` on mobile
-- The `Modal` component in `src/stories/ui/Modal.tsx` automatically renders as a bottom sheet (drawer) on `≤ 768px` — do not reimplement this per-component
+- **Font**: Kanit (400, 600, 800) — `'Kanit', sans-serif`
+- **Mono**: SFMono, ui-monospace, monospace
+- **Sizes**: 10px, 12px, 14px, 16px, 20px, 40px
+- All numeric output uses `font-variant-numeric: tabular-nums`
+- Positive PnL → `success` (green); negative → `failure` (pink). Never swapped.
 
 ---
 
 ## Theme
 
-- Use `useTheme()` from `./ThemeProvider` to read and toggle the current theme
-- Theme values: `'dark'` | `'light'`
-- `ThemeProvider` wraps all Storybook stories via the `withTheme` decorator in `.storybook/preview.tsx`
-- Apply theme-sensitive styles via CSS tokens (they update automatically); only reach for `useTheme()` when you need the value in JS (e.g. chart colors, conditional icons)
+- `ThemeProvider` in `src/ui/ThemeProvider.tsx` wraps Chakra + next-themes + styled-components
+- `.storybook/preview.tsx` wraps all stories with both `ThemeProvider` and styled-components `SCThemeProvider`
+- Use CSS variables for colors — they auto-switch with light/dark
+- Use `useTheme()` only when you need the theme value in JS (e.g. chart colors)
 
 ---
 
-## Component Patterns
+## Storybook Structure
 
-- **Icon-only buttons** must have `aria-label`
-- **All icons** come from `src/stories/perps/Icons.tsx` — check there before adding a new SVG
-- **Modals** use `src/stories/ui/Modal.tsx` — drawer on mobile is automatic, do not build custom overlays
-- **Buttons** use `src/stories/ui/Button.tsx` — check `variant` and `size` props via Storybook docs before use
-- **Tabs** use `src/stories/ui/Tabs.tsx` — supports `variant: 'underline' | 'pill'`
-- Color-only state communication must always have a text or icon fallback for accessibility
+Story titles follow this hierarchy:
+- `'Design System/...'` — Colors, Icons, Shadows, Spacing, Typography
+- `'Components/...'` — Button, Card, Text, TabMenu, TableView
+- `'Widgets/...'` — feature-level compositions
+- `'Apps/...'` — full page layouts
 
----
-
-## Storybook Workflow
-
-1. Call `get-storybook-story-instructions` before creating or editing any story
-2. Call `preview-stories` after every component or story change — include the returned URLs in your response
-3. Call `run-story-tests` before marking work as done — fix any failures before reporting completion
-4. Story titles follow: `'Design System/...'`, `'Components/...'`, `'Widgets/...'`, `'Apps/...'`
-5. Page-level stories use `parameters: { layout: 'fullscreen' }` to skip the device frame decorator
+Page-level stories use `parameters: { layout: 'fullscreen' }`.

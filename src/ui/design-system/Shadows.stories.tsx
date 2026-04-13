@@ -1,37 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import '../design-system.css'
-
-// ── Elevation tokens (PancakeSwap: shadows.level1 / tooltip / modal) ─────────
-const ELEVATION = [
-  { token: '--pcs-shadows-card',     label: 'Card',     use: 'Cards, active tabs, list items' },
-  { token: '--pcs-shadows-dropdown', label: 'Dropdown', use: 'Menus, selects, popovers' },
-  { token: '--pcs-shadows-modal',    label: 'Modal',    use: 'Dialog overlays' },
-  { token: '--pcs-shadows-inset',    label: 'Inset',    use: 'Button depth (bottom edge)' },
-]
-
-// ── State ring tokens (PancakeSwap: shadows.active / focus / success / warning / danger) ──
-const STATE_RINGS = [
-  { token: '--pcs-shadows-active',  label: 'Active',   note: 'Brand/teal interactive focus' },
-  { token: '--pcs-shadows-focus',   label: 'Focus',    note: 'Violet keyboard-focus ring' },
-  { token: '--pcs-shadows-success', label: 'Success',  note: 'Positive / long state' },
-  { token: '--pcs-shadows-warning', label: 'Warning',  note: 'Caution state' },
-  { token: '--pcs-shadows-danger',  label: 'Danger',   note: 'Destructive / error state' },
-]
-
-// ── Trading glow aliases (map to PancakeSwap ring values) ────────────────────
-const GLOWS = [
-  { token: '--pcs-shadows-glow-brand', label: 'Brand glow',  color: 'var(--pcs-colors-brand)',  bg: 'var(--pcs-colors-brand-muted)' },
-  { token: '--pcs-shadows-glow-long',  label: 'Long glow',   color: 'var(--pcs-colors-long)',   bg: 'var(--pcs-colors-long-muted)'  },
-  { token: '--pcs-shadows-glow-short', label: 'Short glow',  color: 'var(--pcs-colors-short)',  bg: 'var(--pcs-colors-short-muted)' },
-  { token: '--pcs-shadows-glow-focus', label: 'Focus ring',  color: 'var(--pcs-colors-accent)', bg: 'var(--pcs-colors-accent-muted)' },
-]
+import { shadows, tokens } from '../tokens'
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <div style={{
       width: 140, height: 90,
-      background: 'var(--pcs-colors-surface-card)',
-      borderRadius: 12,
+      background: 'var(--pcs-colors-card)',
+      borderRadius: tokens.radii.default,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       ...style,
     }}>
@@ -40,102 +16,106 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
   )
 }
 
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section style={{ marginBottom: 56 }}>
+      <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-subtle)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 32, marginTop: 0 }}>
+        {title}
+      </h2>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
+        {children}
+      </div>
+    </section>
+  )
+}
+
+function ShadowCard({ name, value, note }: { name: string; value: string; note: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+      <Card style={{ boxShadow: value }}>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-subtle)' }}>{name}</span>
+      </Card>
+      <div style={{ textAlign: 'center', maxWidth: 140 }}>
+        <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--pcs-colors-text-subtle)', marginBottom: 2 }}>{name}</div>
+        <div style={{ fontSize: 11, color: 'var(--pcs-colors-text-disabled)' }}>{note}</div>
+      </div>
+    </div>
+  )
+}
+
 function ShadowsPage() {
   return (
-    <div className="perps-root" style={{ minHeight: '100vh', padding: '40px 48px', background: 'var(--pcs-colors-bg)', color: 'var(--pcs-colors-text)' }}>
+    <div className="perps-root" style={{ minHeight: '100vh', padding: '40px 48px', background: 'var(--pcs-colors-background)', color: 'var(--pcs-colors-text)', fontFamily: tokens.fonts.normal }}>
       <h1 style={{ fontSize: 28, fontWeight: 800, margin: '0 0 8px', letterSpacing: '-0.5px' }}>Shadows</h1>
-      <p style={{ color: 'var(--pcs-colors-text-muted)', fontSize: 14, margin: '0 0 8px', lineHeight: 1.6 }}>
-        Values sourced from PancakeSwap UIKit <code style={{ fontSize: 12, background: 'var(--pcs-colors-surface-subtle)', padding: '1px 5px', borderRadius: 4 }}>packages/uikit/src/tokens/index.ts</code>.
+      <p style={{ color: 'var(--pcs-colors-text-subtle)', fontSize: 14, margin: '0 0 8px', lineHeight: 1.6 }}>
+        From PancakeSwap UIKit <code style={{ fontSize: 12, background: 'var(--pcs-colors-input)', padding: '1px 5px', borderRadius: 4 }}>packages/uikit/src/tokens/index.ts</code>. Theme-agnostic.
       </p>
-      <p style={{ color: 'var(--pcs-colors-text-subtle)', fontSize: 12, margin: '0 0 48px' }}>
-        Theme-agnostic — same values in light and dark mode.
+      <p style={{ color: 'var(--pcs-colors-text-disabled)', fontSize: 12, margin: '0 0 48px' }}>
+        {Object.keys(shadows).length} shadow tokens total.
       </p>
 
-      {/* Elevation */}
-      <section style={{ marginBottom: 56 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 32, marginTop: 0 }}>
-          Elevation
-        </h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
-          {ELEVATION.map(({ token, label, use }) => (
-            <div key={token} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-              <Card style={{ boxShadow: `var(${token})` }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)' }}>{label}</span>
-              </Card>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--pcs-colors-text-muted)', marginBottom: 2 }}>{token}</div>
-                <div style={{ fontSize: 11, color: 'var(--pcs-colors-text-subtle)' }}>{use}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* All shadows from tokens */}
+      <Section title="All Shadow Tokens">
+        {Object.entries(shadows).map(([name, value]) => (
+          <ShadowCard key={name} name={name} value={value} note={
+            name === 'level1' ? 'Cards, tabs, surfaces' :
+            name === 'active' ? 'Brand teal focus ring' :
+            name === 'success' ? 'Positive / long state' :
+            name === 'warning' ? 'Caution state' :
+            name === 'danger' ? 'Destructive / error' :
+            name === 'focus' ? 'Violet keyboard focus' :
+            name === 'inset' ? 'Inset depth' :
+            name === 'inset2' ? 'Inset subtle' :
+            name === 'tooltip' ? 'Tooltips, popovers'
+            : ''
+          } />
+        ))}
+      </Section>
 
-      {/* State rings */}
-      <section style={{ marginBottom: 56 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 32, marginTop: 0 }}>
-          State Rings
-        </h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
-          {STATE_RINGS.map(({ token, label, note }) => (
-            <div key={token} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-              <Card style={{ boxShadow: `var(${token})` }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)' }}>{label}</span>
-              </Card>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--pcs-colors-text-muted)', marginBottom: 2 }}>{token}</div>
-                <div style={{ fontSize: 11, color: 'var(--pcs-colors-text-subtle)' }}>{note}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Semantic shadow aliases (from theme.ts) */}
+      <Section title="Semantic Shadow Aliases">
+        <ShadowCard name="card" value={shadows.level1} note="Cards, active tabs" />
+        <ShadowCard name="dropdown" value={shadows.tooltip} note="Menus, selects, popovers" />
+        <ShadowCard name="modal" value="0px 20px 36px -8px rgba(14, 14, 44, 0.1), 0px 1px 1px rgba(0, 0, 0, 0.05)" note="Dialog overlays" />
+        <ShadowCard name="glow-brand" value={shadows.active} note="Trading brand glow" />
+        <ShadowCard name="glow-long" value={shadows.success} note="Long / profit glow" />
+        <ShadowCard name="glow-short" value={shadows.danger} note="Short / loss glow" />
+        <ShadowCard name="glow-focus" value={shadows.focus} note="Violet focus glow" />
+      </Section>
 
-      {/* Trading glows */}
-      <section style={{ marginBottom: 56 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 32, marginTop: 0 }}>
-          Trading Glow Aliases
-        </h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
-          {GLOWS.map(({ token, label, color, bg }) => (
-            <div key={token} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-              <Card style={{ border: `1px solid ${color}`, boxShadow: `var(${token})` }}>
-                <div style={{ width: 40, height: 40, borderRadius: 8, background: bg, border: `1px solid ${color}` }} />
-              </Card>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--pcs-colors-text-muted)', marginBottom: 2 }}>{token}</div>
-                <div style={{ fontSize: 11, color: 'var(--pcs-colors-text-subtle)' }}>{label}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Border radius */}
+      {/* ── Border Radius ── */}
       <section style={{ marginBottom: 48 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 32, marginTop: 0 }}>
-          Border Radius
+        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-subtle)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 32, marginTop: 0 }}>
+          Border Radius (radii)
         </h2>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
-          {[
-            { token: '--p-radius-xs',   value: '4px',    use: 'Badges, chips' },
-            { token: '--p-radius-sm',   value: '6px',    use: 'Buttons (ghost), tags' },
-            { token: '--p-radius-md',   value: '10px',   use: 'Inputs, panels, buttons' },
-            { token: '--p-radius-lg',   value: '14px',   use: 'Cards, dialogs' },
-            { token: '--p-radius-xl',   value: '20px',   use: 'Full-width buttons, modals' },
-            { token: '--p-radius-full', value: '9999px', use: 'Pills, avatars' },
-          ].map(({ token, value, use }) => (
-            <div key={token} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          {Object.entries(tokens.radii).map(([key, value]) => (
+            <div key={key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
               <div style={{
                 width: 80, height: 80,
-                background: 'var(--pcs-colors-surface-card)',
-                border: '1px solid var(--pcs-colors-border)',
-                borderRadius: `var(${token})`,
+                background: 'var(--pcs-colors-card)',
+                border: '1px solid var(--pcs-colors-card-border)',
+                borderRadius: value,
               }} />
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 11, fontFamily: 'monospace', color: 'var(--pcs-colors-text-muted)', marginBottom: 2 }}>{value}</div>
-                <div style={{ fontSize: 10, color: 'var(--pcs-colors-text-subtle)' }}>{use}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--pcs-colors-text)' }}>{key}</div>
+                <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--pcs-colors-text-subtle)' }}>{value}</div>
               </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Raw values ── */}
+      <section style={{ marginBottom: 48 }}>
+        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-subtle)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16, marginTop: 0 }}>
+          Raw Shadow Values
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {Object.entries(shadows).map(([name, value]) => (
+            <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '8px 0', borderBottom: '1px solid var(--pcs-colors-card-border)' }}>
+              <div style={{ width: 80, fontSize: 12, fontWeight: 600, color: 'var(--pcs-colors-text)', flexShrink: 0 }}>{name}</div>
+              <div style={{ fontSize: 10, fontFamily: 'monospace', color: 'var(--pcs-colors-text-subtle)', lineHeight: 1.4 }}>{value}</div>
             </div>
           ))}
         </div>
@@ -154,4 +134,4 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = { name: 'Elevation & State Rings' }
+export const Default: Story = { name: 'Shadows & Radii' }
