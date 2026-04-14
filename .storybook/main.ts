@@ -25,6 +25,9 @@ const config: StorybookConfig = {
       'styled-system',
       '@styled-system/should-forward-prop',
       'clsx',
+      'primereact/multiselect',
+      'primereact/selectitem',
+      'lodash/noop',
     ];
     return config;
   },

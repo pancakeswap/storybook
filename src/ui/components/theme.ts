@@ -64,9 +64,16 @@ export const pcsTheme = {
     active:  'var(--pcs-shadows-active)',
     success: 'var(--pcs-shadows-success)',
     warning: 'var(--pcs-shadows-warning)',
+    danger:  'var(--pcs-shadows-danger)',
     focus:   'var(--pcs-shadows-focus)',
     inset:   'var(--pcs-shadows-inset)',
     tooltip: 'var(--pcs-shadows-dropdown)',
+  },
+  toggle: {
+    handleBackground: v('background-alt'),
+  },
+  radio: {
+    handleBackground: v('background-alt'),
   },
   card: {
     background: v('card'),
