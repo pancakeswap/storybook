@@ -12,7 +12,7 @@ function truncateAddress(address: string): string {
 const Container = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 `;
 
 const PfpContainer = styled.div<{ $size: number }>`
@@ -101,17 +101,7 @@ export default function WalletAvatar({
           </WalletBadge>
         )}
       </PfpContainer>
-      <Text
-        bold
-        fontSize={`${fontSize}px`}
-        style={{
-          fontFamily: 'Kanit, sans-serif',
-          lineHeight: '120%',
-          letterSpacing: '-0.32px',
-          fontFeatureSettings: '"liga" off',
-          color: 'var(--pcs-colors-text)',
-        }}
-      >
+      <Text bold fontSize={`${fontSize}px`} style={{ letterSpacing: "-0.32px", lineHeight: 1.2 }}>
         {truncateAddress(address)}
       </Text>
       <CopyButton onClick={handleCopy} aria-label="Copy address">
