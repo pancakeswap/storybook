@@ -4,16 +4,17 @@
  */
 import type { ReactNode } from 'react'
 import { Button } from '../components/Button'
-import { Text } from '../components/Text'
-import { TabMenu, Tab } from '../components/TabMenu'
+import { WalletAvatar } from '../widgets/WalletAvatar'
+import { DropdownMenu } from '../widgets/DropdownMenu'
 import {
   LogoWithTextIcon,
   SearchIcon,
-  CopyIcon,
   ChevronDownIcon,
   ShareIcon,
   NotificationBellIcon,
   SettingsIcon,
+  LinkIcon,
+  TwitterIcon,
 } from '../Icons'
 
 /* ── Types ─────────────────────────────────────────────────── */
@@ -145,90 +146,183 @@ export function AppNav() {
   )
 }
 
+/* ── Page Header sub-components ──────────────────────────────── */
+
+const SHARE_ITEMS = [
+  { label: 'Copy link', icon: <LinkIcon size={16} /> },
+  { label: 'Share on X', icon: <TwitterIcon size={16} /> },
+]
+
+function ChainIcon({ src, alt }: { src: string; alt: string }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      style={{ width: 24, height: 24, borderRadius: 6, display: 'block', flexShrink: 0 }}
+    />
+  )
+}
+
+const NETWORK_ITEMS = [
+  { label: 'All networks' },
+  {
+    label: 'BNB Chain',
+    icon: <ChainIcon src="https://assets.pancakeswap.finance/web/chains/square/56.svg" alt="BNB Chain" />,
+  },
+  {
+    label: 'Ethereum',
+    icon: <ChainIcon src="https://assets.pancakeswap.finance/web/chains/square/1.svg" alt="Ethereum" />,
+  },
+  {
+    label: 'Base',
+    icon: <ChainIcon src="https://assets.pancakeswap.finance/web/chains/square/8453.svg" alt="Base" />,
+  },
+  {
+    label: 'Arbitrum',
+    icon: <ChainIcon src="https://assets.pancakeswap.finance/web/chains/square/42161.svg" alt="Arbitrum" />,
+  },
+]
+
+// Overlapping chain icon cluster — matches Figma "Network multiselect button"
+const CHAIN_ICON_URLS = [
+  'https://assets.pancakeswap.finance/web/chains/square/56.svg',    // BNB
+  'https://assets.pancakeswap.finance/web/chains/square/1.svg',     // ETH
+  'https://assets.pancakeswap.finance/web/chains/square/8453.svg',  // Base
+]
+
+function NetworkIconsCluster() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', flexShrink: 0 }}>
+      {CHAIN_ICON_URLS.map((url, i) => (
+        <div
+          key={url}
+          style={{
+            display: 'flex',
+            width: 24,
+            height: 24,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 8,
+            border: '2px solid var(--V1-Main-Input-primary, #EEEAF4)',
+            background: '#1E1E1E',
+            marginLeft: i > 0 ? -8 : 0,
+            position: 'relative',
+            zIndex: CHAIN_ICON_URLS.length - i,
+            flexShrink: 0,
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+          }}
+        >
+          <img
+            src={url}
+            alt=""
+            style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
+          />
+        </div>
+      ))}
+      <span
+        style={{
+          marginLeft: 4,
+          fontSize: 12,
+          fontWeight: 600,
+          fontFamily: 'Kanit, sans-serif',
+          color: 'var(--pcs-colors-text-subtle)',
+          alignSelf: 'center',
+        }}
+      >
+        +6
+      </span>
+    </div>
+  )
+}
+
 /* ── Page Header ─────────────────────────────────────────────── */
 
 export function PageHeader() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0 0' }}>
-      {/* Left: wallet avatar + address */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1FC7D4, #7645D9)',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              bottom: -2,
-              right: -2,
-              width: 16,
-              height: 16,
-              borderRadius: '50%',
-              background: '#F0B90B',
-              border: '2px solid var(--pcs-colors-background)',
-            }}
-          />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Text bold fontSize="16px">0x40Cf...5461</Text>
-          <button
-            aria-label="Copy address"
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--pcs-colors-text-subtle)',
-              padding: 2,
-              display: 'flex',
-            }}
-          >
-            <CopyIcon size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* Center: stats */}
-      <div style={{ display: 'flex', gap: 32 }}>
-        {[
-          { label: 'Positions', value: '0' },
-          { label: '7D Swaps', value: '3' },
-          { label: '7d Volume', value: '$100.98' },
-        ].map(({ label, value }) => (
-          <div key={label} style={{ textAlign: 'center' }}>
-            <Text fontSize="12px" color="textSubtle" style={{ marginBottom: 2 }}>
-              {label}
-            </Text>
-            <Text bold fontSize="20px" style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {value}
-            </Text>
-          </div>
-        ))}
-      </div>
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', paddingLeft: 16, gap: 2, alignSelf: 'stretch', paddingTop: 40 }}>
+      {/* Left: wallet avatar — H2 Mobile: 16px / 600 / lineHeight 1.5 / tracking 0 */}
+      <WalletAvatar
+        address="0x40Cf56E5bB1C8F11bC1b1cd6a5c7bAdE2E2a5461"
+        fontSize={32}
+      />
 
       {/* Right: share + network */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Button variant="light" scale="sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <ShareIcon size={16} />
-          Share
-        </Button>
-        <Button variant="light" scale="sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div
-            style={{
-              width: 16,
-              height: 16,
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1FC7D4 0%, #9A6AFF 50%, #F0B90B 100%)',
-            }}
-          />
-          All networks
-          <ChevronDownIcon size={14} />
-        </Button>
+
+        {/* Share — text left, icon right, 12px h-padding, 9px v-padding, 8px gap */}
+        <DropdownMenu
+          trigger={
+            <Button
+              variant="light"
+              scale="sm"
+              style={{ padding: '9px 12px', display: 'flex', alignItems: 'center', gap: 8, height: 'auto' }}
+            >
+              Share
+              <ShareIcon size={16} />
+            </Button>
+          }
+          items={SHARE_ITEMS}
+        />
+
+        {/* Networks — 16px left, icons+6, 8px gap, label, 8px gap, chevron, 8px right, 9px v */}
+        <DropdownMenu
+          trigger={
+            <Button
+              variant="light"
+              scale="sm"
+              style={{ padding: '9px 8px 9px 16px', display: 'flex', alignItems: 'center', gap: 8, height: 'auto' }}
+            >
+              <NetworkIconsCluster />
+              All networks
+              <ChevronDownIcon size={14} />
+            </Button>
+          }
+          items={NETWORK_ITEMS}
+          placement="bottom-end"
+        />
       </div>
+    </div>
+  )
+}
+
+/* ── Wallet Tabs ─────────────────────────────────────────────── */
+
+const WALLET_TAB_LABELS = ['Overview', 'Positions', 'History'] as const
+
+function WalletTabs({ activeTab, onTabChange }: { activeTab: WalletTab; onTabChange: (tab: WalletTab) => void }) {
+  return (
+    <div
+      role="tablist"
+      style={{
+        display: 'flex',
+      }}
+    >
+      {WALLET_TAB_LABELS.map((label, i) => {
+        const isActive = activeTab === i
+        return (
+          <button
+            key={label}
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onTabChange(i as WalletTab)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: i === 0 ? '12px 12px 12px 16px' : '12px',
+              cursor: 'pointer',
+              fontFamily: 'Kanit, sans-serif',
+              fontSize: 16,
+              fontWeight: isActive ? 600 : 400,
+              lineHeight: 1.5,
+              color: isActive ? 'var(--pcs-colors-secondary)' : 'var(--pcs-colors-text-subtle)',
+              transition: 'color 0.2s',
+            }}
+          >
+            {label}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -250,16 +344,8 @@ export function WalletPageShell({ activeTab, onTabChange, children }: WalletPage
           <PageHeader />
 
           {/* Page tabs */}
-          <div style={{ marginTop: 12, marginBottom: 24 }}>
-            <TabMenu
-              activeIndex={activeTab}
-              onItemClick={(i) => onTabChange(i as WalletTab)}
-              isShowBorderBottom
-            >
-              <Tab>Overview</Tab>
-              <Tab>Position</Tab>
-              <Tab>History</Tab>
-            </TabMenu>
+          <div style={{ marginTop: 0, marginBottom: 12 }}>
+            <WalletTabs activeTab={activeTab} onTabChange={onTabChange} />
           </div>
 
           {children}

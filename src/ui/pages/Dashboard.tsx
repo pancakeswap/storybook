@@ -4,8 +4,10 @@ import { Button } from '../components/Button'
 import { Text } from '../components/Text'
 import { TableView } from '../components/TableView'
 import type { IColumnsType, ISortOrder } from '../components/TableView/Table'
+import { TokenDisplay } from '../widgets/TokenDisplay'
+import type { TokenInfo } from '../widgets/TokenDisplay'
+import { SearchIcon, MoreHorizontalIcon, ChevronDownIcon, InfoIcon } from '../Icons'
 import { Checkbox } from '../components/Checkbox'
-import { SearchIcon, MoreHorizontalIcon } from '../Icons'
 import { WalletPageShell } from './wallet-shared'
 import type { WalletTab } from './wallet-shared'
 
@@ -14,8 +16,8 @@ import type { WalletTab } from './wallet-shared'
 interface Token {
   id: string
   symbol: string
-  name: string
   chain: string
+  tokenInfo: TokenInfo
   price: number
   change1d: number
   balanceAmount: number
@@ -24,18 +26,128 @@ interface Token {
   allocation: number
 }
 
-type TimeRange = 'D' | 'W' | 'M' | 'All'
-
 /* ── Data ──────────────────────────────────────────────────── */
 
 const TOKENS: Token[] = [
-  { id: '1', symbol: 'BNB',  name: 'BNB',      chain: 'BNB Chain',  price: 590.75,   change1d:  1.20, balanceAmount: 0.542,   balanceSymbol: 'BNB',  value: 320.15, allocation: 16.93 },
-  { id: '2', symbol: 'CAKE', name: 'PancakeSwap', chain: 'BNB Chain', price: 1.46,   change1d: -0.83, balanceAmount: 144.11, balanceSymbol: 'CAKE', value: 210.40, allocation: 11.12 },
-  { id: '3', symbol: 'ETH',  name: 'Ethereum',  chain: 'Ethereum',   price: 2181.25,  change1d:  0.46, balanceAmount: 0.206,  balanceSymbol: 'ETH',  value: 450.30, allocation: 23.79 },
-  { id: '4', symbol: 'WETH', name: 'Wrapped ETH', chain: 'Ethereum', price: 2199.85, change1d:  0.51, balanceAmount: 0.082,  balanceSymbol: 'WETH', value: 180.25, allocation:  9.52 },
-  { id: '5', symbol: 'USDC', name: 'USD Coin',  chain: 'Ethereum',   price: 1.00,     change1d:  0.01, balanceAmount: 275.50, balanceSymbol: 'USDC', value: 275.50, allocation: 14.56 },
-  { id: '6', symbol: 'USDC', name: 'USD Coin',  chain: 'Base',       price: 1.00,     change1d:  0.01, balanceAmount: 210.66, balanceSymbol: 'USDC', value: 210.66, allocation: 11.13 },
-  { id: '7', symbol: 'USDT', name: 'Tether',    chain: 'Arbitrum',   price: 1.00,     change1d: -0.01, balanceAmount: 245.00, balanceSymbol: 'USDT', value: 245.00, allocation: 12.95 },
+  {
+    id: '1',
+    symbol: 'BNB',
+    chain: 'BNB Chain',
+    tokenInfo: {
+      symbol: 'BNB',
+      chainName: 'BNB chain',
+      logoUrls: ['https://tokens.pancakeswap.finance/images/symbol/bnb.png'],
+      chainLogoUrl: 'https://assets.pancakeswap.finance/web/chains/square/56.svg',
+    },
+    price: 590.75,
+    change1d: 1.20,
+    balanceAmount: 0.542,
+    balanceSymbol: 'BNB',
+    value: 320.15,
+    allocation: 16.93,
+  },
+  {
+    id: '2',
+    symbol: 'CAKE',
+    chain: 'BNB Chain',
+    tokenInfo: {
+      symbol: 'CAKE',
+      chainName: 'BNB chain',
+      logoUrls: ['https://tokens.pancakeswap.finance/images/symbol/cake.png'],
+      chainLogoUrl: 'https://assets.pancakeswap.finance/web/chains/square/56.svg',
+    },
+    price: 1.46,
+    change1d: -0.83,
+    balanceAmount: 144.11,
+    balanceSymbol: 'CAKE',
+    value: 210.40,
+    allocation: 11.12,
+  },
+  {
+    id: '3',
+    symbol: 'ETH',
+    chain: 'Ethereum',
+    tokenInfo: {
+      symbol: 'ETH',
+      chainName: 'ETHEREUM',
+      logoUrls: ['https://tokens.pancakeswap.finance/images/symbol/eth.png'],
+      chainLogoUrl: 'https://assets.pancakeswap.finance/web/chains/square/1.svg',
+    },
+    price: 2181.25,
+    change1d: 0.46,
+    balanceAmount: 0.206,
+    balanceSymbol: 'ETH',
+    value: 450.30,
+    allocation: 23.79,
+  },
+  {
+    id: '4',
+    symbol: 'WETH',
+    chain: 'Ethereum',
+    tokenInfo: {
+      symbol: 'WETH',
+      chainName: 'ETHEREUM',
+      logoUrls: ['https://tokens.pancakeswap.finance/images/symbol/weth.png'],
+      chainLogoUrl: 'https://assets.pancakeswap.finance/web/chains/square/1.svg',
+    },
+    price: 2199.85,
+    change1d: 0.51,
+    balanceAmount: 0.082,
+    balanceSymbol: 'WETH',
+    value: 180.25,
+    allocation: 9.52,
+  },
+  {
+    id: '5',
+    symbol: 'USDC',
+    chain: 'Ethereum',
+    tokenInfo: {
+      symbol: 'USDC',
+      chainName: 'ETHEREUM',
+      logoUrls: ['https://tokens.pancakeswap.finance/images/symbol/usdc.png'],
+      chainLogoUrl: 'https://assets.pancakeswap.finance/web/chains/square/1.svg',
+    },
+    price: 1.00,
+    change1d: 0.01,
+    balanceAmount: 275.50,
+    balanceSymbol: 'USDC',
+    value: 275.50,
+    allocation: 14.56,
+  },
+  {
+    id: '6',
+    symbol: 'USDC',
+    chain: 'Base',
+    tokenInfo: {
+      symbol: 'USDC',
+      chainName: 'BASE',
+      logoUrls: ['https://tokens.pancakeswap.finance/images/symbol/usdc.png'],
+      chainLogoUrl: 'https://assets.pancakeswap.finance/web/chains/square/8453.svg',
+    },
+    price: 1.00,
+    change1d: 0.01,
+    balanceAmount: 210.66,
+    balanceSymbol: 'USDC',
+    value: 210.66,
+    allocation: 11.13,
+  },
+  {
+    id: '7',
+    symbol: 'USDT',
+    chain: 'Arbitrum',
+    tokenInfo: {
+      symbol: 'USDT',
+      chainName: 'ARBITRUM',
+      logoUrls: ['https://tokens.pancakeswap.finance/images/symbol/usdt.png'],
+      chainLogoUrl: 'https://assets.pancakeswap.finance/web/chains/square/42161.svg',
+    },
+    price: 1.00,
+    change1d: -0.01,
+    balanceAmount: 245.00,
+    balanceSymbol: 'USDT',
+    value: 245.00,
+    allocation: 12.95,
+  },
 ]
 
 const PORTFOLIO_TOTAL = 1892.26
@@ -45,9 +157,10 @@ const PORTFOLIO_TOTAL = 1892.26
 const CHART_VALUES = [850, 720, 650, 690, 1100, 1430, 1680, 1730, 1680, 1810, 1892]
 const CHART_X_LABELS = ['1:00 AM', '5:00 AM', '9:00 AM', '1:00 PM', '5:00 PM', '9:00 PM']
 const CHART_Y_LABELS = ['$3,000', '$2,500', '$2,000', '$1,500', '$1,000', '$500']
+const TIME_RANGES = ['1D', '1W', '1M', '3M', '1Y']
 
 const CHART_W = 860
-const CHART_H = 220
+const CHART_H = 340
 const CHART_PAD_TOP = 8
 const CHART_PAD_BOTTOM = 32
 const CHART_PAD_RIGHT = 52
@@ -66,7 +179,6 @@ function buildChartPath() {
     y: valueToY(v),
   }))
 
-  // Smooth cubic bezier using midpoints as control points
   let line = `M ${pts[0].x} ${pts[0].y}`
   for (let i = 1; i < pts.length; i++) {
     const p0 = pts[i - 1]
@@ -105,75 +217,57 @@ function fmtValue(n: number) {
 
 /* ── Sub-components ─────────────────────────────────────────── */
 
-const TOKEN_COLORS: Record<string, string> = {
-  BNB:  '#F0B90B',
-  CAKE: '#1FC7D4',
-  ETH:  '#627EEA',
-  WETH: '#8A96C6',
-  USDC: '#2775CA',
-  USDT: '#26A17B',
-}
-
-function TokenAvatar({ symbol }: { symbol: string }) {
-  const bg = TOKEN_COLORS[symbol] ?? 'var(--pcs-colors-tertiary)'
-  return (
-    <div
-      role="img"
-      aria-label={symbol}
-      style={{
-        width: 40, height: 40, borderRadius: '50%',
-        background: bg, flexShrink: 0,
-      }}
-    />
-  )
-}
-
-function ChainBadge({ chain }: { chain: string }) {
-  const CHAIN_COLORS: Record<string, string> = {
-    'BNB Chain': '#F0B90B',
-    'Ethereum': '#627EEA',
-    'Base': '#0052FF',
-    'Arbitrum': '#12AAFF',
-  }
-  return (
-    <Text fontSize="12px" color="textSubtle" style={{ marginTop: 2 }}>
-      <span style={{
-        display: 'inline-block',
-        width: 6, height: 6, borderRadius: '50%',
-        background: CHAIN_COLORS[chain] ?? 'var(--pcs-colors-textSubtle)',
-        marginRight: 4, verticalAlign: 'middle',
-      }} />
-      {chain}
-    </Text>
-  )
-}
-
 function PnlTag({ value }: { value: number }) {
   const positive = value >= 0
   const color = positive ? 'var(--pcs-colors-success)' : 'var(--pcs-colors-failure)'
   const bg = positive ? 'rgba(49,208,170,0.1)' : 'rgba(237,75,158,0.1)'
   return (
     <span style={{
-      display: 'inline-flex', alignItems: 'center',
-      background: bg, color,
-      padding: '2px 8px', borderRadius: 8,
-      fontSize: 14, fontWeight: 600,
+      display: 'inline-flex',
+      justifyContent: 'flex-end',
+      alignItems: 'center',
+      gap: 2,
+      background: bg,
+      color,
+      padding: '2px 8px',
+      borderRadius: 999,
+      fontSize: 14,
+      fontWeight: 600,
       fontVariantNumeric: 'tabular-nums',
+      fontFamily: 'Kanit, sans-serif',
     }}>
-      {positive ? '+' : ''}{value.toFixed(2)}%
+      <span style={{ fontSize: 10, lineHeight: 1 }}>{positive ? '▲' : '▼'}</span>
+      <span>{Math.abs(value).toFixed(1)}%</span>
     </span>
   )
 }
 
 function AllocationBar({ pct }: { pct: number }) {
-  const filledPx = Math.round((pct / 100) * 60)
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <Text fontSize="14px" style={{ fontVariantNumeric: 'tabular-nums', minWidth: 44, textAlign: 'right' }}>
         {pct.toFixed(2)}%
       </Text>
-      <div style={{ width: 60, height: 6, borderRadius: 3, background: 'var(--pcs-colors-input)', overflow: 'hidden', flexShrink: 0 }}>
-        <div style={{ width: filledPx, height: '100%', borderRadius: 3, background: 'var(--pcs-colors-primary)' }} />
+      {/* Track */}
+      <div style={{
+        width: 60,
+        height: 8,
+        borderRadius: 999,
+        border: '1px solid var(--pcs-colors-input-secondary)',
+        background: 'var(--pcs-colors-input)',
+        boxShadow: '0 2px 0 -1px rgba(0, 0, 0, 0.06) inset',
+        flexShrink: 0,
+        overflow: 'hidden',
+        boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {/* Fill */}
+        <div style={{
+          width: `${pct}%`,
+          height: '100%',
+          borderRadius: 999,
+          background: 'var(--pcs-colors-secondary)',
+        }} />
       </div>
     </div>
   )
@@ -182,50 +276,80 @@ function AllocationBar({ pct }: { pct: number }) {
 /* ── Portfolio Chart ─────────────────────────────────────────── */
 
 function PortfolioChart() {
-  const [range, setRange] = useState<TimeRange>('D')
+  const [rangeIndex, setRangeIndex] = useState(0)
 
   return (
-    <Card style={{ marginBottom: 16 }}>
-      <CardBody style={{ padding: '20px 20px 16px' }}>
+    <Card style={{ flex: 1 }}>
+      <CardBody style={{ padding: '20px 20px 16px', display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
         {/* Header row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4, flexShrink: 0 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-              <Text bold fontSize="20px" style={{ fontVariantNumeric: 'tabular-nums' }}>
+              <Text
+                style={{
+                  fontFamily: 'Kanit, sans-serif',
+                  fontSize: '26.343px',
+                  fontWeight: 600,
+                  lineHeight: '110%',
+                  color: 'var(--pcs-colors-text)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 $1,892.26
               </Text>
-              <span style={{
-                background: 'rgba(49,208,170,0.15)', color: 'var(--pcs-colors-success)',
-                padding: '2px 6px', borderRadius: 6, fontSize: 12, fontWeight: 600,
-              }}>
-                +7.1%
-              </span>
+              <PnlTag value={7.1} />
             </div>
-            <Text color="textSubtle" fontSize="12px">Mar 26, 2024 UTC</Text>
+            <Text color="textSubtle" fontSize="12px">Mar 25, 2024 UTC</Text>
           </div>
 
-          {/* Time range buttons */}
-          <div style={{ display: 'flex', gap: 4 }}>
-            {(['D', 'W', 'M', 'All'] as TimeRange[]).map((r) => (
-              <Button
+          {/* Time range selector */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: 'var(--pcs-colors-input)',
+            border: '1px solid var(--pcs-colors-input-secondary)',
+            borderRadius: 16,
+            padding: 4,
+            gap: 2,
+          }}>
+            {TIME_RANGES.map((r, i) => (
+              <button
                 key={r}
-                variant={range === r ? 'primary' : 'light'}
-                scale="xs"
-                onClick={() => setRange(r)}
-                style={{ minWidth: 32 }}
+                onClick={() => setRangeIndex(i)}
+                style={{
+                  display: 'flex',
+                  width: 47,
+                  padding: 4,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  background: rangeIndex === i ? 'var(--V1-Fill-Secondary, #7A6EAA)' : 'transparent',
+                  border: 'none',
+                  borderRadius: 16,
+                  cursor: 'pointer',
+                  fontFamily: 'Kanit, sans-serif',
+                  fontSize: 14,
+                  fontWeight: rangeIndex === i ? 600 : 400,
+                  lineHeight: '150%',
+                  color: rangeIndex === i ? '#FFFFFF' : 'var(--pcs-colors-text-subtle)',
+                  transition: 'background 0.15s, color 0.15s',
+                  whiteSpace: 'nowrap',
+                  boxSizing: 'border-box',
+                }}
               >
                 {r}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
 
-        {/* SVG Chart */}
-        <div style={{ position: 'relative', marginTop: 8 }}>
+        {/* SVG Chart — fills remaining card height */}
+        <div style={{ position: 'relative', marginTop: 8, flex: 1, minHeight: 0 }}>
           <svg
             viewBox={`0 0 ${CHART_W} ${CHART_H}`}
             preserveAspectRatio="none"
-            style={{ width: '100%', height: 220, display: 'block' }}
+            style={{ width: '100%', height: '100%', display: 'block' }}
+            aria-label="Portfolio value chart"
+            role="img"
           >
             <defs>
               <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
@@ -311,23 +435,35 @@ function TokenTable() {
 
   const filtered = TOKENS.filter((t) => {
     if (hideSmall && t.value < 10) return false
+    if (!showHidden && t.value === 0) return false
     if (search) {
       const q = search.toLowerCase()
-      return t.symbol.toLowerCase().includes(q) || t.name.toLowerCase().includes(q) || t.chain.toLowerCase().includes(q)
+      return t.symbol.toLowerCase().includes(q) || t.chain.toLowerCase().includes(q)
     }
     return true
   })
 
   const sorted = sortField && sortOrder
     ? [...filtered].sort((a, b) => {
-        const av = a[sortField as keyof Token] as number
-        const bv = b[sortField as keyof Token] as number
+        const av = a[sortField as keyof Token]
+        const bv = b[sortField as keyof Token]
         if (typeof av === 'number' && typeof bv === 'number') {
           return sortOrder === 'ASC' ? av - bv : bv - av
         }
         return 0
       })
     : filtered
+
+  const cellTextStyle: React.CSSProperties = {
+    fontFamily: 'Kanit, sans-serif',
+    fontSize: '16px',
+    fontWeight: 400,
+    lineHeight: '150%',
+    fontFeatureSettings: '"liga" off',
+    color: 'var(--pcs-colors-text)',
+    textAlign: 'right',
+    fontVariantNumeric: 'tabular-nums',
+  }
 
   const handleSort = useCallback(
     ({ dataIndex, order }: { dataIndex: keyof Token | null; order: ISortOrder }) => {
@@ -344,13 +480,7 @@ function TokenTable() {
       dataIndex: 'symbol',
       minWidth: '200px',
       render: (_, record) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <TokenAvatar symbol={record.symbol} />
-          <div>
-            <Text bold fontSize="14px">{record.symbol}</Text>
-            <ChainBadge chain={record.chain} />
-          </div>
-        </div>
+        <TokenDisplay token={record.tokenInfo} size={40} />
       ),
     },
     {
@@ -358,10 +488,9 @@ function TokenTable() {
       title: 'PRICE',
       dataIndex: 'price',
       sorter: true,
+      align: 'right',
       render: (val: number) => (
-        <Text fontSize="14px" style={{ fontVariantNumeric: 'tabular-nums' }}>
-          {fmtPrice(val)}
-        </Text>
+        <Text style={cellTextStyle}>{fmtPrice(val)}</Text>
       ),
     },
     {
@@ -369,6 +498,7 @@ function TokenTable() {
       title: '1D CHANGE',
       dataIndex: 'change1d',
       sorter: true,
+      align: 'center',
       render: (val: number) => <PnlTag value={val} />,
     },
     {
@@ -376,10 +506,10 @@ function TokenTable() {
       title: 'BALANCE',
       dataIndex: 'balanceAmount',
       sorter: true,
+      align: 'right',
+      width: '155px',
       render: (_, record) => (
-        <Text fontSize="14px" style={{ fontVariantNumeric: 'tabular-nums' }}>
-          {fmtAmount(record.balanceAmount, record.balanceSymbol)}
-        </Text>
+        <Text style={cellTextStyle}>{fmtAmount(record.balanceAmount, record.balanceSymbol)}</Text>
       ),
     },
     {
@@ -387,10 +517,9 @@ function TokenTable() {
       title: 'VALUE',
       dataIndex: 'value',
       sorter: true,
+      align: 'right',
       render: (val: number) => (
-        <Text bold fontSize="14px" style={{ fontVariantNumeric: 'tabular-nums' }}>
-          {fmtValue(val)}
-        </Text>
+        <Text style={cellTextStyle}>{fmtValue(val)}</Text>
       ),
     },
     {
@@ -398,6 +527,7 @@ function TokenTable() {
       title: 'ALLOCATION',
       dataIndex: 'allocation',
       sorter: true,
+      align: 'left',
       render: (val: number) => <AllocationBar pct={val} />,
     },
     {
@@ -423,8 +553,10 @@ function TokenTable() {
   return (
     <Card>
       {/* Filter row */}
-      <div style={{ padding: '16px 24px 0', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: '1 1 220px', maxWidth: 320 }}>
+      <div style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+        {/* Search / token selector */}
+        <style>{`.token-search::placeholder { color: var(--pcs-colors-text); opacity: 1; font-family: Kanit, sans-serif; font-size: 16px; font-weight: 400; }`}</style>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 16, flex: '1 0 0', minWidth: 456 }}>
           <SearchIcon
             size={16}
             style={{
@@ -433,39 +565,75 @@ function TokenTable() {
             }}
           />
           <input
+            className="token-search"
             placeholder="All tokens"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
-              width: '100%', height: 36,
+              width: '100%', height: 40,
               background: 'var(--pcs-colors-input)',
-              border: '1px solid var(--pcs-colors-input-secondary)',
-              borderRadius: 12, paddingLeft: 36, paddingRight: 12,
+              borderTop: '1px solid var(--pcs-colors-input-secondary)',
+              borderRight: '1px solid var(--pcs-colors-input-secondary)',
+              borderBottom: '2px solid var(--pcs-colors-input-secondary)',
+              borderLeft: '1px solid var(--pcs-colors-input-secondary)',
+              borderRadius: 16,
+              paddingLeft: 36, paddingRight: 36,
               color: 'var(--pcs-colors-text)',
-              fontSize: 14, fontFamily: 'Kanit, sans-serif',
+              fontFamily: 'Kanit, sans-serif',
+              fontSize: 16,
+              fontWeight: 400,
+              lineHeight: '150%',
+              fontFeatureSettings: '"liga" off',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
               outline: 'none',
               boxSizing: 'border-box',
             }}
           />
+          <ChevronDownIcon
+            size={16}
+            style={{
+              position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+              color: 'var(--pcs-colors-text-subtle)', pointerEvents: 'none',
+            }}
+          />
         </div>
 
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flexShrink: 0 }}>
-          <Checkbox
-            scale="sm"
-            checked={hideSmall}
-            onChange={(e) => setHideSmall(e.target.checked)}
-          />
-          <Text fontSize="14px" color="textSubtle">Hide small balances</Text>
-        </label>
+        {/* Options card — 8px padding all sides, 10px gap between options */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: 8,
+            background: 'var(--pcs-colors-background)',
+            borderTop: '1px solid var(--pcs-colors-card-border)',
+            borderRight: '1px solid var(--pcs-colors-card-border)',
+            borderBottom: '2px solid var(--pcs-colors-card-border)',
+            borderLeft: '1px solid var(--pcs-colors-card-border)',
+            borderRadius: 16,
+            flexShrink: 0,
+          }}
+        >
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+            <Text fontSize="14px" color="textSubtle">Hide small balances</Text>
+            <InfoIcon size={16} style={{ color: 'var(--pcs-colors-text-disabled)', flexShrink: 0 }} />
+            <Checkbox
+              scale="sm"
+              checked={hideSmall}
+              onChange={(e) => setHideSmall(e.target.checked)}
+            />
+          </label>
 
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', flexShrink: 0 }}>
-          <Checkbox
-            scale="sm"
-            checked={showHidden}
-            onChange={(e) => setShowHidden(e.target.checked)}
-          />
-          <Text fontSize="14px" color="textSubtle">Show hidden tokens</Text>
-        </label>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+            <Text fontSize="14px" color="textSubtle">Show hidden tokens</Text>
+            <Checkbox
+              scale="sm"
+              checked={showHidden}
+              onChange={(e) => setShowHidden(e.target.checked)}
+            />
+          </label>
+        </div>
       </div>
 
       <TableView<Token>
@@ -482,46 +650,100 @@ function TokenTable() {
 
 /* ── Portfolio Breakdown ─────────────────────────────────────── */
 
+const BREAKDOWN_ITEMS = [
+  { label: 'Wallet balance', pct: 62, value: 1173.20, color: 'var(--pcs-colors-primary)' },
+  { label: 'Positions',      pct: 38, value:  719.06, color: 'var(--pcs-colors-secondary)' },
+  { label: 'Unclaimed rewards', pct: 0, value: 0,     color: 'var(--pcs-colors-failure)' },
+]
+
 function PortfolioBreakdown() {
   return (
     <Card>
       <CardBody>
-        {/* Header */}
-        <Text fontSize="12px" color="textSubtle" bold style={{ letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+        {/* Header — Pretitle: 12px/600/uppercase/tracking 0.24px */}
+        <Text
+          fontSize="12px"
+          color="textSubtle"
+          bold
+          style={{ letterSpacing: '0.24px', textTransform: 'uppercase', lineHeight: 1.5, marginBottom: 12 }}
+        >
           My Portfolio Breakdown
         </Text>
 
         {/* Total value */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-          <Text bold fontSize="20px" style={{ fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+          <Text
+            bold
+            fontSize="32px"
+            style={{
+              fontFamily: 'Kanit, sans-serif',
+              fontWeight: 600,
+              lineHeight: '120%',
+              letterSpacing: '-0.32px',
+              fontFeatureSettings: '"liga" off',
+              color: 'var(--pcs-colors-text)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             ${PORTFOLIO_TOTAL.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </Text>
-          <span style={{
-            background: 'rgba(49,208,170,0.15)', color: 'var(--pcs-colors-success)',
-            padding: '2px 8px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-          }}>
-            +171%
-          </span>
+          <PnlTag value={171} />
         </div>
 
-        {/* Stat rows */}
-        {[
-          { label: 'Wallet Balance', value: '$1,892.26' },
-          { label: 'Positions', value: '$0.00' },
-          { label: 'Unclaimed rewards', value: '$0.00' },
-        ].map(({ label, value }) => (
+        {/* Multi-segment allocation bar */}
+        {(() => {
+          const visible = BREAKDOWN_ITEMS.filter((i) => i.pct > 0)
+          return (
+            <div style={{ display: 'flex', height: 12, marginBottom: 24, gap: 2 }}>
+              {visible.map((item, i) => {
+                const isFirst = i === 0
+                const isLast = i === visible.length - 1
+                const radius = isFirst && isLast
+                  ? '99px'
+                  : isFirst
+                  ? '99px 0 0 99px'
+                  : isLast
+                  ? '0 99px 99px 0'
+                  : '0'
+                const background = isFirst
+                  ? 'linear-gradient(180deg, #53DEE9 0%, #1FC7D4 100%)'
+                  : item.color
+                return (
+                  <div
+                    key={item.label}
+                    style={{ flex: item.pct, background, borderRadius: radius }}
+                  />
+                )
+              })}
+            </div>
+          )
+        })()}
+
+        {/* Breakdown rows — 8px gap, no borders */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {BREAKDOWN_ITEMS.map(({ label, pct, value, color }) => (
           <div
             key={label}
             style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '10px 0',
-              borderBottom: '1px solid var(--pcs-colors-card-border)',
             }}
           >
-            <Text fontSize="14px" color="textSubtle">{label}</Text>
-            <Text bold fontSize="14px" style={{ fontVariantNumeric: 'tabular-nums' }}>{value}</Text>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+              <div style={{ width: 4, height: 42, borderRadius: 2, background: color, flexShrink: 0, marginTop: 2 }} />
+              <div>
+                {/* H2 Mobile: 16px / 600 / textSubtle */}
+                <Text fontSize="16px" bold color="textSubtle" style={{ lineHeight: 1.5 }}>{label}</Text>
+                <Text fontSize="12px" color="textSubtle" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  {pct}%
+                </Text>
+              </div>
+            </div>
+            <Text bold fontSize="14px" style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {fmtValue(value)}
+            </Text>
           </div>
         ))}
+        </div>
 
         {/* Action buttons */}
         <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
@@ -535,16 +757,9 @@ function PortfolioBreakdown() {
 
         {/* Buy crypto link */}
         <div style={{ textAlign: 'center', marginTop: 12 }}>
-          <button
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'var(--pcs-colors-primary)', fontSize: 14,
-              fontFamily: 'Kanit, sans-serif', fontWeight: 600,
-              textDecoration: 'underline', padding: 0,
-            }}
-          >
+          <Button variant="text" scale="sm">
             Buy crypto
-          </button>
+          </Button>
         </div>
       </CardBody>
     </Card>
@@ -558,19 +773,18 @@ export function DashboardPage() {
 
   return (
     <WalletPageShell activeTab={tabIndex} onTabChange={setTabIndex}>
-      {/* Two-column layout */}
-      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-        {/* Left column */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+      {/* Top row: chart + sidebar — same height via stretch */}
+      <div style={{ display: 'flex', gap: 16, alignItems: 'stretch', marginBottom: 16 }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <PortfolioChart />
-          <TokenTable />
         </div>
-
-        {/* Right column */}
-        <div style={{ width: 320, flexShrink: 0 }}>
+        <div style={{ width: 323, flexShrink: 0 }}>
           <PortfolioBreakdown />
         </div>
       </div>
+
+      {/* Token table — full width */}
+      <TokenTable />
     </WalletPageShell>
   )
 }
