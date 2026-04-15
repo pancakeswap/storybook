@@ -16,29 +16,41 @@ const TriggerWrap = styled.div`
 const Panel = styled.div`
   position: fixed;
   z-index: 9999;
-  min-width: 200px;
+  display: flex;
+  width: 220px;
+  flex-direction: column;
+  align-items: flex-start;
   background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
-  border-bottom-width: 2px;
+  border-top: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-right: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-left: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   border-radius: 16px;
   box-shadow:
     0 0 0 1px ${({ theme }) => theme.colors.secondary},
     0 0 0 4px rgba(118, 69, 217, 0.2);
-  padding: 8px 0;
   overflow: hidden;
 `;
 
 const MenuItem = styled(Button).attrs({ variant: "text" })`
   display: flex;
+  padding: 8px 16px;
   align-items: center;
   gap: 8px;
+  align-self: stretch;
   width: 100%;
-  padding: 8px 16px;
   border-radius: 0;
   justify-content: flex-start;
   height: auto;
+  font-family: Kanit, sans-serif;
+  font-size: 16px;
   font-weight: 400;
+  line-height: 150%;
+  font-feature-settings: 'liga' off;
   color: ${({ theme }) => theme.colors.text};
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   svg {
     fill: ${({ theme }) => theme.colors.textSubtle};
   }

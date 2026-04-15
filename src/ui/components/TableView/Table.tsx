@@ -14,8 +14,10 @@ export interface IColumnsType<T extends BasicDataType> {
   render?: (value: any, record: T, index: number) => React.ReactNode;
   sorter?: boolean;
   minWidth?: string;
+  width?: string;
   display?: boolean;
   clickable?: boolean;
+  align?: 'left' | 'center' | 'right';
 }
 
 export interface ITableViewProps<T extends BasicDataType> {
@@ -36,17 +38,21 @@ const Table = styled.table`
   tr {
     th,
     td {
-      padding: 12px 6px;
+      padding: 16px;
       vertical-align: middle;
     }
-    th:last-child,
-    td:last-child {
-      padding-right: 24px;
+
+    td {
+      display: table-cell;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      align-self: stretch;
     }
 
-    th:first-child,
-    td:first-child {
-      padding-left: 24px;
+    th {
+      padding-top: 16px;
+      padding-bottom: 16px;
     }
   }
 `;
@@ -104,6 +110,7 @@ const TableCell = <T extends BasicDataType>({ col, data, idx }: ITableCellProps<
       key={col.key}
       style={{
         display: col.display === false ? "none" : "table-cell",
+        textAlign: col.align ?? 'left',
       }}
       data-un-clickable={col.clickable === false ? true : undefined}
     >
@@ -163,7 +170,9 @@ export const TableView = <T extends BasicDataType>({
               key={col.key}
               style={{
                 minWidth: col.minWidth ?? "auto",
+                width: col.width ?? "auto",
                 display: col.display === false ? "none" : "table-cell",
+                textAlign: col.align ?? 'left',
               }}
             >
               {typeof col.title === "function"
