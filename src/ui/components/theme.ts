@@ -90,6 +90,9 @@ export const pcsTheme = {
     },
     dropShadow: 'drop-shadow(0px 1px 4px rgba(25, 19, 38, 0.15))',
   },
+  alert: {
+    background: v('background-alt'),
+  },
   // styled-system needs breakpoints as an array for responsive props like p={["16px", null, "24px"]}
   breakpoints: ['576px', '852px', '968px', '1080px', '1200px'],
   isDark: false, // not used at runtime — CSS vars handle theming

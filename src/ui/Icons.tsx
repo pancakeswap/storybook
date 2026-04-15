@@ -2052,6 +2052,57 @@ export function LayersIcon(p: IconProps) {
   )
 }
 
+/**
+ * PixelAvatarIcon — Blockie-style pixel art avatar clipped to a circle.
+ * Recreated from the Figma Wallet design. Uses PCS primary (#1FC7D4) and failure (#ED4B9E).
+ */
+export function PixelAvatarIcon({ size = 20, ...props }: IconProps) {
+  const C = '#1FC7D4'
+  const P = '#ED4B9E'
+  // 8×8 pixel grid
+  const grid = [
+    [C,C,P,P,P,P,C,C],
+    [C,P,C,P,P,C,P,C],
+    [P,C,P,P,P,P,C,P],
+    [P,P,P,C,C,P,P,P],
+    [P,P,C,C,C,C,P,P],
+    [C,P,P,P,P,P,P,C],
+    [C,C,P,C,C,P,C,C],
+    [C,C,C,P,P,C,C,C],
+  ]
+  const cellSize = 40 / 8
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 40 40"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden={props['aria-label'] ? undefined : true}
+      {...props}
+    >
+      <defs>
+        <clipPath id="pixel-avatar-circle">
+          <circle cx="20" cy="20" r="20" />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#pixel-avatar-circle)">
+        {grid.map((row, y) =>
+          row.map((color, x) => (
+            <rect
+              key={`${x}-${y}`}
+              x={x * cellSize}
+              y={y * cellSize}
+              width={cellSize}
+              height={cellSize}
+              fill={color}
+            />
+          ))
+        )}
+      </g>
+    </svg>
+  )
+}
+
 export function ActivityIcon(p: IconProps) {
   return (
     <Icon {...p}>

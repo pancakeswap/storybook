@@ -40,5 +40,12 @@ export type { MessageProps } from './Message'
 
 export { Collapse } from './Collapse'
 
+export { ButtonMenu, ButtonMenuItem } from './ButtonMenu'
+export type { ButtonMenuProps, ButtonMenuItemProps } from './ButtonMenu'
+
+export { Alert, alertVariants } from './Alert'
+
+export { Toast, ToastsProvider, useToast, toastTypes } from './Toast'
+
 export { pcsTheme } from './theme'
 export type { PcsTheme } from './theme'
