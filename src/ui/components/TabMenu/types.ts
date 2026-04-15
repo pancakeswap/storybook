@@ -8,9 +8,11 @@ export interface TabMenuProps {
   gap?: string;
   isColorInverse?: boolean;
   isShowBorderBottom?: boolean;
+  variant?: "default" | "text";
 }
 export interface TabProps extends ColorProps {
   isActive?: boolean;
   onClick?: () => void;
   scale?: "md" | "lg";
+  variant?: "default" | "text";
 }

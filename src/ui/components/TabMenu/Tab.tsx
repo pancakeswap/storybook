@@ -2,9 +2,15 @@ import { styled } from "styled-components";
 import { color } from "styled-system";
 import type { TabProps } from "./types";
 
-const getBorderRadius = ({ scale }: TabProps) => (scale === "md" ? "16px 16px 0 0" : "24px 24px 0 0");
+const getBorderRadius = ({ scale, variant }: TabProps) => {
+  if (variant === "text") return "16px";
+  return scale === "md" ? "16px 16px 0 0" : "24px 24px 0 0";
+};
 
-const getPadding = ({ scale }: TabProps) => (scale === "md" ? "8px" : "16px");
+const getPadding = ({ scale, variant }: TabProps) => {
+  if (variant === "text") return "12px";
+  return scale === "md" ? "8px" : "16px";
+};
 
 const Tab = styled.button<TabProps>`
   display: inline-flex;
@@ -16,7 +22,7 @@ const Tab = styled.button<TabProps>`
   padding: ${getPadding};
   border-radius: ${getBorderRadius};
   font-size: 16px;
-  font-weight: 600;
+  font-weight: ${({ variant, isActive }) => (variant === "text" ? (isActive ? 600 : 400) : 600)};
 
   ${({ theme }) => theme.mediaQueries.md} {
     flex-grow: 0;

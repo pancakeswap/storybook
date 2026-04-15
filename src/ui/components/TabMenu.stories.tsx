@@ -64,6 +64,12 @@ function TabMenuPage() {
           {['Tab A', 'Tab B', 'Tab C', 'Tab D'].map(label => <Tab key={label}>{label}</Tab>)}
         </TabMenu>
       </Section>
+
+      <Section title="Text Variant">
+        <TabMenu activeIndex={active1} onItemClick={setActive1} variant="text">
+          {['Overview', 'Positions', 'History'].map(label => <Tab key={label}>{label}</Tab>)}
+        </TabMenu>
+      </Section>
     </div>
   )
 }
