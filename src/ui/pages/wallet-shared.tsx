@@ -220,18 +220,29 @@ function NetworkIconsCluster() {
           />
         </div>
       ))}
-      <span
+      <div
         style={{
-          marginLeft: 4,
+          display: 'flex',
+          width: 24,
+          height: 24,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: 8,
+          border: '2px solid var(--V1-Main-Input-primary, #EEEAF4)',
+          background: 'var(--V1-Main-Input-secondary, #D7CAEC)',
+          marginLeft: -8,
+          position: 'relative',
+          zIndex: 0,
           fontSize: 12,
           fontWeight: 600,
           fontFamily: 'Kanit, sans-serif',
-          color: 'var(--pcs-colors-text-subtle)',
-          alignSelf: 'center',
+          color: 'var(--pcs-colors-text)',
+          flexShrink: 0,
+          boxSizing: 'border-box',
         }}
       >
         +6
-      </span>
+      </div>
     </div>
   )
 }
@@ -250,13 +261,20 @@ export function PageHeader() {
       {/* Right: share + network */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 
-        {/* Share — text left, icon right, 12px h-padding, 9px v-padding, 8px gap */}
+        {/* Share */}
         <DropdownMenu
           trigger={
             <Button
               variant="light"
               scale="sm"
-              style={{ padding: '9px 12px', display: 'flex', alignItems: 'center', gap: 8, height: 'auto' }}
+              style={{
+                padding: '7px 12px 9px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                height: 'auto',
+                lineHeight: '24px',
+              }}
             >
               Share
               <ShareIcon size={16} />
@@ -265,13 +283,20 @@ export function PageHeader() {
           items={SHARE_ITEMS}
         />
 
-        {/* Networks — 16px left, icons+6, 8px gap, label, 8px gap, chevron, 8px right, 9px v */}
+        {/* Networks */}
         <DropdownMenu
           trigger={
             <Button
               variant="light"
               scale="sm"
-              style={{ padding: '9px 8px 9px 16px', display: 'flex', alignItems: 'center', gap: 8, height: 'auto' }}
+              style={{
+                padding: '7px 8px 9px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                height: 'auto',
+                lineHeight: '24px',
+              }}
             >
               <NetworkIconsCluster />
               All networks
