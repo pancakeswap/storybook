@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { useWindowWidth, BP_LG, BP_SM } from './wallet-shared'
 import { Card, CardBody } from '../components/Card'
 import { Button } from '../components/Button'
 import { Text } from '../components/Text'
@@ -432,6 +433,9 @@ function TokenTable() {
   const [showHidden, setShowHidden] = useState(false)
   const [sortField, setSortField] = useState<keyof Token | null>(null)
   const [sortOrder, setSortOrder] = useState<ISortOrder>(null)
+  const w = useWindowWidth()
+  const mobile      = w < BP_LG
+  const smallMobile = w < BP_SM
 
   const filtered = TOKENS.filter((t) => {
     if (hideSmall && t.value < 10) return false
@@ -489,6 +493,7 @@ function TokenTable() {
       dataIndex: 'price',
       sorter: true,
       align: 'right',
+      display: !mobile,
       render: (val: number) => (
         <Text style={cellTextStyle}>{fmtPrice(val)}</Text>
       ),
@@ -499,6 +504,7 @@ function TokenTable() {
       dataIndex: 'change1d',
       sorter: true,
       align: 'center',
+      display: !mobile,
       render: (val: number) => <PnlTag value={val} />,
     },
     {
@@ -508,6 +514,7 @@ function TokenTable() {
       sorter: true,
       align: 'right',
       width: '155px',
+      display: !smallMobile,
       render: (_, record) => (
         <Text style={cellTextStyle}>{fmtAmount(record.balanceAmount, record.balanceSymbol)}</Text>
       ),
@@ -528,6 +535,7 @@ function TokenTable() {
       dataIndex: 'allocation',
       sorter: true,
       align: 'left',
+      display: !mobile,
       render: (val: number) => <AllocationBar pct={val} />,
     },
     {
@@ -553,10 +561,10 @@ function TokenTable() {
   return (
     <Card>
       {/* Filter row */}
-      <div style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+      <div style={{ padding: 16, display: 'flex', flexDirection: mobile ? 'column' : 'row', alignItems: mobile ? 'stretch' : 'center', gap: mobile ? 12 : 16, flexWrap: mobile ? undefined : 'wrap' }}>
         {/* Search / token selector */}
         <style>{`.token-search::placeholder { color: var(--pcs-colors-text); opacity: 1; font-family: Kanit, sans-serif; font-size: 16px; font-weight: 400; }`}</style>
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 16, flex: '1 0 0', minWidth: 456 }}>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 16, flex: mobile ? undefined : '1 0 0', minWidth: mobile ? undefined : 456 }}>
           <SearchIcon
             size={16}
             style={{
@@ -770,15 +778,23 @@ function PortfolioBreakdown() {
 
 export function DashboardPage() {
   const [tabIndex, setTabIndex] = useState<WalletTab>(0)
+  const w = useWindowWidth()
+  const mobile = w < BP_LG
 
   return (
     <WalletPageShell activeTab={tabIndex} onTabChange={setTabIndex}>
-      {/* Top row: chart + sidebar — same height via stretch */}
-      <div style={{ display: 'flex', gap: 16, alignItems: 'stretch', marginBottom: 16 }}>
+      {/* Top section: chart + breakdown — side-by-side ≥968px, stacked below */}
+      <div style={{
+        display: 'flex',
+        flexDirection: mobile ? 'column' : 'row',
+        gap: 16,
+        alignItems: mobile ? 'stretch' : 'stretch',
+        marginBottom: 16,
+      }}>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <PortfolioChart />
         </div>
-        <div style={{ width: 323, flexShrink: 0 }}>
+        <div style={{ width: mobile ? '100%' : 323, flexShrink: 0 }}>
           <PortfolioBreakdown />
         </div>
       </div>

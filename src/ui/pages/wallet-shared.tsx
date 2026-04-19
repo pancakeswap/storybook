@@ -2,12 +2,13 @@
  * Shared layout components for the Wallet section of PancakeSwap.
  * Used by Dashboard, Positions, and History pages.
  */
-import type { ReactNode } from 'react'
+import { type ReactNode, useState, useEffect } from 'react'
 import { Button } from '../components/Button'
 import { WalletAvatar } from '../widgets/WalletAvatar'
 import { DropdownMenu } from '../widgets/DropdownMenu'
 import {
   LogoWithTextIcon,
+  LogoIcon,
   SearchIcon,
   ChevronDownIcon,
   ShareIcon,
@@ -16,6 +17,25 @@ import {
   LinkIcon,
   TwitterIcon,
 } from '../Icons'
+
+/* ── Breakpoint hook ─────────────────────────────────────────── */
+
+function useWindowWidth() {
+  const [width, setWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1280)
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return width
+}
+
+// PCS breakpoints: sm=576, lg=968, xxl=1200
+export const BP_SM  = 576
+export const BP_LG  = 968
+const BP_XXL = 1200
+
+export { useWindowWidth }
 
 /* ── Types ─────────────────────────────────────────────────── */
 
@@ -38,82 +58,105 @@ const iconBtnStyle: React.CSSProperties = {
 }
 
 export function AppNav() {
+  const w = useWindowWidth()
+  const mobile  = w < BP_LG   // < 968px: full compact
+  const compact = w < BP_XXL  // < 1200px: icon logo + chevron
+
   return (
     <header
       style={{
-        height: 64,
+        height: mobile ? 48 : 64,
         background: 'var(--pcs-colors-card)',
         borderBottom: '1px solid var(--pcs-colors-card-border)',
         display: 'flex',
         alignItems: 'center',
-        padding: '0 40px',
-        gap: 24,
+        padding: mobile ? '0 16px' : '0 40px',
+        gap: mobile ? 8 : 24,
         position: 'sticky',
         top: 0,
         zIndex: 100,
       }}
     >
       {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-        <LogoWithTextIcon size={120} style={{ color: 'var(--pcs-colors-text)' }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+        {mobile ? (
+          <LogoIcon size={24} />
+        ) : compact ? (
+          <>
+            <LogoIcon size={24} />
+            <ChevronDownIcon size={16} style={{ color: 'var(--pcs-colors-text-subtle)' }} />
+          </>
+        ) : (
+          <LogoWithTextIcon size={120} style={{ color: 'var(--pcs-colors-text)' }} />
+        )}
       </div>
 
-      {/* Nav items */}
-      <nav style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1 }}>
-        {NAV_ITEMS.map((item) => {
-          const isActive = item === 'Dashboard'
-          return (
-            <button
-              key={item}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '8px 12px',
-                borderRadius: 12,
-                color: isActive ? 'var(--pcs-colors-text)' : 'var(--pcs-colors-text-subtle)',
-                fontSize: 16,
-                fontWeight: isActive ? 600 : 400,
-                fontFamily: 'Kanit, sans-serif',
-                borderBottom: isActive ? '2px solid var(--pcs-colors-primary)' : '2px solid transparent',
-              }}
-            >
-              {item}
-            </button>
-          )
-        })}
-      </nav>
+      {/* Nav items — hidden on mobile */}
+      {!mobile && (
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1 }}>
+          {NAV_ITEMS.map((item) => {
+            const isActive = item === 'Dashboard'
+            return (
+              <button
+                key={item}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '8px 12px',
+                  borderRadius: 12,
+                  color: isActive ? 'var(--pcs-colors-text)' : 'var(--pcs-colors-text-subtle)',
+                  fontSize: 16,
+                  fontWeight: isActive ? 600 : 400,
+                  fontFamily: 'Kanit, sans-serif',
+                  borderBottom: isActive ? '2px solid var(--pcs-colors-primary)' : '2px solid transparent',
+                }}
+              >
+                {item}
+              </button>
+            )
+          })}
+        </nav>
+      )}
 
       {/* Right actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-        <button
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: 'var(--pcs-colors-input)',
-            border: '1px solid var(--pcs-colors-input-secondary)',
-            borderRadius: 12,
-            padding: '6px 12px',
-            cursor: 'pointer',
-            color: 'var(--pcs-colors-text-subtle)',
-            fontSize: 14,
-            fontFamily: 'Kanit, sans-serif',
-            minWidth: 120,
-          }}
-        >
-          <SearchIcon size={16} />
-          <span>Search</span>
-          <span style={{ marginLeft: 'auto', opacity: 0.5, fontSize: 12 }}>/</span>
-        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: mobile ? 8 : 8, flexShrink: 0, marginLeft: mobile ? 'auto' : undefined }}>
+        {mobile ? (
+          /* Mobile: icon-only search */
+          <button style={{ ...iconBtnStyle, width: 32, height: 32, padding: 4 }} aria-label="Search">
+            <SearchIcon size={20} />
+          </button>
+        ) : (
+          <button
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'var(--pcs-colors-input)',
+              border: '1px solid var(--pcs-colors-input-secondary)',
+              borderRadius: 12,
+              padding: '6px 12px',
+              cursor: 'pointer',
+              color: 'var(--pcs-colors-text-subtle)',
+              fontSize: 14,
+              fontFamily: 'Kanit, sans-serif',
+              minWidth: 120,
+            }}
+          >
+            <SearchIcon size={16} />
+            <span>Search</span>
+            <span style={{ marginLeft: 'auto', opacity: 0.5, fontSize: 12 }}>/</span>
+          </button>
+        )}
 
-        <button style={iconBtnStyle} aria-label="Notifications">
+        <button style={{ ...iconBtnStyle, ...(mobile ? { width: 32, height: 32, padding: 4 } : {}) }} aria-label="Notifications">
           <NotificationBellIcon size={20} />
         </button>
-        <button style={iconBtnStyle} aria-label="Settings">
+        <button style={{ ...iconBtnStyle, ...(mobile ? { width: 32, height: 32, padding: 4 } : {}) }} aria-label="Settings">
           <SettingsIcon size={20} />
         </button>
 
+        {/* Wallet button — icon-only on mobile */}
         <button
           style={{
             display: 'flex',
@@ -122,24 +165,26 @@ export function AppNav() {
             background: 'var(--pcs-colors-tertiary)',
             border: 'none',
             borderRadius: 12,
-            padding: '8px 12px',
+            padding: mobile ? '4px 8px' : '8px 12px',
             cursor: 'pointer',
             color: 'var(--pcs-colors-primary)',
             fontSize: 14,
             fontWeight: 600,
             fontFamily: 'Kanit, sans-serif',
+            height: mobile ? 32 : undefined,
           }}
         >
           <div
             style={{
-              width: 20,
-              height: 20,
+              width: mobile ? 24 : 20,
+              height: mobile ? 24 : 20,
               borderRadius: '50%',
               background: 'linear-gradient(135deg, #F0B90B, #E8831A)',
+              flexShrink: 0,
             }}
           />
-          <span>$0.00</span>
-          <ChevronDownIcon size={16} />
+          {!mobile && <span>$0.00</span>}
+          <ChevronDownIcon size={mobile ? 12 : 16} />
         </button>
       </div>
     </header>
@@ -250,18 +295,86 @@ function NetworkIconsCluster() {
 /* ── Page Header ─────────────────────────────────────────────── */
 
 export function PageHeader() {
+  const w = useWindowWidth()
+  const mobile      = w < BP_LG   // < 968px
+  const smallMobile = w < BP_SM   // < 576px
+
+  /* ── Small-mobile: avatar on row 1, share+network on row 2 ── */
+  if (smallMobile) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignSelf: 'stretch', paddingTop: 16 }}>
+        {/* Row 1: wallet avatar */}
+        <WalletAvatar
+          address="0x40Cf56E5bB1C8F11bC1b1cd6a5c7bAdE2E2a5461"
+          fontSize={20}
+        />
+
+        {/* Row 2: share (fixed) + network (flex-1) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <DropdownMenu
+            trigger={
+              <Button
+                variant="light"
+                scale="sm"
+                style={{
+                  padding: '7px 12px 9px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  height: 'auto',
+                  lineHeight: '24px',
+                  flexShrink: 0,
+                }}
+              >
+                <ShareIcon size={16} />
+              </Button>
+            }
+            items={SHARE_ITEMS}
+          />
+
+          <DropdownMenu
+            trigger={
+              <Button
+                variant="light"
+                scale="sm"
+                style={{
+                  padding: '7px 8px 9px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  height: 'auto',
+                  lineHeight: '24px',
+                  flex: 1,
+                  justifyContent: 'flex-start',
+                  width: '100%',
+                }}
+              >
+                <NetworkIconsCluster />
+                All networks
+                <ChevronDownIcon size={14} style={{ marginLeft: 'auto' }} />
+              </Button>
+            }
+            items={NETWORK_ITEMS}
+            placement="bottom-end"
+          />
+        </div>
+      </div>
+    )
+  }
+
+  /* ── Tablet / desktop ─────────────────────────────────────── */
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', paddingLeft: 16, gap: 2, alignSelf: 'stretch', paddingTop: 40 }}>
-      {/* Left: wallet avatar — H2 Mobile: 16px / 600 / lineHeight 1.5 / tracking 0 */}
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', paddingLeft: mobile ? 0 : 16, gap: 2, alignSelf: 'stretch', paddingTop: mobile ? 16 : 40 }}>
+      {/* Left: wallet avatar */}
       <WalletAvatar
         address="0x40Cf56E5bB1C8F11bC1b1cd6a5c7bAdE2E2a5461"
-        fontSize={32}
+        fontSize={mobile ? 20 : 32}
       />
 
       {/* Right: share + network */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 
-        {/* Share */}
+        {/* Share — icon-only on tablet */}
         <DropdownMenu
           trigger={
             <Button
@@ -274,23 +387,24 @@ export function PageHeader() {
                 gap: 8,
                 height: 'auto',
                 lineHeight: '24px',
+                minWidth: mobile ? 'unset' : undefined,
               }}
             >
-              Share
+              {!mobile && 'Share'}
               <ShareIcon size={16} />
             </Button>
           }
           items={SHARE_ITEMS}
         />
 
-        {/* Networks */}
+        {/* Networks — hide label text on tablet */}
         <DropdownMenu
           trigger={
             <Button
               variant="light"
               scale="sm"
               style={{
-                padding: '7px 8px 9px 16px',
+                padding: mobile ? '7px 8px 9px 8px' : '7px 8px 9px 16px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
@@ -299,7 +413,7 @@ export function PageHeader() {
               }}
             >
               <NetworkIconsCluster />
-              All networks
+              {!mobile && 'All networks'}
               <ChevronDownIcon size={14} />
             </Button>
           }
@@ -361,10 +475,14 @@ interface WalletPageShellProps {
 }
 
 export function WalletPageShell({ activeTab, onTabChange, children }: WalletPageShellProps) {
+  const w = useWindowWidth()
+  const mobile      = w < BP_LG
+  const smallMobile = w < BP_SM
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--pcs-colors-background)', fontFamily: 'Kanit, sans-serif' }}>
       <AppNav />
-      <div style={{ padding: '0 40px 48px' }}>
+      <div style={{ padding: smallMobile ? '0 16px 48px' : mobile ? '0 24px 48px' : '0 40px 48px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <PageHeader />
 
