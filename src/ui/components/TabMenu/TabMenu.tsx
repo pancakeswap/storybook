@@ -43,12 +43,28 @@ const TabMenu: React.FC<React.PropsWithChildren<TabMenuProps>> = ({
   gap,
   isColorInverse = false,
   isShowBorderBottom = true,
+  variant = "default",
 }) => {
   return (
-    <Wrapper p={["0 4px", "0 16px"]} fullWidth={fullWidth} isShowBorderBottom={isShowBorderBottom}>
+    <Wrapper
+      p={variant === "text" ? "0" : ["0 4px", "0 16px"]}
+      fullWidth={fullWidth}
+      isShowBorderBottom={variant === "text" ? false : isShowBorderBottom}
+    >
       <Inner fullWidth={fullWidth} gap={gap}>
         {Children.map(children, (child: ReactElement, index) => {
           const isActive = activeIndex === index;
+
+          if (variant === "text") {
+            return cloneElement(child, {
+              isActive,
+              onClick: onItemClick ? () => onItemClick(index) : undefined,
+              color: isActive ? "secondary" : "textSubtle",
+              backgroundColor: "transparent",
+              variant: "text",
+            });
+          }
+
           const color = isActive ? "backgroundAlt" : "textSubtle";
           const inverseColor = isActive ? "textSubtle" : "backgroundAlt";
           const backgroundColor = isActive ? "textSubtle" : "input";

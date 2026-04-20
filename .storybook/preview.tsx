@@ -10,9 +10,7 @@ const withTheme: Decorator = (Story, context) => {
   return (
     <ThemeProvider forcedTheme={theme}>
       <SCThemeProvider theme={pcsTheme}>
-        <div style={{ background: 'var(--pcs-colors-background)', minHeight: '100%' }}>
-          <Story />
-        </div>
+        <Story />
       </SCThemeProvider>
     </ThemeProvider>
   )

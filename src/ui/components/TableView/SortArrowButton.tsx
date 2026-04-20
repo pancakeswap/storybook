@@ -7,22 +7,26 @@ const SortBtn = styled.button`
   align-items: center;
   justify-content: center;
   vertical-align: middle;
-  padding: 2px;
+  padding: 1px 2px 3px;
   margin-left: 4px;
   border: none;
-  border-radius: 4px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
   cursor: pointer;
-  background: ${({ theme }) => theme.colors.input};
+  background: ${({ theme }) => theme.colors.tertiary};
+  overflow: hidden;
   path {
     fill: ${({ theme }) => theme.colors.textDisabled};
   }
   &.descend {
     background: ${({ theme }) => theme.colors.textSubtle};
+    border-bottom-color: rgba(0, 0, 0, 0.3);
     path:first-child { fill: rgba(255, 255, 255, 1); }
     path:last-child { fill: rgba(255, 255, 255, 0.3); }
   }
   &.ascend {
     background: ${({ theme }) => theme.colors.textSubtle};
+    border-bottom-color: rgba(0, 0, 0, 0.3);
     path:first-child { fill: rgba(255, 255, 255, 0.3); }
     path:last-child { fill: rgba(255, 255, 255, 1); }
   }
@@ -33,17 +37,20 @@ const SortDESCBtn = styled.button`
   align-items: center;
   justify-content: center;
   vertical-align: middle;
-  padding: 2px;
+  padding: 1px 2px 3px;
   margin-left: 4px;
   border: none;
-  border-radius: 4px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
   cursor: pointer;
-  background: ${({ theme }) => theme.colors.input};
+  background: ${({ theme }) => theme.colors.tertiary};
+  overflow: hidden;
   path {
     fill: ${({ theme }) => theme.colors.textDisabled};
   }
   &.descend {
     background: ${({ theme }) => theme.colors.textSubtle};
+    border-bottom-color: rgba(0, 0, 0, 0.3);
     path { fill: rgba(255, 255, 255, 1); }
   }
 `;
@@ -89,11 +96,11 @@ export const SortArrowButton = (props: ISortArrowButton) => {
 
   return onlyDESC ? (
     <SortDESCBtn onClick={handleClick} className={cls}>
-      <SortDESCIcon width={width} />
+      <SortDESCIcon width={width} height={width} />
     </SortDESCBtn>
   ) : (
     <SortBtn onClick={handleClick} className={cls}>
-      <SortArrow width={width} />
+      <SortArrow width={width} height={width} />
     </SortBtn>
   );
 };
