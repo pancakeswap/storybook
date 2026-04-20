@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import '../design-system.css'
+import { SideBySideThemes } from '../../stories-utils'
 
 const SPACING = [
   { token: '--p-space-1',  px: 4 },
@@ -136,4 +137,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = { name: 'Spacing & Layout' }
+export const Default: Story = {
+  name: 'Spacing & Layout',
+  render: () => (
+    <SideBySideThemes>
+      <SpacingPage />
+    </SideBySideThemes>
+  ),
+}

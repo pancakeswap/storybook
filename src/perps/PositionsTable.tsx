@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import '../ui/perps.css'
-import { Button, Badge } from '../ui'
-import { EditCollateralModal } from './EditCollateralModal'
+import './PositionsTable.css'
 
 export interface Position {
   id: string
@@ -23,141 +22,144 @@ export interface Position {
 
 export interface PositionsTableProps {
   positions?: Position[]
+  /** Whether to render the embedded tab bar / compact layout. */
+  compact?: boolean
   onEditCollateral?: (id: string) => void
   onEditTpSl?: (id: string) => void
   onClose?: (id: string) => void
   onCloseAll?: () => void
 }
 
+type TabKey = 'open' | 'pos' | 'assets' | 'twap' | 'hist' | 'ph' | 'th' | 'tx'
+
+const TABS: { key: TabKey; label: string; count?: number | null }[] = [
+  { key: 'open',   label: 'Open orders',        count: 0 },
+  { key: 'pos',    label: 'Positions',          count: 1 },
+  { key: 'assets', label: 'Assets',             count: null },
+  { key: 'twap',   label: 'TWAP',               count: 0 },
+  { key: 'hist',   label: 'Order history',      count: null },
+  { key: 'ph',     label: 'Position History',   count: null },
+  { key: 'th',     label: 'Trade history',      count: null },
+  { key: 'tx',     label: 'Transaction history', count: null },
+]
+
+const COLS = [
+  'Symbol',
+  'Size',
+  'Entry price',
+  'Mark price',
+  'Margin',
+  'Liq. price',
+  'PNL (ROE%)',
+  'TP/SL',
+  'TP/SL for position',
+  'Reverse',
+]
+
 const MOCK_POSITIONS: Position[] = [
   {
     id: '1',
-    pair: 'CAKE/USDT',
+    pair: 'BTCUSDT',
     direction: 'long',
-    size: '$3,480.00',
-    entryPrice: '$3.42',
-    markPrice: '$3.48',
-    liquidationPrice: '$2.05',
-    margin: '$348.00',
-    leverage: 10,
-    unrealizedPnl: '+$60.94',
-    unrealizedPnlPct: '+1.75%',
-    borrowFee: '-$0.42',
-    fundingFee: '-$0.18',
-    tp: '$4.20',
-    sl: '$3.00',
-  },
-  {
-    id: '2',
-    pair: 'BTC/USDT',
-    direction: 'short',
-    size: '$32,600.00',
-    entryPrice: '$66,200.00',
-    markPrice: '$65,420.00',
-    liquidationPrice: '$72,820.00',
-    margin: '$1,630.00',
+    size: '75.5',
+    entryPrice: '75,482.0',
+    markPrice: '75,497.0',
+    liquidationPrice: '69,162.0',
+    margin: '3.77 USDT',
     leverage: 20,
-    unrealizedPnl: '+$383.87',
-    unrealizedPnlPct: '+1.18%',
-    borrowFee: '-$2.14',
-    fundingFee: '+$1.02',
-    tp: '$60,000.00',
-    sl: '$68,000.00',
+    unrealizedPnl: '+0.01 USDT',
+    unrealizedPnlPct: '+0.40%',
+    borrowFee: '-$0.00',
+    fundingFee: '-$0.00',
+    tp: '',
+    sl: '',
   },
 ]
 
 export function PositionsTable({
   positions = MOCK_POSITIONS,
-  onEditCollateral,
-  onEditTpSl,
+  compact = false,
   onClose,
   onCloseAll,
 }: PositionsTableProps) {
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const editingPos = positions.find(p => p.id === editingId) ?? null
-
-  if (positions.length === 0) {
-    return <div className="p-empty">No open positions</div>
-  }
+  const [tab, setTab] = useState<TabKey>('pos')
 
   return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-        <Button variant="outline" size="sm" onClick={onCloseAll}>Close All</Button>
+    <div className={`perps-root pt-root${compact ? ' pt-compact' : ''}`}>
+      {/* Tabs + utilities */}
+      <div className="pt-tabs-row">
+        <div className="pt-tabs" role="tablist">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.key}
+              className={`pt-tab${tab === t.key ? ' active' : ''}`}
+              onClick={() => setTab(t.key)}
+            >
+              {t.label}
+              {t.count != null && <span className="pt-tab-count">({t.count})</span>}
+            </button>
+          ))}
+        </div>
+        <div className="pt-tabs-spacer" />
+        <label className="pt-hide-other">
+          <input type="checkbox" />
+          Hide other symbols
+        </label>
+        <button type="button" className="pt-close-all" onClick={onCloseAll}>
+          Close All
+        </button>
       </div>
-      <table className="p-table">
-        <thead>
-          <tr>
-            <th>Pair</th>
-            <th>Size</th>
-            <th>Entry / Mark</th>
-            <th>Liq. Price</th>
-            <th>Margin / Lev</th>
-            <th>Unrealized PnL</th>
-            <th>Fees</th>
-            <th>TP / SL</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {positions.map((pos) => {
+
+      {/* Column headers */}
+      <div className="pt-headers">
+        {COLS.map((c) => (
+          <span key={c} className="pt-header">
+            {c} <span className="pt-sort" aria-hidden="true">⇅</span>
+          </span>
+        ))}
+      </div>
+
+      {/* Rows */}
+      <div className="pt-body">
+        {tab === 'pos' && positions.length > 0 ? (
+          positions.map((pos) => {
             const isPos = pos.unrealizedPnl.startsWith('+')
             return (
-              <tr key={pos.id}>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span className="p-value-sm" style={{ fontWeight: 600 }}>{pos.pair}</span>
-                    <Badge variant={pos.direction}>{pos.direction.toUpperCase()}</Badge>
+              <div key={pos.id} className="pt-row">
+                <div className="pt-cell pt-cell-symbol">
+                  <div className="pt-sym-name">{pos.pair}</div>
+                  <div className={`pt-sym-side ${pos.direction === 'long' ? 'p-long' : 'p-short'}`}>
+                    {pos.direction === 'long' ? 'Buy' : 'Sell'} {pos.leverage}x IIII
                   </div>
-                </td>
-                <td><p className="p-value-sm">{pos.size}</p></td>
-                <td>
-                  <p className="p-value-sm" style={{ color: 'var(--pcs-colors-text-muted)', fontSize: 12 }}>{pos.entryPrice}</p>
-                  <p className="p-value-sm" style={{ color: 'var(--pcs-colors-brand)' }}>{pos.markPrice}</p>
-                </td>
-                <td><p className="p-value-sm" style={{ color: 'var(--pcs-colors-short)' }}>{pos.liquidationPrice}</p></td>
-                <td>
-                  <p className="p-value-sm">{pos.margin}</p>
-                  <p className="p-label">{pos.leverage}×</p>
-                </td>
-                <td>
-                  <p className={`p-value-sm ${isPos ? 'p-pnl-pos' : 'p-pnl-neg'}`}>{pos.unrealizedPnl}</p>
-                  <p className={`p-label ${isPos ? 'p-pnl-pos' : 'p-pnl-neg'}`}>{pos.unrealizedPnlPct}</p>
-                </td>
-                <td>
-                  <p className="p-value-sm p-muted" style={{ fontSize: 12 }}>Borrow: {pos.borrowFee}</p>
-                  <p className="p-value-sm p-muted" style={{ fontSize: 12 }}>Fund: {pos.fundingFee}</p>
-                </td>
-                <td>
-                  <p className="p-value-sm p-long" style={{ fontSize: 12 }}>TP: {pos.tp || '—'}</p>
-                  <p className="p-value-sm p-short" style={{ fontSize: 12 }}>SL: {pos.sl || '—'}</p>
-                </td>
-                <td>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 80 }}>
-                    <button className="p-action-btn" onClick={() => { setEditingId(pos.id); onEditCollateral?.(pos.id) }}>Edit</button>
-                    <button className="p-action-btn" onClick={() => onEditTpSl?.(pos.id)}>TP/SL</button>
-                    <button className="p-action-btn danger" onClick={() => onClose?.(pos.id)}>Close</button>
-                  </div>
-                </td>
-              </tr>
+                </div>
+                <div className="pt-cell">
+                  <div className="pt-num">{pos.size}</div>
+                  <div className="pt-num-sub">USDT</div>
+                </div>
+                <div className="pt-cell pt-num">{pos.entryPrice}</div>
+                <div className="pt-cell pt-num">{pos.markPrice}</div>
+                <div className="pt-cell">
+                  <div className="pt-num">{pos.margin}</div>
+                  <div className="pt-num-sub">(Cross)</div>
+                </div>
+                <div className="pt-cell pt-num p-warn">{pos.liquidationPrice}</div>
+                <div className="pt-cell">
+                  <div className={`pt-num ${isPos ? 'p-long' : 'p-short'}`}>{pos.unrealizedPnl} ↗</div>
+                  <div className={`pt-num-sub ${isPos ? 'p-long' : 'p-short'}`}>{pos.unrealizedPnlPct}</div>
+                </div>
+                <button type="button" className="pt-cell pt-link">Add ⓘ</button>
+                <button type="button" className="pt-cell pt-link">Add ⓘ</button>
+                <button type="button" className="pt-cell pt-link" onClick={() => onClose?.(pos.id)}>Reverse</button>
+              </div>
             )
-          })}
-        </tbody>
-      </table>
-
-      {editingPos && (
-        <EditCollateralModal
-          open={editingId !== null}
-          positionId={editingPos.id}
-          pair={editingPos.pair}
-          direction={editingPos.direction}
-          margin={editingPos.margin}
-          leverage={editingPos.leverage}
-          liquidationPrice={editingPos.liquidationPrice}
-          size={editingPos.size}
-          onClose={() => setEditingId(null)}
-        />
-      )}
-    </>
+          })
+        ) : (
+          <div className="pt-empty">No data</div>
+        )}
+      </div>
+    </div>
   )
 }

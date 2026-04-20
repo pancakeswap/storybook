@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CandlestickChart } from './CandlestickChart'
+import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Widgets/Candlestick Chart',
@@ -11,38 +12,40 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const CAKE: Story = {
-  name: 'CAKE/USDT — 1h',
+export const Dark: Story = {
   args: {
-    initialPair: 'CAKE/USDT',
-    initialTimeframe: '1h',
-    height: 400,
+    initialPair: 'BTCUSDT',
+    initialTimeframe: '1D',
+    height: 420,
   },
+  parameters: { ...forceTheme('dark') },
 }
 
-export const BTC: Story = {
-  name: 'BTC/USDT — 4h',
+export const Light: Story = {
+  args: {
+    initialPair: 'BTCUSDT',
+    initialTimeframe: '1D',
+    height: 420,
+  },
+  parameters: { ...forceTheme('light') },
+}
+
+export const BTCDark: Story = {
+  name: 'BTC/USDT — 4h (Dark)',
   args: {
     initialPair: 'BTC/USDT',
-    initialTimeframe: '4h',
+    initialTimeframe: '1H',
     height: 400,
   },
+  parameters: { ...forceTheme('dark') },
 }
 
-export const ETH: Story = {
-  name: 'ETH/USDT — 1d',
+export const BTCLight: Story = {
+  name: 'BTC/USDT — 4h (Light)',
   args: {
-    initialPair: 'ETH/USDT',
-    initialTimeframe: '1d',
+    initialPair: 'BTC/USDT',
+    initialTimeframe: '1H',
     height: 400,
   },
-}
-
-export const Compact: Story = {
-  name: 'Compact Height',
-  args: {
-    initialPair: 'CAKE/USDT',
-    initialTimeframe: '15m',
-    height: 260,
-  },
+  parameters: { ...forceTheme('light') },
 }

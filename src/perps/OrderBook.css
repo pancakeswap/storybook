@@ -1,0 +1,209 @@
+/* ── Order Book (Aster-style) ──────────────────────────────── */
+.ob-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--pcs-colors-surface-card);
+  color: var(--pcs-colors-text);
+  font-variant-numeric: tabular-nums;
+  border-left: 1px solid var(--pcs-colors-border);
+  min-height: 0;
+}
+
+/* ── Tabs ───────────────────────────────────────────────── */
+.ob-tabs {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--pcs-colors-border);
+  flex-shrink: 0;
+}
+
+.ob-tab {
+  height: 32px;
+  padding: 0 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--pcs-colors-text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 120ms var(--pcs-ease-out), border-color 120ms var(--pcs-ease-out);
+}
+.ob-tab:hover { color: var(--pcs-colors-text); }
+.ob-tab.active {
+  color: var(--pcs-colors-text);
+  border-bottom-color: var(--pcs-colors-brand);
+}
+
+/* ── Toolbar row ────────────────────────────────────────── */
+.ob-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  flex-shrink: 0;
+}
+
+.ob-view-toggle { display: inline-flex; gap: 2px; }
+
+.ob-view-btn {
+  width: 22px;
+  height: 20px;
+  background: transparent;
+  color: var(--pcs-colors-text-muted);
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s, color 0.12s;
+}
+.ob-view-btn:hover { color: var(--pcs-colors-text); }
+.ob-view-btn.active {
+  background: var(--pcs-colors-brand-muted);
+  color: var(--pcs-colors-brand);
+}
+
+.ob-toolbar-spacer { flex: 1; }
+
+.ob-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--pcs-colors-surface-subtle);
+  color: var(--pcs-colors-text);
+  border: none;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ob-chip:hover { filter: brightness(1.05); }
+
+/* ── Column headers ─────────────────────────────────────── */
+.ob-headers {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 2px 8px 4px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--pcs-colors-text-muted);
+  flex-shrink: 0;
+}
+.ob-headers > :nth-child(2),
+.ob-headers > :nth-child(3) {
+  text-align: right;
+}
+
+/* ── Asks (stack upward) + Bids (stack downward) ───────── */
+.ob-asks {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.ob-bids {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Rows ────────────────────────────────────────────── */
+.ob-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 0 8px;
+  height: 20px;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  background: linear-gradient(
+    to left,
+    var(--ob-row-bg, transparent) var(--ob-w, 0%),
+    transparent var(--ob-w, 0%)
+  );
+  cursor: pointer;
+  transition: filter 80ms var(--pcs-ease-out);
+}
+.ob-row:hover { filter: brightness(0.98); }
+
+.ob-row-ask { --ob-row-bg: var(--pcs-colors-row-ask); }
+.ob-row-bid { --ob-row-bg: var(--pcs-colors-row-bid); }
+
+.ob-row > .ob-num { text-align: right; color: var(--pcs-colors-text); }
+.ob-row > .ob-num.ob-muted { color: var(--pcs-colors-text-muted); }
+
+.ob-price { font-weight: 600; }
+.ob-price.ob-ask { color: var(--pcs-colors-short); }
+.ob-price.ob-bid { color: var(--pcs-colors-long); }
+
+/* ── Mid-price band ─────────────────────────────────────── */
+.ob-mid {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--pcs-colors-surface-subtle);
+  border-top: 1px solid var(--pcs-colors-border);
+  border-bottom: 1px solid var(--pcs-colors-border);
+  flex-shrink: 0;
+}
+
+.ob-mid-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-weight: 700;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ob-mid-dir { display: inline-flex; }
+
+.ob-mid-mark {
+  color: var(--pcs-colors-text-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Empty state (Trades tab) ───────────────────────────── */
+.ob-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pcs-colors-text-muted);
+  font-size: 12px;
+  padding: 40px 20px;
+}
+
+/* ── Scrollbar (for long lists if needed) ──────────────── */
+.ob-asks::-webkit-scrollbar,
+.ob-bids::-webkit-scrollbar { width: 3px; }
+.ob-asks::-webkit-scrollbar-track,
+.ob-bids::-webkit-scrollbar-track { background: transparent; }
+.ob-asks::-webkit-scrollbar-thumb,
+.ob-bids::-webkit-scrollbar-thumb {
+  background: var(--pcs-colors-border);
+  border-radius: 2px;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .ob-root { width: 260px; }
+}
+@media (max-width: 768px) {
+  .ob-root { width: 100%; border-left: none; border-top: 1px solid var(--pcs-colors-border); }
+}

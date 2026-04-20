@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import '../design-system.css'
 import * as AllIcons from '../Icons'
+import { SideBySideThemes } from '../../stories-utils'
 
 type IconComponent = React.ComponentType<{ size?: number }>
 
@@ -83,24 +84,24 @@ function IconCell({ name, component: Icon }: { name: string; component: IconComp
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
       padding: '16px 12px',
-      background: 'var(--p-card)',
-      border: '1px solid var(--p-border)',
+      background: 'var(--pcs-colors-surface-card)',
+      border: '1px solid var(--pcs-colors-border)',
       borderRadius: 10,
       width: 96,
       cursor: 'default',
       transition: 'border-color 0.12s, background 0.12s',
     }}
       onMouseEnter={(e) => {
-        ;(e.currentTarget as HTMLElement).style.borderColor = 'var(--p-primary)'
-        ;(e.currentTarget as HTMLElement).style.background = 'var(--p-card-alt)'
+        ;(e.currentTarget as HTMLElement).style.borderColor = 'var(--pcs-colors-brand)'
+        ;(e.currentTarget as HTMLElement).style.background = 'var(--pcs-colors-surface-subtle)'
       }}
       onMouseLeave={(e) => {
-        ;(e.currentTarget as HTMLElement).style.borderColor = 'var(--p-border)'
-        ;(e.currentTarget as HTMLElement).style.background = 'var(--p-card)'
+        ;(e.currentTarget as HTMLElement).style.borderColor = 'var(--pcs-colors-border)'
+        ;(e.currentTarget as HTMLElement).style.background = 'var(--pcs-colors-surface-card)'
       }}
     >
       <Icon size={22} aria-hidden />
-      <span style={{ fontSize: 10, color: 'var(--p-text-muted)', textAlign: 'center', lineHeight: 1.3, wordBreak: 'break-word' }}>
+      <span style={{ fontSize: 10, color: 'var(--pcs-colors-text-muted)', textAlign: 'center', lineHeight: 1.3, wordBreak: 'break-word' }}>
         {name}
       </span>
     </div>
@@ -109,25 +110,25 @@ function IconCell({ name, component: Icon }: { name: string; component: IconComp
 
 function IconsPage() {
   return (
-    <div className="perps-root" style={{ minHeight: '100vh', padding: '40px 48px', background: 'var(--p-bg)', color: 'var(--p-text)' }}>
+    <div className="perps-root" style={{ minHeight: '100vh', padding: '40px 48px', background: 'var(--pcs-colors-bg)', color: 'var(--pcs-colors-text)' }}>
       <h1 style={{ fontSize: 28, fontWeight: 800, margin: '0 0 8px', letterSpacing: '-0.5px' }}>Icons</h1>
-      <p style={{ color: 'var(--p-text-muted)', fontSize: 14, margin: '0 0 16px', lineHeight: 1.6 }}>
-        All icons are SVG components from <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--p-primary)' }}>Icons.tsx</code>. They inherit <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--p-primary)' }}>currentColor</code>, default to 16×16, and are <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--p-primary)' }}>aria-hidden</code> by default.
+      <p style={{ color: 'var(--pcs-colors-text-muted)', fontSize: 14, margin: '0 0 16px', lineHeight: 1.6 }}>
+        All icons are SVG components from <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--pcs-colors-brand)' }}>Icons.tsx</code>. They inherit <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--pcs-colors-brand)' }}>currentColor</code>, default to 16×16, and are <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--pcs-colors-brand)' }}>aria-hidden</code> by default.
       </p>
-      <p style={{ color: 'var(--p-text-muted)', fontSize: 13, margin: '0 0 48px', fontFamily: 'monospace', background: 'var(--p-card-alt)', padding: '8px 12px', borderRadius: 6, display: 'inline-block' }}>
+      <p style={{ color: 'var(--pcs-colors-text-muted)', fontSize: 13, margin: '0 0 48px', fontFamily: 'monospace', background: 'var(--pcs-colors-surface-subtle)', padding: '8px 12px', borderRadius: 6, display: 'inline-block' }}>
         {'import { WalletIcon, DepositIcon } from \'./Icons\''}
       </p>
 
       {/* Size demo */}
       <section style={{ marginBottom: 48 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--p-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 20, marginTop: 0 }}>
+        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 20, marginTop: 0 }}>
           Sizes
         </h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           {[12, 16, 20, 24, 32, 40].map((s) => (
             <div key={s} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <AllIcons.WalletIcon size={s} aria-hidden />
-              <span style={{ fontSize: 10, color: 'var(--p-text-muted)' }}>{s}px</span>
+              <span style={{ fontSize: 10, color: 'var(--pcs-colors-text-muted)' }}>{s}px</span>
             </div>
           ))}
         </div>
@@ -135,21 +136,21 @@ function IconsPage() {
 
       {/* Color variants */}
       <section style={{ marginBottom: 48 }}>
-        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--p-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 20, marginTop: 0 }}>
+        <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 20, marginTop: 0 }}>
           Color Variants
         </h2>
         <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
           {[
-            { color: 'var(--p-text)',       label: 'Default' },
-            { color: 'var(--p-text-muted)', label: 'Muted' },
-            { color: 'var(--p-primary)',    label: 'Primary' },
-            { color: 'var(--p-long)',       label: 'Long' },
-            { color: 'var(--p-short)',      label: 'Short' },
-            { color: 'var(--p-warning)',    label: 'Warning' },
+            { color: 'var(--pcs-colors-text)',       label: 'Default' },
+            { color: 'var(--pcs-colors-text-muted)', label: 'Muted' },
+            { color: 'var(--pcs-colors-brand)',    label: 'Primary' },
+            { color: 'var(--pcs-colors-long)',       label: 'Long' },
+            { color: 'var(--pcs-colors-short)',      label: 'Short' },
+            { color: 'var(--pcs-colors-warning)',    label: 'Warning' },
           ].map(({ color, label }) => (
             <div key={label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <AllIcons.TrendingUpIcon size={24} style={{ color }} aria-hidden />
-              <span style={{ fontSize: 10, color: 'var(--p-text-muted)' }}>{label}</span>
+              <span style={{ fontSize: 10, color: 'var(--pcs-colors-text-muted)' }}>{label}</span>
             </div>
           ))}
         </div>
@@ -158,7 +159,7 @@ function IconsPage() {
       {/* All icons by group */}
       {ICON_GROUPS.map(({ group, icons }) => (
         <section key={group} style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--p-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16, marginTop: 0 }}>
+          <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16, marginTop: 0 }}>
             {group}
           </h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -182,4 +183,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = { name: 'Icon Library' }
+export const Default: Story = {
+  name: 'Icon Library',
+  render: () => (
+    <SideBySideThemes>
+      <IconsPage />
+    </SideBySideThemes>
+  ),
+}

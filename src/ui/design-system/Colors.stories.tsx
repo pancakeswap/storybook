@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import '../design-system.css'
+import { SideBySideThemes } from '../../stories-utils'
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 function Swatch({ token, label }: { token: string; label: string }) {
@@ -127,49 +128,58 @@ function ColorsPage() {
         <h2 style={{ fontSize: 13, fontWeight: 700, color: 'var(--pcs-colors-text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 20, marginTop: 0 }}>
           Primitive Scales
         </h2>
-        <PaletteRow name="Gray" shades={[
+        <PaletteRow name="Neutrals (purple-tinted)" shades={[
           { token: '--pcs-colors-gray-50',  label: '50'  },
           { token: '--pcs-colors-gray-100', label: '100' },
+          { token: '--pcs-colors-gray-150', label: '150' },
           { token: '--pcs-colors-gray-200', label: '200' },
+          { token: '--pcs-colors-gray-250', label: '250' },
           { token: '--pcs-colors-gray-300', label: '300' },
           { token: '--pcs-colors-gray-400', label: '400' },
           { token: '--pcs-colors-gray-500', label: '500' },
           { token: '--pcs-colors-gray-600', label: '600' },
           { token: '--pcs-colors-gray-700', label: '700' },
+          { token: '--pcs-colors-gray-750', label: '750' },
           { token: '--pcs-colors-gray-800', label: '800' },
           { token: '--pcs-colors-gray-850', label: '850' },
           { token: '--pcs-colors-gray-900', label: '900' },
           { token: '--pcs-colors-gray-950', label: '950' },
         ]} />
-        <PaletteRow name="Teal (Brand)" shades={[
+        <PaletteRow name="Teal (Brand primary)" shades={[
           { token: '--pcs-colors-teal-50',  label: '50'     },
           { token: '--pcs-colors-teal-100', label: '100'    },
           { token: '--pcs-colors-teal-200', label: '200'    },
           { token: '--pcs-colors-teal-300', label: '300'    },
-          { token: '--pcs-colors-teal-400', label: '400'    },
-          { token: '--pcs-colors-teal-500', label: '500 ★'  },
-          { token: '--pcs-colors-teal-600', label: '600'    },
+          { token: '--pcs-colors-teal-400', label: '400 bright' },
+          { token: '--pcs-colors-teal-500', label: '500 ★ #1FC7D4' },
+          { token: '--pcs-colors-teal-600', label: '600 dark' },
           { token: '--pcs-colors-teal-700', label: '700'    },
           { token: '--pcs-colors-teal-800', label: '800'    },
           { token: '--pcs-colors-teal-900', label: '900'    },
         ]} />
-        <PaletteRow name="Green (Long)" shades={[
-          { token: '--pcs-colors-green-400', label: '400 ★' },
-          { token: '--pcs-colors-green-500', label: '500'   },
-        ]} />
-        <PaletteRow name="Red (Short)" shades={[
-          { token: '--pcs-colors-red-400', label: '400 ★' },
-          { token: '--pcs-colors-red-500', label: '500'   },
-        ]} />
         <PaletteRow name="Violet (Accent)" shades={[
-          { token: '--pcs-colors-violet-400', label: '400'   },
-          { token: '--pcs-colors-violet-500', label: '500 ★' },
+          { token: '--pcs-colors-violet-400', label: '400 light' },
+          { token: '--pcs-colors-violet-500', label: '500 ★ #7645D9' },
           { token: '--pcs-colors-violet-600', label: '600'   },
           { token: '--pcs-colors-violet-900', label: '900'   },
         ]} />
-        <PaletteRow name="Yellow (Warning)" shades={[
-          { token: '--pcs-colors-yellow-400', label: '400 ★' },
-          { token: '--pcs-colors-yellow-500', label: '500'   },
+        <PaletteRow name="Green (Long / Success)" shades={[
+          { token: '--pcs-colors-green-300', label: '300 bright' },
+          { token: '--pcs-colors-green-400', label: '400 ring' },
+          { token: '--pcs-colors-green-500', label: '500 ★ #129E7D' },
+          { token: '--pcs-colors-green-600', label: '600'   },
+        ]} />
+        <PaletteRow name="Pink (Short / Failure)" shades={[
+          { token: '--pcs-colors-pink-50',  label: '50'  },
+          { token: '--pcs-colors-pink-100', label: '100' },
+          { token: '--pcs-colors-pink-200', label: '200' },
+          { token: '--pcs-colors-pink-400', label: '400 ★ #ED4B9E' },
+          { token: '--pcs-colors-pink-500', label: '500' },
+          { token: '--pcs-colors-pink-600', label: '600' },
+        ]} />
+        <PaletteRow name="Amber (Warning)" shades={[
+          { token: '--pcs-colors-amber-400', label: '400 ★ #FFB237' },
+          { token: '--pcs-colors-amber-500', label: '500' },
         ]} />
       </section>
     </div>
@@ -186,4 +196,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = { name: 'Color Tokens' }
+export const Default: Story = {
+  name: 'Color Tokens',
+  render: () => (
+    <SideBySideThemes>
+      <ColorsPage />
+    </SideBySideThemes>
+  ),
+}

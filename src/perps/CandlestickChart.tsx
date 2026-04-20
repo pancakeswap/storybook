@@ -3,9 +3,10 @@ import { createChart, CandlestickSeries, type IChartApi, type CandlestickData, t
 import { useTheme } from '../ui/ThemeProvider'
 import { chartTokens } from '../ui/theme'
 import '../ui/perps.css'
+import './CandlestickChart.css'
 
-const PAIRS = ['CAKE/USDT', 'BTC/USDT', 'ETH/USDT']
-const TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1d', '1w']
+const TIMEFRAMES = ['1m', '5m', '1H', '1D']
+const TOOL_ICONS = ['◷', '✎', '✐', 'A', '⚙', '⊕', '⧈', '⤢']
 
 function generateCandles(basePrice: number, count = 80): CandlestickData<Time>[] {
   const candles: CandlestickData<Time>[] = []
@@ -33,12 +34,7 @@ const BASE_PRICES: Record<string, number> = {
   'CAKE/USDT': 3.48,
   'BTC/USDT':  65420,
   'ETH/USDT':  3180,
-}
-
-const MARKET_DATA: Record<string, { change: string; positive: boolean; high: string; low: string; volume: string; oi: string }> = {
-  'CAKE/USDT': { change: '+4.62%', positive: true,  high: '3.5970', low: '3.3180', volume: '$24.8M',   oi: '$8.2M'   },
-  'BTC/USDT':  { change: '-1.23%', positive: false, high: '67,240', low: '64,880', volume: '$1.82B',   oi: '$542M'   },
-  'ETH/USDT':  { change: '+2.10%', positive: true,  high: '3,286',  low: '3,112',  volume: '$486M',    oi: '$218M'   },
+  BTCUSDT:     75500.8,
 }
 
 export interface CandlestickChartProps {
@@ -48,24 +44,19 @@ export interface CandlestickChartProps {
 }
 
 export function CandlestickChart({
-  initialPair = 'CAKE/USDT',
-  initialTimeframe = '1h',
-  height = 380,
+  initialPair = 'BTCUSDT',
+  initialTimeframe = '1D',
+  height = 420,
 }: CandlestickChartProps) {
-  const [pair, setPair] = useState(initialPair)
-  const [showPairs, setShowPairs] = useState(false)
+  const [pair] = useState(initialPair)
   const [timeframe, setTimeframe] = useState(initialTimeframe)
+  const [rightTab, setRightTab] = useState<'chart' | 'depth' | 'details'>('chart')
   const { theme } = useTheme()
 
   const chartContainerRef = useRef<HTMLDivElement>(null)
+  const volumeRef = useRef<SVGSVGElement>(null)
   const chartRef = useRef<IChartApi | null>(null)
   const seriesRef = useRef<ReturnType<IChartApi['addSeries']> | null>(null)
-
-  const oracle = BASE_PRICES[pair] ?? 1
-  const mkt = MARKET_DATA[pair]
-  const fmtPrice = (p: number) => p >= 1000
-    ? p.toLocaleString(undefined, { maximumFractionDigits: 2 })
-    : p.toFixed(4)
 
   useEffect(() => {
     if (!chartContainerRef.current) return
@@ -76,7 +67,7 @@ export function CandlestickChart({
       layout: {
         background: { color: ct.bg },
         textColor: ct.textColor,
-        fontFamily: "'Inter', system-ui, sans-serif",
+        fontFamily: "'Kanit', system-ui, sans-serif",
         fontSize: 11,
       },
       grid: {
@@ -106,7 +97,7 @@ export function CandlestickChart({
     })
     ro.observe(chartContainerRef.current)
     return () => { ro.disconnect(); chart.remove(); chartRef.current = null; seriesRef.current = null }
-  }, [theme, height])
+  }, [theme, height, pair])
 
   useEffect(() => {
     if (!seriesRef.current) return
@@ -115,82 +106,109 @@ export function CandlestickChart({
   }, [pair, timeframe])
 
   return (
-    <div className="perps-root" style={{ padding: 0 }}>
-      <div className="p-panel" style={{ borderRadius: 0, borderLeft: 'none', borderRight: 'none', borderTop: 'none' }}>
-
-        {/* ── Market info bar ───────────────────────────────── */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0,
-          padding: '0 12px',
-          height: 52,
-          borderBottom: '1px solid var(--p-border)',
-          overflowX: 'auto',
-        }}>
-          {/* Pair selector */}
-          <div style={{ position: 'relative', marginRight: 20, flexShrink: 0 }}>
-            <div
-              className="p-pair-selector"
-              onClick={() => setShowPairs((v) => !v)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setShowPairs((v) => !v)}
-              style={{ border: 'none', background: 'transparent', padding: '4px 6px', gap: 6 }}
+    <div className="perps-root ch-root">
+      {/* Top toolbar */}
+      <div className="ch-toolbar">
+        <div className="ch-tf-group">
+          {TIMEFRAMES.map((tf) => (
+            <button
+              key={tf}
+              type="button"
+              className={`ch-tf-btn${timeframe === tf ? ' active' : ''}`}
+              onClick={() => setTimeframe(tf)}
             >
-              <span className="p-pair-name" style={{ fontSize: 16 }}>{pair}</span>
-              <span className="p-chevron" style={{ fontSize: 8 }}>▼</span>
-            </div>
-            {showPairs && (
-              <div className="p-dropdown" style={{ top: '120%', left: 0 }}>
-                {PAIRS.map((p) => (
-                  <button key={p} className={`p-dropdown-item${p === pair ? ' active' : ''}`}
-                    onClick={() => { setPair(p); setShowPairs(false) }}>
-                    {p}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Separator */}
-          <div style={{ width: 1, height: 28, background: 'var(--p-border)', marginRight: 20, flexShrink: 0 }} />
-
-          {/* Oracle price — most prominent */}
-          <div style={{ marginRight: 24, flexShrink: 0 }}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--p-text)', lineHeight: 1, letterSpacing: '-0.5px' }}>
-              ${fmtPrice(oracle)}
-            </div>
-            <div style={{ fontSize: 10, color: 'var(--p-text-muted)', marginTop: 2 }}>Oracle</div>
-          </div>
-
-          {/* Stats row */}
-          {[
-            { label: '24h Change', value: mkt.change, color: mkt.positive ? 'var(--p-long)' : 'var(--p-short)' },
-            { label: '24h High',   value: mkt.high,   color: 'var(--p-long)'  },
-            { label: '24h Low',    value: mkt.low,    color: 'var(--p-short)' },
-            { label: '24h Volume', value: mkt.volume, color: 'var(--p-text)'  },
-            { label: 'Open Interest', value: mkt.oi,  color: 'var(--p-text)'  },
-          ].map(({ label, value, color }) => (
-            <div key={label} style={{ marginRight: 24, flexShrink: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color, lineHeight: 1 }}>{value}</div>
-              <div style={{ fontSize: 10, color: 'var(--p-text-muted)', marginTop: 2 }}>{label}</div>
-            </div>
+              {tf}
+            </button>
           ))}
+          <button type="button" className="ch-tool-btn" aria-label="More timeframes">▾</button>
+        </div>
+        <div className="ch-sep" aria-hidden="true" />
+        <button type="button" className="ch-tool-btn" aria-label="Indicators">📊</button>
+        <button type="button" className="ch-tool-btn" aria-label="Grid">▦</button>
+        <button type="button" className="ch-tool-btn" aria-label="More indicators">▾</button>
+        <div className="ch-sep" aria-hidden="true" />
+        <button type="button" className="ch-price-mode">
+          Last Price <span className="ch-caret" aria-hidden="true">▾</span>
+        </button>
+        <div className="ch-spacer" />
+        {(['chart', 'depth', 'details'] as const).map((t) => (
+          <button
+            key={t}
+            type="button"
+            className={`ch-right-tab${rightTab === t ? ' active' : ''}`}
+            onClick={() => setRightTab(t)}
+          >
+            {t[0].toUpperCase() + t.slice(1)}
+          </button>
+        ))}
+        <button type="button" className="ch-tool-btn" aria-label="Fullscreen">⛶</button>
+      </div>
 
-          {/* Timeframe — pushed right */}
-          <div className="p-timeframe-bar" style={{ marginLeft: 'auto' }}>
-            {TIMEFRAMES.map((tf) => (
-              <button key={tf} className={`p-tf-btn${timeframe === tf ? ' active' : ''}`}
-                onClick={() => setTimeframe(tf)}>
-                {tf}
-              </button>
-            ))}
-          </div>
+      <div className="ch-body">
+        {/* Left tool rail */}
+        <div className="ch-rail" aria-label="Drawing tools">
+          {TOOL_ICONS.map((g, i) => (
+            <button key={i} type="button" className="ch-rail-btn" aria-label={`Tool ${i + 1}`}>
+              {g}
+            </button>
+          ))}
         </div>
 
-        {/* ── Chart ────────────────────────────────────────── */}
-        <div ref={chartContainerRef} style={{ width: '100%' }} />
+        {/* Chart area */}
+        <div className="ch-area">
+          {/* OHLC legend */}
+          <div className="ch-legend">
+            <div className="ch-legend-row">
+              <span>O<span className="ch-legend-val p-short">73756.4</span></span>
+              <span>H<span className="ch-legend-val p-short">75517.4</span></span>
+              <span>L<span className="ch-legend-val p-short">73684.0</span></span>
+              <span>C<span className="ch-legend-val p-short">75511.8</span></span>
+              <span className="p-short">1757.9 (+2.38%)</span>
+            </div>
+            <div className="ch-legend-row ch-ma-7">
+              MA 7 Close 0 SMA 9 <span className="ch-ma-chip ch-ma-chip-amber">75130.0</span>
+            </div>
+            <div className="ch-legend-row ch-ma-30">
+              MA 30 close 0 SMA 9 <span className="ch-ma-chip ch-ma-chip-violet">70717.4</span>
+              <span className="p-primary-text">73960.7</span>
+            </div>
+          </div>
+
+          <div ref={chartContainerRef} className="ch-canvas" />
+        </div>
+      </div>
+
+      {/* Volume strip */}
+      <div className="ch-volume">
+        <span className="ch-volume-legend">
+          Volume SMA 9 <span className="p-primary-text">3.124K</span>
+        </span>
+        <svg ref={volumeRef} viewBox="0 0 1000 72" preserveAspectRatio="none" className="ch-volume-svg">
+          {Array.from({ length: 100 }).map((_, i) => {
+            const h = 6 + Math.abs(Math.sin(i * 0.9) * 50) + (i % 9 === 0 ? 10 : 0)
+            const up = Math.sin(i * 0.7) > 0
+            return (
+              <rect
+                key={i}
+                x={30 + i * 9.5}
+                y={72 - h}
+                width="6"
+                height={h}
+                className={up ? 'ch-vol-up' : 'ch-vol-down'}
+                opacity="0.6"
+              />
+            )
+          })}
+          <text x="995" y="20" className="ch-vol-axis" textAnchor="end">80K</text>
+          <text x="995" y="40" className="ch-vol-axis" textAnchor="end">60K</text>
+          <text x="995" y="60" className="ch-vol-axis" textAnchor="end">40K</text>
+        </svg>
+      </div>
+
+      {/* Bottom axis bar */}
+      <div className="ch-axis-bar">
+        <span>22  Feb  10  19  Mar  10  19  Apr  10  19  28</span>
+        <span>15:24:28 (UTC+8) &nbsp; %  log  auto</span>
       </div>
     </div>
   )

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import './design-system.css'
 import { Input } from './Input'
+import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Components/Input',
@@ -14,6 +15,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [value, setValue] = useState('')
     return (
@@ -33,7 +35,14 @@ export const Default: Story = {
   },
 }
 
+export const DefaultDark: Story = {
+  ...Default,
+  name: 'Default (Dark)',
+  parameters: { ...Default.parameters, ...forceTheme('dark') },
+}
+
 export const WithLabelAndActions: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [value, setValue] = useState('')
     const rawVal = parseFloat(value) || 0
@@ -63,7 +72,14 @@ export const WithLabelAndActions: Story = {
   },
 }
 
+export const WithLabelAndActionsDark: Story = {
+  ...WithLabelAndActions,
+  name: 'With Label And Actions (Dark)',
+  parameters: { ...WithLabelAndActions.parameters, ...forceTheme('dark') },
+}
+
 export const WithPrefix: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [value, setValue] = useState('')
     return (
@@ -84,7 +100,14 @@ export const WithPrefix: Story = {
   },
 }
 
+export const WithPrefixDark: Story = {
+  ...WithPrefix,
+  name: 'With Prefix (Dark)',
+  parameters: { ...WithPrefix.parameters, ...forceTheme('dark') },
+}
+
 export const AllVariants: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [v1, setV1] = useState('')
     const [v2, setV2] = useState('')
@@ -113,4 +136,10 @@ export const AllVariants: Story = {
       </div>
     )
   },
+}
+
+export const AllVariantsDark: Story = {
+  ...AllVariants,
+  name: 'All Variants (Dark)',
+  parameters: { ...AllVariants.parameters, ...forceTheme('dark') },
 }

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import '../design-system.css'
+import { SideBySideThemes } from '../../stories-utils'
 
 // ── Elevation tokens (PancakeSwap: shadows.level1 / tooltip / modal) ─────────
 const ELEVATION = [
@@ -154,4 +155,11 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Default: Story = { name: 'Elevation & State Rings' }
+export const Default: Story = {
+  name: 'Elevation & State Rings',
+  render: () => (
+    <SideBySideThemes>
+      <ShadowsPage />
+    </SideBySideThemes>
+  ),
+}

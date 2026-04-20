@@ -47,14 +47,14 @@ export function Modal({ open, title, onClose, width = 420, children }: ModalProp
 
   if (!open) return null
 
+  // PCS: rgba(0,0,0,0.6) scrim, no blur
   const backdropBase: React.CSSProperties = {
     position: 'fixed',
     inset: 0,
     background: 'var(--pcs-colors-overlay)',
-    backdropFilter: 'blur(6px)',
-    WebkitBackdropFilter: 'blur(6px)',
     zIndex: 1000,
     display: 'flex',
+    animation: 'pcs-modal-fade 200ms cubic-bezier(0.16,1,0.3,1)',
   }
 
   const header = (
@@ -86,7 +86,7 @@ export function Modal({ open, title, onClose, width = 420, children }: ModalProp
             width: '100%',
             background: 'var(--pcs-colors-surface-card)',
             border: '1px solid var(--pcs-colors-border)',
-            borderRadius: 'var(--p-radius-lg) var(--p-radius-lg) 0 0',
+            borderRadius: 'var(--pcs-radius-xl) var(--pcs-radius-xl) 0 0',
             boxShadow: 'var(--pcs-shadows-modal)',
             maxHeight: '90dvh',
             overflowY: 'auto',
@@ -117,8 +117,9 @@ export function Modal({ open, title, onClose, width = 420, children }: ModalProp
         style={{
           background: 'var(--pcs-colors-surface-card)',
           border: '1px solid var(--pcs-colors-border)',
-          borderRadius: 'var(--p-radius-lg)',
+          borderRadius: 'var(--pcs-radius-xl)',
           padding: 24,
+          animation: 'pcs-modal-scale 200ms cubic-bezier(0.16,1,0.3,1)',
           boxShadow: 'var(--pcs-shadows-modal)',
           width,
           maxWidth: 'calc(100vw - 40px)',

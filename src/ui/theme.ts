@@ -1,40 +1,88 @@
 import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react'
 import { colors } from './tokens'
 
+/**
+ * Semantic theme for PancakeSwap Perpetual.
+ *
+ * All primitive values trace back to:
+ *   pancakeswap-perpetual-design-system/project/colors_and_type.css
+ *
+ * The Chakra tokens here are emitted as `--pcs-colors-*` and
+ * `--pcs-shadows-*` CSS variables (via `cssVarsPrefix: 'pcs'`),
+ * which the component CSS layer consumes directly.
+ */
+
 // ── Primitive aliases ─────────────────────────────────────────
-const teal   = colors.teal[500]    // #00c4cc  brand / teal
-const violet = colors.violet[500]  // #7c6aff  accent / violet
-const green  = colors.green[400]   // #0ecb81  long  / profit
-const red    = colors.red[400]     // #f6465d  short / loss
-const yellow = colors.yellow[400]  // #f0b429  warning
+const teal       = colors.teal[500]    // #1FC7D4  brand
+const tealDark   = colors.teal[600]    // #0098A1
+const tealBright = colors.teal[400]    // #53DEE9
+const violet     = colors.violet[500]  // #7645D9  accent
+const violetLt   = colors.violet[400]  // #A881FC
+const greenLong  = colors.green[500]   // #129E7D
+const greenDark  = colors.green[300]   // #3DDBB5 (dark-mode positive)
+const pinkShort  = colors.pink[400]    // #ED4B9E
+const amber      = colors.amber[400]   // #FFB237
+const amberDark  = colors.amber[500]   // #D67E0A
+
+// Light-theme neutrals
+const textLight       = colors.purple.text       // #280D5F
+const textSubtleLight = colors.gray[500]         // #7A6EAA
+const textDisabled    = colors.gray[400]         // #BDC2C4
+const bgLight         = colors.gray[50]          // #FAF9FA
+const surfaceLight    = '#FFFFFF'
+const surfaceAltLight = colors.gray[100]         // #F7F6FB
+const inputLight      = colors.gray[200]         // #EEEAF4
+const borderLight     = colors.gray[250]         // #E7E3EB
+const borderHoverLt   = colors.gray[300]         // #D7CAEC
+
+// Dark-theme neutrals
+const textDark        = colors.purple.textDark   // #F4EEFF
+const textSubtleDark  = colors.gray[600]         // #B8ADD2
+const bgDark          = colors.gray[950]         // #08060B
+const surfaceDark     = colors.gray[850]         // #27262C
+const surfaceAltDark  = colors.gray[825]         // #353547
+const inputDark       = colors.gray[800]         // #372F47
+const borderDark      = colors.gray[750]         // #383241
+const borderHoverDk   = colors.gray[700]         // #55496E
 
 const config = defineConfig({
   cssVarsPrefix: 'pcs',
 
   globalCss: {
-    // Gradient tokens — identical in both themes, injected once on the root
+    // Gradients — invariant across themes (pulled from colors_and_type.css)
     '.perps-root': {
-      '--pcs-gradient-brand': `linear-gradient(135deg,${teal},${violet})`,
-      '--pcs-gradient-usdc':  'linear-gradient(135deg,#2775ca,#3a9fd8)',
-      '--pcs-gradient-alp':   'linear-gradient(135deg,#1FC7D4,#A881FC)',
+      '--pcs-gradient-brand':        `linear-gradient(135deg,${teal},${violet})`,
+      '--pcs-gradient-bubblegum':    'linear-gradient(139.73deg,#E5FDFF 0%,#F3EFFF 100%)',
+      '--pcs-gradient-cake':         'linear-gradient(180deg,#53DEE9 0%,#1FC7D4 76%)',
+      '--pcs-gradient-card-active':  'linear-gradient(180deg,#1FC7D4 0%,#7645D9 100%)',
+      '--pcs-gradient-violet':       'linear-gradient(180deg,#7645D9 0%,#452A7A 100%)',
+      '--pcs-gradient-dark-page':    'linear-gradient(139.73deg,#313D5C 0%,#3D2A54 100%)',
+      '--pcs-gradient-inverted':     'linear-gradient(180deg,#53DEE9 0%,#7645D9 100%)',
+      '--pcs-gradient-usdc':         'linear-gradient(135deg,#2775ca,#3a9fd8)',
+      '--pcs-gradient-alp':          'linear-gradient(135deg,#1FC7D4,#A881FC)',
     },
   },
 
   theme: {
     tokens: {
       colors: {
-        // ── Neutrals / gray ──────────────────────────────────
+        // ── Gray (purple-tinted neutrals) ────────────────────
         'gray.50':  { value: colors.gray[50]  },
         'gray.100': { value: colors.gray[100] },
+        'gray.150': { value: colors.gray[150] },
         'gray.200': { value: colors.gray[200] },
+        'gray.250': { value: colors.gray[250] },
         'gray.300': { value: colors.gray[300] },
         'gray.400': { value: colors.gray[400] },
         'gray.500': { value: colors.gray[500] },
         'gray.600': { value: colors.gray[600] },
         'gray.700': { value: colors.gray[700] },
+        'gray.750': { value: colors.gray[750] },
         'gray.800': { value: colors.gray[800] },
+        'gray.825': { value: colors.gray[825] },
         'gray.850': { value: colors.gray[850] },
         'gray.900': { value: colors.gray[900] },
+        'gray.925': { value: colors.gray[925] },
         'gray.950': { value: colors.gray[950] },
 
         // ── Teal (brand) ─────────────────────────────────────
@@ -49,248 +97,217 @@ const config = defineConfig({
         'teal.800': { value: colors.teal[800] },
         'teal.900': { value: colors.teal[900] },
 
-        // ── Green (long / profit) ─────────────────────────────
-        'green.400': { value: colors.green[400] },
-        'green.500': { value: colors.green[500] },
-
-        // ── Red (short / loss) ────────────────────────────────
-        'red.400': { value: colors.red[400] },
-        'red.500': { value: colors.red[500] },
-
-        // ── Yellow (warning) ──────────────────────────────────
-        'yellow.400': { value: colors.yellow[400] },
-        'yellow.500': { value: colors.yellow[500] },
-
-        // ── Violet (accent) ───────────────────────────────────
+        // ── Violet (accent) ──────────────────────────────────
         'violet.400': { value: colors.violet[400] },
         'violet.500': { value: colors.violet[500] },
         'violet.600': { value: colors.violet[600] },
         'violet.900': { value: colors.violet[900] },
+
+        // ── Green (long) ─────────────────────────────────────
+        'green.50':  { value: colors.green[50]  },
+        'green.100': { value: colors.green[100] },
+        'green.300': { value: colors.green[300] },
+        'green.400': { value: colors.green[400] },
+        'green.500': { value: colors.green[500] },
+        'green.600': { value: colors.green[600] },
+
+        // ── Pink (short) ─────────────────────────────────────
+        'pink.50':  { value: colors.pink[50]  },
+        'pink.100': { value: colors.pink[100] },
+        'pink.200': { value: colors.pink[200] },
+        'pink.400': { value: colors.pink[400] },
+        'pink.500': { value: colors.pink[500] },
+        'pink.600': { value: colors.pink[600] },
+
+        // Aliases retained for legacy code paths
+        'red.400': { value: colors.pink[400] },
+        'red.500': { value: colors.pink[500] },
+
+        // ── Amber (warning) ──────────────────────────────────
+        'amber.400': { value: colors.amber[400] },
+        'amber.500': { value: colors.amber[500] },
+        'yellow.400': { value: colors.amber[400] }, // legacy alias
+        'yellow.500': { value: colors.amber[500] },
+
+        // ── BNB yellow ───────────────────────────────────────
+        'binance.500': { value: colors.binance[500] },
       },
     },
 
     semanticTokens: {
       colors: {
-        // ── Page background ───────────────────────────────────
+        // ── Page background ──────────────────────────────────
         bg: {
-          DEFAULT: {
-            value: { _light: '#f0f2f5', _dark: '{colors.gray.900}' },
-          },
+          DEFAULT: { value: { _light: bgLight, _dark: bgDark } },
         },
 
-        // ── Surfaces ──────────────────────────────────────────
+        // ── Surfaces ─────────────────────────────────────────
         surface: {
-          DEFAULT: {
-            value: { _light: '#ffffff', _dark: '{colors.gray.850}' },
-          },
-          card: {
-            value: { _light: '#ffffff', _dark: '{colors.gray.800}' },
-          },
-          // Depressed background: alt-cards, inputs, tabs, dropdowns
-          subtle: {
-            value: { _light: '#f5f7fa', _dark: '#1c2233' },
-          },
+          DEFAULT: { value: { _light: surfaceLight, _dark: surfaceDark } },
+          card:    { value: { _light: surfaceLight, _dark: surfaceDark } },
+          // "subtle" = pcs-input / pcs-background-alt2 — used for inputs,
+          // tabs backgrounds, alt cards
+          subtle:  { value: { _light: inputLight,    _dark: inputDark } },
+          alt:     { value: { _light: surfaceAltLight, _dark: surfaceAltDark } },
         },
 
-        // ── Borders ───────────────────────────────────────────
+        // ── Borders ──────────────────────────────────────────
         border: {
-          DEFAULT: {
-            value: { _light: '#e2e8f0', _dark: '#242d3f' },
-          },
-          hover: {
-            value: { _light: '#c4cfdf', _dark: '#3a4560' },
-          },
-          focus: {
-            value: { _light: teal, _dark: teal },
-          },
+          DEFAULT: { value: { _light: borderLight,   _dark: borderDark } },
+          hover:   { value: { _light: borderHoverLt, _dark: borderHoverDk } },
+          focus:   { value: { _light: violet,        _dark: violet } },
         },
 
-        // ── Text ──────────────────────────────────────────────
+        // ── Text ─────────────────────────────────────────────
         text: {
-          DEFAULT: {
-            value: { _light: '{colors.gray.900}', _dark: '#e8edf5' },
-          },
-          muted: {
-            value: { _light: '{colors.gray.500}', _dark: '#7d8ea8' },
-          },
-          // Placeholder / disabled / very dim
-          subtle: {
-            value: { _light: '{colors.gray.300}', _dark: '#3d4a63' },
-          },
-          'on-brand': {
-            value: { _light: '#ffffff', _dark: '#191326' },
-          },
-          'on-long': {
-            value: { _light: '#ffffff', _dark: '#191326' },
-          },
-          'on-short': {
-            value: { _light: '#ffffff', _dark: '#191326' },
-          },
+          DEFAULT: { value: { _light: textLight,       _dark: textDark } },
+          muted:   { value: { _light: textSubtleLight, _dark: textSubtleDark } },
+          subtle:  { value: { _light: textDisabled,    _dark: colors.gray[700] } },
+          'on-brand': { value: { _light: '#FFFFFF', _dark: '#FFFFFF' } },
+          'on-long':  { value: { _light: '#FFFFFF', _dark: '#FFFFFF' } },
+          'on-short': { value: { _light: '#FFFFFF', _dark: '#FFFFFF' } },
         },
 
-        // ── Brand (teal) ──────────────────────────────────────
+        // ── Brand (cyan) ─────────────────────────────────────
         brand: {
-          DEFAULT: {
-            value: { _light: teal, _dark: teal },
-          },
-          muted: {
-            value: { _light: 'rgba(0,196,204,0.12)', _dark: 'rgba(0,196,204,0.15)' },
-          },
-          glow: {
-            value: { _light: 'rgba(0,196,204,0.20)', _dark: 'rgba(0,196,204,0.28)' },
-          },
+          DEFAULT: { value: { _light: teal, _dark: teal } },
+          muted:   { value: { _light: 'rgba(31,199,212,0.12)', _dark: 'rgba(31,199,212,0.16)' } },
+          glow:    { value: { _light: 'rgba(31,199,212,0.20)', _dark: 'rgba(31,199,212,0.28)' } },
         },
+        'brand-bright': { DEFAULT: { value: { _light: tealBright, _dark: tealBright } } },
+        'brand-dark':   { DEFAULT: { value: { _light: tealDark,   _dark: tealDark } } },
 
-        // ── Accent (violet) ───────────────────────────────────
+        // ── Accent (violet) ──────────────────────────────────
         accent: {
-          DEFAULT: {
-            value: { _light: violet, _dark: violet },
-          },
-          muted: {
-            value: { _light: 'rgba(124,106,255,0.10)', _dark: 'rgba(124,106,255,0.12)' },
-          },
+          DEFAULT: { value: { _light: violet, _dark: violetLt } },
+          muted:   { value: { _light: 'rgba(118,69,217,0.10)', _dark: 'rgba(168,129,252,0.14)' } },
         },
 
-        // ── Trading — long (green) ────────────────────────────
+        // ── Long (green) ─────────────────────────────────────
         long: {
-          DEFAULT: {
-            value: { _light: green, _dark: green },
-          },
-          muted: {
-            value: { _light: 'rgba(14,203,129,0.12)', _dark: 'rgba(14,203,129,0.12)' },
-          },
-          bg: {
-            value: { _light: 'rgba(14,203,129,0.06)', _dark: 'rgba(14,203,129,0.06)' },
-          },
+          DEFAULT: { value: { _light: greenLong, _dark: greenDark } },
+          muted:   { value: { _light: 'rgba(18,158,125,0.12)', _dark: 'rgba(61,219,181,0.14)' } },
+          bg:      { value: { _light: colors.bidLight,  _dark: colors.bidDark } },
         },
+        'long-bar': { DEFAULT: { value: { _light: colors.bidBarLight, _dark: colors.bidBarDark } } },
 
-        // ── Trading — short (red) ─────────────────────────────
+        // ── Short (pink) ─────────────────────────────────────
         short: {
-          DEFAULT: {
-            value: { _light: red, _dark: red },
-          },
-          muted: {
-            value: { _light: 'rgba(246,70,93,0.08)', _dark: 'rgba(246,70,93,0.08)' },
-          },
-          bg: {
-            value: { _light: 'rgba(246,70,93,0.04)', _dark: 'rgba(246,70,93,0.04)' },
-          },
+          DEFAULT: { value: { _light: pinkShort, _dark: pinkShort } },
+          muted:   { value: { _light: 'rgba(237,75,158,0.10)', _dark: 'rgba(237,75,158,0.14)' } },
+          bg:      { value: { _light: colors.askLight, _dark: colors.askDark } },
         },
+        'short-bar': { DEFAULT: { value: { _light: colors.askBarLight, _dark: colors.askBarDark } } },
 
-        // ── Status ────────────────────────────────────────────
+        // ── Status ───────────────────────────────────────────
         warning: {
-          DEFAULT: {
-            value: { _light: yellow, _dark: yellow },
-          },
-          muted: {
-            value: { _light: 'rgba(240,180,41,0.12)', _dark: 'rgba(240,180,41,0.12)' },
-          },
+          DEFAULT: { value: { _light: amber, _dark: amber } },
+          muted:   { value: { _light: 'rgba(255,178,55,0.14)', _dark: 'rgba(255,178,55,0.18)' } },
         },
-        positive: {
-          DEFAULT: {
-            value: { _light: green, _dark: green },
-          },
-        },
-        negative: {
-          DEFAULT: {
-            value: { _light: red, _dark: red },
-          },
-        },
+        'warning-text': { DEFAULT: { value: { _light: amberDark, _dark: amber } } },
+        positive: { DEFAULT: { value: { _light: greenLong, _dark: greenDark } } },
+        negative: { DEFAULT: { value: { _light: pinkShort, _dark: pinkShort } } },
 
-        // ── Overlays ──────────────────────────────────────────
+        // ── Overlays ─────────────────────────────────────────
         overlay: {
-          DEFAULT: {
-            value: { _light: 'rgba(0,0,0,0.50)', _dark: 'rgba(0,0,0,0.72)' },
-          },
+          DEFAULT: { value: { _light: 'rgba(0,0,0,0.60)', _dark: 'rgba(0,0,0,0.72)' } },
         },
         'row-hover': {
-          DEFAULT: {
-            value: { _light: 'rgba(0,0,0,0.025)', _dark: 'rgba(255,255,255,0.018)' },
-          },
+          DEFAULT: { value: { _light: 'rgba(0,0,0,0.025)', _dark: 'rgba(255,255,255,0.02)' } },
         },
 
-        // ── Notice / info callout ─────────────────────────────
+        // ── Order-book row tints ─────────────────────────────
+        'row-bid':     { DEFAULT: { value: { _light: colors.bidLight,    _dark: colors.bidDark } } },
+        'row-bid-bar': { DEFAULT: { value: { _light: colors.bidBarLight, _dark: colors.bidBarDark } } },
+        'row-ask':     { DEFAULT: { value: { _light: colors.askLight,    _dark: colors.askDark } } },
+        'row-ask-bar': { DEFAULT: { value: { _light: colors.askBarLight, _dark: colors.askBarDark } } },
+
+        // ── Notice / info callout ────────────────────────────
         notice: {
-          bg: {
-            value: { _light: 'rgba(124,106,255,0.07)', _dark: 'rgba(124,106,255,0.08)' },
-          },
-          border: {
-            value: { _light: 'rgba(124,106,255,0.22)', _dark: 'rgba(124,106,255,0.20)' },
-          },
-          text: {
-            value: { _light: '{colors.violet.600}', _dark: '#a89cff' },
-          },
+          bg:     { value: { _light: 'rgba(118,69,217,0.08)',  _dark: 'rgba(168,129,252,0.10)' } },
+          border: { value: { _light: 'rgba(118,69,217,0.24)',  _dark: 'rgba(168,129,252,0.22)' } },
+          text:   { value: { _light: violet,                    _dark: violetLt } },
+        },
+
+        // ── Dropdown surface ─────────────────────────────────
+        dropdown: {
+          DEFAULT: { value: { _light: inputLight,  _dark: colors.gray[900] } },
+        },
+        'dropdown-deep': {
+          DEFAULT: { value: { _light: borderLight, _dark: colors.gray[925] } },
+        },
+
+        // ── BNB network pill ─────────────────────────────────
+        binance: {
+          DEFAULT: { value: { _light: colors.binance[500], _dark: colors.binance[500] } },
         },
       },
 
-      // ── Shadows — aligned with PancakeSwap UIKit shadow tokens ──
-      //   Source: packages/uikit/src/tokens/index.ts (theme-agnostic,
-      //   same values light & dark unless noted)
+      // ── Shadows — from pcs colors_and_type.css ───────────────
       shadows: {
-        // ── Elevation ─────────────────────────────────────────────
-        // level1 — card lift, active tab, subtle surfaces
-        // PancakeSwap: shadows.level1
         card: {
-          value: '0px 2px 12px -8px rgba(25, 19, 38, 0.1), 0px 1px 1px rgba(25, 19, 38, 0.05)',
+          value: {
+            _light: '0px 2px 12px -8px rgba(25, 19, 38, 0.10), 0px 1px 1px rgba(25, 19, 38, 0.05)',
+            _dark:  '0px 2px 12px -8px rgba(0, 0, 0, 0.60),    0px 1px 1px rgba(0, 0, 0, 0.40)',
+          },
         },
-        // Alias used by existing CSS references
         xs: {
-          value: '0px 2px 12px -8px rgba(25, 19, 38, 0.1), 0px 1px 1px rgba(25, 19, 38, 0.05)',
+          value: {
+            _light: '0px 2px 12px -8px rgba(25, 19, 38, 0.10), 0px 1px 1px rgba(25, 19, 38, 0.05)',
+            _dark:  '0px 2px 12px -8px rgba(0, 0, 0, 0.60),    0px 1px 1px rgba(0, 0, 0, 0.40)',
+          },
         },
-        // tooltip — dropdowns, popovers, menus
-        // PancakeSwap: shadows.tooltip
+        raised: {
+          value: {
+            _light: '0px 8px 24px -12px rgba(25, 19, 38, 0.16)',
+            _dark:  '0px 12px 32px -16px rgba(0, 0, 0, 0.80)',
+          },
+        },
         dropdown: {
-          value: '0px 0px 2px rgba(0, 0, 0, 0.2), 0px 4px 12px -8px rgba(14, 14, 44, 0.1)',
+          value: {
+            _light: '0px 8px 24px -12px rgba(25, 19, 38, 0.16)',
+            _dark:  '0px 12px 32px -16px rgba(0, 0, 0, 0.80)',
+          },
         },
-        // modal overlay shadow
         modal: {
-          value: '0px 20px 36px -8px rgba(14, 14, 44, 0.1), 0px 1px 1px rgba(0, 0, 0, 0.05)',
+          value: {
+            _light: '0px 20px 36px -8px rgba(14, 14, 44, 0.10), 0px 1px 1px rgba(0, 0, 0, 0.05)',
+            _dark:  '0px 24px 48px -12px rgba(0, 0, 0, 0.70),   0px 1px 1px rgba(0, 0, 0, 0.40)',
+          },
         },
-        // button base inset (bottom edge depth)
         inset: {
-          value: '0px -1px 0px 0px rgba(14, 14, 44, 0.4) inset',
+          value: 'inset 0px 2px 2px -1px rgba(74, 74, 104, 0.10)',
         },
 
-        // ── State rings ───────────────────────────────────────────
-        // active — brand/teal interactive focus (card, input)
-        // PancakeSwap: shadows.active  (#0098A1 = teal-600)
-        active: {
-          value: '0px 0px 0px 1px #0098A1, 0px 0px 4px 8px rgba(31, 199, 212, 0.4)',
-        },
-        // focus — violet keyboard-focus ring (buttons, form controls)
-        // PancakeSwap: shadows.focus  (#7645D9 = violet)
+        // ── Rings ──────────────────────────────────────────────
         focus: {
-          value: '0px 0px 0px 1px #7645D9, 0px 0px 0px 4px rgba(118, 69, 217, 0.6)',
+          value: '0px 0px 0px 1px #7645D9, 0px 0px 0px 4px rgba(118, 69, 217, 0.20)',
         },
-        // success — positive / long confirmation
-        // PancakeSwap: shadows.success  (#31D0AA = green)
+        active: {
+          value: '0px 0px 0px 1px #0098A1, 0px 0px 0px 4px rgba(31, 199, 212, 0.20)',
+        },
         success: {
-          value: '0px 0px 0px 1px #31D0AA, 0px 0px 0px 4px rgba(49, 208, 170, 0.2)',
+          value: '0px 0px 0px 1px #31D0AA, 0px 0px 0px 4px rgba(49, 208, 170, 0.20)',
         },
-        // warning — caution state
-        // PancakeSwap: shadows.warning
         warning: {
-          value: '0px 0px 0px 1px #D67E0A, 0px 0px 0px 4px rgba(214, 126, 10, 0.2)',
+          value: '0px 0px 0px 1px #FFB237, 0px 0px 0px 4px rgba(255, 178, 55, 0.20)',
         },
-        // danger — destructive / short / error state
-        // PancakeSwap: shadows.danger  (#ED4B9E = pink-red)
         danger: {
-          value: '0px 0px 0px 1px #ED4B9E, 0px 0px 0px 4px rgba(237, 75, 158, 0.2)',
+          value: '0px 0px 0px 1px #ED4B9E, 0px 0px 0px 4px rgba(237, 75, 158, 0.20)',
         },
 
-        // ── Trading-specific glows ────────────────────────────────
-        // Kept as named aliases; values now follow PancakeSwap ring pattern
+        // ── Trading-specific glows (aligned to ring pattern) ──
         'glow-brand': {
-          value: '0px 0px 0px 1px #0098A1, 0px 0px 4px 8px rgba(31, 199, 212, 0.4)',
+          value: '0px 0px 0px 1px #0098A1, 0px 0px 0px 4px rgba(31, 199, 212, 0.20)',
         },
         'glow-long': {
-          value: '0px 0px 0px 1px #31D0AA, 0px 0px 0px 4px rgba(49, 208, 170, 0.2)',
+          value: '0px 0px 0px 1px #31D0AA, 0px 0px 0px 4px rgba(49, 208, 170, 0.20)',
         },
         'glow-short': {
-          value: '0px 0px 0px 1px #ED4B9E, 0px 0px 0px 4px rgba(237, 75, 158, 0.2)',
+          value: '0px 0px 0px 1px #ED4B9E, 0px 0px 0px 4px rgba(237, 75, 158, 0.20)',
         },
         'glow-focus': {
-          value: '0px 0px 0px 1px #7645D9, 0px 0px 0px 4px rgba(118, 69, 217, 0.6)',
+          value: '0px 0px 0px 1px #7645D9, 0px 0px 0px 4px rgba(118, 69, 217, 0.20)',
         },
       },
     },
@@ -309,21 +326,21 @@ export const chartTokens: Record<Theme, {
   gridLine: string; crosshair: string; long: string; short: string
 }> = {
   dark: {
-    bg:        colors.gray[800],
-    textColor: '#7d8ea8',
-    border:    '#242d3f',
-    gridLine:  'rgba(36,45,63,0.7)',
-    crosshair: 'rgba(125,142,168,0.35)',
-    long:      green,
-    short:     red,
+    bg:        surfaceDark,
+    textColor: textSubtleDark,
+    border:    borderDark,
+    gridLine:  'rgba(56,50,65,0.6)',
+    crosshair: 'rgba(184,173,210,0.35)',
+    long:      greenDark,
+    short:     pinkShort,
   },
   light: {
-    bg:        '#ffffff',
-    textColor: '#4a5a72',
-    border:    '#e2e8f0',
-    gridLine:  'rgba(226,232,240,0.8)',
-    crosshair: 'rgba(74,90,114,0.30)',
-    long:      green,
-    short:     red,
+    bg:        surfaceLight,
+    textColor: textSubtleLight,
+    border:    borderLight,
+    gridLine:  'rgba(231,227,235,0.8)',
+    crosshair: 'rgba(122,110,170,0.30)',
+    long:      greenLong,
+    short:     pinkShort,
   },
 }

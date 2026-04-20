@@ -1,189 +1,253 @@
 /*
  * ╔══════════════════════════════════════════════════════════════╗
- * ║          PancakeSwap Perps — Design System (Structure)      ║
+ * ║       PancakeSwap Perpetual — Design System (Structure)     ║
  * ║                                                              ║
- * ║  Color tokens are defined in theme.ts and injected at       ║
- * ║  runtime by ThemeProvider into #perps-theme-vars <style>.   ║
+ * ║  Semantic color tokens (--pcs-colors-*) come from theme.ts  ║
+ * ║  via Chakra at runtime.                                      ║
  * ║                                                              ║
- * ║  This file contains only theme-invariant structural tokens:  ║
- * ║    typography · spacing · radius · motion · layout · z      ║
+ * ║  This file carries:                                          ║
+ * ║   · @font-face for Kanit                                     ║
+ * ║   · PCS typography / spacing / radius / shadow / motion /   ║
+ * ║     gradient tokens (authoritative from colors_and_type.css)║
+ * ║   · Legacy --p-* aliases that map onto the PCS values for   ║
+ * ║     backward compat with existing components                ║
  * ╚══════════════════════════════════════════════════════════════╝
  */
 
-/* ── Google Fonts ────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* ── Kanit (local) ───────────────────────────────────────────── */
+@font-face {
+  font-family: "Kanit";
+  font-style: normal;
+  font-weight: 300;
+  src: url("../assets/fonts/Kanit-Light.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Kanit";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../assets/fonts/Kanit-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Kanit";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../assets/fonts/Kanit-Medium.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Kanit";
+  font-style: normal;
+  font-weight: 600;
+  src: url("../assets/fonts/Kanit-SemiBold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Kanit";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../assets/fonts/Kanit-Bold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Kanit";
+  font-style: normal;
+  font-weight: 800;
+  src: url("../assets/fonts/Kanit-ExtraBold.ttf") format("truetype");
+  font-display: swap;
+}
 
 /* ════════════════════════════════════════════════════════════════
-   PRIMITIVE STRUCTURAL TOKENS
-   Raw values for non-color dimensions.
+   PCS STRUCTURAL TOKENS  (source of truth)
+   Values exactly match pancakeswap-perpetual-design-system/project/colors_and_type.css
    ════════════════════════════════════════════════════════════════ */
 .perps-root {
 
-  /* ── Font sizes ──────────────────────────────────────────── */
-  --prim-fs-2xs: 10px;
-  --prim-fs-xs:  11px;
-  --prim-fs-sm:  12px;
-  --prim-fs-md:  13px;
-  --prim-fs-lg:  14px;
-  --prim-fs-xl:  15px;
-  --prim-fs-2xl: 16px;
-  --prim-fs-3xl: 18px;
-  --prim-fs-4xl: 22px;
-  --prim-fs-5xl: 28px;
-  --prim-fs-6xl: 36px;
+  /* ── Typography ──────────────────────────────────────────── */
+  --pcs-font-sans: 'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --pcs-font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
 
-  /* ── Spacing (4px base grid) ─────────────────────────────── */
-  --prim-space-0:   0px;
-  --prim-space-1:   4px;
-  --prim-space-2:   8px;
-  --prim-space-3:  12px;
-  --prim-space-4:  16px;
-  --prim-space-5:  20px;
-  --prim-space-6:  24px;
-  --prim-space-8:  32px;
-  --prim-space-10: 40px;
-  --prim-space-12: 48px;
-  --prim-space-16: 64px;
+  --pcs-fs-xs:   10px;
+  --pcs-fs-sm:   12px;   /* caption */
+  --pcs-fs-body: 14px;   /* primary ui size */
+  --pcs-fs-md:   16px;   /* buttons, labels, large numerics */
+  --pcs-fs-lg:   20px;   /* sub-heading */
+  --pcs-fs-xl:   24px;
+  --pcs-fs-2xl:  28px;   /* screen heading */
+  --pcs-fs-3xl:  40px;   /* hero number / display */
+  --pcs-fs-4xl:  56px;
 
-  /* ── Radius ──────────────────────────────────────────────── */
-  --prim-radius-xs:    4px;
-  --prim-radius-sm:    6px;
-  --prim-radius-md:   10px;
-  --prim-radius-lg:   14px;
-  --prim-radius-xl:   20px;
-  --prim-radius-full: 9999px;
+  --pcs-lh-tight: 1.2;
+  --pcs-lh-base:  1.5;
+  --pcs-lh-loose: 1.75;
+
+  --pcs-fw-regular:   400;
+  --pcs-fw-medium:    500;
+  --pcs-fw-semibold:  600;
+  --pcs-fw-bold:      700;
+  --pcs-fw-extrabold: 800;
+
+  /* ── Spacing (4px base) ──────────────────────────────────── */
+  --pcs-space-1:  4px;
+  --pcs-space-2:  8px;
+  --pcs-space-3:  12px;
+  --pcs-space-4:  16px;
+  --pcs-space-5:  20px;
+  --pcs-space-6:  24px;
+  --pcs-space-8:  32px;
+  --pcs-space-10: 40px;
+  --pcs-space-12: 48px;
+  --pcs-space-16: 64px;
+
+  /* ── Radii ───────────────────────────────────────────────── */
+  --pcs-radius-xs:   4px;
+  --pcs-radius-sm:   8px;
+  --pcs-radius-md:  12px;   /* inputs, tabs */
+  --pcs-radius-lg:  16px;   /* buttons, tiles */
+  --pcs-radius-xl:  24px;   /* outer cards */
+  --pcs-radius-pill: 999px;
+
+  /* ── Motion ──────────────────────────────────────────────── */
+  --pcs-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --pcs-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --pcs-dur-fast:  120ms;
+  --pcs-dur-base:  200ms;
+  --pcs-dur-slow:  360ms;
+
+  /* ── Gradients ───────────────────────────────────────────── */
+  --pcs-gradient-bubblegum:   linear-gradient(139.73deg, #E5FDFF 0%, #F3EFFF 100%);
+  --pcs-gradient-cake:        linear-gradient(180deg, #53DEE9 0%, #1FC7D4 76%);
+  --pcs-gradient-card-active: linear-gradient(180deg, #1FC7D4 0%, #7645D9 100%);
+  --pcs-gradient-violet:      linear-gradient(180deg, #7645D9 0%, #452A7A 100%);
+  --pcs-gradient-dark-page:   linear-gradient(139.73deg, #313D5C 0%, #3D2A54 100%);
+  --pcs-gradient-inverted:    linear-gradient(180deg, #53DEE9 0%, #7645D9 100%);
+
+  /* ── Shadows (structure; theme variants in theme.ts) ────── */
+  --pcs-shadow-focus:   0px 0px 0px 1px #7645D9, 0px 0px 0px 4px rgba(118, 69, 217, 0.20);
+  --pcs-shadow-success: 0px 0px 0px 1px #31D0AA, 0px 0px 0px 4px rgba(49, 208, 170, 0.20);
+  --pcs-shadow-warning: 0px 0px 0px 1px #ED4B9E, 0px 0px 0px 4px rgba(237, 75, 158, 0.20);
+  --pcs-shadow-inset:   inset 0px 2px 2px -1px rgba(74, 74, 104, 0.10);
 
   /* ── Z-index ─────────────────────────────────────────────── */
-  --prim-z-base:      1;
-  --prim-z-raised:   10;
-  --prim-z-dropdown: 20;
-  --prim-z-sticky:  100;
-  --prim-z-overlay: 500;
-  --prim-z-modal:  1000;
-  --prim-z-toast:  2000;
+  --pcs-z-base:      1;
+  --pcs-z-raised:   10;
+  --pcs-z-dropdown: 20;
+  --pcs-z-sticky:  100;
+  --pcs-z-overlay: 500;
+  --pcs-z-modal:  1000;
+  --pcs-z-toast:  2000;
 
-  /* ── Transition durations ────────────────────────────────── */
-  --prim-duration-instant:  80ms;
-  --prim-duration-fast:    120ms;
-  --prim-duration-base:    150ms;
-  --prim-duration-slow:    250ms;
-  --prim-duration-sluggish: 400ms;
-
-  /* ── Easing ──────────────────────────────────────────────── */
-  --prim-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
-  --prim-ease-out:     cubic-bezier(0, 0, 0.2, 1);
-  --prim-ease-in:      cubic-bezier(0.4, 0, 1, 1);
-  --prim-ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* ── Control heights ─────────────────────────────────────── */
+  --pcs-control-xs: 24px;
+  --pcs-control-sm: 32px;
+  --pcs-control-md: 40px;
+  --pcs-control-lg: 48px;
+  --pcs-control-xl: 56px;
 }
 
 
 /* ════════════════════════════════════════════════════════════════
-   SEMANTIC STRUCTURAL TOKENS  (--p-* public API, non-color)
+   LEGACY --p-* ALIASES
+   Keep existing components working — every --p-* resolves to a
+   PCS value. Safe to remove once all callers migrate to --pcs-*.
    ════════════════════════════════════════════════════════════════ */
 .perps-root {
 
-  /* ── Typography ─────────────────────────────────────────── */
-  --p-font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  --p-font-mono:   'SF Mono', 'Fira Code', 'Consolas', monospace;
+  /* Typography */
+  --p-font-family: var(--pcs-font-sans);
+  --p-font-mono:   var(--pcs-font-mono);
 
-  --p-text-2xs:  var(--prim-fs-2xs);  /* 10px  meta / badge label   */
-  --p-text-xs:   var(--prim-fs-xs);   /* 11px  table header / label */
-  --p-text-sm:   var(--prim-fs-sm);   /* 12px  table cell / caption */
-  --p-text-base: var(--prim-fs-md);   /* 13px  body default         */
-  --p-text-lg:   var(--prim-fs-lg);   /* 14px  emphasized body      */
-  --p-text-xl:   var(--prim-fs-xl);   /* 15px  subheading           */
-  --p-text-2xl:  var(--prim-fs-2xl);  /* 16px  section title        */
-  --p-text-3xl:  var(--prim-fs-3xl);  /* 18px  card title           */
-  --p-text-4xl:  var(--prim-fs-4xl);  /* 22px  stat value           */
-  --p-text-5xl:  var(--prim-fs-5xl);  /* 28px  hero number          */
-  --p-text-6xl:  var(--prim-fs-6xl);  /* 36px  display              */
+  --p-text-2xs:  var(--pcs-fs-xs);    /* 10px */
+  --p-text-xs:   var(--pcs-fs-xs);    /* 10px (was 11) */
+  --p-text-sm:   var(--pcs-fs-sm);    /* 12px */
+  --p-text-base: var(--pcs-fs-body);  /* 14px (was 13) */
+  --p-text-lg:   var(--pcs-fs-body);  /* 14px */
+  --p-text-xl:   var(--pcs-fs-md);    /* 16px (was 15) */
+  --p-text-2xl:  var(--pcs-fs-md);    /* 16px */
+  --p-text-3xl:  var(--pcs-fs-lg);    /* 20px (was 18) */
+  --p-text-4xl:  var(--pcs-fs-xl);    /* 24px (was 22) */
+  --p-text-5xl:  var(--pcs-fs-2xl);   /* 28px */
+  --p-text-6xl:  var(--pcs-fs-3xl);   /* 40px (was 36) */
 
-  --p-leading-tight:   1.25;
+  --p-leading-tight:   var(--pcs-lh-tight);
   --p-leading-snug:    1.4;
-  --p-leading-normal:  1.5;
-  --p-leading-relaxed: 1.6;
+  --p-leading-normal:  var(--pcs-lh-base);
+  --p-leading-relaxed: var(--pcs-lh-loose);
 
-  --p-font-normal: 400;
-  --p-font-medium: 500;
-  --p-font-semi:   600;
-  --p-font-bold:   700;
-  --p-font-black:  800;
+  --p-font-normal: var(--pcs-fw-regular);
+  --p-font-medium: var(--pcs-fw-medium);
+  --p-font-semi:   var(--pcs-fw-semibold);
+  --p-font-bold:   var(--pcs-fw-bold);
+  --p-font-black:  var(--pcs-fw-extrabold);
 
-  --p-tracking-tight:   -0.4px;
+  --p-tracking-tight:   -0.01em;
   --p-tracking-normal:   0;
   --p-tracking-wide:     0.02em;
   --p-tracking-wider:    0.04em;
   --p-tracking-widest:   0.08em;
 
-  /* ── Spacing ─────────────────────────────────────────────── */
-  --p-space-0:  var(--prim-space-0);
-  --p-space-1:  var(--prim-space-1);   /* 4px  */
-  --p-space-2:  var(--prim-space-2);   /* 8px  */
-  --p-space-3:  var(--prim-space-3);   /* 12px */
-  --p-space-4:  var(--prim-space-4);   /* 16px */
-  --p-space-5:  var(--prim-space-5);   /* 20px */
-  --p-space-6:  var(--prim-space-6);   /* 24px */
-  --p-space-8:  var(--prim-space-8);   /* 32px */
-  --p-space-10: var(--prim-space-10);  /* 40px */
-  --p-space-12: var(--prim-space-12);  /* 48px */
-  --p-space-16: var(--prim-space-16);  /* 64px */
+  /* Spacing */
+  --p-space-0:  0px;
+  --p-space-1:  var(--pcs-space-1);
+  --p-space-2:  var(--pcs-space-2);
+  --p-space-3:  var(--pcs-space-3);
+  --p-space-4:  var(--pcs-space-4);
+  --p-space-5:  var(--pcs-space-5);
+  --p-space-6:  var(--pcs-space-6);
+  --p-space-8:  var(--pcs-space-8);
+  --p-space-10: var(--pcs-space-10);
+  --p-space-12: var(--pcs-space-12);
+  --p-space-16: var(--pcs-space-16);
 
-  --p-page-gutter:   var(--prim-space-4);  /* 16px outer page margin  */
-  --p-card-padding:  var(--prim-space-4);  /* 16px card inner padding */
-  --p-panel-padding: var(--prim-space-4);  /* 16px panel padding      */
+  --p-page-gutter:   var(--pcs-space-4);
+  --p-card-padding:  var(--pcs-space-6);
+  --p-panel-padding: var(--pcs-space-4);
 
-  /* ── Border radius ───────────────────────────────────────── */
-  --p-radius-xs:   var(--prim-radius-xs);
-  --p-radius-sm:   var(--prim-radius-sm);
-  --p-radius-md:   var(--prim-radius-md);
-  --p-radius-lg:   var(--prim-radius-lg);
-  --p-radius-xl:   var(--prim-radius-xl);
-  --p-radius-full: var(--prim-radius-full);
+  /* Radius — legacy aliases map to PCS scale */
+  --p-radius-xs:   var(--pcs-radius-xs);    /* 4  */
+  --p-radius-sm:   var(--pcs-radius-sm);    /* 8  */
+  --p-radius-md:   var(--pcs-radius-md);    /* 12 */
+  --p-radius-lg:   var(--pcs-radius-lg);    /* 16 */
+  --p-radius-xl:   var(--pcs-radius-xl);    /* 24 */
+  --p-radius-full: var(--pcs-radius-pill);  /* 999 */
 
-  /* ── Motion ──────────────────────────────────────────────── */
-  --p-duration-fast: var(--prim-duration-fast);
-  --p-duration-base: var(--prim-duration-base);
-  --p-duration-slow: var(--prim-duration-slow);
-  --p-ease:          var(--prim-ease-default);
-  --p-ease-out:      var(--prim-ease-out);
-  --p-ease-spring:   var(--prim-ease-spring);
+  /* Motion */
+  --p-duration-fast: var(--pcs-dur-fast);
+  --p-duration-base: var(--pcs-dur-base);
+  --p-duration-slow: var(--pcs-dur-slow);
+  --p-ease:          var(--pcs-ease-out);
+  --p-ease-out:      var(--pcs-ease-out);
+  --p-ease-spring:   var(--pcs-ease-out);
 
   --p-transition-colors:
     color            var(--p-duration-fast) var(--p-ease),
     background-color var(--p-duration-fast) var(--p-ease),
     border-color     var(--p-duration-fast) var(--p-ease);
 
-  /* ── Layout ──────────────────────────────────────────────── */
+  /* Layout */
   --p-navbar-height:  56px;
   --p-sidebar-width: 300px;
   --p-bottom-height: 220px;
 
-  /* ── Z-index ─────────────────────────────────────────────── */
-  --p-z-base:     var(--prim-z-base);
-  --p-z-raised:   var(--prim-z-raised);
-  --p-z-dropdown: var(--prim-z-dropdown);
-  --p-z-sticky:   var(--prim-z-sticky);
-  --p-z-overlay:  var(--prim-z-overlay);
-  --p-z-modal:    var(--prim-z-modal);
-  --p-z-toast:    var(--prim-z-toast);
+  /* Z-index */
+  --p-z-base:     var(--pcs-z-base);
+  --p-z-raised:   var(--pcs-z-raised);
+  --p-z-dropdown: var(--pcs-z-dropdown);
+  --p-z-sticky:   var(--pcs-z-sticky);
+  --p-z-overlay:  var(--pcs-z-overlay);
+  --p-z-modal:    var(--pcs-z-modal);
+  --p-z-toast:    var(--pcs-z-toast);
 
-  /* ── Control heights ─────────────────────────────────────── */
-  --p-control-xs: 24px;
-  --p-control-sm: 32px;
-  --p-control-md: 40px;
-  --p-control-lg: 48px;
-  --p-control-xl: 56px;
+  /* Control heights */
+  --p-control-xs: var(--pcs-control-xs);
+  --p-control-sm: var(--pcs-control-sm);
+  --p-control-md: var(--pcs-control-md);
+  --p-control-lg: var(--pcs-control-lg);
+  --p-control-xl: var(--pcs-control-xl);
 }
 
-
-/* ════════════════════════════════════════════════════════════════
-   RESPONSIVE BREAKPOINTS
-   Mobile-first — enhance with min-width media queries.
-   xs: 0–479px | sm: 480–767px | md: 768–1023px
-   lg: 1024–1279px | xl: 1280px+ | 2xl: 1536px+
-   ════════════════════════════════════════════════════════════════ */
-
-/* Convenience: narrow panel (right sidebar, mobile) */
+/* Narrow-panel breakpoint (preserved) */
 @container (max-width: 380px) {
   .p-stat-grid-4 { grid-template-columns: 1fr 1fr; }
 }

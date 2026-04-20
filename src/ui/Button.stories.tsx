@@ -3,6 +3,7 @@ import { useState } from 'react'
 import './design-system.css'
 import { Button } from './Button'
 import type { ButtonVariant, ButtonSize } from './Button'
+import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Components/Button',
@@ -37,6 +38,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
+  parameters: { ...forceTheme('light') },
   render: (args) => (
     <div className="perps-root" style={{ padding: 24 }}>
       <Button {...args} />
@@ -44,7 +46,14 @@ export const Default: Story = {
   ),
 }
 
+export const DefaultDark: Story = {
+  ...Default,
+  name: 'Default (Dark)',
+  parameters: { ...Default.parameters, ...forceTheme('dark') },
+}
+
 export const AllVariants: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => (
     <div className="perps-root" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* Variants */}
@@ -99,4 +108,10 @@ export const AllVariants: Story = {
       </div>
     </div>
   ),
+}
+
+export const AllVariantsDark: Story = {
+  ...AllVariants,
+  name: 'All Variants (Dark)',
+  parameters: { ...AllVariants.parameters, ...forceTheme('dark') },
 }

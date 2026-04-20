@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { EditCollateralModal } from './EditCollateralModal'
+import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Widgets/Edit Collateral',
@@ -28,10 +29,18 @@ type Story = StoryObj<typeof meta>
 
 export const DepositTab: Story = {
   name: 'Deposit',
+  parameters: { ...forceTheme('light') },
+}
+
+export const DepositTabDark: Story = {
+  ...DepositTab,
+  name: 'Deposit (Dark)',
+  parameters: { ...DepositTab.parameters, ...forceTheme('dark') },
 }
 
 export const WithdrawTab: Story = {
   name: 'Withdraw (Short)',
+  parameters: { ...forceTheme('light') },
   args: {
     direction: 'short',
     pair: 'ETH/USDT',
@@ -42,9 +51,22 @@ export const WithdrawTab: Story = {
   },
 }
 
+export const WithdrawTabDark: Story = {
+  ...WithdrawTab,
+  name: 'Withdraw (Short, Dark)',
+  parameters: { ...WithdrawTab.parameters, ...forceTheme('dark') },
+}
+
 export const NoBalance: Story = {
   name: 'No Balance',
+  parameters: { ...forceTheme('light') },
   args: {
     availableBalance: '0.00',
   },
+}
+
+export const NoBalanceDark: Story = {
+  ...NoBalance,
+  name: 'No Balance (Dark)',
+  parameters: { ...NoBalance.parameters, ...forceTheme('dark') },
 }

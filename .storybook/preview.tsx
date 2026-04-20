@@ -4,7 +4,11 @@ import { PhoneFrame, TabletFrame } from './DeviceFrame'
 import './preview.css'
 
 const withTheme: Decorator = (Story, context) => {
-  const theme = (context.globals['theme'] as string) ?? 'dark'
+  // Story-level parameter wins over the toolbar global, so individual
+  // stories can force light/dark regardless of the reviewer's selection.
+  const paramTheme = (context.parameters['theme'] as string | undefined)
+  const globalTheme = (context.globals['theme'] as string | undefined)
+  const theme = paramTheme ?? globalTheme ?? 'dark'
   return (
     <ThemeProvider forcedTheme={theme}>
       {/* Wrapper ensures canvas areas in docs mode get the correct background */}

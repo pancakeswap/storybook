@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import './design-system.css'
 import { Slider } from './Slider'
+import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Components/Slider',
@@ -14,6 +15,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const LeverageSlider: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [leverage, setLeverage] = useState(10)
     return (
@@ -52,7 +54,14 @@ export const LeverageSlider: Story = {
   },
 }
 
+export const LeverageSliderDark: Story = {
+  ...LeverageSlider,
+  name: 'Leverage Slider (Dark)',
+  parameters: { ...LeverageSlider.parameters, ...forceTheme('dark') },
+}
+
 export const SimpleSlider: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [value, setValue] = useState(50)
     return (
@@ -70,7 +79,14 @@ export const SimpleSlider: Story = {
   },
 }
 
+export const SimpleSliderDark: Story = {
+  ...SimpleSlider,
+  name: 'Simple Slider (Dark)',
+  parameters: { ...SimpleSlider.parameters, ...forceTheme('dark') },
+}
+
 export const WithMarks: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [value, setValue] = useState(25)
     return (
@@ -94,4 +110,10 @@ export const WithMarks: Story = {
       </div>
     )
   },
+}
+
+export const WithMarksDark: Story = {
+  ...WithMarks,
+  name: 'With Marks (Dark)',
+  parameters: { ...WithMarks.parameters, ...forceTheme('dark') },
 }

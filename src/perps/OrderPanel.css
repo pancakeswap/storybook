@@ -1,0 +1,251 @@
+/* ── Order Panel (Aster-style trade panel) ──────────────────── */
+.op-root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--pcs-colors-surface-card);
+  border-bottom: 1px solid var(--pcs-colors-border);
+  color: var(--pcs-colors-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Mode row (Cross / 20x / M) ─────────────────────────── */
+.op-mode-row { display: flex; gap: 4px; }
+
+.op-mode-btn,
+.op-mode-m {
+  background: var(--pcs-colors-surface-subtle);
+  border: 1px solid var(--pcs-colors-border);
+  border-radius: 8px;
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: filter 0.12s;
+}
+.op-mode-btn { flex: 1; }
+.op-mode-lev { color: var(--pcs-colors-brand); }
+.op-mode-m { width: 34px; color: var(--pcs-colors-text-muted); }
+.op-mode-btn:hover, .op-mode-m:hover { filter: brightness(1.05); }
+
+.op-caret { font-size: 8px; opacity: 0.8; }
+
+/* ── Order type tabs ────────────────────────────────────── */
+.op-order-tabs {
+  display: flex;
+  gap: 16px;
+  border-bottom: 1px solid var(--pcs-colors-border);
+  margin-top: 2px;
+}
+
+.op-order-tab {
+  background: transparent;
+  border: none;
+  color: var(--pcs-colors-text-muted);
+  border-bottom: 2px solid transparent;
+  padding: 6px 0;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+}
+.op-order-tab:hover { color: var(--pcs-colors-text); }
+.op-order-tab.active {
+  color: var(--pcs-colors-text);
+  border-bottom-color: var(--pcs-colors-brand);
+}
+
+/* ── Avbl row ───────────────────────────────────────────── */
+.op-avbl-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.op-avbl-label { color: var(--pcs-colors-text-muted); }
+.op-avbl-value {
+  color: var(--pcs-colors-text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Size input ─────────────────────────────────────────── */
+.op-size-input,
+.op-tpsl-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--pcs-colors-surface-subtle);
+  border: 1px solid var(--pcs-colors-border);
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+
+.op-size-label {
+  font-size: 11px;
+  color: var(--pcs-colors-text-muted);
+  font-weight: 500;
+}
+
+.op-size-field {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: right;
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.op-size-field::placeholder { color: var(--pcs-colors-text-muted); font-weight: 500; }
+
+.op-size-unit {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ── TP/SL inputs ───────────────────────────────────────── */
+.op-tpsl-prefix { font-size: 10px; font-weight: 700; }
+.op-tpsl-suffix { color: var(--pcs-colors-text-muted); font-size: 10px; }
+
+/* ── Slider ─────────────────────────────────────────────── */
+.op-slider {
+  position: relative;
+  height: 14px;
+  margin: 2px 0;
+}
+
+.op-slider-track {
+  position: absolute;
+  left: 0; right: 0;
+  top: 6px;
+  height: 2px;
+  background: var(--pcs-colors-surface-subtle);
+  border-radius: 2px;
+}
+
+.op-slider-fill {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  height: 2px;
+  background: var(--pcs-colors-brand);
+  border-radius: 2px;
+  transition: width 0.12s;
+}
+
+.op-slider-stop {
+  position: absolute;
+  top: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pcs-colors-text-muted);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.op-slider-thumb {
+  position: absolute;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--pcs-colors-brand);
+  border: 2px solid var(--pcs-colors-surface-card);
+  pointer-events: none;
+  transition: left 0.12s;
+}
+
+/* ── Checkboxes ─────────────────────────────────────────── */
+.op-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--pcs-colors-text);
+  font-weight: 500;
+  cursor: pointer;
+}
+.op-check input {
+  accent-color: var(--pcs-colors-brand);
+  width: 12px;
+  height: 12px;
+}
+
+/* ── Buy/Sell buttons ──────────────────────────────────── */
+.op-cta-row { display: flex; gap: 6px; margin-top: 4px; }
+
+.op-cta {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  cursor: pointer;
+  transition: filter 0.12s, transform 0.12s;
+}
+.op-cta:hover { filter: brightness(1.06); }
+.op-cta:active { transform: scale(0.98); filter: brightness(0.95); }
+
+.op-cta-long { background: var(--pcs-colors-brand); color: var(--pcs-colors-text-on-brand); }
+.op-cta-short { background: var(--pcs-colors-short); color: var(--pcs-colors-text-on-short); }
+
+/* ── Stats grid ─────────────────────────────────────────── */
+.op-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 10px;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.op-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.op-stat-span { grid-column: 1 / 3; }
+
+.op-stat-label {
+  color: var(--pcs-colors-text-muted);
+}
+.op-stat-label strong {
+  color: var(--pcs-colors-text);
+  font-weight: 700;
+  margin-left: 3px;
+}
+
+.op-stat-value {
+  color: var(--pcs-colors-text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.op-stat-muted { color: var(--pcs-colors-text-muted); font-weight: 500; }

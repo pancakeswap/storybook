@@ -1,10 +1,10 @@
-/* ── Navbar root ───────────────────────────────────────────── */
+/* ── Navbar (Aster-style, 48h) ─────────────────────────────── */
 .nb-root {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 56px;
-  padding: 0 16px;
+  gap: 24px;
+  height: 48px;
+  padding: 0 14px;
   background: var(--pcs-colors-surface-card);
   border-bottom: 1px solid var(--pcs-colors-border);
   flex-shrink: 0;
@@ -12,7 +12,6 @@
   z-index: 100;
 }
 
-/* ── Left side ─────────────────────────────────────────────── */
 .nb-left {
   display: flex;
   align-items: center;
@@ -21,152 +20,137 @@
 }
 
 .nb-logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   text-decoration: none;
   flex-shrink: 0;
 }
 
-.nb-logo-text {
+.nb-wordmark {
   font-size: 15px;
   font-weight: 800;
   color: var(--pcs-colors-text);
   letter-spacing: -0.3px;
   white-space: nowrap;
+  line-height: 1;
 }
 
-/* ── Nav items ─────────────────────────────────────────────── */
+/* ── Nav items (tabs) ──────────────────────────────────── */
 .nb-nav {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 18px;
 }
 
 .nb-nav-item {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
+  gap: 3px;
+  padding: 0;
   border: none;
-  border-radius: 8px;
   background: transparent;
   color: var(--pcs-colors-text-muted);
   font-family: inherit;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.12s, color 0.12s;
+  transition: color 0.12s;
 }
-.nb-nav-item:hover {
-  background: var(--pcs-colors-surface-subtle);
-  color: var(--pcs-colors-text);
-}
-.nb-nav-item.active {
-  color: var(--pcs-colors-brand);
-  font-weight: 600;
-}
-.nb-nav-item.active:hover {
-  background: var(--pcs-colors-brand-muted);
-}
+.nb-nav-item:hover { color: var(--pcs-colors-text); }
+.nb-nav-item.active { color: var(--pcs-colors-text); }
 
 .nb-chevron {
-  font-size: 10px;
+  display: inline-flex;
   opacity: 0.6;
 }
 
-/* ── Right side ────────────────────────────────────────────── */
+.nb-spacer { flex: 1; min-width: 8px; }
+
+/* ── Right side ────────────────────────────────────────── */
 .nb-right {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-/* ── Icon buttons ──────────────────────────────────────────── */
-.nb-icon-btn {
-  width: 34px;
-  height: 34px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--pcs-colors-text-muted);
-  cursor: pointer;
-  display: flex;
+/* ── Deposit pill (teal/brand) ──────────────────────────── */
+.nb-deposit-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.12s, color 0.12s;
-  flex-shrink: 0;
-}
-.nb-icon-btn:hover {
-  background: var(--pcs-colors-surface-subtle);
-  color: var(--pcs-colors-text);
-}
-
-
-/* ── Divider ───────────────────────────────────────────────── */
-.nb-divider {
-  width: 1px;
-  height: 20px;
-  background: var(--pcs-colors-border);
-  margin: 0 4px;
-  flex-shrink: 0;
-}
-
-/* ── Deposit button ────────────────────────────────────────── */
-.nb-deposit-btn {
-  height: 34px;
-  padding: 0 16px;
+  height: 30px;
+  padding: 0 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--pcs-colors-brand);
   color: var(--pcs-colors-text-on-brand);
   font-family: inherit;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: filter 0.15s;
+  letter-spacing: 0;
+  transition: filter var(--pcs-dur-base) var(--pcs-ease-out), transform var(--pcs-dur-fast) var(--pcs-ease-out);
   flex-shrink: 0;
 }
-.nb-deposit-btn:hover { filter: brightness(1.1); }
-.nb-deposit-btn:active { filter: brightness(0.9); }
+.nb-deposit-btn:hover  { filter: brightness(1.06); }
+.nb-deposit-btn:active { filter: brightness(0.95); transform: scale(0.98); }
 
-/* ── Wallet button ─────────────────────────────────────────── */
+/* ── Chain pill ────────────────────────────────────────── */
+.nb-chain-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pcs-colors-surface-subtle);
+  color: var(--pcs-colors-text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.nb-chain-pill:hover { filter: brightness(1.05); }
+
+/* ── Wallet pill ───────────────────────────────────────── */
+.nb-wallet-wrap { position: relative; }
+
 .nb-wallet-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: 34px;
+  gap: 6px;
+  height: 30px;
   padding: 0 12px;
-  border: 1px solid var(--pcs-colors-border);
-  border-radius: 8px;
+  border: none;
+  border-radius: 10px;
   background: var(--pcs-colors-surface-subtle);
   color: var(--pcs-colors-text);
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
-  transition: border-color 0.12s, background 0.12s;
   white-space: nowrap;
   flex-shrink: 0;
-  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  transition: filter 0.12s;
 }
-.nb-wallet-btn:hover {
-  border-color: var(--pcs-colors-border-hover);
-  background: var(--pcs-colors-surface-subtle);
-}
+.nb-wallet-btn:hover { filter: brightness(1.05); }
 
 .nb-wallet-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
   background: var(--pcs-colors-long);
   flex-shrink: 0;
 }
 
-/* ── Wallet dropdown ───────────────────────────────────────── */
+.nb-wallet-addr { line-height: 1; }
+
+/* ── Wallet dropdown ───────────────────────────────────── */
 .nb-wallet-dropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -185,7 +169,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  padding: 11px 16px;
+  padding: 10px 14px;
   border: none;
   background: transparent;
   color: var(--pcs-colors-text);
@@ -204,23 +188,31 @@
   margin: 2px 0;
 }
 
-.nb-wallet-disconnect {
-  color: var(--pcs-colors-short);
-}
-.nb-wallet-disconnect:hover {
-  background: var(--pcs-colors-short-muted);
-}
+.nb-wallet-disconnect { color: var(--pcs-colors-short); }
+.nb-wallet-disconnect:hover { background: var(--pcs-colors-short-muted); }
 
-/* ══════════════════════════════════════════════════════════════
+/* ── Kebab ─────────────────────────────────────────────── */
+.nb-kebab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--pcs-colors-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.nb-kebab:hover { color: var(--pcs-colors-text); background: var(--pcs-colors-surface-subtle); }
+
+/* ══════════════════════════════════════════════════════════
    RESPONSIVE — Mobile  ≤ 768px
-   ══════════════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .nb-root { padding: 0 12px; }
-
-  /* Hide nav links */
+  .nb-root { padding: 0 12px; gap: 12px; }
   .nb-nav { display: none; }
-
-  /* Hide icon buttons and dividers */
-  .nb-icon-btn { display: none; }
-  .nb-divider { display: none; }
+  .nb-chain-pill { display: none; }
+  .nb-kebab { display: none; }
 }

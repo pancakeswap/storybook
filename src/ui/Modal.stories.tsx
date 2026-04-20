@@ -3,6 +3,7 @@ import { useState } from 'react'
 import './design-system.css'
 import { Modal } from './Modal'
 import { Button } from './Button'
+import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Components/Modal',
@@ -15,6 +16,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [open, setOpen] = useState(false)
     return (
@@ -34,7 +36,14 @@ export const Default: Story = {
   },
 }
 
+export const DefaultDark: Story = {
+  ...Default,
+  name: 'Default (Dark)',
+  parameters: { ...Default.parameters, ...forceTheme('dark') },
+}
+
 export const WithForm: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [open, setOpen] = useState(false)
     return (
@@ -57,4 +66,10 @@ export const WithForm: Story = {
       </div>
     )
   },
+}
+
+export const WithFormDark: Story = {
+  ...WithForm,
+  name: 'With Form (Dark)',
+  parameters: { ...WithForm.parameters, ...forceTheme('dark') },
 }

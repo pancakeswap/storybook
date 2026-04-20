@@ -1,0 +1,98 @@
+/* ── Account Panel ─────────────────────────────────────────── */
+.ac-root {
+  flex: 1;
+  background: var(--pcs-colors-surface-card);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  color: var(--pcs-colors-text);
+  font-variant-numeric: tabular-nums;
+  min-height: 0;
+}
+
+.ac-header {
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--pcs-colors-border);
+  flex-shrink: 0;
+}
+
+.ac-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pcs-colors-text);
+}
+
+/* ── Actions (Deposit / Withdraw / Transfer) ────────────── */
+.ac-actions {
+  display: flex;
+  gap: 6px;
+  padding: 10px 12px;
+}
+
+.ac-btn {
+  flex: 1;
+  background: var(--pcs-colors-surface-subtle);
+  color: var(--pcs-colors-text);
+  border: none;
+  border-radius: 6px;
+  padding: 5px 0;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.12s;
+}
+.ac-btn:hover { filter: brightness(1.06); }
+.ac-btn-primary {
+  background: var(--pcs-colors-brand);
+  color: var(--pcs-colors-text-on-brand);
+}
+
+/* ── Sections ───────────────────────────────────────────── */
+.ac-section {
+  padding: 0 12px 10px;
+}
+
+.ac-section-bordered {
+  border-top: 1px solid var(--pcs-colors-border);
+  padding-top: 10px;
+}
+
+.ac-section-title {
+  color: var(--pcs-colors-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ac-section > .ac-section-title { display: block; margin-bottom: 6px; }
+
+.ac-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ac-shield {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ac-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+.ac-label { color: var(--pcs-colors-text-muted); }
+
+.ac-value {
+  color: var(--pcs-colors-text);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}

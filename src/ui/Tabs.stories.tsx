@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 import './design-system.css'
 import { Tabs } from './Tabs'
+import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Components/Tabs',
@@ -14,6 +15,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const PillVariant: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [value, setValue] = useState('market')
     return (
@@ -32,7 +34,14 @@ export const PillVariant: Story = {
   },
 }
 
+export const PillVariantDark: Story = {
+  ...PillVariant,
+  name: 'Pill Variant (Dark)',
+  parameters: { ...PillVariant.parameters, ...forceTheme('dark') },
+}
+
 export const UnderlineVariant: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [value, setValue] = useState('open')
     return (
@@ -53,7 +62,14 @@ export const UnderlineVariant: Story = {
   },
 }
 
+export const UnderlineVariantDark: Story = {
+  ...UnderlineVariant,
+  name: 'Underline Variant (Dark)',
+  parameters: { ...UnderlineVariant.parameters, ...forceTheme('dark') },
+}
+
 export const BothVariants: Story = {
+  parameters: { ...forceTheme('light') },
   render: () => {
     const [pill, setPill] = useState('market')
     const [underline, setUnderline] = useState('open')
@@ -88,4 +104,10 @@ export const BothVariants: Story = {
       </div>
     )
   },
+}
+
+export const BothVariantsDark: Story = {
+  ...BothVariants,
+  name: 'Both Variants (Dark)',
+  parameters: { ...BothVariants.parameters, ...forceTheme('dark') },
 }
