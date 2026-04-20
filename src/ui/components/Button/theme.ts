@@ -70,6 +70,9 @@ export const styleVariants = {
     backgroundColor: "input",
     color: "textSubtle",
     boxShadow: "none",
+    border: "1px solid",
+    borderColor: "inputSecondary",
+    borderBottomWidth: "2px",
   },
   [variants.BUBBLEGUM]: {
     background: vars.colors.gradientBubblegum,
