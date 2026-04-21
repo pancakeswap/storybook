@@ -22,7 +22,6 @@ export interface Position {
 
 export interface PositionsTableProps {
   positions?: Position[]
-  /** Whether to render the embedded tab bar / compact layout. */
   compact?: boolean
   onEditCollateral?: (id: string) => void
   onEditTpSl?: (id: string) => void
@@ -30,17 +29,17 @@ export interface PositionsTableProps {
   onCloseAll?: () => void
 }
 
-type TabKey = 'open' | 'pos' | 'assets' | 'twap' | 'hist' | 'ph' | 'th' | 'tx'
+type TabKey = 'pos' | 'open' | 'assets' | 'twap' | 'hist' | 'ph' | 'th' | 'tx'
 
-const TABS: { key: TabKey; label: string; count?: number | null }[] = [
-  { key: 'open',   label: 'Open orders',        count: 0 },
-  { key: 'pos',    label: 'Positions',          count: 1 },
-  { key: 'assets', label: 'Assets',             count: null },
-  { key: 'twap',   label: 'TWAP',               count: 0 },
-  { key: 'hist',   label: 'Order history',      count: null },
-  { key: 'ph',     label: 'Position History',   count: null },
-  { key: 'th',     label: 'Trade history',      count: null },
-  { key: 'tx',     label: 'Transaction history', count: null },
+const TABS: { key: TabKey; label: string }[] = [
+  { key: 'pos',    label: 'Positions' },
+  { key: 'open',   label: 'Open Orders' },
+  { key: 'assets', label: 'Assets' },
+  { key: 'twap',   label: 'TWAP' },
+  { key: 'hist',   label: 'Order History' },
+  { key: 'ph',     label: 'Position History' },
+  { key: 'th',     label: 'Trade History' },
+  { key: 'tx',     label: 'Transaction History' },
 ]
 
 const COLS = [
@@ -76,63 +75,107 @@ const MOCK_POSITIONS: Position[] = [
   },
 ]
 
+function EmptyBoxIcon() {
+  return (
+    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+      {/* Bottom of box */}
+      <path d="M8 28L28 38L48 28V44L28 54L8 44V28Z" fill="#1FC7D4" opacity="0.25"/>
+      {/* Front face */}
+      <path d="M8 28L28 38L48 28L28 18L8 28Z" fill="#1FC7D4" opacity="0.5"/>
+      {/* Left flap open */}
+      <path d="M8 28L18 23L18 13L8 18V28Z" fill="#1FC7D4" opacity="0.8"/>
+      {/* Right flap open */}
+      <path d="M48 28L38 23L38 13L48 18V28Z" fill="#1FC7D4"/>
+      {/* Back top */}
+      <path d="M18 13L28 8L38 13L28 18L18 13Z" fill="#1FC7D4" opacity="0.65"/>
+      {/* Left inner shadow */}
+      <path d="M28 38L8 28L8 44L28 54V38Z" fill="#1FC7D4" opacity="0.15"/>
+    </svg>
+  )
+}
+
 export function PositionsTable({
   positions = MOCK_POSITIONS,
   compact = false,
+  onEditCollateral,
+  onEditTpSl,
   onClose,
   onCloseAll,
 }: PositionsTableProps) {
   const [tab, setTab] = useState<TabKey>('pos')
+  const [hideOther, setHideOther] = useState(false)
+
+  const posCount = positions.length
 
   return (
     <div className={`perps-root pt-root${compact ? ' pt-compact' : ''}`}>
-      {/* Tabs + utilities */}
+
+      {/* ── Tab bar ──────────────────────────────────────────── */}
       <div className="pt-tabs-row">
         <div className="pt-tabs" role="tablist">
-          {TABS.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              role="tab"
-              aria-selected={tab === t.key}
-              className={`pt-tab${tab === t.key ? ' active' : ''}`}
-              onClick={() => setTab(t.key)}
-            >
-              {t.label}
-              {t.count != null && <span className="pt-tab-count">({t.count})</span>}
-            </button>
-          ))}
+          {TABS.map((t) => {
+            const isPos = t.key === 'pos'
+            return (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.key}
+                className={`pt-tab${tab === t.key ? ' active' : ''}`}
+                onClick={() => setTab(t.key)}
+              >
+                {t.label}
+                {isPos && (
+                  <span className="pt-tab-count">({posCount})</span>
+                )}
+              </button>
+            )
+          })}
         </div>
+
         <div className="pt-tabs-spacer" />
+
+        {/* Hide Other Symbols */}
         <label className="pt-hide-other">
-          <input type="checkbox" />
-          Hide other symbols
+          <span className="pt-checkbox-wrap">
+            <input
+              type="checkbox"
+              checked={hideOther}
+              onChange={(e) => setHideOther(e.target.checked)}
+            />
+            <span className="pt-checkbox-box" aria-hidden="true" />
+          </span>
+          Hide Other Symbols
         </label>
+
+        {/* Close All */}
         <button type="button" className="pt-close-all" onClick={onCloseAll}>
           Close All
         </button>
       </div>
 
-      {/* Column headers */}
-      <div className="pt-headers">
-        {COLS.map((c) => (
-          <span key={c} className="pt-header">
-            {c} <span className="pt-sort" aria-hidden="true">⇅</span>
-          </span>
-        ))}
-      </div>
+      {/* ── Column headers (positions only) ─────────────────── */}
+      {tab === 'pos' && positions.length > 0 && (
+        <div className="pt-headers">
+          {COLS.map((c) => (
+            <span key={c} className="pt-header">
+              {c} <span className="pt-sort" aria-hidden="true">⇅</span>
+            </span>
+          ))}
+        </div>
+      )}
 
-      {/* Rows */}
+      {/* ── Body ─────────────────────────────────────────────── */}
       <div className="pt-body">
         {tab === 'pos' && positions.length > 0 ? (
           positions.map((pos) => {
-            const isPos = pos.unrealizedPnl.startsWith('+')
+            const isGain = pos.unrealizedPnl.startsWith('+')
             return (
               <div key={pos.id} className="pt-row">
                 <div className="pt-cell pt-cell-symbol">
                   <div className="pt-sym-name">{pos.pair}</div>
                   <div className={`pt-sym-side ${pos.direction === 'long' ? 'p-long' : 'p-short'}`}>
-                    {pos.direction === 'long' ? 'Buy' : 'Sell'} {pos.leverage}x IIII
+                    {pos.direction === 'long' ? 'Buy' : 'Sell'} {pos.leverage}x Cross
                   </div>
                 </div>
                 <div className="pt-cell">
@@ -143,23 +186,39 @@ export function PositionsTable({
                 <div className="pt-cell pt-num">{pos.markPrice}</div>
                 <div className="pt-cell">
                   <div className="pt-num">{pos.margin}</div>
-                  <div className="pt-num-sub">(Cross)</div>
+                  <button
+                    type="button"
+                    className="pt-num-sub pt-link"
+                    onClick={() => onEditCollateral?.(pos.id)}
+                  >
+                    (Cross) Edit
+                  </button>
                 </div>
                 <div className="pt-cell pt-num p-warn">{pos.liquidationPrice}</div>
                 <div className="pt-cell">
-                  <div className={`pt-num ${isPos ? 'p-long' : 'p-short'}`}>{pos.unrealizedPnl} ↗</div>
-                  <div className={`pt-num-sub ${isPos ? 'p-long' : 'p-short'}`}>{pos.unrealizedPnlPct}</div>
+                  <div className={`pt-num ${isGain ? 'p-long' : 'p-short'}`}>{pos.unrealizedPnl} ↗</div>
+                  <div className={`pt-num-sub ${isGain ? 'p-long' : 'p-short'}`}>{pos.unrealizedPnlPct}</div>
                 </div>
-                <button type="button" className="pt-cell pt-link">Add ⓘ</button>
-                <button type="button" className="pt-cell pt-link">Add ⓘ</button>
-                <button type="button" className="pt-cell pt-link" onClick={() => onClose?.(pos.id)}>Reverse</button>
+                <button type="button" className="pt-cell pt-link" onClick={() => onEditTpSl?.(pos.id)}>
+                  {pos.tp || pos.sl ? `TP: ${pos.tp || '—'} / SL: ${pos.sl || '—'}` : 'Add TP/SL'}
+                </button>
+                <button type="button" className="pt-cell pt-link" onClick={() => onEditTpSl?.(pos.id)}>
+                  Add ⓘ
+                </button>
+                <button type="button" className="pt-cell pt-link" onClick={() => onClose?.(pos.id)}>
+                  Close
+                </button>
               </div>
             )
           })
         ) : (
-          <div className="pt-empty">No data</div>
+          <div className="pt-empty">
+            <EmptyBoxIcon />
+            <span className="pt-empty-text">No Positions found</span>
+          </div>
         )}
       </div>
+
     </div>
   )
 }

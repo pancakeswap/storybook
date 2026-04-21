@@ -1,9 +1,9 @@
-/* ── Navbar (Aster-style, 48h) ─────────────────────────────── */
+/* ── Navbar (Aster-style, 44h) ─────────────────────────────── */
 .nb-root {
   display: flex;
   align-items: center;
   gap: 24px;
-  height: 48px;
+  height: 44px;
   padding: 0 14px;
   background: var(--pcs-colors-surface-card);
   border-bottom: 1px solid var(--pcs-colors-border);

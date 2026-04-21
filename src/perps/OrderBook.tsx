@@ -12,105 +12,150 @@ export type OrderBookRow = {
 }
 
 export interface OrderBookProps {
-  /** Asks sorted from lowest ask (closest to spread) to highest. */
+  /** Asks sorted from highest ask (index 0) to lowest ask (closest to spread). */
   asks?: OrderBookRow[]
-  /** Bids sorted from highest bid (closest to spread) to lowest. */
+  /** Bids sorted from highest bid (index 0, closest to spread) to lowest. */
   bids?: OrderBookRow[]
-  /** Last traded price shown in the mid band (green/red). */
-  midPrice?: number
-  /** Direction marker shown next to the mid price. */
-  midDirection?: 'up' | 'down'
-  /** Secondary reference (mark) price shown under the mid. */
-  markPrice?: number
   /** Tick-size grouping label (e.g. "0.1"). */
   grouping?: string
-  /** Quote currency. */
+  /** Base currency label shown in column headers. */
+  base?: string
+  /** Quote currency (kept for future use). */
   quote?: string
 }
 
-const DEFAULT_BASE = 75500.8
+/* ── Mock data ────────────────────────────────────────────── */
+const BASE_PRICE = 75500.8
+
 function genAsks(): OrderBookRow[] {
   let total = 0
-  return Array.from({ length: 12 }, (_, i) => {
-    const p = DEFAULT_BASE + (i + 1) * 2.5
+  return Array.from({ length: 10 }, (_, i) => {
+    const p = BASE_PRICE + (i + 1) * 2.5
     const s = 50 + ((i * 97) % 650)
     total += s
     return { p, s, t: total }
-  }).reverse()
+  }).reverse() // index 0 = highest ask (largest cumulative)
 }
+
 function genBids(): OrderBookRow[] {
   let total = 0
-  return Array.from({ length: 12 }, (_, i) => {
-    const p = DEFAULT_BASE - (i + 1) * 2.5
+  return Array.from({ length: 10 }, (_, i) => {
+    const p = BASE_PRICE - (i + 1) * 2.5
     const s = 50 + ((i * 113) % 720)
     total += s
     return { p, s, t: total }
-  })
+  }) // index 0 = highest bid (smallest cumulative)
 }
 
-const DEFAULT_ASKS: OrderBookRow[] = genAsks()
-const DEFAULT_BIDS: OrderBookRow[] = genBids()
+const DEFAULT_ASKS = genAsks()
+const DEFAULT_BIDS = genBids()
 
-const nfSize = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-const nfPrice = new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+/* ── Formatters ───────────────────────────────────────────── */
+const nfPrice  = new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+const nfAmount = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
 function fmtTotal(v: number): string {
   if (v >= 1_000_000) return (v / 1_000_000).toFixed(2) + 'M'
-  if (v >= 1_000) return (v / 1_000).toFixed(2) + 'K'
+  if (v >= 1_000)     return (v / 1_000).toFixed(2) + 'K'
   return v.toFixed(2)
 }
 
-function UpTri() {
+/* ── Icons ────────────────────────────────────────────────── */
+function IconBoth() {
   return (
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M7 14l5-5 5 5z"/>
-    </svg>
-  )
-}
-function DownTri() {
-  return (
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M7 10l5 5 5-5z"/>
+    <svg width="16" height="15" viewBox="0 0 16 15" fill="none" aria-hidden="true">
+      <rect x="0.5" y="0.5" width="6" height="6" stroke="#31D0AA" />
+      <rect x="0.5" y="8.5" width="6" height="6" stroke="#ED4B9E" />
+      <rect x="8"   y="0"   width="8" height="3" fill="#65616E" />
+      <rect x="8"   y="4"   width="8" height="3" fill="#65616E" />
+      <rect x="8"   y="8"   width="8" height="3" fill="#65616E" />
+      <rect x="8"   y="12"  width="8" height="3" fill="#65616E" />
     </svg>
   )
 }
 
+function IconBids() {
+  return (
+    <svg width="16" height="15" viewBox="0 0 16 15" fill="none" aria-hidden="true">
+      <rect x="0.5" y="0.5" width="6" height="14" stroke="#31D0AA" />
+      <rect x="8"   y="0"   width="8" height="3"  fill="#65616E" />
+      <rect x="8"   y="4"   width="8" height="3"  fill="#65616E" />
+      <rect x="8"   y="8"   width="8" height="3"  fill="#65616E" />
+      <rect x="8"   y="12"  width="8" height="3"  fill="#65616E" />
+    </svg>
+  )
+}
+
+function IconAsks() {
+  return (
+    <svg width="16" height="15" viewBox="0 0 16 15" fill="none" aria-hidden="true">
+      <rect x="0.5" y="0.5" width="6" height="14" stroke="#ED4B9E" />
+      <rect x="8"   y="0"   width="8" height="3"  fill="#65616E" />
+      <rect x="8"   y="4"   width="8" height="3"  fill="#65616E" />
+      <rect x="8"   y="8"   width="8" height="3"  fill="#65616E" />
+      <rect x="8"   y="12"  width="8" height="3"  fill="#65616E" />
+    </svg>
+  )
+}
+
+function ChevronIcon({ up }: { up: boolean }) {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d={up ? 'M18 15l-6-6-6 6' : 'M6 9l6 6 6-6'}
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+/* ── Component ────────────────────────────────────────────── */
 type ViewMode = 'both' | 'bids' | 'asks'
+const GROUPINGS = ['0.1', '1', '10', '50', '100']
 
 export function OrderBook({
   asks = DEFAULT_ASKS,
   bids = DEFAULT_BIDS,
-  midPrice = 75500.8,
-  midDirection = 'up',
-  markPrice = 75497.0,
-  grouping = '0.1',
-  quote = 'USDT',
+  grouping: groupingProp = '0.1',
+  base = 'BTC',
 }: OrderBookProps) {
-  const [tab, setTab] = useState<'book' | 'trades'>('book')
-  const [view, setView] = useState<ViewMode>('both')
+  const [tab, setTab]               = useState<'book' | 'trades'>('book')
+  const [view, setView]             = useState<ViewMode>('both')
+  const [grouping, setGrouping]     = useState(groupingProp)
+  const [groupingOpen, setGroupingOpen] = useState(false)
 
-  const askMax = useMemo(() => Math.max(...asks.map((r) => r.t), 1), [asks])
-  const bidMax = useMemo(() => Math.max(...bids.map((r) => r.t), 1), [bids])
+  const askMax     = useMemo(() => Math.max(...asks.map(r => r.t), 1), [asks])
+  const bidMax     = useMemo(() => Math.max(...bids.map(r => r.t), 1), [bids])
+  const askSizeMax = useMemo(() => Math.max(...asks.map(r => r.s), 1), [asks])
+  const bidSizeMax = useMemo(() => Math.max(...bids.map(r => r.s), 1), [bids])
+
+  // Lowest ask = asks[last], highest bid = bids[0]
+  const lowestAsk  = asks[asks.length - 1]
+  const highestBid = bids[0]
+  const spread     = lowestAsk && highestBid ? lowestAsk.p - highestBid.p : 0
+  const spreadPct  = lowestAsk ? (spread / lowestAsk.p) * 100 : 0
 
   return (
     <section className="perps-root ob-root" aria-label="Order book">
-      {/* Tabs */}
+
+      {/* ── Tabs ── */}
       <div className="ob-tabs" role="tablist">
         <button
-          role="tab"
+          role="tab" type="button"
           aria-selected={tab === 'book'}
-          className={`ob-tab${tab === 'book' ? ' active' : ''}`}
+          className={`ob-tab${tab === 'book' ? ' ob-tab--active' : ''}`}
           onClick={() => setTab('book')}
-          type="button"
         >
-          Order book
+          Order Book
         </button>
         <button
-          role="tab"
+          role="tab" type="button"
           aria-selected={tab === 'trades'}
-          className={`ob-tab${tab === 'trades' ? ' active' : ''}`}
+          className={`ob-tab${tab === 'trades' ? ' ob-tab--active' : ''}`}
           onClick={() => setTab('trades')}
-          type="button"
         >
           Trades
         </button>
@@ -118,90 +163,132 @@ export function OrderBook({
 
       {tab === 'book' ? (
         <>
-          {/* View toggles + tick-size/quote chips */}
+          {/* ── Toolbar ── */}
           <div className="ob-toolbar">
-            <div className="ob-view-toggle" role="group" aria-label="Order book view">
-              <button
-                type="button"
-                className={`ob-view-btn${view === 'both' ? ' active' : ''}`}
-                onClick={() => setView('both')}
-                aria-label="Show bids and asks"
-              >
-                ≡
+            <div className="ob-views" role="group" aria-label="View mode">
+              <button type="button" aria-label="Show bids and asks" aria-pressed={view === 'both'}
+                className={`ob-view-btn${view === 'both' ? ' ob-view-btn--active' : ''}`}
+                onClick={() => setView('both')}>
+                <IconBoth />
               </button>
-              <button
-                type="button"
-                className={`ob-view-btn${view === 'bids' ? ' active' : ''}`}
-                onClick={() => setView('bids')}
-                aria-label="Show bids only"
-              >
-                ⋮
+              <button type="button" aria-label="Show bids only" aria-pressed={view === 'bids'}
+                className={`ob-view-btn${view === 'bids' ? ' ob-view-btn--active' : ''}`}
+                onClick={() => setView('bids')}>
+                <IconBids />
               </button>
-              <button
-                type="button"
-                className={`ob-view-btn${view === 'asks' ? ' active' : ''}`}
-                onClick={() => setView('asks')}
-                aria-label="Show asks only"
-              >
-                ⋯
+              <button type="button" aria-label="Show asks only" aria-pressed={view === 'asks'}
+                className={`ob-view-btn${view === 'asks' ? ' ob-view-btn--active' : ''}`}
+                onClick={() => setView('asks')}>
+                <IconAsks />
               </button>
             </div>
-            <div className="ob-toolbar-spacer" />
-            <button type="button" className="ob-chip">{grouping} ▾</button>
-            <button type="button" className="ob-chip">{quote} ▾</button>
+
+            <div className="ob-grouping-wrap">
+              <button
+                type="button"
+                className="ob-grouping-btn"
+                onClick={() => setGroupingOpen(v => !v)}
+                aria-haspopup="listbox"
+                aria-expanded={groupingOpen}
+              >
+                <span>{grouping}</span>
+                <ChevronIcon up={groupingOpen} />
+              </button>
+              {groupingOpen && (
+                <div className="ob-grouping-menu" role="listbox">
+                  {GROUPINGS.map(g => (
+                    <button
+                      key={g}
+                      role="option"
+                      type="button"
+                      aria-selected={g === grouping}
+                      className={`ob-grouping-item${g === grouping ? ' ob-grouping-item--active' : ''}`}
+                      onClick={() => { setGrouping(g); setGroupingOpen(false) }}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Column headers */}
+          {/* ── Column headers ── */}
           <div className="ob-headers">
-            <span>Price ({quote})</span>
-            <span>Size ({quote})</span>
-            <span>Total ({quote})</span>
+            <span>Price</span>
+            <span>Amount ({base})</span>
+            <span>SUM ({base})</span>
           </div>
 
-          {/* Asks (stacked upward toward the mid band) */}
+          {/* ── Asks ── */}
           {view !== 'bids' && (
             <div className="ob-asks">
-              {asks.map((r) => (
-                <Row key={`a-${r.p}`} row={r} side="ask" widthPct={(r.t / askMax) * 100} />
+              {asks.map(r => (
+                <OrderRow
+                  key={`a-${r.p}`}
+                  row={r}
+                  side="ask"
+                  depthPct={(r.t / askMax) * 100}
+                  sizePct={(r.s / askSizeMax) * 100}
+                />
               ))}
             </div>
           )}
 
-          {/* Mid-price band */}
-          <div className="ob-mid" role="row" aria-label="Mid price">
-            <span className={`ob-mid-price ${midDirection === 'up' ? 'p-long' : 'p-short'}`}>
-              {nfPrice.format(midPrice)}
-              <span className="ob-mid-dir" aria-hidden="true">{midDirection === 'up' ? <UpTri /> : <DownTri />}</span>
-            </span>
-            <span className="ob-mid-mark">/ {nfPrice.format(markPrice)}</span>
+          {/* ── Spread ── */}
+          <div className="ob-spread" role="row" aria-label="Spread">
+            <span className="ob-spread-label">Spread</span>
+            <span className="ob-spread-val">{nfPrice.format(spread)}</span>
+            <span className="ob-spread-pct">{spreadPct.toFixed(3)}%</span>
           </div>
 
-          {/* Bids (stacked downward from the mid band) */}
+          {/* ── Bids ── */}
           {view !== 'asks' && (
             <div className="ob-bids">
-              {bids.map((r) => (
-                <Row key={`b-${r.p}`} row={r} side="bid" widthPct={(r.t / bidMax) * 100} />
+              {bids.map(r => (
+                <OrderRow
+                  key={`b-${r.p}`}
+                  row={r}
+                  side="bid"
+                  depthPct={(r.t / bidMax) * 100}
+                  sizePct={(r.s / bidSizeMax) * 100}
+                />
               ))}
             </div>
           )}
         </>
       ) : (
-        <div className="ob-empty">No Trades yet</div>
+        <div className="ob-empty">No trades yet</div>
       )}
     </section>
   )
 }
 
-function Row({ row, side, widthPct }: { row: OrderBookRow; side: 'ask' | 'bid'; widthPct: number }) {
+/* ── Row ──────────────────────────────────────────────────── */
+function OrderRow({
+  row,
+  side,
+  depthPct,
+  sizePct,
+}: {
+  row: OrderBookRow
+  side: 'ask' | 'bid'
+  depthPct: number
+  sizePct: number
+}) {
+  const depth = Math.min(100, Math.max(0, depthPct))
+  const size  = Math.min(100, Math.max(0, sizePct))
+
   return (
-    <div
-      className={`ob-row ob-row-${side}`}
-      role="row"
-      style={{ ['--ob-w' as string]: `${Math.min(100, Math.max(0, widthPct))}%` }}
-    >
-      <span className={`ob-price ob-${side}`}>{nfPrice.format(row.p)}</span>
-      <span className="ob-num">{nfSize.format(row.s)}</span>
-      <span className="ob-num ob-muted">{fmtTotal(row.t)}</span>
+    <div className={`ob-row ob-row-${side}`}>
+      {/* Depth fill — outer, darker */}
+      <div className="ob-fill ob-fill-depth" style={{ width: `${depth}%` }} />
+      {/* Size fill — inner, brighter (only when meaningfully large) */}
+      {size > 8 && <div className="ob-fill ob-fill-size" style={{ width: `${size}%` }} />}
+
+      <span className={`ob-price ob-price-${side}`}>{nfPrice.format(row.p)}</span>
+      <span className="ob-cell ob-cell-center">{nfAmount.format(row.s)}</span>
+      <span className="ob-cell ob-cell-right">{fmtTotal(row.t)}</span>
     </div>
   )
 }

@@ -1,99 +1,98 @@
 import '../ui/perps.css'
 import './AccountPanel.css'
 
-export interface AccountEquity {
-  spot: string
-  perp: string
-  unrealizedPnl: string
-}
-
 export interface AccountPanelProps {
-  /** Account-equity block values. */
-  equity?: AccountEquity
-  /** Margin ratio text (shield badge). */
-  marginRatio?: string
-  /** Account margin ratio detail value. */
-  accountMarginRatio?: string
-  /** Fired when the amber Deposit pill is clicked. */
+  /** Spot total value string */
+  spotTotal?: string
+  /** Perp total value string */
+  perpTotal?: string
+  /** Perp unrealized PnL string */
+  unrealizedPnl?: string
+  /** Account market ratio */
+  accountMarketRatio?: string
+  /** Account maintenance margin */
+  maintenanceMargin?: string
+  /** Account equity (margin section) */
+  accountEquity?: string
+  /** Deposit button handler */
   onDeposit?: () => void
-  /** Fired when the Withdraw button is clicked. */
+  /** Withdraw button handler */
   onWithdraw?: () => void
-  /** Fired when the Transfer button is clicked. */
+  /** Transfer button handler */
   onTransfer?: () => void
-}
-
-function ShieldIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <path d="M12 2L3 5v6c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V5l-9-3z"/>
-    </svg>
-  )
-}
-
-const DEFAULT_EQUITY: AccountEquity = {
-  spot: '0.00 USD',
-  perp: '6.82 USD',
-  unrealizedPnl: '0.02 USD',
+  /** Multi-Assets Mode button handler */
+  onMultiAssets?: () => void
 }
 
 export function AccountPanel({
-  equity = DEFAULT_EQUITY,
-  marginRatio = '2.90%',
-  accountMarginRatio = '—',
+  spotTotal = '$---',
+  perpTotal = '$---',
+  unrealizedPnl = '$---',
+  accountMarketRatio = '0.00%',
+  maintenanceMargin = '$---',
+  accountEquity = '$---',
   onDeposit,
   onWithdraw,
   onTransfer,
+  onMultiAssets,
 }: AccountPanelProps) {
   return (
     <div className="perps-root ac-root">
-      <div className="ac-header">
-        <span className="ac-title">Account</span>
-      </div>
 
-      {/* Deposit / Withdraw / Transfer */}
+      {/* ── Deposit / Withdraw / Transfer ─────────────── */}
       <div className="ac-actions">
         <button type="button" className="ac-btn ac-btn-primary" onClick={onDeposit}>
           Deposit
         </button>
-        <button type="button" className="ac-btn" onClick={onWithdraw}>
+        <button type="button" className="ac-btn ac-btn-secondary" onClick={onWithdraw}>
           Withdraw
         </button>
-        <button type="button" className="ac-btn" onClick={onTransfer}>
+        <button type="button" className="ac-btn ac-btn-secondary" onClick={onTransfer}>
           Transfer
         </button>
       </div>
 
-      {/* Account equity */}
+      {/* ── Account Equity ─────────────────────────────── */}
       <div className="ac-section">
         <div className="ac-section-title">Account Equity</div>
         <div className="ac-row">
-          <span className="ac-label">Spot total value</span>
-          <span className="ac-value">{equity.spot}</span>
+          <span className="ac-label">Spot Total Value</span>
+          <span className="ac-value">{spotTotal}</span>
         </div>
         <div className="ac-row">
-          <span className="ac-label">Perp total value</span>
-          <span className="ac-value">{equity.perp}</span>
+          <span className="ac-label">Perp Total Value</span>
+          <span className="ac-value">{perpTotal}</span>
         </div>
         <div className="ac-row">
-          <span className="ac-label">Perpetuals unrealized Pnl</span>
-          <span className="ac-value">{equity.unrealizedPnl}</span>
+          <span className="ac-label">Perp Unrealized PnL</span>
+          <span className="ac-value">{unrealizedPnl}</span>
         </div>
       </div>
 
-      {/* Margin */}
-      <div className="ac-section ac-section-bordered">
-        <div className="ac-section-head">
-          <span className="ac-section-title">Margin</span>
-          <span className="ac-shield p-long">
-            <ShieldIcon />
-            {marginRatio}
-          </span>
+      {/* ── Margin ─────────────────────────────────────── */}
+      <div className="ac-section">
+        <div className="ac-section-title">Margin</div>
+        <div className="ac-row">
+          <span className="ac-label">Account Market Ratio</span>
+          <span className="ac-value">{accountMarketRatio}</span>
         </div>
         <div className="ac-row">
-          <span className="ac-label">Account Margin Ratio</span>
-          <span className="ac-value">{accountMarginRatio}</span>
+          <span className="ac-label">Account Maintenance Margin</span>
+          <span className="ac-value">{maintenanceMargin}</span>
+        </div>
+        <div className="ac-row">
+          <span className="ac-label">Account Equity</span>
+          <span className="ac-value">{accountEquity}</span>
         </div>
       </div>
+
+      {/* ── Multi-Assets Mode ──────────────────────────── */}
+      <div className="ac-footer">
+        <button type="button" className="ac-multi-assets-btn" onClick={onMultiAssets}>
+          Multi-Assets Mode
+        </button>
+      </div>
+
     </div>
   )
 }

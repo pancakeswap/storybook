@@ -10,7 +10,7 @@ const meta = {
   parameters: { layout: 'fullscreen' },
   args: {
     onToggleFavorite: fn(),
-    onShield: fn(),
+    onSelectPair: fn(),
   },
 } satisfies Meta<typeof TickerBar>
 
@@ -30,7 +30,25 @@ export const PriceDown: Story = {
   parameters: { ...forceTheme('dark') },
   args: {
     price: '64,112.3',
-    changePct: '-1.42%',
-    priceDirection: 'down',
+    change24h: '-1.42%',
+    change24hDirection: 'down',
+  },
+}
+
+export const BNB: Story = {
+  name: 'BNB Pair',
+  parameters: { ...forceTheme('dark') },
+  args: {
+    symbol: 'BNB - USD',
+    coinGlyph: 'B',
+    coinColor: 'linear-gradient(180deg, #F3BA2F, #D6A318)',
+    price: '412.50',
+    mark: '412.48',
+    index: '412.51',
+    fundingRate: '0.0010%',
+    fundingCountdown: '01:12:44',
+    change24h: '+2.31%',
+    change24hDirection: 'up',
+    volume24h: '$1,243,891,204.50',
   },
 }

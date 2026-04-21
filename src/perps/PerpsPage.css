@@ -1,59 +1,122 @@
 /* ────────────────────────────────────────────────────────────
- * PerpsPage — Aster-style flex layout
+ * PerpsPage — Figma 2043-20619 layout
  *
- *   Navbar (48)
- *   TickerBar (48)
- *   ┌────────────────────────────────────┬──────────────┐
- *   │ pp-main-top: Chart + OrderBook     │              │
- *   │                                    │ OrderPanel   │
- *   ├────────────────────────────────────┤              │
- *   │ TradingPanel (positions) 200h      │ AccountPanel │
- *   └────────────────────────────────────┴──────────────┘
+ *   Navbar  (44px, sticky, full width)
+ *
+ *   pp-body — flex row, align-items: stretch
+ *   ┌───────────────────────────────┬──────────┬──────────┐
+ *   │ pp-left (flex col, flex: 1)   │ ob-root  │ pp-right │
+ *   │ ┌──────────────────────────┐  │          │          │
+ *   │ │ TickerBar (natural 66px) │  │          │          │
+ *   │ ├──────────────────────────┤  │  280px   │  288px   │
+ *   │ │ pp-chart                 │  │          │          │
+ *   │ ├──────────────────────────┤  │          │ pp-ord   │
+ *   │ │ pp-trading-wrap          │  │          │ pp-acct  │
+ *   │ └──────────────────────────┘  │          │          │
+ *   └───────────────────────────────┴──────────┴──────────┘
+ *
+ *   OB and right panel stretch to pp-left height via align-items: stretch.
+ *   TickerBar is naturally 66px (padding + two text lines).
+ *   Page scrolls to reveal TradingPanel — no inner scroll on it.
  * ──────────────────────────────────────────────────────── */
 
+/* ── Root shell ──────────────────────────────────────────── */
 .pp-root {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100dvh;
   background: var(--pcs-colors-bg);
+  /* NO overflow: hidden — lets the page scroll natively */
 }
 
+/* Sticky navbar */
+.pp-root > .nb-root {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+/* ── Body: flex row — pp-main (flex:1) | pp-right (288px) ── */
 .pp-body {
   flex: 1;
   display: flex;
-  min-height: 0;
-  overflow: hidden;
+  flex-direction: row;
+  align-items: stretch;
 }
 
-/* ── Left region ───────────────────────────────────────── */
+/* ── Main section: chart+OB on top, positions table below ─── */
 .pp-main {
   flex: 1;
-  display: flex;
-  flex-direction: column;
   min-width: 0;
-  min-height: 0;
-}
-
-.pp-main-top {
-  flex: 1;
-  display: flex;
-  min-height: 0;
-}
-
-/* ── Right column: trade panel + account ──────────────── */
-.pp-right {
-  width: 288px;
   display: flex;
   flex-direction: column;
+}
+
+/* ── Top row inside pp-main: chart column + OrderBook ───────  */
+.pp-top {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   flex-shrink: 0;
-  border-left: 1px solid var(--pcs-colors-border);
-  background: var(--pcs-colors-surface-card);
+}
+
+/* ── Left column: TickerBar + Chart ─────────────────────── */
+.pp-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TickerBar + chart locked to 716px so OB aligns at same height */
+.pp-left-top {
+  height: 716px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chart fills whatever pp-left-top has left after TickerBar */
+.pp-chart {
+  flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
-/* ── Scrollbars ────────────────────────────────────────── */
+/* ── OrderBook sits directly in pp-top (no wrapper needed) ── */
+/* ob-root width set in OrderBook.css (280px); stretches to pp-top height */
+
+/* ── Positions table — grows to fill remaining pp-main height ─ */
+.pp-trading-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--pcs-colors-border);
+}
+
+/* ── Right panel: OrderPanel + AccountPanel, full height ───── */
+.pp-right {
+  width: 288px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--pcs-colors-surface-card);
+  border-left: 1px solid var(--pcs-colors-border);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.pp-right::-webkit-scrollbar { display: none; }
+
+/* AccountPanel sits directly below OrderPanel inside pp-right */
+.pp-account-wrap {
+  flex-shrink: 0;
+  border-top: 1px solid var(--pcs-colors-border);
+}
+
+/* ── Thin scrollbars ─────────────────────────────────────── */
 :where(.pp-root) *::-webkit-scrollbar { width: 4px; height: 4px; }
 :where(.pp-root) *::-webkit-scrollbar-track { background: transparent; }
 :where(.pp-root) *::-webkit-scrollbar-thumb {
@@ -61,37 +124,40 @@
   border-radius: 2px;
 }
 
-/* ══════════════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════
    RESPONSIVE — Tablet ≤ 1024px
-   ══════════════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
-  .pp-right { width: 260px; }
+  .pp-right {
+    width: 260px;
+  }
 }
 
-/* ══════════════════════════════════════════════════════════════
-   RESPONSIVE — Mobile ≤ 768px
-   Vertical stack
-   ══════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile ≤ 768px  —  single-column stack
+   ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .pp-root {
-    height: auto;
-    min-height: 100dvh;
-    overflow: visible;
-  }
-
+  /* Body stacks: main on top, right panel below */
   .pp-body {
     flex-direction: column;
-    overflow: visible;
   }
 
-  .pp-main-top {
+  /* pp-top stacks chart above OB */
+  .pp-top {
     flex-direction: column;
   }
 
+  /* OB goes full width on mobile */
+  .pp-top > .ob-root {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--pcs-colors-border);
+  }
+
+  /* Right panel goes full width below pp-main */
   .pp-right {
     width: 100%;
     border-left: none;
     border-top: 1px solid var(--pcs-colors-border);
-    overflow: visible;
   }
 }

@@ -1,195 +1,273 @@
-/* ── Order Book (Aster-style) ──────────────────────────────── */
+/* ── Order Book ────────────────────────────────────────────── */
 .ob-root {
   display: flex;
   flex-direction: column;
-  height: 100%;
   width: 280px;
   flex-shrink: 0;
   background: var(--pcs-colors-surface-card);
   color: var(--pcs-colors-text);
   font-variant-numeric: tabular-nums;
+  font-family: inherit;
   border-left: 1px solid var(--pcs-colors-border);
   min-height: 0;
 }
 
-/* ── Tabs ───────────────────────────────────────────────── */
+/* ── Tabs ─────────────────────────────────────────────────── */
 .ob-tabs {
   display: flex;
-  align-items: center;
-  height: 32px;
-  padding: 0 8px;
-  border-bottom: 1px solid var(--pcs-colors-border);
+  align-items: stretch;
   flex-shrink: 0;
 }
 
 .ob-tab {
-  height: 32px;
-  padding: 0 10px;
+  flex: 1;
+  padding: 12px 0;
   background: transparent;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-bottom: 2px solid var(--pcs-colors-border);
   color: var(--pcs-colors-text-muted);
   font-family: inherit;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
-  transition: color 120ms var(--pcs-ease-out), border-color 120ms var(--pcs-ease-out);
+  text-align: center;
+  transition: color 120ms, border-color 120ms;
 }
-.ob-tab:hover { color: var(--pcs-colors-text); }
-.ob-tab.active {
-  color: var(--pcs-colors-text);
+
+.ob-tab--active {
+  color: var(--pcs-colors-accent, #a881fc);
+  font-weight: 600;
   border-bottom-color: var(--pcs-colors-brand);
 }
 
-/* ── Toolbar row ────────────────────────────────────────── */
+.ob-tab:not(.ob-tab--active):hover { color: var(--pcs-colors-text); }
+
+/* ── Toolbar ──────────────────────────────────────────────── */
 .ob-toolbar {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 8px;
+  justify-content: space-between;
+  padding: 8px 16px;
   flex-shrink: 0;
 }
 
-.ob-view-toggle { display: inline-flex; gap: 2px; }
+/* View-mode icons */
+.ob-views { display: flex; gap: 5px; }
 
 .ob-view-btn {
-  width: 22px;
-  height: 20px;
+  width: 26px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
-  color: var(--pcs-colors-text-muted);
   border: none;
   border-radius: 4px;
-  font-size: 12px;
-  line-height: 1;
   cursor: pointer;
   padding: 0;
-  transition: background 0.12s, color 0.12s;
-}
-.ob-view-btn:hover { color: var(--pcs-colors-text); }
-.ob-view-btn.active {
-  background: var(--pcs-colors-brand-muted);
-  color: var(--pcs-colors-brand);
+  opacity: 0.45;
+  transition: opacity 0.12s, background 0.12s;
 }
 
-.ob-toolbar-spacer { flex: 1; }
-
-.ob-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
+.ob-view-btn--active {
+  opacity: 1;
   background: var(--pcs-colors-surface-subtle);
-  color: var(--pcs-colors-text);
-  border: none;
-  border-radius: 6px;
-  padding: 2px 6px;
-  font-size: 10px;
-  font-weight: 700;
-  cursor: pointer;
 }
-.ob-chip:hover { filter: brightness(1.05); }
 
-/* ── Column headers ─────────────────────────────────────── */
+.ob-view-btn:hover:not(.ob-view-btn--active) { opacity: 0.8; }
+
+/* ── Grouping dropdown ────────────────────────────────────── */
+.ob-grouping-wrap { position: relative; }
+
+.ob-grouping-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ob-grouping-btn:hover { opacity: 0.75; }
+
+.ob-grouping-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 60px;
+  background: var(--pcs-colors-surface-card, #18171a);
+  border: 1px solid var(--pcs-colors-border);
+  border-radius: 8px;
+  overflow: hidden;
+  z-index: 200;
+  padding: 8px 0;
+}
+
+.ob-grouping-item {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.ob-grouping-item:hover { background: var(--pcs-colors-surface-subtle); }
+
+.ob-grouping-item--active { color: var(--pcs-colors-brand); }
+
+/* ── Column headers ───────────────────────────────────────── */
 .ob-headers {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  padding: 2px 8px 4px;
-  font-size: 10px;
-  font-weight: 500;
+  padding: 8px 16px;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12px;
   color: var(--pcs-colors-text-muted);
   flex-shrink: 0;
 }
-.ob-headers > :nth-child(2),
-.ob-headers > :nth-child(3) {
-  text-align: right;
-}
 
-/* ── Asks (stack upward) + Bids (stack downward) ───────── */
+.ob-headers > :nth-child(2) { text-align: center; }
+.ob-headers > :nth-child(3) { text-align: right; }
+
+/* ── Ask / Bid sections ───────────────────────────────────── */
 .ob-asks {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-end;   /* newest fills toward the spread */
   overflow: hidden;
   min-height: 0;
 }
 
+/* Top fade — softly hides the most-distant ask rows */
+.ob-asks::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 90px;
+  background: linear-gradient(
+    to bottom,
+    var(--pcs-colors-surface-card, #27262c),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
 .ob-bids {
+  position: relative;
   flex: 1;
   overflow: hidden;
   min-height: 0;
 }
 
-/* ── Rows ────────────────────────────────────────────── */
+/* Bottom fade — softly hides the most-distant bid rows */
+.ob-bids::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 90px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--pcs-colors-surface-card, #27262c)
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Row ──────────────────────────────────────────────────── */
 .ob-row {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  padding: 0 8px;
-  height: 20px;
-  align-items: center;
+  padding: 3px 16px;
   gap: 4px;
-  font-size: 11px;
-  font-weight: 500;
-  background: linear-gradient(
-    to left,
-    var(--ob-row-bg, transparent) var(--ob-w, 0%),
-    transparent var(--ob-w, 0%)
-  );
-  cursor: pointer;
-  transition: filter 80ms var(--pcs-ease-out);
-}
-.ob-row:hover { filter: brightness(0.98); }
-
-.ob-row-ask { --ob-row-bg: var(--pcs-colors-row-ask); }
-.ob-row-bid { --ob-row-bg: var(--pcs-colors-row-bid); }
-
-.ob-row > .ob-num { text-align: right; color: var(--pcs-colors-text); }
-.ob-row > .ob-num.ob-muted { color: var(--pcs-colors-text-muted); }
-
-.ob-price { font-weight: 600; }
-.ob-price.ob-ask { color: var(--pcs-colors-short); }
-.ob-price.ob-bid { color: var(--pcs-colors-long); }
-
-/* ── Mid-price band ─────────────────────────────────────── */
-.ob-mid {
-  display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  background: var(--pcs-colors-surface-subtle);
-  border-top: 1px solid var(--pcs-colors-border);
-  border-bottom: 1px solid var(--pcs-colors-border);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.ob-row:hover { filter: brightness(1.06); }
+
+/* Depth fills — absolutely positioned, grow from left */
+.ob-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* Ask fills: dark red-purple */
+.ob-row-ask .ob-fill-depth { background: rgba(85, 17, 70, 0.50); }
+.ob-row-ask .ob-fill-size  { background: rgba(123, 25, 77, 0.50); }
+
+/* Bid fills: dark green */
+.ob-row-bid .ob-fill-depth { background: #0c3a32; }
+.ob-row-bid .ob-fill-size  { background: #035345; }
+
+/* Text cells sit above fills */
+.ob-price,
+.ob-cell {
+  position: relative;
+  z-index: 1;
+  line-height: 1.5;
+}
+
+.ob-price-ask { color: var(--pcs-colors-short, #ed4b9e); }
+.ob-price-bid { color: #3ddbb5; }
+
+.ob-cell       { color: var(--pcs-colors-text, #f4eeff); }
+.ob-cell-center { text-align: center; }
+.ob-cell-right  { text-align: right; }
+
+/* ── Spread row ───────────────────────────────────────────── */
+.ob-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 4px 16px;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--pcs-colors-text);
+  background: var(--pcs-colors-surface-subtle, #353547);
   flex-shrink: 0;
 }
 
-.ob-mid-price {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-weight: 700;
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-}
+.ob-spread-val { text-align: center; }
+.ob-spread-pct { text-align: right; }
 
-.ob-mid-dir { display: inline-flex; }
-
-.ob-mid-mark {
-  color: var(--pcs-colors-text-muted);
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Empty state (Trades tab) ───────────────────────────── */
+/* ── Empty state ──────────────────────────────────────────── */
 .ob-empty {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--pcs-colors-text-muted);
-  font-size: 12px;
+  font-size: 14px;
   padding: 40px 20px;
 }
 
-/* ── Scrollbar (for long lists if needed) ──────────────── */
+/* ── Thin scrollbar ───────────────────────────────────────── */
 .ob-asks::-webkit-scrollbar,
 .ob-bids::-webkit-scrollbar { width: 3px; }
 .ob-asks::-webkit-scrollbar-track,
@@ -200,10 +278,15 @@
   border-radius: 2px;
 }
 
-/* ── Responsive ──────────────────────────────────────── */
+/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .ob-root { width: 260px; }
 }
+
 @media (max-width: 768px) {
-  .ob-root { width: 100%; border-left: none; border-top: 1px solid var(--pcs-colors-border); }
+  .ob-root {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--pcs-colors-border);
+  }
 }

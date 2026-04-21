@@ -93,7 +93,10 @@ export function CandlestickChart({
     chartRef.current  = chart
     seriesRef.current = series
     const ro = new ResizeObserver((entries) => {
-      if (entries[0]) chart.resize(entries[0].contentRect.width, height)
+      if (entries[0]) {
+        const { width, height: containerH } = entries[0].contentRect
+        chart.resize(width, containerH > 0 ? containerH : height)
+      }
     })
     ro.observe(chartContainerRef.current)
     return () => { ro.disconnect(); chart.remove(); chartRef.current = null; seriesRef.current = null }

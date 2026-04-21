@@ -1,98 +1,98 @@
-/* ── Account Panel ─────────────────────────────────────────── */
+/* ── Account Panel (Figma 2056-21162) ──────────────────────── */
 .ac-root {
-  flex: 1;
-  background: var(--pcs-colors-surface-card);
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  gap: 12px;
+  padding: 12px;
+  background: var(--pcs-colors-surface-card);
+  border: 1px solid var(--pcs-colors-border);
+  border-bottom: 2px solid var(--pcs-colors-border);
   color: var(--pcs-colors-text);
-  font-variant-numeric: tabular-nums;
-  min-height: 0;
+  font-family: inherit;
+  font-size: 14px;
 }
 
-.ac-header {
-  padding: 10px 12px 8px;
-  border-bottom: 1px solid var(--pcs-colors-border);
-  flex-shrink: 0;
-}
-
-.ac-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--pcs-colors-text);
-}
-
-/* ── Actions (Deposit / Withdraw / Transfer) ────────────── */
+/* ── Action buttons row ──────────────────────────────────── */
 .ac-actions {
   display: flex;
-  gap: 6px;
-  padding: 10px 12px;
+  gap: 8px;
 }
 
 .ac-btn {
   flex: 1;
-  background: var(--pcs-colors-surface-subtle);
-  color: var(--pcs-colors-text);
+  height: 48px;
   border: none;
-  border-radius: 6px;
-  padding: 5px 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
   font-family: inherit;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: filter 0.12s;
+  transition: filter 0.12s, transform 0.1s;
+  white-space: nowrap;
 }
-.ac-btn:hover { filter: brightness(1.06); }
+.ac-btn:hover  { filter: brightness(1.08); }
+.ac-btn:active { transform: scale(0.98); filter: brightness(0.95); }
+
 .ac-btn-primary {
   background: var(--pcs-colors-brand);
-  color: var(--pcs-colors-text-on-brand);
+  color: #000;
 }
 
-/* ── Sections ───────────────────────────────────────────── */
+.ac-btn-secondary {
+  background: var(--pcs-colors-surface-subtle);
+  color: var(--pcs-colors-brand);
+}
+
+/* ── Stat sections ───────────────────────────────────────── */
 .ac-section {
-  padding: 0 12px 10px;
-}
-
-.ac-section-bordered {
-  border-top: 1px solid var(--pcs-colors-border);
-  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .ac-section-title {
+  font-size: 16px;
+  font-weight: 400;
   color: var(--pcs-colors-text);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.ac-section > .ac-section-title { display: block; margin-bottom: 6px; }
-
-.ac-section-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.ac-shield {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 11px;
-  font-weight: 700;
+  line-height: 1.3;
 }
 
 .ac-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11px;
-  padding: 2px 0;
 }
 
-.ac-label { color: var(--pcs-colors-text-muted); }
+.ac-label {
+  font-size: 14px;
+  color: var(--pcs-colors-text-muted);
+}
 
 .ac-value {
+  font-size: 14px;
   color: var(--pcs-colors-text);
-  font-weight: 500;
+  text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+/* ── Footer: Multi-Assets Mode ───────────────────────────── */
+.ac-footer {
+  padding-top: 4px;
+}
+
+.ac-multi-assets-btn {
+  width: 100%;
+  height: 48px;
+  background: transparent;
+  border: 2px solid var(--pcs-colors-accent);
+  border-radius: 16px;
+  color: var(--pcs-colors-accent);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s, transform 0.1s;
+}
+.ac-multi-assets-btn:hover  { filter: brightness(1.1); }
+.ac-multi-assets-btn:active { transform: scale(0.98); }
