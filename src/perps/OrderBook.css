@@ -217,13 +217,13 @@
   pointer-events: none;
 }
 
-/* Ask fills: dark red-purple */
-.ob-row-ask .ob-fill-depth { background: rgba(85, 17, 70, 0.50); }
-.ob-row-ask .ob-fill-size  { background: rgba(123, 25, 77, 0.50); }
+/* Ask fills: theme-aware pink tints (deeper size bar over lighter depth bar) */
+.ob-row-ask .ob-fill-depth { background: color-mix(in srgb, var(--pcs-colors-failure) 14%, transparent); }
+.ob-row-ask .ob-fill-size  { background: color-mix(in srgb, var(--pcs-colors-failure) 28%, transparent); }
 
-/* Bid fills: dark green */
-.ob-row-bid .ob-fill-depth { background: #0c3a32; }
-.ob-row-bid .ob-fill-size  { background: #035345; }
+/* Bid fills: theme-aware green tints */
+.ob-row-bid .ob-fill-depth { background: color-mix(in srgb, var(--pcs-colors-success) 14%, transparent); }
+.ob-row-bid .ob-fill-size  { background: color-mix(in srgb, var(--pcs-colors-success) 28%, transparent); }
 
 /* Text cells sit above fills */
 .ob-price,
@@ -234,7 +234,7 @@
 }
 
 .ob-price-ask { color: var(--pcs-colors-failure, #ed4b9e); }
-.ob-price-bid { color: #3ddbb5; }
+.ob-price-bid { color: var(--pcs-colors-success); }
 
 .ob-cell       { color: var(--pcs-colors-text, #f4eeff); }
 .ob-cell-center { text-align: center; }

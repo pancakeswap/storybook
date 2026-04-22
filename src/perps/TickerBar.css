@@ -6,11 +6,11 @@
   align-items: center;
   gap: 24px;
   padding: 12px;
-  background: #27262c;                 /* --V1/Main/Card */
-  border-top:    1px solid #383241;    /* --V1/Main/Card-border */
-  border-right:  1px solid #383241;
-  border-bottom: 2px solid #383241;    /* thicker bottom per Figma */
-  border-left:   1px solid #383241;
+  background: var(--pcs-colors-card);
+  border-top:    1px solid var(--pcs-colors-card-border);
+  border-right:  1px solid var(--pcs-colors-card-border);
+  border-bottom: 2px solid var(--pcs-colors-card-border); /* thicker bottom per Figma */
+  border-left:   1px solid var(--pcs-colors-card-border);
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
   overflow-x: auto;
@@ -24,11 +24,11 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;                            /* Figma: gap-[8px] */
-  background: #372f47;                 /* --V1/Main/Input-primary */
-  border-top:    1px solid #55496e;    /* --V1/Main/Input-secondary */
-  border-right:  1px solid #55496e;
-  border-bottom: 2px solid #55496e;
-  border-left:   1px solid #55496e;
+  background: var(--pcs-colors-input);
+  border-top:    1px solid var(--pcs-colors-input-secondary);
+  border-right:  1px solid var(--pcs-colors-input-secondary);
+  border-bottom: 2px solid var(--pcs-colors-input-secondary);
+  border-left:   1px solid var(--pcs-colors-input-secondary);
   border-radius: 16px;
   padding: 7px 8px 9px;               /* Figma: pt-7 pb-9 px-8 */
   flex-shrink: 0;
@@ -80,7 +80,7 @@
 .tb-pair-name {
   font-size: 16px;
   font-weight: 600;
-  color: #f4eeff;                      /* --V1/Fill/Primary */
+  color: var(--pcs-colors-text);                      /* --V1/Fill/Primary */
   white-space: nowrap;
   line-height: 1.5;
   padding: 0 8px;
@@ -100,7 +100,7 @@
   font-size: 20px;                     /* Figma: H4 */
   font-weight: 600;
   letter-spacing: -0.2px;
-  color: #f4eeff;
+  color: var(--pcs-colors-text);
   white-space: nowrap;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
@@ -123,27 +123,27 @@
   flex-shrink: 0;
 }
 
-/* Label row — Figma: 14px Regular, #b8add2 */
+/* Label row — Figma: 14px Regular, var(--pcs-colors-text-subtle) */
 .tb-stat-label {
   font-size: 14px;
   font-weight: 400;
-  color: #b8add2;                      /* --V1/Fill/Secondary */
+  color: var(--pcs-colors-text-subtle);                      /* --V1/Fill/Secondary */
   white-space: nowrap;
   line-height: 1.5;
 }
 
 /* Dashed underline for hoverable labels (Mark / Index / Funding) */
 .tb-stat-label-dashed {
-  border-bottom: 1px dashed #5b4776;  /* --V2-Expanded/Secondary/40 */
+  border-bottom: 1px dashed var(--pcs-colors-card-border);
   display: inline-block;
   cursor: help;
 }
 
-/* Value row — Figma: 14px SemiBold, #f4eeff */
+/* Value row — Figma: 14px SemiBold, var(--pcs-colors-text) */
 .tb-stat-value {
   font-size: 14px;
   font-weight: 600;
-  color: #f4eeff;
+  color: var(--pcs-colors-text);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
@@ -160,7 +160,7 @@
 .tb-funding-rate {
   font-size: 14px;
   font-weight: 600;
-  color: #3ddbb5;                      /* --V2-Expanded/Positive/60 */
+  color: var(--pcs-colors-success);
   font-variant-numeric: tabular-nums;
   min-width: 70px;
 }
@@ -168,7 +168,7 @@
 /* Separator */
 .tb-funding-sep {
   font-size: 14px;
-  color: #b8add2;
+  color: var(--pcs-colors-text-subtle);
   padding: 0 2px;
 }
 
@@ -184,7 +184,7 @@
   justify-content: flex-end;
   padding: 8px;
   /* Gradient mask fades stats into the card background */
-  background: linear-gradient(to right, transparent, #27262c 50%);
+  background: linear-gradient(to right, transparent, var(--pcs-colors-card) 50%);
   pointer-events: none;
 }
 
@@ -199,7 +199,7 @@
   pointer-events: all;
   transition: color 0.12s;
 }
-.tb-chevron:hover { color: #f4eeff; }
+.tb-chevron:hover { color: var(--pcs-colors-text); }
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 1024px) {

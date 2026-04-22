@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { TickerBar } from './TickerBar'
-import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Widgets/Ticker Bar',
@@ -17,17 +16,8 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Dark: Story = {
-  parameters: { ...forceTheme('dark') },
-}
-
-export const Light: Story = {
-  parameters: { ...forceTheme('light') },
-}
-
 export const PriceDown: Story = {
   name: 'Price Down',
-  parameters: { ...forceTheme('dark') },
   args: {
     price: '64,112.3',
     change24h: '-1.42%',
@@ -37,7 +27,6 @@ export const PriceDown: Story = {
 
 export const BNB: Story = {
   name: 'BNB Pair',
-  parameters: { ...forceTheme('dark') },
   args: {
     symbol: 'BNB - USD',
     coinGlyph: 'B',

@@ -36,7 +36,7 @@
 
 .ac-btn-primary {
   background: var(--pcs-colors-primary);
-  color: #000;
+  color: var(--pcs-colors-inverted-contrast);
 }
 
 .ac-btn-secondary {

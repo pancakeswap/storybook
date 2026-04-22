@@ -76,7 +76,7 @@
   justify-content: space-between;
   gap: 8px;
   padding: 8px 16px;
-  background: var(--V1-Main-Input-primary, #372F47);
+  background: var(--pcs-colors-input);
   border: none;
   border-radius: 16px;
   cursor: pointer;
@@ -98,8 +98,8 @@
   width: 24px;
   height: 24px;
   border-radius: 8px;
-  border: 1px solid var(--V1-Main-Input-secondary, #55496E);
-  background: var(--V1-Main-Input-primary, #372F47);
+  border: 1px solid var(--pcs-colors-input-secondary);
+  background: var(--pcs-colors-input);
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
   display: flex;
   align-items: center;
@@ -150,7 +150,7 @@
   font-family: inherit;
   font-size: 16px;
   font-weight: 600;
-  color: #000;
+  color: var(--pcs-colors-inverted-contrast);
   cursor: pointer;
   transition: filter 0.12s, transform 0.1s;
 }

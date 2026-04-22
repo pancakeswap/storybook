@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { AccountPanel } from './AccountPanel'
-import { forceTheme } from '../stories-utils'
 
 const meta = {
   title: 'Widgets/Account Panel',
@@ -25,10 +24,4 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const Dark: Story = {
-  parameters: { ...forceTheme('dark') },
-}
-
-export const Light: Story = {
-  parameters: { ...forceTheme('light') },
-}
+export const Default: Story = {}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Checkbox } from '../ui/components'
 import '../ui/perps.css'
 import './PositionsTable.css'
 
@@ -137,14 +138,11 @@ export function PositionsTable({
 
         {/* Hide Other Symbols */}
         <label className="pt-hide-other">
-          <span className="pt-checkbox-wrap">
-            <input
-              type="checkbox"
-              checked={hideOther}
-              onChange={(e) => setHideOther(e.target.checked)}
-            />
-            <span className="pt-checkbox-box" aria-hidden="true" />
-          </span>
+          <Checkbox
+            scale="sm"
+            checked={hideOther}
+            onChange={(e) => setHideOther(e.target.checked)}
+          />
           Hide Other Symbols
         </label>
 

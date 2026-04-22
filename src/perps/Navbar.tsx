@@ -59,13 +59,75 @@ function Caret() {
 
 function BnbGlyph() {
   return (
-    <svg viewBox="0 0 32 32" width="18" height="18" aria-hidden="true">
+    <svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true">
       <circle cx="16" cy="16" r="16" fill="#F0B90B"/>
       <path d="M11.1 14.9L16 10l4.9 4.9 2.85-2.85L16 4.3 8.25 12.05zm-6.8 1.1L7.15 13.15 10 16l-2.85 2.85zM11.1 17.1L16 22l4.9-4.9 2.85 2.85L16 27.7l-7.75-7.75 2.85-2.85zm10.75-1.1L24.7 13.15 27.55 16 24.7 18.85z" fill="#fff"/>
       <path d="M18.9 16L16 13.1 13.85 15.25 13.6 15.5l-.35.35L13.1 16l2.9 2.9 2.9-2.9z" fill="#fff"/>
     </svg>
   )
 }
+
+function EthGlyph() {
+  return (
+    <svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true">
+      <circle cx="16" cy="16" r="16" fill="#627EEA"/>
+      <path d="M16.498 4v8.87l7.497 3.35z" fill="#fff" fillOpacity=".602"/>
+      <path d="M16.498 4L9 16.22l7.498-3.35z" fill="#fff"/>
+      <path d="M16.498 21.968v6.027L24 17.616z" fill="#fff" fillOpacity=".602"/>
+      <path d="M16.498 27.995v-6.028L9 17.616z" fill="#fff"/>
+      <path d="M16.498 20.573l7.497-4.353-7.497-3.348z" fill="#fff" fillOpacity=".2"/>
+      <path d="M9 16.22l7.498 4.353v-7.701z" fill="#fff" fillOpacity=".602"/>
+    </svg>
+  )
+}
+
+function ArbitrumGlyph() {
+  return (
+    <svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true">
+      <circle cx="16" cy="16" r="16" fill="#2D364D"/>
+      <path d="M15.4 9.5L8.9 20.7h3.2l3.3-5.7 3.3 5.7h3.2L15.4 9.5z" fill="#28A0F0"/>
+      <path d="M20.6 22.8h2.5V13.3l-2.5 4.3v5.2z" fill="#fff"/>
+    </svg>
+  )
+}
+
+function SolanaGlyph() {
+  return (
+    <svg viewBox="0 0 32 32" width="16" height="16" aria-hidden="true">
+      <circle cx="16" cy="16" r="16" fill="#080808"/>
+      <defs>
+        <linearGradient id="sol-g" x1="6" y1="22" x2="26" y2="10" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#9945FF"/>
+          <stop offset=".5" stopColor="#19FB9B"/>
+          <stop offset="1" stopColor="#00C2FF"/>
+        </linearGradient>
+      </defs>
+      <path d="M9.5 21.3a.6.6 0 0 1 .44-.18h14.3a.3.3 0 0 1 .21.51l-2.95 2.95a.6.6 0 0 1-.43.18H6.75a.3.3 0 0 1-.21-.51l2.96-2.95zM9.5 9.4a.6.6 0 0 1 .44-.18h14.3a.3.3 0 0 1 .21.51l-2.95 2.95a.6.6 0 0 1-.43.18H6.75a.3.3 0 0 1-.21-.51L9.5 9.4zm13.01 5.92a.6.6 0 0 0-.43-.18H7.77a.3.3 0 0 0-.21.51l2.95 2.95a.6.6 0 0 0 .44.18h14.3a.3.3 0 0 0 .21-.51l-2.95-2.95z" fill="url(#sol-g)"/>
+    </svg>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M5 12l5 5L20 7" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+interface ChainOption {
+  id: string
+  label: string
+  icon: JSX.Element
+  iconBg: string
+}
+
+const CHAINS: ChainOption[] = [
+  { id: 'bnb',  label: 'BNB Chain',    icon: <BnbGlyph />,      iconBg: '#1E1E1E' },
+  { id: 'eth',  label: 'Ethereum',     icon: <EthGlyph />,      iconBg: '#627EEA' },
+  { id: 'arb',  label: 'Arbitrum One', icon: <ArbitrumGlyph />, iconBg: '#2D364D' },
+  { id: 'sol',  label: 'Solana',       icon: <SolanaGlyph />,   iconBg: '#080808' },
+]
 
 export function Navbar({
   onDeposit,
@@ -74,7 +136,11 @@ export function Navbar({
   activeTab = 'Trade',
 }: NavbarProps) {
   const [walletOpen, setWalletOpen] = useState(false)
+  const [chainOpen, setChainOpen] = useState(false)
+  const [chainId, setChainId] = useState('bnb')
   const { toggleTheme } = useTheme()
+
+  const selectedChain = CHAINS.find((c) => c.id === chainId) ?? CHAINS[0]
 
   return (
     <nav className="nb-root perps-root" aria-label="Main navigation">
@@ -108,9 +174,57 @@ export function Navbar({
           Deposit
         </button>
 
-        <button type="button" className="nb-chain-pill" aria-label="Select chain">
-          <BnbGlyph />
-        </button>
+        <div className="nb-chain-wrap">
+          <button
+            type="button"
+            className="nb-chain-pill"
+            aria-label="Select chain"
+            aria-haspopup="listbox"
+            aria-expanded={chainOpen}
+            onClick={() => setChainOpen((o) => !o)}
+          >
+            <span
+              className="nb-chain-icon"
+              style={{ background: selectedChain.iconBg }}
+              aria-hidden="true"
+            >
+              {selectedChain.icon}
+            </span>
+            <Caret />
+          </button>
+
+          {chainOpen && (
+            <div className="nb-chain-dropdown" role="listbox" aria-label="Select network">
+              {CHAINS.map((c) => {
+                const isSelected = c.id === chainId
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    className="nb-chain-item"
+                    onClick={() => { setChainId(c.id); setChainOpen(false) }}
+                  >
+                    <span
+                      className="nb-chain-icon"
+                      style={{ background: c.iconBg }}
+                      aria-hidden="true"
+                    >
+                      {c.icon}
+                    </span>
+                    <span className="nb-chain-label">{c.label}</span>
+                    {isSelected && (
+                      <span className="nb-chain-check" aria-hidden="true">
+                        <CheckIcon />
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
 
         <div className="nb-wallet-wrap">
           <button

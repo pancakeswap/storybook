@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
+import { Checkbox } from '../ui/components'
 import '../ui/perps.css'
 import './OrderPanel.css'
 import { MarginModeModal } from './MarginModeModal'
@@ -378,8 +379,8 @@ export function OrderPanel({
       {/* ── Reduce Only + GTC ───────────────────────────── */}
       <div className="op-check-row">
         <label className="op-check">
-          <input
-            type="checkbox"
+          <Checkbox
+            scale="sm"
             checked={reduceOnly}
             onChange={(e) => setReduceOnly(e.target.checked)}
           />
@@ -418,8 +419,8 @@ export function OrderPanel({
       {/* ── TP / SL + trigger type ───────────────────────── */}
       <div className="op-check-row">
         <label className="op-check">
-          <input
-            type="checkbox"
+          <Checkbox
+            scale="sm"
             checked={tpsl}
             onChange={(e) => setTpsl(e.target.checked)}
           />

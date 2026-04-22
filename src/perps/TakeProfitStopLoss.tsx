@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import '../ui/perps.css'
 import { Button } from '../ui/components/Button'
+import { Checkbox } from '../ui/components/Checkbox'
 import { Tag } from '../ui/components/Tag'
 import { Input, InputGroup } from '../ui/components/Input'
 
@@ -80,11 +81,10 @@ export function TakeProfitStopLoss({
             </p>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
               <span className="p-label">Enable</span>
-              <input
-                type="checkbox"
+              <Checkbox
+                scale="xs"
                 checked={tpEnabled}
                 onChange={(e) => setTpEnabled(e.target.checked)}
-                style={{ accentColor: 'var(--pcs-colors-success)', width: 14, height: 14 }}
               />
             </label>
           </div>
@@ -133,11 +133,10 @@ export function TakeProfitStopLoss({
             </p>
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
               <span className="p-label">Enable</span>
-              <input
-                type="checkbox"
+              <Checkbox
+                scale="xs"
                 checked={slEnabled}
                 onChange={(e) => setSlEnabled(e.target.checked)}
-                style={{ accentColor: 'var(--pcs-colors-failure)', width: 14, height: 14 }}
               />
             </label>
           </div>

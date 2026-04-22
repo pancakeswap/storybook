@@ -40,8 +40,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  border: 1px solid var(--V1-Main-Input-secondary, #55496E);
-  background: var(--V1-Main-Input-primary, #372F47);
+  border: 1px solid var(--pcs-colors-input-secondary);
+  background: var(--pcs-colors-input);
   box-shadow: 0 2px 0 -1px var(--V1-Effects-Inset-point, rgba(0, 0, 0, 0.16)) inset;
   font-size: 16px;
   font-weight: 400;

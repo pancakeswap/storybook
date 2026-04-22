@@ -98,7 +98,9 @@
 .nb-deposit-btn:hover  { filter: brightness(1.06); }
 .nb-deposit-btn:active { filter: brightness(0.95); transform: scale(0.98); }
 
-/* ── Chain pill ────────────────────────────────────────── */
+/* ── Chain pill + dropdown ─────────────────────────────── */
+.nb-chain-wrap { position: relative; flex-shrink: 0; }
+
 .nb-chain-pill {
   display: inline-flex;
   align-items: center;
@@ -115,6 +117,80 @@
   transition: background 0.12s;
 }
 .nb-chain-pill:hover { filter: brightness(1.05); }
+
+.nb-chain-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--pcs-colors-input);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* ── Chain dropdown menu ───────────────────────────────── */
+.nb-chain-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  padding: 8px 0;
+  background: var(--pcs-colors-input);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-bottom-width: 2px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--pcs-shadows-dropdown);
+  z-index: 200;
+}
+
+.nb-chain-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+.nb-chain-item:hover {
+  background: color-mix(in srgb, var(--pcs-colors-text) 8%, transparent);
+}
+.nb-chain-item .nb-chain-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+}
+
+.nb-chain-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nb-chain-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: var(--pcs-colors-success);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
 
 /* ── Wallet pill ───────────────────────────────────────── */
 .nb-wallet-wrap { position: relative; }
