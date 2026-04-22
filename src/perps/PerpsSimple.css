@@ -1,0 +1,619 @@
+/* Perps Simple — One-Tap trade layout (ps-* prefix)
+ *
+ * Structure:
+ *   .ps-root ────── full page
+ *     Navbar
+ *     .ps-body   ── grid 1fr / 440px
+ *       .ps-left  ── column: price header / chart card / positions strip
+ *       .ps-trade-panel ── right column
+ */
+
+.ps-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--pcs-colors-background);
+  color: var(--pcs-colors-text);
+  font-family: 'Kanit', sans-serif;
+}
+
+.ps-body {
+  display: grid;
+  grid-template-columns: 1fr 440px;
+  flex: 1;
+  min-height: 0;
+}
+
+.ps-left {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+}
+
+.ps-spacer { flex: 1; }
+
+/* ── Utility color classes (tabular numerals everywhere numeric) ── */
+.ps-success { color: var(--pcs-colors-success); }
+.ps-failure { color: var(--pcs-colors-failure); }
+
+/* ═════════════════════════════════════════════════════════════
+ * Price header
+ * ═════════════════════════════════════════════════════════════ */
+.ps-price-card {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 18px;
+  background: var(--pcs-colors-card);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 20px;
+  box-shadow: var(--pcs-shadows-card);
+}
+
+.ps-price-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ps-price-pair-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ps-price-pair {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--pcs-colors-text);
+}
+
+.ps-tag-perp {
+  padding: 2px 8px;
+  background: var(--pcs-colors-input);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--pcs-colors-secondary);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.ps-caret-muted {
+  display: inline-flex;
+  color: var(--pcs-colors-text-subtle);
+}
+
+.ps-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.ps-price-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--pcs-colors-text);
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.ps-price-cents {
+  color: var(--pcs-colors-text-subtle);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.ps-change-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  /* light-theme tint; dark-theme resolves via color-mix */
+  background: color-mix(in srgb, var(--pcs-colors-success) 15%, var(--pcs-colors-card));
+  color: var(--pcs-colors-success);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ps-price-stats {
+  display: flex;
+  gap: 28px;
+  margin-left: auto;
+}
+
+.ps-stat-label {
+  font-family: 'Kanit', sans-serif;
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.ps-stat-value {
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--pcs-colors-text);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+/* ═════════════════════════════════════════════════════════════
+ * Chart card
+ * ═════════════════════════════════════════════════════════════ */
+.ps-chart-card {
+  flex: 0 0 auto;
+  background: var(--pcs-colors-card);
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid var(--pcs-colors-card-border);
+  box-shadow: var(--pcs-shadows-card);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ps-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.ps-tf-group {
+  display: flex;
+  gap: 4px;
+  background: var(--pcs-colors-input);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.ps-tf-btn {
+  border: none;
+  background: transparent;
+  color: var(--pcs-colors-text-subtle);
+  font-family: 'Kanit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.ps-tf-btn:hover { color: var(--pcs-colors-text); }
+.ps-tf-btn.active {
+  background: var(--pcs-colors-card);
+  color: var(--pcs-colors-primary);
+  box-shadow: var(--pcs-shadows-card);
+}
+
+.ps-pyth-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--pcs-colors-input);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pcs-colors-text-subtle);
+}
+.ps-pyth-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--pcs-colors-success);
+}
+
+.ps-chart-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-simple-chart {
+  display: block;
+  width: 100%;
+  height: 260px;
+  color: var(--pcs-colors-success);
+}
+
+/* ═════════════════════════════════════════════════════════════
+ * Positions strip
+ * ═════════════════════════════════════════════════════════════ */
+.ps-positions-strip {
+  background: var(--pcs-colors-card);
+  padding: 14px 18px;
+  border-radius: 18px;
+  border: 1px solid var(--pcs-colors-card-border);
+  box-shadow: var(--pcs-shadows-card);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.ps-positions-bunny {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: var(--pcs-colors-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ps-positions-label {
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 500;
+}
+
+.ps-positions-body {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--pcs-colors-text);
+}
+
+.ps-history-link {
+  background: none;
+  border: none;
+  font-family: 'Kanit', sans-serif;
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 999px;
+}
+.ps-history-link:hover { color: var(--pcs-colors-text); }
+
+/* ═════════════════════════════════════════════════════════════
+ * Trade panel (right)
+ * ═════════════════════════════════════════════════════════════ */
+.ps-trade-panel {
+  background: var(--pcs-colors-card);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ps-trade-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ps-trade-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--pcs-colors-text);
+}
+
+.ps-trade-subtitle {
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 500;
+}
+
+.ps-limit-toggle {
+  border: none;
+  background: var(--pcs-colors-input);
+  color: var(--pcs-colors-text-subtle);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 120ms ease, background 120ms ease;
+}
+.ps-limit-toggle:hover { color: var(--pcs-colors-text); }
+.ps-limit-toggle.active {
+  background: color-mix(in srgb, var(--pcs-colors-primary) 18%, var(--pcs-colors-card));
+  color: var(--pcs-colors-primary);
+}
+
+/* ── Stake card (bubblegum gradient sheet) ───────────────────── */
+.ps-stake-card {
+  background: linear-gradient(139.73deg, #E5FDFF 0%, #F3EFFF 100%);
+  border-radius: 20px;
+  padding: 16px;
+  border: 1px solid var(--pcs-colors-card-border);
+}
+/* Dark-theme: gradient fights the theme; dim it with a purple overlay so it reads */
+html.dark .ps-stake-card {
+  background:
+    linear-gradient(139.73deg, rgba(229, 253, 255, 0.08) 0%, rgba(243, 239, 255, 0.14) 100%),
+    var(--pcs-colors-card);
+}
+
+.ps-stake-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ps-stake-label {
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 600;
+}
+
+.ps-stake-balance {
+  font-size: 11px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 500;
+}
+
+.ps-stake-balance-val {
+  color: var(--pcs-colors-secondary);
+  font-weight: 700;
+}
+
+.ps-stake-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 12px;
+}
+
+.ps-stake-input-wrap {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.ps-stake-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: 'Kanit', sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--pcs-colors-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+  line-height: 1;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+.ps-stake-input::-webkit-outer-spin-button,
+.ps-stake-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ps-stake-unit {
+  font-size: 16px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 600;
+}
+
+.ps-stake-position-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--pcs-colors-card);
+  border-radius: 999px;
+  box-shadow: var(--pcs-shadows-card);
+  white-space: nowrap;
+}
+
+.ps-stake-position-val {
+  color: var(--pcs-colors-secondary);
+  font-weight: 700;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-stake-position-label {
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.ps-pct-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.ps-pct-btn {
+  flex: 1;
+  border: none;
+  background: var(--pcs-colors-card);
+  color: var(--pcs-colors-text);
+  border-radius: 12px;
+  padding: 9px 0 11px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--pcs-shadows-card);
+  transition: transform 100ms ease;
+}
+.ps-pct-btn:hover { opacity: 0.85; }
+.ps-pct-btn:active { transform: translateY(1px); }
+.ps-pct-btn.active {
+  background: var(--pcs-colors-secondary);
+  color: #fff;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+}
+
+/* ── Leverage picker ─────────────────────────────────────────── */
+.ps-lev-section { display: flex; flex-direction: column; }
+
+.ps-lev-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.ps-lev-label {
+  font-size: 14px;
+  color: var(--pcs-colors-text);
+  font-weight: 700;
+}
+
+.ps-lev-value-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.ps-lev-value {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-lev-max {
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 600;
+}
+
+.ps-lev-pills {
+  display: flex;
+  gap: 5px;
+}
+
+.ps-lev-pill {
+  flex: 1;
+  border: none;
+  background: var(--pcs-colors-card);
+  color: var(--pcs-colors-text);
+  border-radius: 14px;
+  padding: 10px 4px 12px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  box-shadow:
+    inset 0 0 0 1.5px var(--pcs-colors-card-border),
+    inset 0 -2px 0 var(--pcs-colors-card-border);
+  transition: transform 100ms ease, opacity 120ms ease;
+}
+.ps-lev-pill:hover { opacity: 0.85; }
+.ps-lev-pill:active { transform: translateY(1px); }
+.ps-lev-pill.active {
+  color: #fff;
+  /* background set inline from JS to the risk tone */
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18);
+}
+
+/* ── Risk banner — theme-reactive tint ──────────────────────── */
+.ps-risk-banner {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--ps-risk-bg-light);
+}
+html.dark .ps-risk-banner {
+  background: color-mix(in srgb, var(--ps-risk-tone) 18%, var(--pcs-colors-card));
+}
+
+.ps-risk-icon { font-size: 20px; line-height: 1; }
+.ps-risk-title { font-size: 12px; font-weight: 700; }
+.ps-risk-copy {
+  font-size: 11px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: 1px;
+}
+
+/* ── Order summary ──────────────────────────────────────────── */
+.ps-summary-card {
+  background: var(--pcs-colors-background);
+  border-radius: 14px;
+  padding: 12px 14px;
+  border: 1px dashed var(--pcs-colors-card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ps-summary-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ps-summary-label {
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 500;
+}
+
+.ps-summary-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pcs-colors-text);
+  font-variant-numeric: tabular-nums;
+}
+.ps-summary-value.ps-failure { color: var(--pcs-colors-failure); }
+
+/* ── Long / Short CTAs (Duolingo-style chunky buttons) ──────── */
+.ps-cta-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.ps-chunky-btn {
+  flex: 1;
+  border: none;
+  color: #fff;
+  border-radius: 20px;
+  padding: 18px 20px 22px;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow:
+    inset 0 -4px 0 rgba(0, 0, 0, 0.18),
+    0 2px 0 rgba(0, 0, 0, 0.08);
+  transition: transform 100ms ease, box-shadow 100ms ease;
+}
+.ps-chunky-btn:hover { opacity: 0.92; }
+.ps-chunky-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.ps-chunky-long  { background: var(--pcs-colors-success); }
+.ps-chunky-short { background: var(--pcs-colors-failure); }
+
+.ps-fine-print {
+  text-align: center;
+  font-size: 11px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 500;
+  margin-top: -4px;
+}
