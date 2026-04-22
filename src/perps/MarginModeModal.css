@@ -1,0 +1,158 @@
+/* ── Margin Mode Modal ──────────────────────────────────────── */
+
+/* Overlay backdrop — V1/Main/Overlay background from PCS DS     */
+.mm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 23, 38, 0.6);
+  z-index: var(--pcs-z-overlay, 500);
+  animation: pcs-modal-fade 0.15s ease;
+}
+
+/* Modal panel */
+.mm-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--pcs-z-modal, 1000);
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  width: 411px;
+  max-width: calc(100vw - 32px);
+
+  background: var(--pcs-colors-card, #27262C);
+  border: 1px solid var(--pcs-colors-card-border, #383241);
+  border-bottom: 2px solid var(--pcs-colors-card-border, #383241);
+  border-radius: 24px;
+  overflow: hidden;
+
+  animation: pcs-modal-scale 0.18s ease;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.mm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mm-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pcs-colors-text, #F4EEFF);
+  margin: 0;
+}
+
+.mm-close {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--pcs-colors-text-subtle, #B8ADD2);
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  transition: color 0.12s, background 0.12s;
+}
+.mm-close:hover {
+  color: var(--pcs-colors-text, #F4EEFF);
+  background: var(--pcs-colors-input, #372F47);
+}
+
+/* ── Mode options ────────────────────────────────────────────── */
+.mm-options {
+  display: flex;
+  gap: 8px;
+}
+
+.mm-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--V1-Main-Input-primary, #372F47);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.12s;
+}
+.mm-option:hover {
+  filter: brightness(1.08);
+}
+
+.mm-option-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pcs-colors-text, #F4EEFF);
+}
+
+/* Checkbox circle */
+.mm-option-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--V1-Main-Input-secondary, #55496E);
+  background: var(--V1-Main-Input-primary, #372F47);
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 2px;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.mm-option-check--on {
+  background: var(--pcs-colors-success, #31D0AA);
+  border: none;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  /* Focus ring matching Figma "Focus" effect */
+  box-shadow: 0 0 0 1px var(--pcs-colors-secondary, #A881FC),
+              0 0 0 4px rgba(168, 129, 252, 0.4);
+}
+
+/* ── Body text ───────────────────────────────────────────────── */
+.mm-description {
+  font-size: 14px;
+  color: var(--pcs-colors-text, #F4EEFF);
+  line-height: 1.5;
+  margin: 0;
+  /* Lock to the height of the longer (Cross) description so the
+     modal stays the same size regardless of which mode is selected */
+  min-height: 84px;
+}
+
+.mm-footnote {
+  margin: 0;
+  padding: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--pcs-colors-text, #F4EEFF);
+  opacity: 0.5;
+}
+
+/* ── Confirm button ──────────────────────────────────────────── */
+.mm-confirm {
+  width: 100%;
+  height: 48px;
+  background: var(--pcs-colors-primary, #1FC7D4);
+  border: none;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  transition: filter 0.12s, transform 0.1s;
+}
+.mm-confirm:hover  { filter: brightness(1.07); }
+.mm-confirm:active { transform: scale(0.98); filter: brightness(0.95); }

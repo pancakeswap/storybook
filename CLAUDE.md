@@ -7,7 +7,10 @@ When implementing any feature or UI:
 1. **Use existing components** — `Button`, `Card`, `Text`, `TabMenu`, `TableView` live in `src/ui/components/`. Import and compose them. Do NOT create ad-hoc styled buttons, cards, text wrappers, tables, or tabs.
 2. **Use existing design tokens** — colors, shadows, spacing, radii, fonts are defined in `src/ui/tokens.ts` and exposed as CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`). Never hardcode hex values, pixel sizes, or shadows that already have a token.
 3. **Use existing icons** — 241 icons live in `src/ui/Icons.tsx`. Check there before adding any SVG.
-4. **Do NOT modify the design system or base components** unless the user explicitly asks to change them. This includes: `tokens.ts`, `theme.ts`, `design-system.css`, `Icons.tsx`, and everything in `src/ui/components/{Button,Card,Text,TabMenu,TableView}/`.
+4. **Ask before changing a basic component or widget.** Files in scope: `tokens.ts`, `theme.ts`, `design-system.css`, `Icons.tsx`, and everything in `src/ui/components/*` and `src/ui/widgets/*`. If a change you need would modify any of these, pause and ask the user which scope they want:
+   - **Change the basic component/widget directly** — affects every feature that uses it.
+   - **Change only on the current page** — keep the basic component untouched and adjust the call site instead.
+   Do NOT pick the scope yourself.
 5. **Follow PancakeSwap's design language** — see section below.
 
 ---

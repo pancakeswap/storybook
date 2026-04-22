@@ -1,0 +1,218 @@
+/* ── Navbar (Aster-style, 44h) ─────────────────────────────── */
+.nb-root {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--pcs-colors-card);
+  border-bottom: 1px solid var(--pcs-colors-card-border);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
+}
+
+.nb-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+}
+
+.nb-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.nb-wordmark {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--pcs-colors-text);
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+/* ── Nav items (tabs) ──────────────────────────────────── */
+.nb-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nb-nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--pcs-colors-text-subtle);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+.nb-nav-item:hover { color: var(--pcs-colors-text); }
+.nb-nav-item.active { color: var(--pcs-colors-text); }
+
+.nb-chevron {
+  display: inline-flex;
+  opacity: 0.6;
+}
+
+.nb-spacer { flex: 1; min-width: 8px; }
+
+/* ── Right side ────────────────────────────────────────── */
+.nb-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Deposit pill (teal/brand) ──────────────────────────── */
+.nb-deposit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pcs-colors-primary);
+  color: var(--pcs-colors-inverted-contrast);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0;
+  transition: filter var(--p-duration-base) var(--p-ease-out), transform var(--p-duration-fast) var(--p-ease-out);
+  flex-shrink: 0;
+}
+.nb-deposit-btn:hover  { filter: brightness(1.06); }
+.nb-deposit-btn:active { filter: brightness(0.95); transform: scale(0.98); }
+
+/* ── Chain pill ────────────────────────────────────────── */
+.nb-chain-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pcs-colors-input);
+  color: var(--pcs-colors-text);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.nb-chain-pill:hover { filter: brightness(1.05); }
+
+/* ── Wallet pill ───────────────────────────────────────── */
+.nb-wallet-wrap { position: relative; }
+
+.nb-wallet-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--pcs-colors-input);
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  transition: filter 0.12s;
+}
+.nb-wallet-btn:hover { filter: brightness(1.05); }
+
+.nb-wallet-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--pcs-colors-success);
+  flex-shrink: 0;
+}
+
+.nb-wallet-addr { line-height: 1; }
+
+/* ── Wallet dropdown ───────────────────────────────────── */
+.nb-wallet-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--pcs-colors-card);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--pcs-shadows-dropdown);
+  z-index: 200;
+}
+
+.nb-wallet-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: var(--pcs-colors-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.1s;
+  text-align: left;
+}
+.nb-wallet-item:hover { background: var(--pcs-colors-input); }
+
+.nb-wallet-divider {
+  height: 1px;
+  background: var(--pcs-colors-card-border);
+  margin: 2px 0;
+}
+
+.nb-wallet-disconnect { color: var(--pcs-colors-failure); }
+.nb-wallet-disconnect:hover { background: var(--pcs-colors-failure-muted); }
+
+/* ── Kebab ─────────────────────────────────────────────── */
+.nb-kebab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.nb-kebab:hover { color: var(--pcs-colors-text); background: var(--pcs-colors-input); }
+
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — Mobile  ≤ 768px
+   ══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .nb-root { padding: 0 12px; gap: 12px; }
+  .nb-nav { display: none; }
+  .nb-chain-pill { display: none; }
+  .nb-kebab { display: none; }
+}
