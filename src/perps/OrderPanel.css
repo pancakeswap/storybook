@@ -3,7 +3,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px;
+  /* No top padding so the "Market / Limit / Stop Limit" tabs sit flush
+   * with the top of the right rail, aligning with the Order Book tabs
+   * on the left side. Side + bottom padding stays 12px. */
+  padding: 0 12px 12px;
   background: var(--pcs-colors-card);
   border-bottom: 1px solid var(--pcs-colors-card-border);
   color: var(--pcs-colors-text);
@@ -88,7 +91,9 @@
   border: none;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
-  padding: 10px 0;
+  /* 12px top/bottom matches .ob-tab so the Trade-panel tabs
+   * line up horizontally with the Order Book tabs. */
+  padding: 12px 0;
   margin-right: 16px;
   color: var(--pcs-colors-text-subtle);
   font-family: inherit;

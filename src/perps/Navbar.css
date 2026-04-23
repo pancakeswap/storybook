@@ -36,30 +36,41 @@
   line-height: 1;
 }
 
-/* ── Nav items (tabs) ──────────────────────────────────── */
-.nb-nav {
-  display: flex;
-  align-items: center;
-  gap: 18px;
+/* ── Simple / Pro toggle (Figma 147:13109) ──────────────── */
+.nb-mode-toggle {
+  display: inline-flex;
+  align-items: stretch;
+  background: var(--pcs-colors-input);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 12px;
+  padding: 0;
+  flex-shrink: 0;
 }
 
-.nb-nav-item {
+.nb-mode-tab {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  padding: 0;
+  justify-content: center;
+  padding: 4px 12px;
   border: none;
+  border-radius: 12px;
   background: transparent;
   color: var(--pcs-colors-text-subtle);
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  min-width: 100px;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.12s;
+  transition: background 0.12s, color 0.12s, font-weight 0.12s;
 }
-.nb-nav-item:hover { color: var(--pcs-colors-text); }
-.nb-nav-item.active { color: var(--pcs-colors-text); }
+.nb-mode-tab:hover:not(.nb-mode-tab--active) { color: var(--pcs-colors-text); }
+.nb-mode-tab--active {
+  background: var(--pcs-colors-text-subtle);
+  color: var(--pcs-colors-inverted-contrast);
+  font-weight: 600;
+}
 
 .nb-chevron {
   display: inline-flex;
@@ -226,46 +237,13 @@
 
 .nb-wallet-addr { line-height: 1; }
 
-/* ── Wallet dropdown ───────────────────────────────────── */
-.nb-wallet-dropdown {
+/* ── Wallet panel (positioning wrapper) ─────────────────── */
+.nb-wallet-panel {
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  min-width: 180px;
-  background: var(--pcs-colors-card);
-  border: 1px solid var(--pcs-colors-card-border);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--pcs-shadows-dropdown);
   z-index: 200;
 }
-
-.nb-wallet-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 14px;
-  border: none;
-  background: transparent;
-  color: var(--pcs-colors-text);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.1s;
-  text-align: left;
-}
-.nb-wallet-item:hover { background: var(--pcs-colors-input); }
-
-.nb-wallet-divider {
-  height: 1px;
-  background: var(--pcs-colors-card-border);
-  margin: 2px 0;
-}
-
-.nb-wallet-disconnect { color: var(--pcs-colors-failure); }
-.nb-wallet-disconnect:hover { background: var(--pcs-colors-failure-muted); }
 
 /* ── Kebab ─────────────────────────────────────────────── */
 .nb-kebab {
@@ -288,7 +266,7 @@
    ══════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .nb-root { padding: 0 12px; gap: 12px; }
-  .nb-nav { display: none; }
+  .nb-mode-toggle { display: none; }
   .nb-chain-pill { display: none; }
   .nb-kebab { display: none; }
 }

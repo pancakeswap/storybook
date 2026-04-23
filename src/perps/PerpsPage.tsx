@@ -141,9 +141,7 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
       <DepositModal
         open={modal !== null}
         initialTab={modal ?? 'deposit'}
-        availableBalance={fmt(available)}
-        usedBalance={fmt(used)}
-        totalBalance={fmt(balance)}
+        walletBalance={fmt(balance)}
         maxWithdrawable={fmt(available)}
         onDeposit={handleDeposit}
         onWithdraw={handleWithdraw}

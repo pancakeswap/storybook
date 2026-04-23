@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import '../ui/perps.css'
 import './OrderBook.css'
+import { TradesFeed } from './TradesFeed'
 
 export type OrderBookRow = {
   /** Price */
@@ -27,24 +28,29 @@ export interface OrderBookProps {
 /* ── Mock data ────────────────────────────────────────────── */
 const BASE_PRICE = 75500.8
 
+/**
+ * Generate 20 rows per side so the pool is deep enough for both-only and
+ * single-side views. In the "both" view the component slices down to the
+ * 10 rows nearest the spread per side (20 total).
+ */
 function genAsks(): OrderBookRow[] {
   let total = 0
-  return Array.from({ length: 10 }, (_, i) => {
+  return Array.from({ length: 20 }, (_, i) => {
     const p = BASE_PRICE + (i + 1) * 2.5
     const s = 50 + ((i * 97) % 650)
     total += s
     return { p, s, t: total }
-  }).reverse() // index 0 = highest ask (largest cumulative)
+  }).reverse() // index 0 = highest ask (largest cumulative, farthest from spread)
 }
 
 function genBids(): OrderBookRow[] {
   let total = 0
-  return Array.from({ length: 10 }, (_, i) => {
+  return Array.from({ length: 20 }, (_, i) => {
     const p = BASE_PRICE - (i + 1) * 2.5
     const s = 50 + ((i * 113) % 720)
     total += s
     return { p, s, t: total }
-  }) // index 0 = highest bid (smallest cumulative)
+  }) // index 0 = highest bid (closest to spread)
 }
 
 const DEFAULT_ASKS = genAsks()
@@ -138,8 +144,25 @@ export function OrderBook({
   const spread     = lowestAsk && highestBid ? lowestAsk.p - highestBid.p : 0
   const spreadPct  = lowestAsk ? (spread / lowestAsk.p) * 100 : 0
 
+  // Rows shown per view:
+  //   both  → 10 asks + 10 bids (closest to the spread on each side)
+  //   bids  → 20 bids (all rows)
+  //   asks  → 20 asks (all rows)
+  const displayAsks = useMemo(
+    () => (view === 'both' ? asks.slice(-10) : asks.slice(0, 20)),
+    [asks, view],
+  )
+  const displayBids = useMemo(
+    () => (view === 'both' ? bids.slice(0, 10) : bids.slice(0, 20)),
+    [bids, view],
+  )
+
   return (
-    <section className="perps-root ob-root" aria-label="Order book">
+    <section
+      className="perps-root ob-root"
+      aria-label="Order book"
+      data-view={view}
+    >
 
       {/* ── Tabs ── */}
       <div className="ob-tabs" role="tablist">
@@ -223,7 +246,7 @@ export function OrderBook({
           {/* ── Asks ── */}
           {view !== 'bids' && (
             <div className="ob-asks">
-              {asks.map(r => (
+              {displayAsks.map(r => (
                 <OrderRow
                   key={`a-${r.p}`}
                   row={r}
@@ -245,7 +268,7 @@ export function OrderBook({
           {/* ── Bids ── */}
           {view !== 'asks' && (
             <div className="ob-bids">
-              {bids.map(r => (
+              {displayBids.map(r => (
                 <OrderRow
                   key={`b-${r.p}`}
                   row={r}
@@ -258,7 +281,7 @@ export function OrderBook({
           )}
         </>
       ) : (
-        <div className="ob-empty">No trades yet</div>
+        <TradesFeed base={base} />
       )}
     </section>
   )

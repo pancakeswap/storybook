@@ -3,6 +3,12 @@
   display: flex;
   flex-direction: column;
   width: 280px;
+  /* Always fill the height of our grid slot (chart column in PerpsPage
+   * or story-wrapper in Storybook). Combined with `min-height: 0` this
+   * lets the scrolling children (bids / asks / trades) clip inside the
+   * card instead of pushing the layout taller. */
+  height: 100%;
+  max-height: 100%;
   flex-shrink: 0;
   background: var(--pcs-colors-card);
   color: var(--pcs-colors-text);
@@ -10,6 +16,7 @@
   font-family: inherit;
   border-left: 1px solid var(--pcs-colors-card-border);
   min-height: 0;
+  overflow: hidden;
 }
 
 /* ── Tabs ─────────────────────────────────────────────────── */
@@ -190,6 +197,23 @@
   );
   pointer-events: none;
   z-index: 2;
+}
+
+/* ── Single-side views ───────────────────────────────────────
+ * Bids-only / asks-only views show 20 rows at once.
+ * 20 rows × 20px = 400px. Drop the fade overlay since nothing
+ * needs to be masked.
+ * ─────────────────────────────────────────────────────────── */
+.ob-root[data-view="bids"] .ob-bids,
+.ob-root[data-view="asks"] .ob-asks {
+  flex: none;
+  height: 400px;
+  overflow-y: auto;
+  justify-content: flex-start;
+}
+.ob-root[data-view="bids"] .ob-bids::after,
+.ob-root[data-view="asks"] .ob-asks::after {
+  display: none;
 }
 
 /* ── Row ──────────────────────────────────────────────────── */

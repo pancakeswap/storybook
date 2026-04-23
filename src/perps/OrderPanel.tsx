@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 import { Checkbox } from '../ui/components'
+import { InfoIcon } from '../ui/Icons'
 import '../ui/perps.css'
 import './OrderPanel.css'
 import { MarginModeModal } from './MarginModeModal'
@@ -43,15 +44,6 @@ const ORDER_TYPES: { value: OrderType; label: string }[] = [
 
 const SLIDER_MARKS = [0, 25, 50, 75, 100]
 
-function InfoIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
-    </svg>
-  )
-}
 
 function AddCircleIcon() {
   return (
@@ -215,7 +207,7 @@ export function OrderPanel({
           </button>
         ))}
         <button type="button" className="op-info-btn" aria-label="Order type info">
-          <InfoIcon />
+          <InfoIcon size={16} />
         </button>
       </div>
 

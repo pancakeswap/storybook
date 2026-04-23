@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useTheme } from '../ui/ThemeProvider'
 import '../ui/perps.css'
 import './Navbar.css'
+import { WalletPanel } from './WalletPanel'
 
 export interface NavbarProps {
   /** Fired when Deposit pill is clicked. */
@@ -10,24 +10,11 @@ export interface NavbarProps {
   onWithdraw?: () => void
   /** Truncated wallet address to display, e.g. "0x64…a5a0". */
   walletAddress?: string
-  /** Active top-level nav item. */
-  activeTab?: string
+  /** Current mode of the Simple / Pro toggle. */
+  mode?: 'simple' | 'pro'
+  /** Fired when the user switches mode. */
+  onModeChange?: (mode: 'simple' | 'pro') => void
 }
-
-interface NavItem {
-  label: string
-  hasChevron?: boolean
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Trade',     hasChevron: true  },
-  { label: 'Portfolio' },
-  { label: 'Referral' },
-  { label: 'Staking' },
-  { label: 'Explorer' },
-  { label: 'Rewards',   hasChevron: true  },
-  { label: 'More',      hasChevron: true  },
-]
 
 function PancakeSwapLogo() {
   return (
@@ -133,12 +120,12 @@ export function Navbar({
   onDeposit,
   onWithdraw,
   walletAddress = '0x64\u2026a5a0',
-  activeTab = 'Trade',
+  mode = 'pro',
+  onModeChange,
 }: NavbarProps) {
   const [walletOpen, setWalletOpen] = useState(false)
   const [chainOpen, setChainOpen] = useState(false)
   const [chainId, setChainId] = useState('bnb')
-  const { toggleTheme } = useTheme()
 
   const selectedChain = CHAINS.find((c) => c.id === chainId) ?? CHAINS[0]
 
@@ -151,18 +138,26 @@ export function Navbar({
           <Wordmark />
         </a>
 
-        <div className="nb-nav" role="menubar">
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.label}
-              role="menuitem"
-              type="button"
-              className={`nb-nav-item${item.label === activeTab ? ' active' : ''}`}
-            >
-              {item.label}
-              {item.hasChevron && <span className="nb-chevron" aria-hidden="true"><Caret /></span>}
-            </button>
-          ))}
+        {/* Simple / Pro toggle — Figma 147:13109 */}
+        <div className="nb-mode-toggle" role="tablist" aria-label="Trading mode">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'simple'}
+            className={`nb-mode-tab${mode === 'simple' ? ' nb-mode-tab--active' : ''}`}
+            onClick={() => onModeChange?.('simple')}
+          >
+            Simple
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'pro'}
+            className={`nb-mode-tab${mode === 'pro' ? ' nb-mode-tab--active' : ''}`}
+            onClick={() => onModeChange?.('pro')}
+          >
+            Pro
+          </button>
         </div>
       </div>
 
@@ -240,17 +235,13 @@ export function Navbar({
           </button>
 
           {walletOpen && (
-            <div className="nb-wallet-dropdown" role="menu">
-              <button type="button" className="nb-wallet-item" role="menuitem" onClick={() => { toggleTheme(); setWalletOpen(false) }}>
-                Toggle theme
-              </button>
-              <button type="button" className="nb-wallet-item" role="menuitem" onClick={() => { onWithdraw?.(); setWalletOpen(false) }}>
-                Withdraw
-              </button>
-              <div className="nb-wallet-divider" role="separator" />
-              <button type="button" className="nb-wallet-item nb-wallet-disconnect" role="menuitem" onClick={() => setWalletOpen(false)}>
-                Disconnect
-              </button>
+            <div className="nb-wallet-panel">
+              <WalletPanel
+                address={walletAddress}
+                onDeposit={() => { onDeposit?.(); setWalletOpen(false) }}
+                onWithdraw={() => { onWithdraw?.(); setWalletOpen(false) }}
+                onDisconnect={() => setWalletOpen(false)}
+              />
             </div>
           )}
         </div>

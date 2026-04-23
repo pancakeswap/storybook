@@ -95,6 +95,14 @@ export const pcsTheme = {
   },
   // styled-system needs breakpoints as an array for responsive props like p={["16px", null, "24px"]}
   breakpoints: ['576px', '852px', '968px', '1080px', '1200px'],
+  zIndices: {
+    dropdown: 10,
+    ribbon:   9,
+    modal:    100,
+  },
+  modal: {
+    background: v('card'),
+  },
   isDark: false, // not used at runtime — CSS vars handle theming
   mediaQueries: {
     xs: '',

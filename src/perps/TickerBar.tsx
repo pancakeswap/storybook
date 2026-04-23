@@ -1,5 +1,9 @@
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import '../ui/perps.css'
 import './TickerBar.css'
+import { MarketsDropdown } from './MarketsDropdown'
+import type { MarketRow } from './MarketsDropdown'
 
 /* ── Icon helpers ──────────────────────────────────────────── */
 function StarIcon() {
@@ -52,8 +56,8 @@ export interface TickerBarProps {
   volume24h?: string
   /** Fired when the star is clicked */
   onToggleFavorite?: () => void
-  /** Fired when the pair chip is clicked */
-  onSelectPair?: () => void
+  /** Fired when a market is selected from the dropdown. */
+  onSelectPair?: (market: MarketRow) => void
 }
 
 /* ── Component ─────────────────────────────────────────────── */
@@ -72,11 +76,60 @@ export function TickerBar({
   onToggleFavorite,
   onSelectPair,
 }: TickerBarProps) {
+  const [marketsOpen, setMarketsOpen] = useState(false)
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null)
+  const pairWrapRef = useRef<HTMLDivElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Position the dropdown below the pair pill whenever it opens / window
+  // resizes / the page scrolls. The dropdown is rendered via a portal to
+  // document.body to avoid being clipped by .tb-root's overflow.
+  useLayoutEffect(() => {
+    if (!marketsOpen || !pairWrapRef.current) return
+    const place = () => {
+      const r = pairWrapRef.current!.getBoundingClientRect()
+      setDropdownPos({ top: r.bottom + 8, left: r.left })
+    }
+    place()
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [marketsOpen])
+
+  // Close the dropdown when clicking outside the pair pill / dropdown
+  useEffect(() => {
+    if (!marketsOpen) return
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node
+      const inTrigger = pairWrapRef.current?.contains(target)
+      const inPanel   = dropdownRef.current?.contains(target)
+      if (!inTrigger && !inPanel) setMarketsOpen(false)
+    }
+    window.addEventListener('mousedown', handler)
+    return () => window.removeEventListener('mousedown', handler)
+  }, [marketsOpen])
+
+  // Close on Escape
+  useEffect(() => {
+    if (!marketsOpen) return
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setMarketsOpen(false) }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [marketsOpen])
+
+  const handleSelectMarket = (market: MarketRow) => {
+    setMarketsOpen(false)
+    onSelectPair?.(market)
+  }
+
   return (
     <div className="perps-root tb-root" role="region" aria-label="Market ticker">
 
       {/* ── Pair selector pill ─────────────────────────────── */}
-      <div className="tb-pair-pill">
+      <div className="tb-pair-pill" ref={pairWrapRef}>
         <button
           type="button"
           className="tb-star"
@@ -89,8 +142,10 @@ export function TickerBar({
         <button
           type="button"
           className="tb-pair-select"
+          aria-haspopup="listbox"
+          aria-expanded={marketsOpen}
           aria-label={`Select pair, current: ${symbol}`}
-          onClick={onSelectPair}
+          onClick={() => setMarketsOpen((o) => !o)}
         >
           <span className="tb-coin" aria-hidden="true" style={{ background: coinColor }}>
             {coinGlyph}
@@ -98,6 +153,19 @@ export function TickerBar({
           <span className="tb-pair-name">{symbol}</span>
           <span className="tb-caret"><CaretDownIcon /></span>
         </button>
+
+        {marketsOpen && dropdownPos && typeof document !== 'undefined' &&
+          createPortal(
+            <div
+              ref={dropdownRef}
+              className="tb-markets-dropdown"
+              style={{ top: dropdownPos.top, left: dropdownPos.left }}
+            >
+              <MarketsDropdown onSelect={handleSelectMarket} />
+            </div>,
+            document.body,
+          )
+        }
       </div>
 
       {/* ── Last price ─────────────────────────────────────── */}

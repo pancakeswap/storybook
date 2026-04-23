@@ -1,0 +1,131 @@
+/* ── Take Profit / Stop Loss · OTOCO modal ───────────────────
+ * Figma 70:5670
+ * Two-column OTOCO layout:
+ *   ┌── Order A ──┐   ┌── Order B ──┐
+ *   │             │   │             │
+ *   │  (primary)  │╶╯ └─────────────┘
+ *   │             │╶╮ ┌── Order C ──┐
+ *   │             │   │             │
+ *   └─────────────┘   └─────────────┘
+ * ─────────────────────────────────────────────────────────── */
+
+.otoco-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Grid ─────────────────────────────────────────────────── */
+.otoco-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  position: relative;
+}
+
+.otoco-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Order card (shared) ──────────────────────────────────── */
+.otoco-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 16px;
+  background: transparent;
+}
+
+/* All cards inherit the modal's card-primary background for a consistent surface. */
+.otoco-card--primary {
+  height: 100%;
+}
+
+/* Card header (title + subtitle) */
+.otoco-card-header {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Horizontal divider inside card */
+.otoco-divider {
+  height: 1px;
+  background: var(--pcs-colors-card-border);
+}
+
+/* ── Rows inside a card ───────────────────────────────────── */
+.otoco-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.otoco-rows--tight { gap: 4px; }
+
+.otoco-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.otoco-value { text-align: right; }
+
+/* Stop row — value + edit button */
+.otoco-stop {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.otoco-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+  transition: color 0.12s;
+}
+.otoco-edit-btn:hover { color: var(--pcs-colors-text); }
+
+/* ── OTOCO bracket connector (decorative) ─────────────────── */
+/* Positioned in the gap between Order A and B/C cards.
+ * SVG is 24w x 160h; we center it vertically between the two secondary cards. */
+.otoco-bracket {
+  position: absolute;
+  left: calc(50% - 12px);
+  top: 128px;
+  width: 24px;
+  height: 160px;
+  color: var(--pcs-colors-input-secondary);
+  pointer-events: none;
+}
+
+/* ── Footer caption ───────────────────────────────────────── */
+.otoco-caption {
+  line-height: 1.5;
+}
+
+/* ── Action buttons row ───────────────────────────────────── */
+.otoco-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .otoco-grid {
+    grid-template-columns: 1fr;
+  }
+  .otoco-bracket { display: none; }
+  .otoco-card--primary { height: auto; }
+}

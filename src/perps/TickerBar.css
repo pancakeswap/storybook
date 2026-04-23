@@ -21,6 +21,7 @@
 
 /* ── Pair selector pill ────────────────────────────────────── */
 .tb-pair-pill {
+  position: relative;                  /* anchor for the markets dropdown */
   display: inline-flex;
   align-items: center;
   gap: 8px;                            /* Figma: gap-[8px] */
@@ -32,6 +33,16 @@
   border-radius: 16px;
   padding: 7px 8px 9px;               /* Figma: pt-7 pb-9 px-8 */
   flex-shrink: 0;
+}
+
+/* ── Markets dropdown ────────────────────────────────────────
+ * Portaled to document.body and positioned relative to the viewport
+ * so it escapes the tb-root overflow clip. JS sets top/left from the
+ * pair-pill's bounding rect.
+ * ─────────────────────────────────────────────────────────── */
+.tb-markets-dropdown {
+  position: fixed;
+  z-index: 1000;
 }
 
 /* Star toggle */
