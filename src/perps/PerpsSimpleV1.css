@@ -1,0 +1,858 @@
+/* Perps Simple — Pro-style trading page (ps2-* prefix) */
+
+.ps2-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--pcs-colors-background);
+  color: var(--pcs-colors-text);
+}
+
+/* ── Top navigation ────────────────────────────────────────── */
+.ps2-nav {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: var(--pcs-colors-card);
+  border-bottom: 1px solid var(--pcs-colors-card-border);
+  flex-shrink: 0;
+}
+.ps2-nav-left { display: flex; align-items: center; gap: 24px; }
+.ps2-nav-right { display: flex; align-items: center; gap: 12px; }
+
+.ps2-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--pcs-colors-text);
+  cursor: pointer;
+}
+.ps2-logo-bunny { font-size: 22px; line-height: 1; }
+.ps2-logo-chev { color: var(--pcs-colors-text-subtle); font-size: 10px; }
+
+.ps2-nav-tabs { display: flex; align-items: center; gap: 0; }
+.ps2-nav-tab {
+  background: none;
+  border: 0;
+  padding: 0 16px;
+  height: 48px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+}
+.ps2-nav-tab:hover { color: var(--pcs-colors-text); }
+.ps2-nav-tab.is-active { color: var(--pcs-colors-secondary); }
+
+.ps2-mode {
+  display: inline-flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--pcs-colors-input);
+}
+.ps2-mode-btn {
+  padding: 0 16px;
+  height: 32px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+}
+.ps2-mode-btn.is-active {
+  background: var(--pcs-colors-secondary);
+  color: var(--pcs-colors-inverted-contrast);
+}
+
+.ps2-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--pcs-colors-input);
+  color: var(--pcs-colors-text-subtle);
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 180px;
+}
+.ps2-search-label { flex: 1; }
+.ps2-kbd {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--pcs-colors-card-border);
+  color: var(--pcs-colors-text-subtle);
+  font-size: 12px;
+  font-family: var(--p-font-mono, monospace);
+}
+
+.ps2-icon-btn {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pcs-colors-input);
+  color: var(--pcs-colors-text);
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-grid;
+  place-items: center;
+}
+.ps2-icon-btn:hover { opacity: 0.7; }
+
+.ps2-wallet {
+  padding: 0 16px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pcs-colors-primary);
+  color: var(--pcs-colors-inverted-contrast);
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.ps2-wallet:hover { opacity: 0.85; }
+
+/* ── Body grid ────────────────────────────────────────────── */
+.ps2-body {
+  flex: 1;
+  padding: 8px;
+  overflow: auto;
+}
+.ps2-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 394px;
+  gap: 8px;
+  max-width: 1660px;
+  margin: 0 auto;
+}
+.ps2-left { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ps2-right { display: flex; flex-direction: column; gap: 8px; }
+
+/* ── Ticker bar ───────────────────────────────────────────── */
+.ps2-ticker {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px;
+  border-radius: 16px;
+  min-height: 80px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.ps2-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--pcs-colors-input);
+  border: 0;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--pcs-colors-text);
+  cursor: pointer;
+  height: 56px;
+  min-width: 172px;
+}
+.ps2-pair-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f3ba2f, #f0b90b);
+  display: inline-grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+}
+.ps2-pair-bnb { display: block; }
+.ps2-pair-label { flex: 1; text-align: left; }
+.ps2-pair-chev { color: var(--pcs-colors-text-subtle); font-size: 10px; }
+
+.ps2-ticker-price { display: flex; flex-direction: column; gap: 2px; min-width: 200px; }
+.ps2-ticker-num {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--pcs-colors-text);
+}
+.ps2-ticker-chg {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--pcs-colors-success) 16%, transparent);
+  color: var(--pcs-colors-success);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ps2-ticker-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 80px;
+}
+.ps2-ticker-stat-label {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+}
+.ps2-ticker-stat-value {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pcs-colors-text);
+}
+.ps2-num { font-variant-numeric: tabular-nums; }
+.ps2-pos { color: var(--pcs-colors-success); }
+.ps2-neg { color: var(--pcs-colors-failure); }
+.ps2-sub { color: var(--pcs-colors-text-subtle); font-weight: 500; }
+
+/* ── Chart placeholder ────────────────────────────────────── */
+.ps2-chart {
+  height: 644px;
+  border-radius: 16px;
+  background: var(--pcs-colors-input);
+  display: grid;
+  place-items: center;
+}
+.ps2-chart-placeholder {
+  color: var(--pcs-colors-text-disabled);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* ── Bottom tabs (Positions / Orders / History) ───────────── */
+.ps2-bottom {
+  display: flex;
+  padding: 0 12px 12px 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1 0 0;
+  align-self: stretch;
+  border-radius: 24px;
+  border: 1px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-card);
+  box-sizing: border-box;
+}
+.ps2-bottom-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  border-bottom: 1px solid var(--pcs-colors-card-border);
+}
+.ps2-bottom-tabs { display: flex; }
+.ps2-bottom-tab {
+  display: flex;
+  width: 140px;
+  padding: 12px 10px;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--pcs-colors-card-border);
+  margin-bottom: -1px;
+  box-sizing: border-box;
+  font-family: var(--p-font-family);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  color: var(--pcs-colors-text-subtle);
+  font-feature-settings: 'liga' off;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ps2-bottom-tab.is-active {
+  width: 120px;
+  border-bottom: 2px solid var(--pcs-colors-primary);
+  color: var(--pcs-colors-secondary);
+}
+
+.ps2-bottom-actions { display: flex; align-items: center; gap: 20px; }
+
+.ps2-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+  user-select: none;
+}
+.ps2-check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.ps2-check-box {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-card);
+  position: relative;
+  flex-shrink: 0;
+}
+.ps2-check input:checked + .ps2-check-box,
+.ps2-tpsl input:checked + .ps2-check-box {
+  background: var(--pcs-colors-primary);
+  border-color: var(--pcs-colors-primary);
+}
+.ps2-check input:checked + .ps2-check-box::after,
+.ps2-tpsl input:checked + .ps2-check-box::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 6px;
+  height: 10px;
+  border: solid var(--pcs-colors-inverted-contrast);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.ps2-close-all {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--pcs-colors-primary);
+  cursor: pointer;
+}
+
+.ps2-bottom-body {
+  flex: 1 1 auto;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  padding: 48px 0;
+}
+.ps2-empty { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.ps2-empty-icon { width: 112px; height: 56px; display: block; flex-shrink: 0; }
+.ps2-empty-text { color: var(--pcs-colors-secondary); font-size: 14px; font-weight: 600; }
+
+/* ── Order panel (Figma: 394×732, pixel-perfect) ──────────── */
+.ps2-order {
+  width: 394px;
+  height: 732px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  border-radius: 24px;
+  border-top: 1px solid var(--pcs-colors-card-border);
+  border-right: 1px solid var(--pcs-colors-card-border);
+  border-bottom: 2px solid var(--pcs-colors-card-border);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-card);
+  box-sizing: border-box;
+}
+
+/* Header row: ORDER TYPE label + Market/Limit toggle (Figma 87:21299) */
+.ps2-order-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  flex-shrink: 0;
+}
+.ps2-order-title {
+  color: var(--pcs-colors-text);
+  font-family: var(--p-font-family);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  text-transform: uppercase;
+  font-feature-settings: 'liga' off;
+}
+.ps2-order-tabs {
+  display: flex;
+  width: 159px;
+  align-items: center;
+  border-radius: 16px;
+  border: 1px solid var(--pcs-colors-input-secondary);
+  background: var(--pcs-colors-input);
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+}
+.ps2-order-tab {
+  display: flex;
+  flex: 1 0 0;
+  padding: 4px;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  font: inherit;
+  font-family: var(--p-font-family);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+}
+.ps2-order-tab.is-active {
+  background: var(--pcs-colors-text-subtle);
+  color: var(--pcs-colors-inverted-contrast);
+}
+
+/* Long / Short stack (Figma: container pill + two flex:1 buttons) */
+.ps2-side {
+  display: flex;
+  align-items: flex-start;
+  align-self: stretch;
+  border-radius: 12px;
+  border: 1px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-input);
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  flex-shrink: 0;
+}
+.ps2-side-btn {
+  display: flex;
+  flex: 1 0 0;
+  padding: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  font-family: var(--p-font-family);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  color: var(--pcs-colors-text-subtle);
+  font-feature-settings: 'liga' off;
+  cursor: pointer;
+}
+.ps2-side-btn.is-active {
+  font-weight: 600;
+  color: var(--pcs-colors-inverted-contrast);
+}
+.ps2-side-long.is-active {
+  background: var(--pcs-colors-success);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+}
+.ps2-side-short.is-active {
+  background: var(--pcs-colors-failure);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+}
+.ps2-side-ico { width: 24px; height: 24px; flex-shrink: 0; }
+.ps2-side-btn:not(.is-active) .ps2-side-ico { display: none; }
+
+/* You pay (Figma spec) */
+.ps2-pay {
+  display: flex;
+  height: 48px;
+  padding: 0 16px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 16px;
+  border: 1px solid var(--pcs-colors-input-secondary);
+  background: var(--pcs-colors-input);
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  flex-shrink: 0;
+  cursor: text;
+}
+.ps2-pay-label { color: var(--pcs-colors-text-subtle); font-size: 14px; }
+.ps2-pay-field { display: inline-flex; align-items: baseline; gap: 6px; }
+.ps2-pay-input {
+  border: 0;
+  background: transparent;
+  text-align: right;
+  font: inherit;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--pcs-colors-text);
+  width: 96px;
+  outline: none;
+}
+.ps2-pay-unit {
+  color: var(--pcs-colors-text);
+  font-family: var(--p-font-family);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  font-feature-settings: 'liga' off;
+}
+
+/* Leverage card (Figma: gradient bg, 24px radius, bottom-heavy border) */
+.ps2-lev {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 24px;
+  border-top: 1px solid var(--pcs-colors-card-border);
+  border-right: 1px solid var(--pcs-colors-card-border);
+  border-bottom: 2px solid var(--pcs-colors-card-border);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  background: linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.ps2-lev-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  align-self: stretch;
+  height: 27px;
+}
+.ps2-lev-label { font-size: 14px; font-weight: 700; color: var(--pcs-colors-text); }
+.ps2-lev-value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--pcs-colors-primary);
+  font-weight: 700;
+}
+.ps2-lev-value strong { font-size: 18px; font-weight: 700; }
+.ps2-lev-max { color: var(--pcs-colors-text-subtle); font-size: 12px; font-weight: 500; }
+
+.ps2-slider { position: relative; height: 48px; align-self: stretch; }
+.ps2-slider-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  margin: 0;
+}
+.ps2-slider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--pcs-colors-secondary) 25%, transparent);
+}
+.ps2-slider-fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: var(--pcs-colors-primary);
+  pointer-events: none;
+}
+.ps2-slider-bunny {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  height: 48px;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 1px;
+  pointer-events: none;
+  z-index: 1;
+}
+.ps2-bunny-back {
+  display: block;
+  width: 36px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.ps2-bunny-connector { display: block; flex-shrink: 0; }
+.ps2-bunny-front { display: block; flex-shrink: 0; }
+
+.ps2-lev-pills {
+  display: flex;
+  align-self: stretch;
+  gap: 5px;
+}
+.ps2-lev-pill {
+  display: flex;
+  flex: 1 0 0;
+  padding: 10px 2px 12px 2px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 14px;
+  border-top: 1px solid var(--pcs-colors-card-border);
+  border-right: 1px solid var(--pcs-colors-card-border);
+  border-bottom: 2px solid var(--pcs-colors-card-border);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-card);
+  font-family: var(--p-font-family);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  color: var(--pcs-colors-text);
+  cursor: pointer;
+}
+.ps2-lev-pill:hover { border-color: var(--pcs-colors-primary-bright); }
+.ps2-lev-pill.is-active {
+  border-top: 1px solid var(--pcs-colors-v2-primary\.70);
+  border-right: 1px solid var(--pcs-colors-v2-primary\.70);
+  border-bottom: 1px solid var(--pcs-colors-v2-primary\.70);
+  border-left: 1px solid var(--pcs-colors-v2-primary\.70);
+  background: var(--pcs-colors-primary);
+  color: var(--pcs-colors-inverted-contrast);
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+}
+
+/* TP/SL card (Figma spec) */
+.ps2-tpsl {
+  display: flex;
+  padding: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+  border-radius: 16px;
+  border-top: 1px solid var(--pcs-colors-card-border);
+  border-right: 1px solid var(--pcs-colors-card-border);
+  border-bottom: 2px solid var(--pcs-colors-card-border);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-card-secondary);
+  flex-shrink: 0;
+}
+.ps2-tpsl-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pcs-colors-text);
+  font-family: var(--p-font-family);
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  font-feature-settings: 'liga' off;
+  cursor: pointer;
+  user-select: none;
+}
+.ps2-tpsl-row input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.ps2-tpsl-check {
+  display: flex;
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  align-items: flex-start;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid var(--pcs-colors-input-secondary);
+  background: var(--pcs-colors-input);
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  flex-shrink: 0;
+  position: relative;
+}
+.ps2-tpsl-row input:checked + .ps2-tpsl-check {
+  padding: 1px 2px 3px 2px;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  background: var(--pcs-colors-success);
+  box-shadow: none;
+}
+.ps2-tpsl-row input:checked + .ps2-tpsl-check::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid var(--pcs-colors-inverted-contrast);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* TP/SL input fields (shown when checked) */
+.ps2-tpsl-fields {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: 8px;
+}
+.ps2-tpsl-field {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  cursor: text;
+}
+.ps2-tpsl-field-label {
+  color: var(--pcs-colors-text-subtle);
+  font-family: var(--p-font-family);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  text-transform: uppercase;
+  font-feature-settings: 'liga' off;
+}
+.ps2-tpsl-input {
+  display: block;
+  height: 37px;
+  padding: 8px 12px;
+  align-self: stretch;
+  border-radius: 12px;
+  border: 1px solid var(--pcs-colors-input-secondary);
+  background: var(--pcs-colors-input);
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  font-family: var(--p-font-family);
+  font-size: 14px;
+  color: var(--pcs-colors-text);
+  box-sizing: border-box;
+  outline: none;
+  width: 100%;
+  min-width: 0;
+}
+.ps2-tpsl-input::placeholder { color: var(--pcs-colors-text-disabled); }
+
+/* Connect wallet CTA wrapper (Figma: card-style container around button) */
+.ps2-cta-wrap {
+  margin-top: auto;
+  display: flex;
+  padding: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  align-self: stretch;
+  border-radius: 16px;
+  border-top: 1px solid var(--pcs-colors-card-border);
+  border-right: 1px solid var(--pcs-colors-card-border);
+  border-bottom: 2px solid var(--pcs-colors-card-border);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-card-secondary);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.ps2-cta {
+  display: flex;
+  height: 48px;
+  padding: 11px 12px 13px 12px;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 16px;
+  background: var(--pcs-colors-primary);
+  color: var(--pcs-colors-inverted-contrast);
+  font-family: var(--p-font-family);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.ps2-cta:hover { opacity: 0.85; }
+.ps2-cta:active { transform: translateY(1px); border-bottom-color: transparent; }
+
+/* ── Account panel (Figma spec) ───────────────────────────── */
+.ps2-account {
+  display: flex;
+  padding: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1 0 0;
+  align-self: stretch;
+  border-radius: 24px;
+  border-top: 1px solid var(--pcs-colors-card-border);
+  border-right: 1px solid var(--pcs-colors-card-border);
+  border-bottom: 2px solid var(--pcs-colors-card-border);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-card);
+  box-sizing: border-box;
+}
+.ps2-account-tabs {
+  display: flex;
+  align-self: stretch;
+  gap: 8px;
+}
+.ps2-account-tab {
+  display: flex;
+  flex: 1 0 0;
+  padding: 11px 12px 13px 12px;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  border: 0;
+  border-radius: 16px;
+  font-family: var(--p-font-family);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  font-feature-settings: 'liga' off;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.ps2-account-tab-deposit {
+  background: var(--pcs-colors-primary);
+  color: var(--pcs-colors-inverted-contrast);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+}
+.ps2-account-tab-withdraw {
+  background: var(--pcs-colors-tertiary);
+  color: var(--pcs-colors-v2-primary\.60);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.ps2-account-stats {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  align-self: stretch;
+}
+.ps2-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  font-size: 14px;
+}
+.ps2-row dt { color: var(--pcs-colors-text-subtle); }
+.ps2-row dd { margin: 0; color: var(--pcs-colors-text); font-weight: 600; font-variant-numeric: tabular-nums; }
