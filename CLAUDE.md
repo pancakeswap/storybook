@@ -13,6 +13,23 @@ When implementing any feature or UI:
    Do NOT pick the scope yourself.
 5. **Follow PancakeSwap's design language** — see section below.
 
+### Style widgets with styled-components — no raw .css
+
+This repo is published as `@pancakeswap/storybook` and consumed by `pancake-frontend`. Styled-components carry their CSS with the component and use the consumer's styled-components theme automatically. Raw `.css` files force consumers to side-effect import a stylesheet and risk style loss in SSR / code-split builds.
+
+- **Do NOT add new `.css` files alongside widgets.** Existing `.css` files under `src/widgets/` are legacy and being migrated.
+- All visual styling for new or synced widgets goes in `styled-components` blocks colocated in the same `.tsx`. Read tokens from the theme: `${({ theme }) => theme.colors.success}`, `theme.radii.card`, `theme.shadows.level1`, etc.
+- Token shape is `pcsTheme` in `src/ui/components/theme.ts` — keys mirror PancakeSwap uikit, so widgets work in both this repo (Storybook + Vite dev) and pancake-frontend without changes.
+- Layout primitives (`PerpsPanel`, tab bars, table rows) belong in `src/widgets/primitives.tsx` and are reused — don't reinvent.
+
+### Widgets are stateless
+
+The `src/widgets/*` components are presentation-only. The consumer (pancake-frontend) owns business data and writes. Lift state out via props and callbacks.
+
+- Internal `useState` is only OK for view-state: hover, dropdown open/close, focused input, optimistic input draft. Anything that represents real account/order/market data must come in via props.
+- Async fetching, wagmi/Privy hooks, react-query, jotai atoms — none of those belong in widgets here. They live in the consumer.
+- Modals expose `open`, `onClose`, `onConfirm` callbacks; the consumer drives open/close.
+
 ---
 
 ## PancakeSwap Design Language

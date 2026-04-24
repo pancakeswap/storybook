@@ -129,6 +129,15 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
             <OrderPanel onPlaceOrder={handlePlaceOrder} />
             <div className="pp-account-wrap">
               <AccountPanel
+                walletDisplay="0x1234…abcd"
+                state={{
+                  kind: 'ready',
+                  equity: '1234.56',
+                  available: '987.21',
+                  unrealizedPnl: '+12.34',
+                  pnlSign: 'positive',
+                  marginMode: 'Cross',
+                }}
                 onDeposit={() => setModal('deposit')}
                 onWithdraw={() => setModal('withdraw')}
               />

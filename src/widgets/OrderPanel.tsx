@@ -525,10 +525,14 @@ export function OrderPanel({
 
       {/* ── Leverage Modal ───────────────────────────────── */}
       <LeverageModal
-        open={showLeverageModal}
-        pair="BTC-USDT"
-        current={leverage}
-        onConfirm={(lev) => setLeverage(lev)}
+        isOpen={showLeverageModal}
+        symbol="BTC-USDT"
+        currentLeverage={leverage}
+        availableBalance={5000}
+        onConfirm={(lev) => {
+          setLeverage(lev)
+          setShowLeverageModal(false)
+        }}
         onClose={() => setShowLeverageModal(false)}
       />
 

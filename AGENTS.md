@@ -133,8 +133,10 @@ Write styles mobile-first; enhance upward with `min-width` media queries.
 
 ## Component Conventions
 
-- Every component that renders UI must import `./perps.css` (which re-exports `./design-system.css`)
-- Use `className` with `--p-*` tokens for styling; avoid inline `style` for anything that maps to a design token
+- **Use `styled-components` for all widget styling — do NOT add new `.css` files alongside widget components.** Tokens come from the styled-components theme: `theme.colors.success`, `theme.colors.backgroundAlt`, `theme.radii.card`, etc. (See `src/ui/components/theme.ts` for the full shape — same keys as PancakeSwap's uikit, so widgets work in both this repo and pancake-frontend without changes.) Existing `.css` files under `src/widgets/` are legacy and being migrated; new widgets must not introduce more.
+  - Why: the library is published as `@pancakeswap/storybook` and consumed by `pancake-frontend`. `.css` files require consumers to side-effect import a stylesheet and risk style-loss in SSR/code-split builds. Styled-components carry their CSS with the component and use the consumer's theme automatically.
+  - Layout primitives (`PerpsPanel`, tabs, rows) live in shared files (e.g. `src/widgets/primitives.tsx`) and are reused across widgets — don't reinvent.
+- Components must be **stateless / props-driven**. Lift business data, fetch state, and write actions to the consumer via props and callbacks. Internal `useState` is only OK for view-state (hover, dropdown open/close, focused input).
 - Icon-only buttons must have `aria-label`
 - Color-only state communication must have a text/icon fallback
 - Storybook: run `preview-stories` after every change; run `run-story-tests` before handing off

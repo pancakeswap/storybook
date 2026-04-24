@@ -1,7 +1,11 @@
 import { useMemo, useState } from 'react'
 import '../ui/perps.css'
 import './OrderBook.css'
-import { TradesFeed } from './TradesFeed'
+// TODO(perps-sync): OrderBook still uses its old design + the legacy "trades"
+// view. Migrate to the pancake-frontend layout in a follow-up pass; for now
+// we leave the toggle in place but render an empty placeholder to keep the
+// existing OrderBook stories compiling after RecentTrades was renamed.
+const LegacyTradesPlaceholder = () => null
 
 export type OrderBookRow = {
   /** Price */
@@ -281,7 +285,7 @@ export function OrderBook({
           )}
         </>
       ) : (
-        <TradesFeed base={base} />
+        <LegacyTradesPlaceholder />
       )}
     </section>
   )
