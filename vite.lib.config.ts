@@ -67,7 +67,6 @@ export default defineConfig({
         'src/widgets/Navbar.tsx',
         'src/widgets/OpenOrdersTable.tsx',
         'src/widgets/OrderBook.tsx',
-        'src/widgets/OrderConfirmationModal.tsx',
         'src/widgets/OrderHistoryTable.tsx',
         'src/widgets/OrderPanel.tsx',
         'src/widgets/OrdersTradeHistory.tsx',
