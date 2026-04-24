@@ -74,3 +74,11 @@ export type { ModalProps, InjectedModalProps, UseModalV2Props } from './widgets/
 // ── Theme ─────────────────────────────────────────────────────
 export { pcsTheme } from './components/theme'
 export type { PcsTheme } from './components/theme'
+
+// ── Icons ─────────────────────────────────────────────────────
+// Re-export the full 253-icon set. Consumers get tree-shaken individual
+// icons via named imports (e.g. `import { ChevronDownIcon } from '...'`).
+export * from './Icons'
+
+// ── Contexts / hooks ──────────────────────────────────────────
+export { useMatchBreakpoints, MatchBreakpointsProvider } from './contexts'
