@@ -8,7 +8,14 @@ import Modal from '../ui/widgets/Modal/Modal'
 import { ModalV2 } from '../ui/widgets/Modal/ModalV2'
 
 export type OrderSide = 'BUY' | 'SELL'
-export type OrderType = 'LIMIT' | 'MARKET' | 'STOP_MARKET' | 'STOP' | 'TAKE_PROFIT' | 'TAKE_PROFIT_MARKET'
+export type OrderType =
+  | 'MARKET'
+  | 'LIMIT'
+  | 'STOP'
+  | 'TAKE_PROFIT'
+  | 'STOP_MARKET'
+  | 'TAKE_PROFIT_MARKET'
+  | 'TRAILING_STOP_MARKET'
 
 export interface OrderConfirmDetails {
   symbol: string
