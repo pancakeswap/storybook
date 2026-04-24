@@ -2,7 +2,7 @@ import { DismissableLayer } from "@radix-ui/react-dismissable-layer";
 import { AnimatePresence, LazyMotion, m } from "framer-motion";
 import get from "lodash/get";
 import React, { createContext, useCallback, useMemo, useRef, useState } from "react";
-import { isMobile } from "react-device-detect";
+import { isMobile } from "./isMobile";
 import { createPortal } from "react-dom";
 import { styled } from "styled-components";
 import { Overlay } from "../../components/Overlay";

@@ -1,7 +1,7 @@
 import { DismissableLayer } from "@radix-ui/react-dismissable-layer";
 import { AnimatePresence, LazyMotion } from "framer-motion";
 import React, { createContext, useCallback, useMemo, useRef, useState } from "react";
-import { isMobile } from "react-device-detect";
+import { isMobile } from "./isMobile";
 import { createPortal } from "react-dom";
 import type { BoxProps } from "../../components/Box";
 import { Overlay } from "../../components/Overlay";

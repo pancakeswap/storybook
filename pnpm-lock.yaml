@@ -35,9 +35,6 @@ importers:
       primereact:
         specifier: ^10.9.7
         version: 10.9.7(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-device-detect:
-        specifier: ^2.2.3
-        version: 2.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3017,12 +3014,6 @@ packages:
   quansync@0.2.11:
     resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
-  react-device-detect@2.2.3:
-    resolution: {integrity: sha512-buYY3qrCnQVlIFHrC5UcUoAj7iANs/+srdkwsnNjI7anr3Tt7UY6MqNxtMLlr0tMBied0O49UZVK8XKs3ZIiPw==}
-    peerDependencies:
-      react: '>= 0.14.0'
-      react-dom: '>= 0.14.0'
-
   react-docgen-typescript@2.4.0:
     resolution: {integrity: sha512-ZtAp5XTO5HRzQctjPU0ybY0RRCQO19X/8fxn3w7y2VVTUbGHDKULPTL4ky3vB05euSgG5NpALhEhDPvQ56wvXg==}
     peerDependencies:
@@ -3306,10 +3297,6 @@ packages:
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
-    hasBin: true
-
-  ua-parser-js@1.0.41:
-    resolution: {integrity: sha512-LbBDqdIC5s8iROCUjMbW1f5dJQTEFB1+KO9ogbvlb3nm9n4YHa5p4KTvFPWvh2Hs8gZMBuiB1/8+pdfe/tDPug==}
     hasBin: true
 
   ufo@1.6.3:
@@ -6956,12 +6943,6 @@ snapshots:
 
   quansync@0.2.11: {}
 
-  react-device-detect@2.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-      ua-parser-js: 1.0.41
-
   react-docgen-typescript@2.4.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
@@ -7283,8 +7264,6 @@ snapshots:
       - supports-color
 
   typescript@5.9.3: {}
-
-  ua-parser-js@1.0.41: {}
 
   ufo@1.6.3: {}
 
