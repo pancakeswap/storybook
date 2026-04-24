@@ -1,5 +1,7 @@
+import type { ComponentType } from "react";
 import { styled } from "styled-components";
 import Text from "../Text/Text";
+import type { TextProps } from "../Text/types";
 import type { HeadingProps } from "./types";
 import { tags, scales } from "./types";
 
@@ -22,7 +24,7 @@ const style = {
   },
 };
 
-const Heading = styled(Text).attrs({ bold: true })<HeadingProps>`
+const Heading: ComponentType<HeadingProps & TextProps> = styled(Text).attrs({ bold: true })<HeadingProps>`
   font-size: ${({ scale }) => style[scale || scales.MD].fontSize};
   font-weight: 600;
   line-height: 1.1;

@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useCallback } from "react";
-import { Box } from "../Box";
+import { Box, Flex } from "../Box";
 import {
   BunnySlider,
   BarBackground,
@@ -68,7 +68,7 @@ const Slider: React.FC<React.PropsWithChildren<SliderProps>> = ({
         </SliderLabelContainer>
       )}
       {marks && marks.length > 0 && (
-        <Box display="flex" justifyContent="space-between" mt="6px">
+        <Flex justifyContent="space-between" mt="6px">
           {marks.map((mark) => {
             const isActive = value === mark.value;
             return (
@@ -93,7 +93,7 @@ const Slider: React.FC<React.PropsWithChildren<SliderProps>> = ({
               </button>
             );
           })}
-        </Box>
+        </Flex>
       )}
     </Box>
   );

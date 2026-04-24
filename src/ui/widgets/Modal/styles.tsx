@@ -1,5 +1,6 @@
 import React from "react";
-import type { MouseEvent } from "react";
+import type { ComponentType, MouseEvent } from "react";
+import type { FlexProps } from "../../components/Box/types";
 import { styled } from "styled-components";
 import { MotionBox } from "../../components/Box";
 import Flex from "../../components/Box/Flex";
@@ -22,12 +23,12 @@ export const ModalHeader = styled(Flex)<{ width?: string; background?: string; h
   }
 `;
 
-export const ModalTitle = styled(Flex)`
+export const ModalTitle: ComponentType<FlexProps> = styled(Flex)`
   align-items: center;
   flex: 1;
 `;
 
-export const ModalBody = styled(Flex)`
+export const ModalBody: ComponentType<FlexProps> = styled(Flex)`
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
