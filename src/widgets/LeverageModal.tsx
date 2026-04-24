@@ -36,7 +36,14 @@ export interface LeverageModalProps {
    */
   errorSlot?: React.ReactNode
   /** Optional translator. Defaults to identity. */
-  t?: (key: string, options?: Record<string, unknown>) => string
+  /**
+   * Translator signature matches PancakeSwap's `@pancakeswap/localization`
+   * `TranslateFunction` (data values are `string | number | undefined`) so
+   * pancake-frontend can pass its `t` directly without a cast. Storybook
+   * stories that don't need i18n can omit this prop — `defaultT` handles
+   * `%placeholder%` substitution locally.
+   */
+  t?: (key: string, options?: Record<string, string | number | undefined>) => string
 }
 
 const Stepper = styled(Flex)`
@@ -69,7 +76,10 @@ const ValueBox = styled(Flex)`
  * `@pancakeswap/localization`. Identity-with-no-substitution would render
  * the literal `%symbol%` in titles — confusing in the UI.
  */
-const defaultT = (key: string, options?: Record<string, unknown>): string => {
+const defaultT = (
+  key: string,
+  options?: Record<string, string | number | undefined>,
+): string => {
   if (!options) return key
   return Object.entries(options).reduce(
     (acc, [k, v]) => acc.split(`%${k}%`).join(String(v)),

@@ -43,8 +43,13 @@ export interface AccountPanelProps {
   onDeposit?: () => void
   onWithdraw?: () => void
   onEnableTrading?: () => void
-  /** Optional translation hook — defaults are English literals. */
-  t?: (key: string, options?: Record<string, unknown>) => string
+  /**
+   * Translator signature matches PancakeSwap's `@pancakeswap/localization`
+   * `TranslateFunction` so pancake-frontend can pass its `t` directly
+   * without a cast. Storybook stories that don't need i18n can omit this
+   * prop — widget defaults to identity.
+   */
+  t?: (key: string, options?: Record<string, string | number | undefined>) => string
 }
 
 const Card = styled(PerpsPanel)`
