@@ -62,7 +62,20 @@ const ValueBox = styled(Flex)`
   font-variant-numeric: tabular-nums;
 `
 
-const identity = (s: string) => s
+/**
+ * Mirror PancakeSwap localization's `%placeholder%` substitution shape so
+ * the widget is useful out-of-the-box in storybook (without a real `t`)
+ * AND drops in cleanly when pancake-frontend passes its own `t` from
+ * `@pancakeswap/localization`. Identity-with-no-substitution would render
+ * the literal `%symbol%` in titles — confusing in the UI.
+ */
+const defaultT = (key: string, options?: Record<string, unknown>): string => {
+  if (!options) return key
+  return Object.entries(options).reduce(
+    (acc, [k, v]) => acc.split(`%${k}%`).join(String(v)),
+    key,
+  )
+}
 
 export const LeverageModal: React.FC<LeverageModalProps> = ({
   isOpen,
@@ -75,7 +88,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
   onClose,
   isSubmitting = false,
   errorSlot,
-  t = identity,
+  t = defaultT,
 }) => {
   const [value, setValue] = useState<number>(currentLeverage)
 
@@ -111,15 +124,21 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
             </StepButton>
           </Stepper>
 
-          <Box>
-            <Slider
-              name="perp-leverage"
-              min={minLeverage}
-              max={maxLeverage}
-              value={value}
-              onValueChanged={(v) => setValue(clamp(v))}
-            />
-          </Box>
+          {/*
+           * `width="100%"` is forwarded to the Slider's outer Box. Without
+           * it the Box has no intrinsic width (its inner BunnySlider /
+           * BarBackground / StyledInput are all `position: absolute`) and
+           * shrinks to 0 inside this flex column — which leaves the bunny
+           * + track collapsed against the left edge.
+           */}
+          <Slider
+            name="perp-leverage"
+            min={minLeverage}
+            max={maxLeverage}
+            value={value}
+            onValueChanged={(v) => setValue(clamp(v))}
+            width="100%"
+          />
 
           <Box>
             <Text fontSize="14px" color="textSubtle">

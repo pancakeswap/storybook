@@ -6,7 +6,7 @@ import { Message, MessageText } from '../ui/components/Message'
 import { LeverageModal } from './LeverageModal'
 
 const meta = {
-  title: 'Widgets/Leverage Modal',
+  title: 'Widgets/Leverage Modal 🆕',
   component: LeverageModal,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },

@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { AccountPanel } from './AccountPanel'
 
 const meta = {
-  title: 'Widgets/Account Panel',
+  title: 'Widgets/Account Panel 🆕',
   component: AccountPanel,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },

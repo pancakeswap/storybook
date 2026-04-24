@@ -20,7 +20,7 @@ const MOCK_TRADES: RecentTradeRow[] = Array.from({ length: 40 }, (_, i) => {
 })
 
 const meta = {
-  title: 'Widgets/Recent Trades',
+  title: 'Widgets/Recent Trades 🆕',
   component: RecentTrades,
   parameters: { layout: 'centered' },
   decorators: [
