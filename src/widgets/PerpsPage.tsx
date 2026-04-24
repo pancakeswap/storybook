@@ -4,14 +4,10 @@ import { OrderBook } from './OrderBook'
 import { OrderPanel } from './OrderPanel'
 import type { OrderParams } from './OrderPanel'
 import { DepositModal } from './DepositModal'
-import { EditCollateralModal } from './EditCollateralModal'
-import { TakeProfitStopLoss } from './TakeProfitStopLoss'
-import { Modal, ModalV2 } from '../ui/widgets/Modal'
 import { Navbar } from './Navbar'
 import { SymbolHeader } from './SymbolHeader'
 import { AccountPanel } from './AccountPanel'
-import { TradingPanel } from './TradingPanel'
-import type { Position } from './PositionsTable'
+import { PositionsPanel } from './PositionsPanel'
 import '../ui/perps.css'
 import './PerpsPage.css'
 
@@ -21,14 +17,9 @@ export interface PerpsPageProps {
 
 export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
   const [balance, setBalance] = useState(0)
-  const [used, setUsed] = useState(0)
+  const [used] = useState(0)
   const [modal, setModal] = useState<null | 'deposit' | 'withdraw'>(null)
-  const [positions, setPositions] = useState<Position[]>([])
-  const [editCollateralId, setEditCollateralId] = useState<string | null>(null)
-  const [editTpSlId, setEditTpSlId] = useState<string | null>(null)
-
-  const editCollateralPos = positions.find((p) => p.id === editCollateralId) ?? null
-  const editTpSlPos = positions.find((p) => p.id === editTpSlId) ?? null
+  const [, setEditTpSlId] = useState<string | null>(null)
 
   const available = balance - used
   const fmt = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -45,8 +36,8 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
     // Stub: real wiring is out of scope for this layout pass
   }
 
-  const handleClosePosition = (id: string) => {
-    setPositions((prev) => prev.filter((p) => p.id !== id))
+  const handleClosePosition = (_id: string) => {
+    // demo stub — real positions would come from consumer state
   }
 
   return (
@@ -137,12 +128,14 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
 
             {/* Positions table — spans chart + OB width only */}
             <div className="pp-trading-wrap">
-              <TradingPanel
-                positions={positions}
-                onEditCollateral={(id) => setEditCollateralId(id)}
-                onEditTpSl={(id) => setEditTpSlId(id)}
-                onClose={handleClosePosition}
-                onCloseAll={() => { setUsed(0); setPositions([]) }}
+              <PositionsPanel
+                tab="positions"
+                onTabChange={() => {}}
+                positions={[]}
+                openOrders={[]}
+                onClosePosition={(p) => handleClosePosition(p.id)}
+                onEditTpSl={(p) => setEditTpSlId(p.id)}
+                onCancelOrder={() => {}}
               />
             </div>
 
@@ -181,50 +174,10 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
         onClose={() => setModal(null)}
       />
 
-      {editCollateralPos && (
-        <EditCollateralModal
-          open={true}
-          positionId={editCollateralPos.id}
-          pair={editCollateralPos.pair}
-          direction={editCollateralPos.direction}
-          margin={editCollateralPos.margin}
-          leverage={editCollateralPos.leverage}
-          liquidationPrice={editCollateralPos.liquidationPrice}
-          size={editCollateralPos.size}
-          availableBalance={fmt(available)}
-          onDeposit={(id, amount) => {
-            setBalance((b) => b + (parseFloat(amount) || 0))
-            setEditCollateralId(null)
-          }}
-          onWithdraw={(id, amount) => {
-            setBalance((b) => Math.max(b - (parseFloat(amount) || 0), used))
-            setEditCollateralId(null)
-          }}
-          onClose={() => setEditCollateralId(null)}
-        />
-      )}
-
-      <ModalV2 isOpen={editTpSlPos !== null} onDismiss={() => setEditTpSlId(null)} closeOnOverlayClick>
-        <Modal
-          title={editTpSlPos ? `TP / SL — ${editTpSlPos.pair}` : 'TP / SL'}
-          onDismiss={() => setEditTpSlId(null)}
-          minWidth="420px"
-        >
-          {editTpSlPos && (
-            <TakeProfitStopLoss
-              direction={editTpSlPos.direction}
-              entryPrice={parseFloat(editTpSlPos.entryPrice.replace(/,/g, '')) || 65000}
-              positionSize={parseFloat(editTpSlPos.size) || 1000}
-              onConfirm={(tp, sl) => {
-                setPositions((prev) =>
-                  prev.map((p) => p.id === editTpSlPos.id ? { ...p, tp, sl } : p)
-                )
-                setEditTpSlId(null)
-              }}
-            />
-          )}
-        </Modal>
-      </ModalV2>
+      {/* EditCollateralModal / TpSl modal demo wiring removed — PerpsPage
+          is a layout showcase and those modals depend on removed Position
+          state. The synced PositionsPanel widget has its own story with
+          proper TP/SL / close callbacks. */}
     </>
   )
 }

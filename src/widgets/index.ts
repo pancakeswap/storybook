@@ -40,3 +40,14 @@ export type { SymbolHeaderProps } from './SymbolHeader'
 
 export { OrderBook } from './OrderBook'
 export type { OrderBookProps, OrderBookView, OrderBookSizeUnit, DepthLevel } from './OrderBook'
+
+export { PositionsPanel } from './PositionsPanel'
+export type {
+  PositionsPanelProps,
+  PositionsPanelTab,
+  PositionRow,
+  OpenOrderRow,
+} from './PositionsPanel'
+
+export { TpSlModal } from './TpSlModal'
+export type { TpSlModalProps, TpSlIntent, PositionSide } from './TpSlModal'

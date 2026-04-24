@@ -71,13 +71,10 @@ export default defineConfig({
         'src/widgets/PerpsPage.tsx',
         'src/widgets/PoolDashboard.tsx',
         'src/widgets/PositionManagement.tsx',
-        'src/widgets/PositionsTable.tsx',
         'src/widgets/RemoveLiquidity.tsx',
-        'src/widgets/TakeProfitStopLoss.tsx',
         'src/widgets/TokenSelectDropdown.tsx',
         'src/widgets/TpSlOtocoModal.tsx',
         'src/widgets/TradeHistoryTable.tsx',
-        'src/widgets/TradingPanel.tsx',
         'src/widgets/WalletPanel.tsx',
       ],
       // Most types we touch in widgets are simple — when the inferred
