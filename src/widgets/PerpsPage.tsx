@@ -119,7 +119,20 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
               </div>
 
               {/* Order book — aligns with chart height */}
-              <OrderBook />
+              <OrderBook
+                asks={[['78510', '0.12'], ['78515', '0.08']]}
+                bids={[['78495', '0.15'], ['78490', '0.22']]}
+                baseAsset="BTC"
+                quoteAsset="USDT"
+                tickSize={0.1}
+                lastPrice={78500}
+                view="both"
+                priceStep="0.1"
+                sizeUnit="BASE"
+                onViewChange={() => {}}
+                onPriceStepChange={() => {}}
+                onSizeUnitChange={() => {}}
+              />
             </div>
 
             {/* Positions table — spans chart + OB width only */}

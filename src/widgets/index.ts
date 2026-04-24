@@ -37,3 +37,6 @@ export type { MarketsDropdownProps, MarketRow } from './MarketsDropdown'
 
 export { SymbolHeader } from './SymbolHeader'
 export type { SymbolHeaderProps } from './SymbolHeader'
+
+export { OrderBook } from './OrderBook'
+export type { OrderBookProps, OrderBookView, OrderBookSizeUnit, DepthLevel } from './OrderBook'
