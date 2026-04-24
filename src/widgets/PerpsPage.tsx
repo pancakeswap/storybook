@@ -8,7 +8,7 @@ import { EditCollateralModal } from './EditCollateralModal'
 import { TakeProfitStopLoss } from './TakeProfitStopLoss'
 import { Modal, ModalV2 } from '../ui/widgets/Modal'
 import { Navbar } from './Navbar'
-import { TickerBar } from './TickerBar'
+import { SymbolHeader } from './SymbolHeader'
 import { AccountPanel } from './AccountPanel'
 import { TradingPanel } from './TradingPanel'
 import type { Position } from './PositionsTable'
@@ -100,7 +100,18 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
               {/* TickerBar + chart */}
               <div className="pp-left">
                 <div className="pp-left-top">
-                  <TickerBar />
+                  <SymbolHeader
+                    symbol="BTCUSDT"
+                    pairLabel="BTC - USDT"
+                    leverage={25}
+                    lastPrice="84185.5"
+                    markPrice="84190.1"
+                    indexPrice="84188.4"
+                    fundingRate="0.00009"
+                    nextFundingTime={Date.now() + 3_420_000}
+                    change24h="-0.52"
+                    volume24h="1940116000"
+                  />
                   <div className="pp-chart">
                     <CandlestickChart initialPair={initialPair} initialTimeframe="1D" />
                   </div>

@@ -31,3 +31,9 @@ export type { WithdrawModalProps } from './WithdrawModal'
 
 export { OrderConfirmModal } from './OrderConfirmModal'
 export type { OrderConfirmModalProps, OrderConfirmDetails, OrderSide, OrderType } from './OrderConfirmModal'
+
+export { MarketsDropdown } from './MarketsDropdown'
+export type { MarketsDropdownProps, MarketRow } from './MarketsDropdown'
+
+export { SymbolHeader } from './SymbolHeader'
+export type { SymbolHeaderProps } from './SymbolHeader'

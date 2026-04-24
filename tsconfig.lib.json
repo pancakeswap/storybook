@@ -41,9 +41,11 @@
     "src/widgets/primitives.tsx",
     "src/widgets/AccountPanel.tsx",
     "src/widgets/LeverageModal.tsx",
+    "src/widgets/MarketsDropdown.tsx",
     "src/widgets/OrderConfirmModal.tsx",
     "src/widgets/PerpsErrorMessage.tsx",
     "src/widgets/RecentTrades.tsx",
+    "src/widgets/SymbolHeader.tsx",
     "src/widgets/WithdrawModal.tsx"
   ],
   "exclude": [
