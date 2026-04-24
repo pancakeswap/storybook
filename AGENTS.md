@@ -95,7 +95,7 @@ Primitive tokens  →  Semantic tokens  →  Component tokens
 | `src/ui/perps.css` | Shared utility classes (import `design-system.css`) |
 | `src/ui/Icons.tsx` | SVG icon library |
 | `src/ui/ThemeProvider.tsx` | Theme context + `useTheme` hook |
-| `src/perps/PerpsPage.css` | Page-level layout |
+| `src/widgets/PerpsPage.css` | Page-level layout |
 
 ### Spacing Rule
 

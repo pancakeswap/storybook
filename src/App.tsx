@@ -1,5 +1,5 @@
 import { ThemeProvider } from './ui/ThemeProvider'
-import { PerpsPage } from './perps/PerpsPage'
+import { PerpsPage } from './widgets/PerpsPage'
 
 function App() {
   return (

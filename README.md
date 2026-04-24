@@ -45,7 +45,7 @@ src/
 │   ├── Input.tsx
 │   ├── index.ts                # Barrel export
 │   └── design-system/          # Design token Storybook stories
-├── perps/                  # Perps trading UI components
+├── widgets/                # Perps trading UI widgets
 │   ├── PerpsPage.tsx           # Full trading page (chart + order panel + portfolio)
 │   ├── Navbar.tsx              # Top navigation with theme toggle
 │   ├── CandlestickChart.tsx
