@@ -24,8 +24,8 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Basic 0–100 slider with the bunny thumb. */
-export const Default: Story = {
+/** Default bunny variant — the classic PCS bunny-thumb slider. */
+export const Bunny: Story = {
   args: { min: 0, max: 100, value: 25, width: '100%' },
   render: (args) => {
     const [value, setValue] = useState(args.value)
@@ -33,40 +33,24 @@ export const Default: Story = {
   },
 }
 
-/** Discrete leverage selector with marks (1× / 25× / 50× / 75× / 100×). */
-export const WithMarks: Story = {
-  args: {
-    min: 1,
-    max: 100,
-    value: 10,
-    step: 1,
-    width: '100%',
-    marks: [
-      { value: 1, label: '1×' },
-      { value: 25, label: '25×' },
-      { value: 50, label: '50×' },
-      { value: 75, label: '75×' },
-      { value: 100, label: '100×' },
-    ],
-  },
-  render: (args) => {
-    const [value, setValue] = useState(args.value)
-    return <Slider {...args} value={value} onValueChanged={setValue} />
-  },
-}
-
-/** Percentage selector that surfaces the live value above the thumb (renders "MAX" at 100). */
-export const WithValueLabel: Story = {
-  args: {
-    min: 0,
-    max: 100,
-    value: 40,
-    step: 1,
-    width: '100%',
-  },
+/** Bunny with live `valueLabel` above the thumb (renders "MAX" at 100). */
+export const BunnyWithValueLabel: Story = {
+  args: { min: 0, max: 100, value: 40, step: 1, width: '100%' },
   render: (args) => {
     const [value, setValue] = useState(args.value)
     return <Slider {...args} value={value} onValueChanged={setValue} valueLabel={`${value}%`} />
+  },
+}
+
+/**
+ * Dotted variant — percentage rail with clickable stops. Used by the
+ * perps OrderPanel size-percent slider.
+ */
+export const Dotted: Story = {
+  args: { min: 0, max: 100, value: 25, step: 1, width: '100%', variant: 'dotted', dotStep: 25 },
+  render: (args) => {
+    const [value, setValue] = useState(args.value)
+    return <Slider {...args} value={value} onValueChanged={setValue} />
   },
 }
 

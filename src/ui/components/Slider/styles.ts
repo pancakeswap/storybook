@@ -106,3 +106,82 @@ export const BarProgress = styled.div<DisabledProp>`
   position: absolute;
   top: 18px;
 `;
+
+/* ── Dotted variant (storybook `.op-slider`) ──────────────────────────── */
+
+interface DottedDisabledProp {
+  $disabled?: boolean;
+}
+
+export const DottedRoot = styled.div`
+  position: relative;
+  height: 37px;
+  overflow: visible;
+  margin: 4px 0;
+  cursor: pointer;
+  &[aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+`;
+
+export const DottedRail = styled.div<DottedDisabledProp>`
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 24px;
+  height: 2px;
+  background: ${({ theme, $disabled }) => ($disabled ? theme.colors.textDisabled : theme.colors.cardBorder)};
+  border-radius: 2px;
+  pointer-events: none;
+`;
+
+export const DottedBunnyBar = styled.div<DottedDisabledProp & { $width: string }>`
+  position: absolute;
+  left: 10px;
+  top: 18px;
+  height: 12px;
+  border-radius: 6px;
+  background: ${({ theme }) => theme.colors.primary};
+  width: ${({ $width }) => $width};
+  filter: ${({ $disabled }) => ($disabled ? "grayscale(100%)" : "none")};
+  pointer-events: none;
+`;
+
+export const DottedBunnyBack = styled.div`
+  position: absolute;
+  left: 0;
+  top: 15px;
+  pointer-events: none;
+`;
+
+export const DottedBunnyFront = styled.div<DottedDisabledProp>`
+  position: absolute;
+  top: 0;
+  width: 32px;
+  height: 48px;
+  cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "grab")};
+  user-select: none;
+  -webkit-user-select: none;
+  filter: ${({ $disabled }) => ($disabled ? "grayscale(100%)" : "none")};
+  &:active {
+    cursor: grabbing;
+  }
+`;
+
+export const DottedStop = styled.button<DottedDisabledProp & { $filled: boolean }>`
+  position: absolute;
+  top: 20px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: ${({ $disabled }) => ($disabled ? "not-allowed" : "pointer")};
+  transform: translateX(-4px);
+  transition: background 0.12s, transform 0.1s;
+  background: ${({ theme, $filled, $disabled }) =>
+    $disabled ? theme.colors.textDisabled : $filled ? theme.colors.primary : theme.colors.cardBorder};
+  &:hover {
+    transform: translateX(-4px) ${({ $disabled }) => ($disabled ? "" : "scale(1.3)")};
+  }
+`;

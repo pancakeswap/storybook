@@ -1,5 +1,7 @@
-import React, { ChangeEvent, useCallback } from "react";
-import { Box, Flex } from "../Box";
+import React, { useCallback } from "react";
+import type { ChangeEvent } from "react";
+import { Box } from "../Box";
+import DottedSlider from "./DottedSlider";
 import {
   BunnySlider,
   BarBackground,
@@ -20,15 +22,34 @@ const Slider: React.FC<React.PropsWithChildren<SliderProps>> = ({
   valueLabel,
   step = "any",
   disabled = false,
-  marks,
+  variant = "bunny",
+  dotStep,
   ...props
 }) => {
+  // Hooks must run unconditionally in the same order every render — keep
+  // `useCallback` above the `variant === "dotted"` early return.
   const handleChange = useCallback(
     ({ target }: ChangeEvent<HTMLInputElement>) => {
       onValueChanged(parseFloat(target.value));
     },
     [onValueChanged]
   );
+
+  if (variant === "dotted") {
+    return (
+      <DottedSlider
+        name={name}
+        min={min}
+        max={max}
+        value={value}
+        onValueChanged={onValueChanged}
+        step={step}
+        disabled={disabled}
+        dotStep={dotStep}
+        {...props}
+      />
+    );
+  }
 
   const progressPercentage = (value / max) * 100;
   const isMax = value === max;
@@ -66,34 +87,6 @@ const Slider: React.FC<React.PropsWithChildren<SliderProps>> = ({
         <SliderLabelContainer>
           <SliderLabel progress={labelProgress}>{displayValueLabel}</SliderLabel>
         </SliderLabelContainer>
-      )}
-      {marks && marks.length > 0 && (
-        <Flex justifyContent="space-between" mt="6px">
-          {marks.map((mark) => {
-            const isActive = value === mark.value;
-            return (
-              <button
-                key={mark.value}
-                type="button"
-                onClick={() => onValueChanged(mark.value)}
-                disabled={disabled}
-                style={{
-                  background: isActive ? "var(--pcs-colors-primary-muted)" : "transparent",
-                  color: isActive ? "var(--pcs-colors-primary)" : "var(--pcs-colors-text-subtle)",
-                  border: "none",
-                  padding: "2px 5px",
-                  fontSize: 11,
-                  fontWeight: isActive ? 600 : 500,
-                  borderRadius: 6,
-                  cursor: disabled ? "not-allowed" : "pointer",
-                  fontFamily: "inherit",
-                }}
-              >
-                {mark.label ?? mark.value}
-              </button>
-            );
-          })}
-        </Flex>
       )}
     </Box>
   );

@@ -1,9 +1,11 @@
 import type { BoxProps } from "../Box/types";
 
-export interface SliderMark {
-  value: number;
-  label?: string;
-}
+/**
+ * `bunny` (default): the classic bunny-thumb slider.
+ * `dotted`: percent-based rail with clickable stops at every `dotStep` (default
+ * 25%). Matches the storybook `op-slider` design used in the perps OrderPanel.
+ */
+export type SliderVariant = "bunny" | "dotted";
 
 export default interface SliderProps extends BoxProps {
   name: string;
@@ -14,5 +16,11 @@ export default interface SliderProps extends BoxProps {
   onValueChanged: (newValue: number) => void;
   valueLabel?: string;
   disabled?: boolean;
-  marks?: SliderMark[];
+  /** Visual variant. Defaults to `"bunny"`. */
+  variant?: SliderVariant;
+  /**
+   * Step (in percent of the range) between clickable dots when
+   * `variant="dotted"`. Defaults to `25` → stops at 0/25/50/75/100.
+   */
+  dotStep?: number;
 }
