@@ -70,6 +70,15 @@ export const BunnySlider = styled.div`
 `;
 
 export const StyledInput = styled.input<StyledInputProps>`
+  /*
+   * `width: 100%` is required so the range input fills the BunnySlider
+   * wrapper — without it the browser defaults to ~129px and the bunny
+   * thumb sits on a narrow invisible strip that doesn't line up with
+   * the visible BarBackground/BarProgress divs (which are 100% wide).
+   * Missing from the PCS uikit port until this fix; pancake-uikit hides
+   * the misalignment because it's always used inside a narrow container.
+   */
+  width: 100%;
   cursor: ${getCursorStyle};
   height: 32px;
   position: relative;

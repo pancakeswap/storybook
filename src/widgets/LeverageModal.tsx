@@ -114,7 +114,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
 
   return (
     <ModalV2 isOpen={isOpen} onDismiss={onClose} closeOnOverlayClick>
-      <Modal title={t('🔧 [STORYBOOK-DIST] %symbol% Adjust Leverage', { symbol })} onDismiss={onClose}>
+      <Modal title={t('%symbol% Adjust Leverage', { symbol })} onDismiss={onClose}>
         <Flex flexDirection="column" style={{ gap: 16, minWidth: 340, maxWidth: 440 }}>
           <Stepper>
             <StepButton
