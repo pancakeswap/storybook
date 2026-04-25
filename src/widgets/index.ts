@@ -51,3 +51,9 @@ export type {
 
 export { TpSlModal } from './TpSlModal'
 export type { TpSlModalProps, TpSlIntent, PositionSide } from './TpSlModal'
+
+export { ChartPanel } from './ChartPanel'
+export type { ChartPanelProps } from './ChartPanel'
+
+export { BookTradesPanel } from './BookTradesPanel'
+export type { BookTradesPanelProps, BookTradesTab } from './BookTradesPanel'

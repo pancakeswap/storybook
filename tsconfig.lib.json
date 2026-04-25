@@ -40,6 +40,8 @@
     "src/widgets/index.ts",
     "src/widgets/primitives.tsx",
     "src/widgets/AccountPanel.tsx",
+    "src/widgets/BookTradesPanel.tsx",
+    "src/widgets/ChartPanel.tsx",
     "src/widgets/LeverageModal.tsx",
     "src/widgets/MarketsDropdown.tsx",
     "src/widgets/OrderBook.tsx",
