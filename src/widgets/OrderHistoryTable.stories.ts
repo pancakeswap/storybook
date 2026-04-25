@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { OrderHistoryTable } from './OrderHistoryTable'
 
 const meta = {
-  title: 'Widgets/Order History',
+  title: 'Widgets/Order History ⚠️ deprecated',
   component: OrderHistoryTable,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { PoolDashboard } from './PoolDashboard'
 
 const meta = {
-  title: 'Widgets/Pool Dashboard',
+  title: 'Widgets/Pool Dashboard ⚠️ deprecated',
   component: PoolDashboard,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },

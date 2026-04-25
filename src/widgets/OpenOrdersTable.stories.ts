@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { OpenOrdersTable } from './OpenOrdersTable'
 
 const meta = {
-  title: 'Widgets/Open Orders',
+  title: 'Widgets/Open Orders ⚠️ deprecated',
   component: OpenOrdersTable,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

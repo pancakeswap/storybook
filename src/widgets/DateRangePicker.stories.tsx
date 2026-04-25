@@ -6,7 +6,7 @@ import { DateRangePicker } from './DateRangePicker'
 import type { DateRange } from './DateRangePicker'
 
 const meta = {
-  title: 'Widgets/Date Range Picker',
+  title: 'Widgets/Date Range Picker ⚠️ deprecated',
   component: DateRangePicker,
   parameters: { layout: 'centered' },
   args: {

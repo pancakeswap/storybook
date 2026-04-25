@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { DepositWithdraw } from './DepositWithdraw'
 
 const meta = {
-  title: 'Widgets/Deposit & Withdraw',
+  title: 'Widgets/Deposit & Withdraw ⚠️ deprecated',
   component: DepositWithdraw,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },

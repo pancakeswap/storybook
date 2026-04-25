@@ -66,3 +66,15 @@ export type {
   SizeUnit,
   MarginMode,
 } from './OrderForm'
+
+export { DepositModal } from './DepositModal'
+export type {
+  DepositModalProps,
+  DepositStep,
+  DepositTokenRow,
+  DepositSubmitState,
+  DepositReceipt,
+} from './DepositModal'
+
+export { EnableTradingModal } from './EnableTradingModal'
+export type { EnableTradingModalProps, EnableTradingPhase } from './EnableTradingModal'

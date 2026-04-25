@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { EditCollateralModal } from './EditCollateralModal'
 
 const meta = {
-  title: 'Widgets/Edit Collateral',
+  title: 'Widgets/Edit Collateral ⚠️ deprecated',
   component: EditCollateralModal,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },

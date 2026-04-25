@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { Navbar } from './Navbar'
 
 const meta = {
-  title: 'Widgets/Navbar',
+  title: 'Widgets/Navbar ⚠️ deprecated',
   component: Navbar,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

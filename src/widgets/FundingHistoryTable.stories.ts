@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FundingHistoryTable } from './FundingHistoryTable'
 
 const meta = {
-  title: 'Widgets/Funding History',
+  title: 'Widgets/Funding History ⚠️ deprecated',
   component: FundingHistoryTable,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

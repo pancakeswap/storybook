@@ -15,21 +15,8 @@ export interface PerpsPageProps {
 }
 
 export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
-  const [balance, setBalance] = useState(0)
-  const [used] = useState(0)
   const [modal, setModal] = useState<null | 'deposit' | 'withdraw'>(null)
   const [, setEditTpSlId] = useState<string | null>(null)
-
-  const available = balance - used
-  const fmt = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-
-  const handleDeposit = (amount: string) => {
-    setBalance((b) => b + (parseFloat(amount) || 0))
-  }
-  const handleWithdraw = (amount: string) => {
-    const n = parseFloat(amount) || 0
-    setBalance((b) => Math.max(b - n, used))
-  }
 
   const handleClosePosition = (_id: string) => {
     // demo stub — real positions would come from consumer state
@@ -191,13 +178,19 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
       </div>
 
       <DepositModal
-        open={modal !== null}
-        initialTab={modal ?? 'deposit'}
-        walletBalance={fmt(balance)}
-        maxWithdrawable={fmt(available)}
-        onDeposit={handleDeposit}
-        onWithdraw={handleWithdraw}
+        isOpen={modal === 'deposit'}
         onClose={() => setModal(null)}
+        step="select"
+        evmAddress="0x1234…abcd"
+        assets={[]}
+        onSelectAsset={() => {}}
+        amount=""
+        onAmountChange={() => {}}
+        onPercentClick={() => {}}
+        submitState="idle"
+        canContinue={false}
+        onContinue={() => {}}
+        onBack={() => setModal(null)}
       />
 
       {/* EditCollateralModal / TpSl modal demo wiring removed — PerpsPage

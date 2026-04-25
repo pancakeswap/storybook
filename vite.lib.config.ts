@@ -58,7 +58,6 @@ export default defineConfig({
         'src/widgets/BunnySlider.tsx',
         'src/widgets/CandlestickChart.tsx',
         'src/widgets/DateRangePicker.tsx',
-        'src/widgets/DepositModal.tsx',
         'src/widgets/DepositWithdraw.tsx',
         'src/widgets/EditCollateralModal.tsx',
         'src/widgets/FundingHistoryTable.tsx',

@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { AddLiquidity } from './AddLiquidity'
 
 const meta = {
-  title: 'Widgets/Add Liquidity',
+  title: 'Widgets/Add Liquidity ⚠️ deprecated',
   component: AddLiquidity,
   tags: ['autodocs'],
   parameters: { layout: 'centered' },

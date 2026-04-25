@@ -5,7 +5,7 @@ import { Button } from '../ui/components/Button'
 import { TpSlOtocoModal } from './TpSlOtocoModal'
 
 const meta = {
-  title: 'Widgets/TP · SL OTOCO Modal',
+  title: 'Widgets/TP · SL OTOCO Modal ⚠️ deprecated',
   component: TpSlOtocoModal,
   parameters: { layout: 'centered' },
   args: {

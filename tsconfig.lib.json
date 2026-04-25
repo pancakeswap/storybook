@@ -42,6 +42,8 @@
     "src/widgets/AccountPanel.tsx",
     "src/widgets/BookTradesPanel.tsx",
     "src/widgets/ChartPanel.tsx",
+    "src/widgets/DepositModal.tsx",
+    "src/widgets/EnableTradingModal.tsx",
     "src/widgets/LeverageModal.tsx",
     "src/widgets/MarketsDropdown.tsx",
     "src/widgets/OrderBook.tsx",

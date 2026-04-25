@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { CandlestickChart } from './CandlestickChart'
 
 const meta = {
-  title: 'Widgets/Candlestick Chart',
+  title: 'Widgets/Candlestick Chart ⚠️ deprecated',
   component: CandlestickChart,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },

@@ -3,7 +3,7 @@ import { fn } from 'storybook/test'
 import { TokenSelectDropdown } from './TokenSelectDropdown'
 
 const meta = {
-  title: 'Widgets/Token Select Dropdown',
+  title: 'Widgets/Token Select Dropdown ⚠️ deprecated',
   component: TokenSelectDropdown,
   parameters: { layout: 'centered' },
   args: {
