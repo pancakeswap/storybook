@@ -4,9 +4,11 @@
  * pancake-frontend and is presentation-only — the consumer owns business
  * data and writes.
  *
- * Widgets that have NOT yet been synced (Navbar, BunnySlider,
- * MarketsDropdown, OrderPanel, OrderBook, …) are intentionally not
- * exported. Add them here when their UI is ready and they are stateless.
+ * The set below covers every published widget. The only `src/widgets/*`
+ * file not re-exported is `PerpsPage.tsx`, which is a Storybook-only
+ * layout showcase that composes the synced widgets. Older deprecated
+ * widgets (Navbar, BunnySlider, AddLiquidity, RemoveLiquidity, etc.) have
+ * been removed — they were never consumed by pancake-frontend.
  */
 
 // ── Shared primitives ────────────────────────────────────────

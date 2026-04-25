@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { CandlestickChart } from './CandlestickChart'
 import { OrderBook } from './OrderBook'
 import { OrderForm, type OrderFormDraft } from './OrderForm'
 import { DepositModal } from './DepositModal'
-import { Navbar } from './Navbar'
 import { SymbolHeader } from './SymbolHeader'
 import { AccountPanel } from './AccountPanel'
 import { PositionsPanel } from './PositionsPanel'
@@ -14,7 +12,7 @@ export interface PerpsPageProps {
   initialPair?: string
 }
 
-export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
+export function PerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: PerpsPageProps) {
   const [modal, setModal] = useState<null | 'deposit' | 'withdraw'>(null)
   const [, setEditTpSlId] = useState<string | null>(null)
 
@@ -25,11 +23,6 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
   return (
     <>
       <div className="perps-root pp-root">
-        <Navbar
-          onDeposit={() => setModal('deposit')}
-          onWithdraw={() => setModal('withdraw')}
-        />
-
         {/*
          * pp-body — CSS Grid 3 cols × 3 rows (Figma 2043-20619)
          *
@@ -85,8 +78,8 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
                     change24h="-0.52"
                     volume24h="1940116000"
                   />
-                  <div className="pp-chart">
-                    <CandlestickChart initialPair={initialPair} initialTimeframe="1D" />
+                  <div className="pp-chart" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7a6eaa' }}>
+                    Chart goes here
                   </div>
                 </div>
               </div>

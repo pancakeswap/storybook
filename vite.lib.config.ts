@@ -42,37 +42,17 @@ export default defineConfig({
       // `index.d.ts` per entry, replacing pnpm-store paths with the
       // import they originated from (e.g. `motion-dom`, `csstype`).
       entryRoot: 'src',
-      // Don't error out on the half-synced widget files (DepositModal,
-      // OrderConfirmationModal, PositionsTable, TpSlOtocoModal …) — those
-      // are not part of the published surface yet. The widgets/index.ts
-      // barrel only re-exports the synced ones.
+      // Don't emit declarations for layout-demo / non-exported widget
+      // files — the widgets/index.ts barrel is the published surface.
       exclude: [
         '**/*.stories.tsx',
         '**/*.stories.ts',
         '**/*.test.ts',
         '**/*.test.tsx',
-        // Un-synced widgets — rolling them in only when they're added to
-        // src/widgets/index.ts. Keep this list sorted; remove a name when
-        // its widget joins the synced set.
-        'src/widgets/AddLiquidity.tsx',
-        'src/widgets/BunnySlider.tsx',
-        'src/widgets/CandlestickChart.tsx',
-        'src/widgets/DateRangePicker.tsx',
-        'src/widgets/DepositWithdraw.tsx',
-        'src/widgets/EditCollateralModal.tsx',
-        'src/widgets/FundingHistoryTable.tsx',
-        'src/widgets/MarginModeModal.tsx',
-        'src/widgets/Navbar.tsx',
-        'src/widgets/OpenOrdersTable.tsx',
-        'src/widgets/OrderHistoryTable.tsx',
-        'src/widgets/OrdersTradeHistory.tsx',
+        // PerpsPage is a layout showcase used by Storybook only; not a
+        // published widget. WalletPanel is auxiliary UI used inside other
+        // widgets and isn't re-exported either.
         'src/widgets/PerpsPage.tsx',
-        'src/widgets/PoolDashboard.tsx',
-        'src/widgets/PositionManagement.tsx',
-        'src/widgets/RemoveLiquidity.tsx',
-        'src/widgets/TokenSelectDropdown.tsx',
-        'src/widgets/TpSlOtocoModal.tsx',
-        'src/widgets/TradeHistoryTable.tsx',
         'src/widgets/WalletPanel.tsx',
       ],
       // Most types we touch in widgets are simple — when the inferred

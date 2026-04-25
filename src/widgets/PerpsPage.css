@@ -1,8 +1,6 @@
 /* ────────────────────────────────────────────────────────────
  * PerpsPage — Figma 2043-20619 layout
  *
- *   Navbar  (44px, sticky, full width)
- *
  *   pp-body — flex row, align-items: stretch
  *   ┌───────────────────────────────┬──────────┬──────────┐
  *   │ pp-left (flex col, flex: 1)   │ ob-root  │ pp-right │
@@ -27,13 +25,6 @@
   min-height: 100dvh;
   background: var(--pcs-colors-background);
   /* NO overflow: hidden — lets the page scroll natively */
-}
-
-/* Sticky navbar */
-.pp-root > .nb-root {
-  position: sticky;
-  top: 0;
-  z-index: 200;
 }
 
 /* ── Body: flex row — pp-main (flex:1) | pp-right (288px) ── */
