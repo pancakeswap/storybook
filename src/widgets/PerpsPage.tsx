@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { CandlestickChart } from './CandlestickChart'
 import { OrderBook } from './OrderBook'
-import { OrderPanel } from './OrderPanel'
-import type { OrderParams } from './OrderPanel'
+import { OrderForm, type OrderFormDraft } from './OrderForm'
 import { DepositModal } from './DepositModal'
 import { Navbar } from './Navbar'
 import { SymbolHeader } from './SymbolHeader'
@@ -30,10 +29,6 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
   const handleWithdraw = (amount: string) => {
     const n = parseFloat(amount) || 0
     setBalance((b) => Math.max(b - n, used))
-  }
-
-  const handlePlaceOrder = (_order: OrderParams) => {
-    // Stub: real wiring is out of scope for this layout pass
   }
 
   const handleClosePosition = (_id: string) => {
@@ -143,7 +138,38 @@ export function PerpsPage({ initialPair = 'BTCUSDT' }: PerpsPageProps) {
 
           {/* Right panel — full height: OrderPanel on top, AccountPanel below */}
           <aside className="pp-right" aria-label="Order panel and account">
-            <OrderPanel onPlaceOrder={handlePlaceOrder} />
+            <OrderForm
+              symbol="BTCUSDT"
+              baseAsset="BTC"
+              quoteAsset="USDT"
+              draft={{
+                side: 'BUY',
+                leverage: 25,
+                marginMode: 'CROSS',
+                sizeUnit: 'BASE',
+                quantity: '',
+                price: '',
+                reduceOnly: false,
+                tpSlEnabled: false,
+                takeProfitPrice: '',
+                stopLossPrice: '',
+                timeInForce: 'GTC',
+              } satisfies OrderFormDraft}
+              onDraftChange={() => {}}
+              typeKey="market"
+              onTypeKeyChange={() => {}}
+              availableBalanceText="0.00"
+              preview={{ cost: '—', liq: '—' }}
+              feeText="0.02% / 0.05%"
+              sizePercent={0}
+              onSizePercentChange={() => {}}
+              cta="Buy / Long"
+              canSubmit={false}
+              onSubmit={() => {}}
+              onLeverageClick={() => {}}
+              onMarginModeToggle={() => {}}
+              onDepositClick={() => {}}
+            />
             <div className="pp-account-wrap">
               <AccountPanel
                 walletDisplay="0x1234…abcd"

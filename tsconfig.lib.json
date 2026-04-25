@@ -46,6 +46,7 @@
     "src/widgets/MarketsDropdown.tsx",
     "src/widgets/OrderBook.tsx",
     "src/widgets/OrderConfirmModal.tsx",
+    "src/widgets/OrderForm.tsx",
     "src/widgets/PerpsErrorMessage.tsx",
     "src/widgets/PositionsPanel.tsx",
     "src/widgets/RecentTrades.tsx",

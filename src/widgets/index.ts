@@ -57,3 +57,12 @@ export type { ChartPanelProps } from './ChartPanel'
 
 export { BookTradesPanel } from './BookTradesPanel'
 export type { BookTradesPanelProps, BookTradesTab } from './BookTradesPanel'
+
+export { OrderForm } from './OrderForm'
+export type {
+  OrderFormProps,
+  OrderFormDraft,
+  OrderTypeKey,
+  SizeUnit,
+  MarginMode,
+} from './OrderForm'
