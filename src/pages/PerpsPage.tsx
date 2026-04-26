@@ -5,7 +5,7 @@ import { DepositModal } from '../widgets/DepositModal'
 import { SymbolHeader } from '../widgets/SymbolHeader'
 import { AccountPanel } from '../widgets/AccountPanel'
 import { PositionsPanel } from '../widgets/PositionsPanel'
-import '../theme/perps.css'
+import '../widgets/perps.css'
 import './PerpsPage.css'
 
 export interface PerpsPageProps {

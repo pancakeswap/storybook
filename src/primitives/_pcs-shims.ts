@@ -9,7 +9,7 @@
 import type { ComponentPropsWithRef, ElementType } from "react";
 import { styled, keyframes } from "styled-components";
 import { space, layout, flexbox } from "styled-system";
-import { lightColors, shadows } from "../theme/tokens";
+import { lightColors, shadows } from "../design-system/tokens";
 
 /* ── polymorphic helpers ────────────────────────────────────────── */
 
@@ -101,7 +101,7 @@ export function getThemeValue(theme: any, path: string, fallback?: any): any {
 
 /* ── re-export color sets from tokens ───────────────────────────── */
 
-export { lightColors, darkColors } from "../theme/tokens";
+export { lightColors, darkColors } from "../design-system/tokens";
 
 /* ── shouldForwardProp ─────────────────────────────────────────── */
 

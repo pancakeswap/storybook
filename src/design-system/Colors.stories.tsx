@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import '../theme/design-system.css'
-import { baseColors, additionalColors, lightColors, darkColors, lightColorsV2, darkColorsV2, shadows } from '../theme/tokens'
+import './design-system.css'
+import { baseColors, additionalColors, lightColors, darkColors, lightColorsV2, darkColorsV2, shadows } from './tokens'
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 function Swatch({ token, hex, label }: { token: string; hex?: string; label: string }) {

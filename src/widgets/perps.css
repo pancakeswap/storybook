@@ -1,4 +1,4 @@
-@import './design-system.css';
+@import '../design-system/design-system.css';
 
 /* ── Base styles ───────────────────────────────────────────── */
 .perps-root {

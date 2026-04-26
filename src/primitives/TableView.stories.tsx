@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { TableView, type IColumnsType } from './TableView'
 import { Text } from './Text'
 import { Card, CardBody } from './Card'
-import '../theme/design-system.css'
+import '../design-system/design-system.css'
 
 /* ── Sample data ──────────────────────────────────────────── */
 interface Token {

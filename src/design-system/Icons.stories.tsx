@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import '../theme/design-system.css'
+import './design-system.css'
 import * as AllIcons from '../primitives/Icons'
 
 type IconComponent = React.ComponentType<{ size?: number; style?: React.CSSProperties }>

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Card, CardBody, CardHeader, CardFooter } from './Card'
 import { Button } from './Button'
 import { Text } from './Text'
-import '../theme/design-system.css'
+import '../design-system/design-system.css'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

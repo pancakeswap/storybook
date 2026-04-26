@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import '../theme/design-system.css'
-import { shadows, tokens } from '../theme/tokens'
+import './design-system.css'
+import { shadows, tokens } from './tokens'
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (

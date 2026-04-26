@@ -1,5 +1,5 @@
 import React, { createContext, useState } from "react";
-import { breakpoints } from "../../css/breakpoints";
+import { breakpoints } from "../../design-system/breakpoints";
 import { useIsomorphicEffect } from "../../hooks/useIsomorphicEffect";
 
 type State = {

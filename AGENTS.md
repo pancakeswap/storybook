@@ -29,13 +29,6 @@ src/
 │   ├── _pcs-shims.ts          ← Internal compat shims for uikit imports
 │   └── index.ts               ← Internal barrel of all primitive exports
 │
-├── theme/                     ← Design-system foundation (tokens + theme + provider + base CSS)
-│   ├── tokens.ts              ← Raw values: lightColors, darkColors, shadows, fonts, space, radii
-│   ├── theme.ts               ← Chakra theme — emits --pcs-colors-* / --pcs-shadows-* CSS vars
-│   ├── ThemeProvider.tsx      ← Wraps Chakra + next-themes + styled-components
-│   ├── design-system.css      ← Structural CSS: font import (Kanit), spacing, radius, z-index
-│   └── perps.css              ← Perps utility classes used by WalletPanel/PerpsPage demo
-│
 ├── widgets/                   ← Perps-specific feature widgets (synced from
 │   │                            apps/web/src/views/Perpetuals/components/*)
 │   ├── AccountPanel.tsx       ← ┐
@@ -56,6 +49,7 @@ src/
 │   ├── WithdrawModal.tsx      ← ┘
 │   ├── primitives.tsx         ← PerpsPanel, UnderlineTab, UnderlineTabs (shared layout)
 │   ├── WalletPanel.tsx        ← Auxiliary UI used inside other widgets. NOT exported.
+│   ├── perps.css              ← Perps utility classes used by WalletPanel/PerpsPage demo
 │   ├── *.stories.tsx          ← Storybook stories per widget
 │   └── index.ts               ← Public surface for `@pancakeswap/storybook/widgets`
 │
@@ -66,12 +60,19 @@ src/
 │   ├── PerpsPage.css          ← Layout-only CSS (grid/flex shells, no widget surfaces)
 │   └── PerpsPage.stories.ts   ← Storybook story under `Apps/Perps`
 │
-├── design-system/             ← Stories for the design system itself
-│                                (Colors, Icons, Shadows, Spacing, Typography)
+├── design-system/             ← Design-system foundation: tokens, Chakra theme, provider,
+│   │                            breakpoints, base CSS — plus the Storybook docs that show them off.
+│   ├── tokens.ts              ← Raw values: lightColors, darkColors, shadows, fonts, space, radii
+│   ├── theme.ts               ← Chakra theme — emits --pcs-colors-* / --pcs-shadows-* CSS vars
+│   ├── ThemeProvider.tsx      ← Wraps Chakra + next-themes + styled-components
+│   ├── design-system.css      ← Structural CSS: font import (Kanit), spacing, radius, z-index
+│   ├── breakpoints.ts         ← Breakpoint constants used by MatchBreakpoints
+│   ├── *.stories.tsx          ← Colors, Icons, Shadows, Spacing, Typography (Storybook-only)
+│   └── index.ts               ← Internal barrel of the runtime API (tokens, theme, provider, breakpoints)
+│
 ├── contexts/                  ← MatchBreakpoints (responsive context)
 ├── hooks/                     ← useIsomorphicEffect
 ├── util/                      ← animationToolkit, getPortalRoot, getThemeValue, serialize
-├── css/                       ← breakpoints constants used by MatchBreakpoints
 ├── App.tsx, main.tsx          ← Vite dev playground (not part of the published lib)
 ├── stories-utils.tsx          ← Common Storybook decorators / wrappers
 ├── index.ts                   ← Public surface for `@pancakeswap/storybook/primitives`
@@ -94,7 +95,7 @@ src/
 |---|---|
 | A new generic primitive (button variant, table component, layout helper) | `src/primitives/<Name>/` + re-export in `src/primitives/index.ts` and `src/index.ts` |
 | A new icon | `src/primitives/Icons.tsx` |
-| A new design token | `src/theme/tokens.ts` first, then surface it through `src/theme/theme.ts` |
+| A new design token | `src/design-system/tokens.ts` first, then surface it through `src/design-system/theme.ts` |
 | A new perps widget | `src/widgets/<Name>.tsx` + re-export in `src/widgets/index.ts` + add `<Name>.stories.tsx` |
 | A composite UI used inside other primitives but not published at the top level | `src/primitives/<Name>/` (same flat tier — re-export from `src/primitives/index.ts` only if it's stable enough for downstream consumers) |
 | A page-level layout showcase that composes widgets | `src/pages/<Name>.tsx`. Pages do **only layout** — no widget-style overrides; if a widget needs a visual tweak, add a prop/variant to the widget. Auto-excluded from declarations via `vite.lib.config.ts`. |
@@ -108,9 +109,9 @@ src/
 When implementing any feature or UI:
 
 1. **Use existing components** — `Button`, `Card`, `Text`, `TabMenu`, `TableView` live in `src/primitives/`. Import and compose them. Do NOT create ad-hoc styled buttons, cards, text wrappers, tables, or tabs.
-2. **Use existing design tokens** — colors, shadows, spacing, radii, fonts are defined in `src/theme/tokens.ts` and exposed as CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`). Never hardcode hex values, pixel sizes, or shadows that already have a token.
+2. **Use existing design tokens** — colors, shadows, spacing, radii, fonts are defined in `src/design-system/tokens.ts` and exposed as CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`). Never hardcode hex values, pixel sizes, or shadows that already have a token.
 3. **Use existing icons** — 241 icons live in `src/primitives/Icons.tsx`. Check there before adding any SVG.
-4. **Ask before changing a basic component or widget.** Files in scope: `src/theme/tokens.ts`, `src/theme/theme.ts`, `src/theme/design-system.css`, `src/primitives/Icons.tsx`, and everything in `src/primitives/*`. If a change you need would modify any of these, pause and ask the user which scope they want:
+4. **Ask before changing a basic component or widget.** Files in scope: `src/design-system/tokens.ts`, `src/design-system/theme.ts`, `src/design-system/design-system.css`, `src/primitives/Icons.tsx`, and everything in `src/primitives/*`. If a change you need would modify any of these, pause and ask the user which scope they want:
    - **Change the basic component/widget directly** — affects every feature that uses it.
    - **Change only on the current page** — keep the basic component untouched and adjust the call site instead.
    Do NOT pick the scope yourself.
@@ -214,9 +215,9 @@ The design system is ported from **PancakeSwap UIKit** (`pancake-frontend/packag
 
 | Layer | File | Purpose |
 |---|---|---|
-| Raw values | `src/theme/tokens.ts` | All PCS colors (lightColors, darkColors, v2 scales), shadows, fonts, space, radii, fontSizes |
-| Chakra theme | `src/theme/theme.ts` | Maps tokens → CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`) with light/dark switching |
-| Structural CSS | `src/theme/design-system.css` | Font import (Kanit), font sizes, spacing, radius, z-index, motion primitives |
+| Raw values | `src/design-system/tokens.ts` | All PCS colors (lightColors, darkColors, v2 scales), shadows, fonts, space, radii, fontSizes |
+| Chakra theme | `src/design-system/theme.ts` | Maps tokens → CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`) with light/dark switching |
+| Structural CSS | `src/design-system/design-system.css` | Font import (Kanit), font sizes, spacing, radius, z-index, motion primitives |
 | styled-components theme | `src/primitives/theme.ts` | Provides `pcsTheme` object for styled-components `ThemeProvider` — maps `theme.colors.*` to CSS variable references |
 
 ### Key color tokens (PCS naming)
@@ -256,7 +257,7 @@ All in `src/primitives/`:
 
 ## Theme
 
-- `ThemeProvider` in `src/theme/ThemeProvider.tsx` wraps Chakra + next-themes + styled-components.
+- `ThemeProvider` in `src/design-system/ThemeProvider.tsx` wraps Chakra + next-themes + styled-components.
 - `.storybook/preview.tsx` wraps all stories with both `ThemeProvider` and styled-components `SCThemeProvider`.
 - Use CSS variables for colors — they auto-switch with light/dark.
 - Use `useTheme()` only when you need the theme value in JS (e.g. chart colors).

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import '../theme/design-system.css'
-import { tokens } from '../theme/tokens'
+import './design-system.css'
+import { tokens } from './tokens'
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

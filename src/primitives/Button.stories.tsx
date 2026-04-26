@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { Button, type Variant, type Scale } from './Button'
 import { AddIcon, ArrowForwardIcon, CogIcon } from '../primitives/Icons'
-import '../theme/design-system.css'
+import '../design-system/design-system.css'
 
 const VARIANTS: Variant[] = ['primary', 'secondary', 'tertiary', 'text', 'danger', 'dangerOutline', 'subtle', 'success', 'light', 'bubblegum']
 const SCALES: Scale[] = ['md', 'sm', 'xs']

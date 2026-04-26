@@ -1,4 +1,4 @@
-import '../theme/perps.css'
+import './perps.css'
 import './WalletPanel.css'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
