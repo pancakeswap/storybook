@@ -6,6 +6,94 @@ This repo is published as `@pancakeswap/storybook` (a github-installable lib) an
 
 ---
 
+## File Structure
+
+Two-bucket library. Basic primitives live in `src/ui/` (built into `dist/ui.js`); feature-level perps widgets live in `src/widgets/` (built into `dist/widgets.js`). Each bucket is its own Vite entry point in `vite.lib.config.ts`, with `react`, `react/jsx-runtime`, `react-dom`, and `styled-components` externalised so consumers reuse their own copies (avoids the "two React copies" / "two styled-components instances" pitfall).
+
+```
+src/
+├── ui/                        ← Basic primitives (Button, Card, Text, …)
+│   ├── components/            ← styled-components-based primitives
+│   │   ├── Box/               ← Box, Flex, Grid, MotionBox (styled-system layout shorthand)
+│   │   ├── Button/            ← variants: primary, secondary, tertiary, text, danger,
+│   │   │                        dangerOutline, subtle, success, light, bubblegum
+│   │   ├── Card/              ← Card, CardBody, CardHeader, CardFooter, CardRibbon
+│   │   ├── TabMenu/           ← TabMenu + Tab
+│   │   ├── TableView/         ← Generic TableView<T>
+│   │   ├── Text/              ← Polymorphic Text component
+│   │   ├── ButtonMenu/, Checkbox/, Collapse/, Heading/, Input/, Link/, Message/,
+│   │   │   Overlay/, Radio/, Slider/, Svg/, Tag/, Toast/, Toggle/, Alert/
+│   │   ├── theme.ts           ← pcsTheme (styled-components ThemeProvider input)
+│   │   ├── _pcs-shims.ts      ← Internal compat shims for uikit imports
+│   │   └── index.ts           ← Re-export barrel for `@pancakeswap/storybook/ui`
+│   ├── widgets/               ← Composite UI used by basic-component stories
+│   │   ├── Modal/             ← ModalV2 (controlled with isOpen/onClose)
+│   │   ├── DropdownMenu/, MultiSelect/, PortfolioBreakdown/, TokenDisplay/, WalletAvatar/
+│   ├── design-system/         ← Stories for the design system itself
+│   │                            (Colors, Icons, Shadows, Spacing, Typography)
+│   ├── contexts/              ← MatchBreakpoints (responsive context)
+│   ├── hooks/                 ← useIsomorphicEffect
+│   ├── util/                  ← animationToolkit, getPortalRoot, getThemeValue, serialize
+│   ├── Icons.tsx              ← 241 PCS icons (all use fill="currentColor", default 20×20)
+│   ├── tokens.ts              ← Raw values: lightColors, darkColors, shadows, fonts, space, radii
+│   ├── theme.ts               ← Chakra theme — emits --pcs-colors-* / --pcs-shadows-* CSS vars
+│   ├── design-system.css      ← Structural CSS: font import (Kanit), spacing, radius, z-index
+│   ├── perps.css              ← Legacy perps utility classes (being migrated out)
+│   ├── ThemeProvider.tsx      ← Wraps Chakra + next-themes + styled-components
+│   └── index.ts               ← Public surface for `@pancakeswap/storybook/ui`
+│
+├── widgets/                   ← Perps-specific feature widgets (synced from
+│   │                            apps/web/src/views/Perpetuals/components/*)
+│   ├── AccountPanel.tsx       ← ┐
+│   ├── BookTradesPanel.tsx    ← │
+│   ├── ChartPanel.tsx         ← │
+│   ├── DepositModal.tsx       ← │
+│   ├── EnableTradingModal.tsx ← │  Stateless, props-driven.
+│   ├── LeverageModal.tsx      ← │  Open/close via isOpen + onClose.
+│   ├── MarketsDropdown.tsx    ← │  No wagmi/Privy/jotai/react-query
+│   ├── OrderBook.tsx          ← │  inside — those live in the consumer.
+│   ├── OrderConfirmModal.tsx  ← │
+│   ├── OrderForm.tsx          ← │
+│   ├── PerpsErrorMessage.tsx  ← │
+│   ├── PositionsPanel.tsx     ← │
+│   ├── RecentTrades.tsx       ← │
+│   ├── SymbolHeader.tsx       ← │
+│   ├── TpSlModal.tsx          ← │
+│   ├── WithdrawModal.tsx      ← ┘
+│   ├── primitives.tsx         ← PerpsPanel, UnderlineTab, UnderlineTabs (shared layout)
+│   ├── PerpsPage.tsx          ← Storybook-only layout showcase. NOT exported, NOT typed.
+│   ├── WalletPanel.tsx        ← Auxiliary UI used inside other widgets. NOT exported.
+│   ├── *.stories.tsx          ← Storybook stories per widget
+│   └── index.ts               ← Public surface for `@pancakeswap/storybook/widgets`
+│
+├── App.tsx, main.tsx          ← Vite dev playground (not part of the published lib)
+├── stories-utils.tsx          ← Common Storybook decorators / wrappers
+└── lib-shims.d.ts             ← Type shims for the published bundle
+```
+
+### Build & publish
+
+- `pnpm build:lib` → emits `dist/ui.js` + `dist/widgets.js` plus bundled `dist/ui/index.d.ts` and `dist/widgets/index.d.ts` (via `vite-plugin-dts` with `rollupTypes: true`).
+- Consumers import from one of three subpaths, mapped via `package.json#exports`:
+  - `@pancakeswap/storybook` → `dist/widgets.js`
+  - `@pancakeswap/storybook/widgets` → `dist/widgets.js`
+  - `@pancakeswap/storybook/ui` → `dist/ui.js`
+- `vite.lib.config.ts#exclude` lists files that must NOT have declarations emitted (`PerpsPage.tsx`, `WalletPanel.tsx`) — they're internal to Storybook, not part of the published API.
+- Storybook dev: `pnpm storybook`. Vite playground: `pnpm dev`.
+
+### What goes where
+
+| Adding… | Goes in |
+|---|---|
+| A new generic primitive (button variant, table component, layout helper) | `src/ui/components/<Name>/` + re-export in `src/ui/components/index.ts` and `src/ui/index.ts` |
+| A new icon | `src/ui/Icons.tsx` |
+| A new design token | `src/ui/tokens.ts` first, then surface it through `theme.ts` |
+| A new perps widget | `src/widgets/<Name>.tsx` + re-export in `src/widgets/index.ts` + add `<Name>.stories.tsx` |
+| A composite UI used inside other primitives but not published as a top-level widget | `src/ui/widgets/<Name>/` |
+| A page-level layout showcase | `src/widgets/<Name>.tsx`, but **don't export it** — add it to `vite.lib.config.ts#exclude` like `PerpsPage.tsx` |
+
+---
+
 ## Implementation Rules
 
 ### Reuse first — never re-implement
