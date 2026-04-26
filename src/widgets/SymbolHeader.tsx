@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import styled, { useTheme } from 'styled-components'
-import { Flex } from '../ui/components/Box'
-import { Text } from '../ui/components/Text'
-import { ChevronDownIcon } from '../ui/Icons'
+import { Flex } from '../primitives/Box'
+import { Text } from '../primitives/Text'
+import { ChevronDownIcon } from '../primitives/Icons'
 
 export interface SymbolHeaderProps {
   /** Full venue symbol — used as React key + aria labels. */

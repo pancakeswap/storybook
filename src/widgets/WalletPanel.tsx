@@ -1,7 +1,7 @@
-import '../ui/perps.css'
+import '../theme/perps.css'
 import './WalletPanel.css'
-import { Button } from '../ui/components/Button'
-import { Text } from '../ui/components/Text'
+import { Button } from '../primitives/Button'
+import { Text } from '../primitives/Text'
 
 export interface WalletPanelProps {
   /** Truncated address shown at the top, e.g. "0x3D…4aa8". */

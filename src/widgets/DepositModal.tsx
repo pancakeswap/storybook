@@ -1,11 +1,11 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Flex } from '../ui/components/Box'
-import { Button } from '../ui/components/Button'
-import { Text } from '../ui/components/Text'
-import { ArrowBackIcon } from '../ui/Icons'
-import Modal from '../ui/widgets/Modal/Modal'
-import { ModalV2 } from '../ui/widgets/Modal/ModalV2'
+import { Flex } from '../primitives/Box'
+import { Button } from '../primitives/Button'
+import { Text } from '../primitives/Text'
+import { ArrowBackIcon } from '../primitives/Icons'
+import Modal from '../primitives/Modal/Modal'
+import { ModalV2 } from '../primitives/Modal/ModalV2'
 
 export type DepositStep = 'select' | 'amount' | 'checking' | 'success' | 'failed'
 

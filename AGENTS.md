@@ -8,39 +8,33 @@ This repo is published as `@pancakeswap/storybook` (a github-installable lib) an
 
 ## File Structure
 
-Two-bucket library. Basic primitives live in `src/ui/` (built into `dist/ui.js`); feature-level perps widgets live in `src/widgets/` (built into `dist/widgets.js`). Each bucket is its own Vite entry point in `vite.lib.config.ts`, with `react`, `react/jsx-runtime`, `react-dom`, and `styled-components` externalised so consumers reuse their own copies (avoids the "two React copies" / "two styled-components instances" pitfall).
+Two-bucket library. Basic primitives live flat in `src/primitives/` (built into `dist/primitives.js`); feature-level perps widgets live in `src/widgets/` (built into `dist/widgets.js`). Each bucket is its own Vite entry point in `vite.lib.config.ts`, with `react`, `react/jsx-runtime`, `react-dom`, and `styled-components` externalised so consumers reuse their own copies (avoids the "two React copies" / "two styled-components instances" pitfall).
 
 ```
 src/
-├── ui/                        ← Basic primitives (Button, Card, Text, …)
-│   ├── components/            ← styled-components-based primitives
-│   │   ├── Box/               ← Box, Flex, Grid, MotionBox (styled-system layout shorthand)
-│   │   ├── Button/            ← variants: primary, secondary, tertiary, text, danger,
-│   │   │                        dangerOutline, subtle, success, light, bubblegum
-│   │   ├── Card/              ← Card, CardBody, CardHeader, CardFooter, CardRibbon
-│   │   ├── TabMenu/           ← TabMenu + Tab
-│   │   ├── TableView/         ← Generic TableView<T>
-│   │   ├── Text/              ← Polymorphic Text component
-│   │   ├── ButtonMenu/, Checkbox/, Collapse/, Heading/, Input/, Link/, Message/,
-│   │   │   Overlay/, Radio/, Slider/, Svg/, Tag/, Toast/, Toggle/, Alert/
-│   │   ├── theme.ts           ← pcsTheme (styled-components ThemeProvider input)
-│   │   ├── _pcs-shims.ts      ← Internal compat shims for uikit imports
-│   │   └── index.ts           ← Re-export barrel for `@pancakeswap/storybook/ui`
-│   ├── widgets/               ← Composite UI used by basic-component stories
-│   │   ├── Modal/             ← ModalV2 (controlled with isOpen/onClose)
-│   │   ├── DropdownMenu/, MultiSelect/, PortfolioBreakdown/, TokenDisplay/, WalletAvatar/
-│   ├── design-system/         ← Stories for the design system itself
-│   │                            (Colors, Icons, Shadows, Spacing, Typography)
-│   ├── contexts/              ← MatchBreakpoints (responsive context)
-│   ├── hooks/                 ← useIsomorphicEffect
-│   ├── util/                  ← animationToolkit, getPortalRoot, getThemeValue, serialize
+├── primitives/                ← Basic primitives, FLAT — no atom/composite split
+│   ├── Box/                   ← Box, Flex, Grid, MotionBox (styled-system layout shorthand)
+│   ├── Button/                ← variants: primary, secondary, tertiary, text, danger,
+│   │                            dangerOutline, subtle, success, light, bubblegum
+│   ├── Card/                  ← Card, CardBody, CardHeader, CardFooter, CardRibbon
+│   ├── TabMenu/               ← TabMenu + Tab
+│   ├── TableView/             ← Generic TableView<T>
+│   ├── Text/                  ← Polymorphic Text component
+│   ├── ButtonMenu/, Checkbox/, Collapse/, Heading/, Input/, Link/, Message/,
+│   │   Overlay/, Radio/, Slider/, Svg/, Tag/, Toast/, Toggle/, Alert/
+│   ├── Modal/                 ← Modal, ModalV2, ModalProvider, MotionModal, BottomDrawer
+│   ├── DropdownMenu/, MultiSelect/, PortfolioBreakdown/, TokenDisplay/, WalletAvatar/
 │   ├── Icons.tsx              ← 241 PCS icons (all use fill="currentColor", default 20×20)
+│   ├── theme.ts               ← pcsTheme (styled-components ThemeProvider input)
+│   ├── _pcs-shims.ts          ← Internal compat shims for uikit imports
+│   └── index.ts               ← Internal barrel of all primitive exports
+│
+├── theme/                     ← Design-system foundation (tokens + theme + provider + base CSS)
 │   ├── tokens.ts              ← Raw values: lightColors, darkColors, shadows, fonts, space, radii
 │   ├── theme.ts               ← Chakra theme — emits --pcs-colors-* / --pcs-shadows-* CSS vars
-│   ├── design-system.css      ← Structural CSS: font import (Kanit), spacing, radius, z-index
-│   ├── perps.css              ← Legacy perps utility classes (being migrated out)
 │   ├── ThemeProvider.tsx      ← Wraps Chakra + next-themes + styled-components
-│   └── index.ts               ← Public surface for `@pancakeswap/storybook/ui`
+│   ├── design-system.css      ← Structural CSS: font import (Kanit), spacing, radius, z-index
+│   └── perps.css              ← Perps utility classes used by WalletPanel/PerpsPage demo
 │
 ├── widgets/                   ← Perps-specific feature widgets (synced from
 │   │                            apps/web/src/views/Perpetuals/components/*)
@@ -61,36 +55,49 @@ src/
 │   ├── TpSlModal.tsx          ← │
 │   ├── WithdrawModal.tsx      ← ┘
 │   ├── primitives.tsx         ← PerpsPanel, UnderlineTab, UnderlineTabs (shared layout)
-│   ├── PerpsPage.tsx          ← Storybook-only layout showcase. NOT exported, NOT typed.
 │   ├── WalletPanel.tsx        ← Auxiliary UI used inside other widgets. NOT exported.
 │   ├── *.stories.tsx          ← Storybook stories per widget
 │   └── index.ts               ← Public surface for `@pancakeswap/storybook/widgets`
 │
+├── pages/                     ← Page-level layout showcases (Storybook-only).
+│   │                            Compose widgets into full screens. NOT exported,
+│   │                            NOT typed — auto-excluded via `vite.lib.config.ts`.
+│   ├── PerpsPage.tsx          ← Perps trading terminal layout (Figma 2043-20619)
+│   ├── PerpsPage.css          ← Layout-only CSS (grid/flex shells, no widget surfaces)
+│   └── PerpsPage.stories.ts   ← Storybook story under `Apps/Perps`
+│
+├── design-system/             ← Stories for the design system itself
+│                                (Colors, Icons, Shadows, Spacing, Typography)
+├── contexts/                  ← MatchBreakpoints (responsive context)
+├── hooks/                     ← useIsomorphicEffect
+├── util/                      ← animationToolkit, getPortalRoot, getThemeValue, serialize
+├── css/                       ← breakpoints constants used by MatchBreakpoints
 ├── App.tsx, main.tsx          ← Vite dev playground (not part of the published lib)
 ├── stories-utils.tsx          ← Common Storybook decorators / wrappers
+├── index.ts                   ← Public surface for `@pancakeswap/storybook/primitives`
 └── lib-shims.d.ts             ← Type shims for the published bundle
 ```
 
 ### Build & publish
 
-- `pnpm build:lib` → emits `dist/ui.js` + `dist/widgets.js` plus bundled `dist/ui/index.d.ts` and `dist/widgets/index.d.ts` (via `vite-plugin-dts` with `rollupTypes: true`).
+- `pnpm build:lib` → emits `dist/primitives.js` + `dist/widgets.js` plus bundled `dist/primitives.d.ts` and `dist/widgets.d.ts` (via `vite-plugin-dts` with `rollupTypes: true`).
 - Consumers import from one of three subpaths, mapped via `package.json#exports`:
   - `@pancakeswap/storybook` → `dist/widgets.js`
   - `@pancakeswap/storybook/widgets` → `dist/widgets.js`
-  - `@pancakeswap/storybook/ui` → `dist/ui.js`
-- `vite.lib.config.ts#exclude` lists files that must NOT have declarations emitted (`PerpsPage.tsx`, `WalletPanel.tsx`) — they're internal to Storybook, not part of the published API.
+  - `@pancakeswap/storybook/primitives` → `dist/primitives.js`
+- `vite.lib.config.ts#exclude` lists files that must NOT have declarations emitted (`src/pages/**`, `WalletPanel.tsx`) — they're internal to Storybook, not part of the published API.
 - Storybook dev: `pnpm storybook`. Vite playground: `pnpm dev`.
 
 ### What goes where
 
 | Adding… | Goes in |
 |---|---|
-| A new generic primitive (button variant, table component, layout helper) | `src/ui/components/<Name>/` + re-export in `src/ui/components/index.ts` and `src/ui/index.ts` |
-| A new icon | `src/ui/Icons.tsx` |
-| A new design token | `src/ui/tokens.ts` first, then surface it through `theme.ts` |
+| A new generic primitive (button variant, table component, layout helper) | `src/primitives/<Name>/` + re-export in `src/primitives/index.ts` and `src/index.ts` |
+| A new icon | `src/primitives/Icons.tsx` |
+| A new design token | `src/theme/tokens.ts` first, then surface it through `src/theme/theme.ts` |
 | A new perps widget | `src/widgets/<Name>.tsx` + re-export in `src/widgets/index.ts` + add `<Name>.stories.tsx` |
-| A composite UI used inside other primitives but not published as a top-level widget | `src/ui/widgets/<Name>/` |
-| A page-level layout showcase | `src/widgets/<Name>.tsx`, but **don't export it** — add it to `vite.lib.config.ts#exclude` like `PerpsPage.tsx` |
+| A composite UI used inside other primitives but not published at the top level | `src/primitives/<Name>/` (same flat tier — re-export from `src/primitives/index.ts` only if it's stable enough for downstream consumers) |
+| A page-level layout showcase that composes widgets | `src/pages/<Name>.tsx`. Pages do **only layout** — no widget-style overrides; if a widget needs a visual tweak, add a prop/variant to the widget. Auto-excluded from declarations via `vite.lib.config.ts`. |
 
 ---
 
@@ -100,10 +107,10 @@ src/
 
 When implementing any feature or UI:
 
-1. **Use existing components** — `Button`, `Card`, `Text`, `TabMenu`, `TableView` live in `src/ui/components/`. Import and compose them. Do NOT create ad-hoc styled buttons, cards, text wrappers, tables, or tabs.
-2. **Use existing design tokens** — colors, shadows, spacing, radii, fonts are defined in `src/ui/tokens.ts` and exposed as CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`). Never hardcode hex values, pixel sizes, or shadows that already have a token.
-3. **Use existing icons** — 241 icons live in `src/ui/Icons.tsx`. Check there before adding any SVG.
-4. **Ask before changing a basic component or widget.** Files in scope: `tokens.ts`, `theme.ts`, `design-system.css`, `Icons.tsx`, and everything in `src/ui/components/*` and `src/ui/widgets/*`. If a change you need would modify any of these, pause and ask the user which scope they want:
+1. **Use existing components** — `Button`, `Card`, `Text`, `TabMenu`, `TableView` live in `src/primitives/`. Import and compose them. Do NOT create ad-hoc styled buttons, cards, text wrappers, tables, or tabs.
+2. **Use existing design tokens** — colors, shadows, spacing, radii, fonts are defined in `src/theme/tokens.ts` and exposed as CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`). Never hardcode hex values, pixel sizes, or shadows that already have a token.
+3. **Use existing icons** — 241 icons live in `src/primitives/Icons.tsx`. Check there before adding any SVG.
+4. **Ask before changing a basic component or widget.** Files in scope: `src/theme/tokens.ts`, `src/theme/theme.ts`, `src/theme/design-system.css`, `src/primitives/Icons.tsx`, and everything in `src/primitives/*`. If a change you need would modify any of these, pause and ask the user which scope they want:
    - **Change the basic component/widget directly** — affects every feature that uses it.
    - **Change only on the current page** — keep the basic component untouched and adjust the call site instead.
    Do NOT pick the scope yourself.
@@ -115,7 +122,7 @@ Styled-components carry their CSS with the component and use the consumer's styl
 
 - **Do NOT add new `.css` files alongside widgets.** Existing `.css` files under `src/widgets/` are legacy and being migrated.
 - **Do NOT use inline `style={{}}`** for styling — only acceptable for genuinely dynamic values that can't be expressed via props (e.g. a computed translateX from drag state, a width tied to live audio amplitude). For static layout / spacing / color, use the options below.
-- **Prefer the styled-system primitives** in `src/ui/components/Box/` for layout and spacing — `<Box>`, `<Flex>`, `<Grid>`, `<MotionBox>`. They accept the standard styled-system props (`p`, `px`, `py`, `m`, `flex`, `width`, `height`, `bg`, `color`, `position`, `top`, `border`, `borderRadius`, …) and resolve through the theme:
+- **Prefer the styled-system primitives** in `src/primitives/Box/` for layout and spacing — `<Box>`, `<Flex>`, `<Grid>`, `<MotionBox>`. They accept the standard styled-system props (`p`, `px`, `py`, `m`, `flex`, `width`, `height`, `bg`, `color`, `position`, `top`, `border`, `borderRadius`, …) and resolve through the theme:
 
   ```tsx
   // ✅ Good — props are typed, themeable, no inline style identity churn
@@ -130,8 +137,19 @@ Styled-components carry their CSS with the component and use the consumer's styl
   ```
 
 - For anything more complex than the styled-system shorthand allows (pseudo-classes, nested selectors, animations, conditional styling that depends on multiple props), reach for `styled.div` / `styled(Box)` colocated in the same `.tsx`. Read tokens from the theme: `${({ theme }) => theme.colors.success}`, `theme.radii.card`, `theme.shadows.level1`, etc.
-- Token shape is `pcsTheme` in `src/ui/components/theme.ts` — keys mirror PancakeSwap uikit, so widgets work in both this repo (Storybook + Vite dev) and pancake-frontend without changes.
+- Token shape is `pcsTheme` in `src/primitives/theme.ts` — keys mirror PancakeSwap uikit, so widgets work in both this repo (Storybook + Vite dev) and pancake-frontend without changes.
 - Layout primitives (`PerpsPanel`, tab bars, table rows) belong in `src/widgets/primitives.tsx` and are reused — don't reinvent.
+
+### Pages are pure layout
+
+Files under `src/pages/` are layout shells. They place widgets in a visual arrangement and do nothing else.
+
+- A page MUST NOT contain CSS or styled-components that override widget internals. Page-level styles are limited to layout containers (Flex / Grid wrappers, sizing, gaps) — never widget surface styling (colors, paddings, borders, typography inside a widget).
+- If a widget's appearance needs to change in a particular page, do ONE of:
+  1. **Update the widget itself** if the change is universal (every consumer should get it).
+  2. **Add a new prop / variant to the widget** if the change is context-specific (e.g. `<OrderForm density="compact" />`, `<PositionsPanel hideHeader />`). The widget owns its surface; the page only chooses among existing variants.
+- Pages are not part of the published API. They live in Storybook for documentation/preview only — `vite.lib.config.ts#exclude` lists `src/pages/**` so no declarations are emitted for them.
+- A page composes only `src/widgets/*` and `src/primitives/Box / Flex / Grid`. Importing a primitive other than the layout helpers (e.g. directly using `Button` or `Card` in a page) is a smell — that styling belongs inside a widget.
 
 ### Widgets are stateless
 
@@ -196,10 +214,10 @@ The design system is ported from **PancakeSwap UIKit** (`pancake-frontend/packag
 
 | Layer | File | Purpose |
 |---|---|---|
-| Raw values | `src/ui/tokens.ts` | All PCS colors (lightColors, darkColors, v2 scales), shadows, fonts, space, radii, fontSizes |
-| Chakra theme | `src/ui/theme.ts` | Maps tokens → CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`) with light/dark switching |
-| Structural CSS | `src/ui/design-system.css` | Font import (Kanit), font sizes, spacing, radius, z-index, motion primitives |
-| styled-components theme | `src/ui/components/theme.ts` | Provides `pcsTheme` object for styled-components `ThemeProvider` — maps `theme.colors.*` to CSS variable references |
+| Raw values | `src/theme/tokens.ts` | All PCS colors (lightColors, darkColors, v2 scales), shadows, fonts, space, radii, fontSizes |
+| Chakra theme | `src/theme/theme.ts` | Maps tokens → CSS variables (`--pcs-colors-*`, `--pcs-shadows-*`) with light/dark switching |
+| Structural CSS | `src/theme/design-system.css` | Font import (Kanit), font sizes, spacing, radius, z-index, motion primitives |
+| styled-components theme | `src/primitives/theme.ts` | Provides `pcsTheme` object for styled-components `ThemeProvider` — maps `theme.colors.*` to CSS variable references |
 
 ### Key color tokens (PCS naming)
 
@@ -221,24 +239,24 @@ The design system is ported from **PancakeSwap UIKit** (`pancake-frontend/packag
 
 ### Components (from PCS UIKit, styled-components)
 
-All in `src/ui/components/`:
+All in `src/primitives/`:
 
 - **Button** — `variant`: primary, secondary, tertiary, text, danger, dangerOutline, subtle, success, light, bubblegum. `scale`: md (48px), sm (32px), xs (20px). Inset bottom shadow on solid variants.
 - **Card** — `isActive`, `isSuccess`, `isWarning`, `isDisabled`. Sub-components: `CardBody` (24px padding), `CardHeader` (variants: default, blue, bubblegum, violet, pale), `CardFooter`, `CardRibbon`.
 - **Text** — `color` (PCS named colors), `bold`, `small`, `fontSize`, `ellipsis`, `textTransform`, `strikeThrough`. Polymorphic `as` prop.
 - **TabMenu** + **Tab** — `activeIndex`, `onItemClick`, `fullWidth`, `gap`, `isShowBorderBottom`. Tab `scale`: md, lg.
 - **TableView** — Generic `TableView<T>` with `columns`, `data`, `onSort`, `sortOrder`, `sortField`, `onRowClick`. PCS sort arrow buttons.
-- **Box / Flex / Grid** — styled-system primitives in `src/ui/components/Box/`. Use these for layout instead of raw `<div>` + inline styles.
+- **Box / Flex / Grid** — styled-system primitives in `src/primitives/Box/`. Use these for layout instead of raw `<div>` + inline styles.
 
 ### Icons
 
-241 PCS icons + custom additions in `src/ui/Icons.tsx`. All use `fill="currentColor"`, default 20x20.
+241 PCS icons + custom additions in `src/primitives/Icons.tsx`. All use `fill="currentColor"`, default 20x20.
 
 ---
 
 ## Theme
 
-- `ThemeProvider` in `src/ui/ThemeProvider.tsx` wraps Chakra + next-themes + styled-components.
+- `ThemeProvider` in `src/theme/ThemeProvider.tsx` wraps Chakra + next-themes + styled-components.
 - `.storybook/preview.tsx` wraps all stories with both `ThemeProvider` and styled-components `SCThemeProvider`.
 - Use CSS variables for colors — they auto-switch with light/dark.
 - Use `useTheme()` only when you need the theme value in JS (e.g. chart colors).

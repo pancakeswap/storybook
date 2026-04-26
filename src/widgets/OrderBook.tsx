@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import styled, { useTheme } from 'styled-components'
-import { Flex } from '../ui/components/Box'
+import { Flex } from '../primitives/Box'
 import { PerpsPanel } from './primitives'
 
 export type OrderBookView = 'both' | 'bids' | 'asks'

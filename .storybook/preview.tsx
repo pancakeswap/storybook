@@ -1,9 +1,9 @@
 import type { Preview, Decorator } from '@storybook/react-vite'
 import { ThemeProvider as SCThemeProvider } from 'styled-components'
-import { ThemeProvider } from '../src/ui/ThemeProvider'
-import { pcsTheme } from '../src/ui/components/theme'
-import { MatchBreakpointsProvider } from '../src/ui/contexts'
-import { ModalProvider } from '../src/ui/widgets/Modal'
+import { ThemeProvider } from '../src/theme/ThemeProvider'
+import { pcsTheme } from '../src/primitives/theme'
+import { MatchBreakpointsProvider } from '../src/contexts'
+import { ModalProvider } from '../src/primitives/Modal'
 import { PhoneFrame, TabletFrame } from './DeviceFrame'
 import './preview.css'
 

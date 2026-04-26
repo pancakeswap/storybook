@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Button } from '../ui/components/Button'
-import { Flex } from '../ui/components/Box'
-import { Message, MessageText } from '../ui/components/Message'
-import { Text } from '../ui/components/Text'
+import { Button } from '../primitives/Button'
+import { Flex } from '../primitives/Box'
+import { Message, MessageText } from '../primitives/Message'
+import { Text } from '../primitives/Text'
 import { PerpsPanel } from './primitives'
 
 /**

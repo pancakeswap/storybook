@@ -1,8 +1,8 @@
 import React from 'react'
 import styled, { useTheme } from 'styled-components'
-import { Flex } from '../ui/components/Box'
-import { Button } from '../ui/components/Button'
-import { Text } from '../ui/components/Text'
+import { Flex } from '../primitives/Box'
+import { Button } from '../primitives/Button'
+import { Text } from '../primitives/Text'
 import { PerpsPanel, UnderlineTab, UnderlineTabs } from './primitives'
 
 export interface PositionRow {

@@ -1,7 +1,7 @@
 import React, { Children, cloneElement } from 'react'
 import type { ReactElement } from 'react'
 import styled from 'styled-components'
-import { Card } from '../ui/components/Card'
+import { Card } from '../primitives/Card'
 
 /**
  * Edge-to-edge trading-UI panel shell. Wraps the PCS `Card` so we keep the

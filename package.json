@@ -12,9 +12,9 @@
       "types": "./dist/widgets.d.ts",
       "import": "./dist/widgets.js"
     },
-    "./ui": {
-      "types": "./dist/ui.d.ts",
-      "import": "./dist/ui.js"
+    "./primitives": {
+      "types": "./dist/primitives.d.ts",
+      "import": "./dist/primitives.js"
     },
     "./widgets": {
       "types": "./dist/widgets.d.ts",

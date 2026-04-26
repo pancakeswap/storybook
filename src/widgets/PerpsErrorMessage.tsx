@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Box } from '../ui/components/Box'
-import { Flex } from '../ui/components/Box'
-import { Button } from '../ui/components/Button'
-import { Message, MessageText } from '../ui/components/Message'
-import { Text } from '../ui/components/Text'
+import { Box } from '../primitives/Box'
+import { Flex } from '../primitives/Box'
+import { Button } from '../primitives/Button'
+import { Message, MessageText } from '../primitives/Message'
+import { Text } from '../primitives/Text'
 
 export type PerpsErrorVariant = 'primary' | 'success' | 'warning' | 'danger'
 

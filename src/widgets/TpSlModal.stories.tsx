@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
-import { Button } from '../ui/components/Button'
+import { Button } from '../primitives/Button'
 import { TpSlModal } from './TpSlModal'
 
 const meta = {

@@ -2,15 +2,15 @@
  * Library build configuration for `@pancakeswap/storybook`.
  *
  * Two entries:
- *   - `dist/ui.js`      → exports basic components (Button, Card, Modal, …)
- *   - `dist/widgets.js` → exports synced perps widgets (AccountPanel, …)
+ *   - `dist/primitives.js` → exports basic components (Button, Card, Modal, …)
+ *   - `dist/widgets.js`    → exports synced perps widgets (AccountPanel, …)
  *
  * Externalises React + react-dom + styled-components so the consumer's
  * own copy is used (avoids the "two React copies" / "two styled-components
  * instances" warnings that break hooks identity and ThemeContext).
  *
  * Type declarations are emitted by `vite-plugin-dts` which bundles them
- * into stable `dist/ui/index.d.ts` + `dist/widgets/index.d.ts` files —
+ * into stable `dist/primitives/index.d.ts` + `dist/widgets/index.d.ts` files —
  * avoids the "cannot be named without a reference to .pnpm/…" portability
  * issues that a raw `tsc --emitDeclarationOnly` hits when types infer
  * generics from transitive deps (csstype, motion-dom).
@@ -49,10 +49,12 @@ export default defineConfig({
         '**/*.stories.ts',
         '**/*.test.ts',
         '**/*.test.tsx',
-        // PerpsPage is a layout showcase used by Storybook only; not a
-        // published widget. WalletPanel is auxiliary UI used inside other
-        // widgets and isn't re-exported either.
-        'src/widgets/PerpsPage.tsx',
+        // Pages live in `src/pages/` and are Storybook-only layout
+        // showcases that compose published widgets — they are not part
+        // of the published API, so no declarations are emitted for them.
+        // WalletPanel is auxiliary UI used inside other widgets and
+        // isn't re-exported either.
+        'src/pages/**',
         'src/widgets/WalletPanel.tsx',
       ],
       // Most types we touch in widgets are simple — when the inferred
@@ -71,7 +73,7 @@ export default defineConfig({
     cssCodeSplit: false,
     lib: {
       entry: {
-        ui: path.resolve(dirname, 'src/ui/index.ts'),
+        primitives: path.resolve(dirname, 'src/index.ts'),
         widgets: path.resolve(dirname, 'src/widgets/index.ts'),
       },
       formats: ['es'],

@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
-import { Flex } from '../ui/components/Box'
-import { Text } from '../ui/components/Text'
-import { SearchIcon } from '../ui/Icons'
+import { Flex } from '../primitives/Box'
+import { Text } from '../primitives/Text'
+import { SearchIcon } from '../primitives/Icons'
 
 export interface MarketRow {
   /** Full venue symbol, e.g. 'BTCUSDT'. */

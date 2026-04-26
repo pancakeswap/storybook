@@ -1,10 +1,10 @@
 import React from 'react'
-import { Box, Flex } from '../ui/components/Box'
-import { Button } from '../ui/components/Button'
-import { Input } from '../ui/components/Input'
-import { Text } from '../ui/components/Text'
-import Modal from '../ui/widgets/Modal/Modal'
-import { ModalV2 } from '../ui/widgets/Modal/ModalV2'
+import { Box, Flex } from '../primitives/Box'
+import { Button } from '../primitives/Button'
+import { Input } from '../primitives/Input'
+import { Text } from '../primitives/Text'
+import Modal from '../primitives/Modal/Modal'
+import { ModalV2 } from '../primitives/Modal/ModalV2'
 
 export interface WithdrawModalProps {
   /** Controlled open state. */

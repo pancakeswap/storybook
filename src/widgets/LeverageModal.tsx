@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Box, Flex } from '../ui/components/Box'
-import { Button } from '../ui/components/Button'
-import Slider from '../ui/components/Slider/Slider'
-import { Text } from '../ui/components/Text'
-import Modal from '../ui/widgets/Modal/Modal'
-import { ModalV2 } from '../ui/widgets/Modal/ModalV2'
+import { Box, Flex } from '../primitives/Box'
+import { Button } from '../primitives/Button'
+import Slider from '../primitives/Slider/Slider'
+import { Text } from '../primitives/Text'
+import Modal from '../primitives/Modal/Modal'
+import { ModalV2 } from '../primitives/Modal/ModalV2'
 
 export interface LeverageModalProps {
   /** Controlled open state. */

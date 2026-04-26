@@ -1,7 +1,7 @@
 import { ThemeProvider as SCThemeProvider } from 'styled-components'
-import { ThemeProvider } from './ui/ThemeProvider'
-import { pcsTheme } from './ui/components/theme'
-import { PerpsPage } from './widgets/PerpsPage'
+import { ThemeProvider } from './theme/ThemeProvider'
+import { pcsTheme } from './primitives/theme'
+import { PerpsPage } from './pages/PerpsPage'
 
 function App() {
   return (

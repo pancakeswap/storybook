@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 import { fn } from 'storybook/test'
-import { Button } from '../ui/components/Button'
-import { Message, MessageText } from '../ui/components/Message'
+import { Button } from '../primitives/Button'
+import { Message, MessageText } from '../primitives/Message'
 import { WithdrawModal } from './WithdrawModal'
 
 const meta = {
