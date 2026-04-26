@@ -13,12 +13,27 @@ When implementing any feature or UI:
    Do NOT pick the scope yourself.
 5. **Follow PancakeSwap's design language** — see section below.
 
-### Style widgets with styled-components — no raw .css
+### Style widgets with styled-components + Box/Flex — no raw .css, no inline `style={{}}`
 
-This repo is published as `@pancakeswap/storybook` and consumed by `pancake-frontend`. Styled-components carry their CSS with the component and use the consumer's styled-components theme automatically. Raw `.css` files force consumers to side-effect import a stylesheet and risk style loss in SSR / code-split builds.
+This repo is published as `@pancakeswap/storybook` and consumed by `pancake-frontend`. Styled-components carry their CSS with the component and use the consumer's styled-components theme automatically. Raw `.css` files force consumers to side-effect import a stylesheet and risk style loss in SSR / code-split builds. Inline `style={{}}` objects bypass the theme, can't be overridden by parent styled-components, and create new object identities every render (causing needless reconciliation).
 
 - **Do NOT add new `.css` files alongside widgets.** Existing `.css` files under `src/widgets/` are legacy and being migrated.
-- All visual styling for new or synced widgets goes in `styled-components` blocks colocated in the same `.tsx`. Read tokens from the theme: `${({ theme }) => theme.colors.success}`, `theme.radii.card`, `theme.shadows.level1`, etc.
+- **Do NOT use inline `style={{}}`** for styling — only acceptable for genuinely dynamic values that can't be expressed via props (e.g. a computed translateX from drag state, a width tied to live audio amplitude). For static layout / spacing / color, use the options below.
+- **Prefer the styled-system primitives** in `src/ui/components/Box/` for layout and spacing — `<Box>`, `<Flex>`, `<Grid>`, `<MotionBox>`. They accept the standard styled-system props (`p`, `px`, `py`, `m`, `flex`, `width`, `height`, `bg`, `color`, `position`, `top`, `border`, `borderRadius`, …) and resolve through the theme:
+
+  ```tsx
+  // ✅ Good — props are typed, themeable, no inline style identity churn
+  <Flex flexDirection="column" p="6px" gap="8px" bg="backgroundAlt" borderRadius="card">
+    <Box flex={1}>{...}</Box>
+  </Flex>
+
+  // ❌ Bad — inline style, hardcoded values, no theme integration
+  <div style={{ display: 'flex', flexDirection: 'column', padding: 6, gap: 8 }}>
+    <div style={{ flex: 1 }}>{...}</div>
+  </div>
+  ```
+
+- For anything more complex than the styled-system shorthand allows (pseudo-classes, nested selectors, animations, conditional styling that depends on multiple props), reach for `styled.div` / `styled(Box)` colocated in the same `.tsx`. Read tokens from the theme: `${({ theme }) => theme.colors.success}`, `theme.radii.card`, `theme.shadows.level1`, etc.
 - Token shape is `pcsTheme` in `src/ui/components/theme.ts` — keys mirror PancakeSwap uikit, so widgets work in both this repo (Storybook + Vite dev) and pancake-frontend without changes.
 - Layout primitives (`PerpsPanel`, tab bars, table rows) belong in `src/widgets/primitives.tsx` and are reused — don't reinvent.
 
