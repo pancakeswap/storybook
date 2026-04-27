@@ -1,284 +1,836 @@
-import { useState } from 'react'
-import './SimpleBetPanel.css'
+import React from 'react'
+import styled from 'styled-components'
+import { Flex } from '../primitives/Box'
+import { Button } from '../primitives/Button'
+import { Text } from '../primitives/Text'
+import { AddIcon, HelpIcon, WalletFilledIcon } from '../primitives/Icons'
+import { PerpsPanel } from './primitives'
 
+/**
+ * Stateless "Simple-mode" UP/DOWN bet entry. Mirrors pancake-frontend's
+ * `SimpleBetPanel` adapter — the consumer owns the bet/leverage draft,
+ * formats every display string, and supplies the async submit lifecycle.
+ *
+ * Visual is a 1:1 port of the original `SimpleBetPanel.css` (Figma
+ * 235:30152) re-expressed as theme-driven styled-components: gradient
+ * leverage track with safe/warn/danger zones, color-mix tinted zone
+ * pill, the bottom-border-2px button-press effect, and the casino-style
+ * fund chip / bet input pair.
+ */
 export interface SimpleBetPanelProps {
-  pair?: string
-  price?: string
-  pricePnlPct?: number
-  fundBalance?: string
-  initialBet?: number
-  initialLeverage?: number
-  estimatedEntry?: string
-  liqIfLong?: string
-  marginRequired?: string
-  openingFee?: string
-  onUp?: (state: { bet: number; leverage: number }) => void
-  onDown?: (state: { bet: number; leverage: number }) => void
+  // ── Symbol display ───────────────────────────────────────
+  symbol: string
+  baseAsset: string
+  pair: string
+  price: string
+  pricePnlPct: number
+  onSymbolClick?: () => void
+
+  // ── Controlled draft ─────────────────────────────────────
+  bet: string
+  onBetChange: (next: string) => void
+  leverage: number
+  onLeverageChange: (next: number) => void
+  quoteAsset: string
+  onQuoteAssetClick?: () => void
+
+  // ── Fund display + actions ───────────────────────────────
+  fundBalanceText: string
+  onTopUpFund?: () => void
+  onPercentClick?: (frac: 0.25 | 0.5 | 1) => void
+
+  // ── Stats summary (consumer pre-formats) ─────────────────
+  estimatedEntry: string
+  liqIfLong: string
+  marginRequired: string
+  openingFee: string
+
+  // ── CTA ──────────────────────────────────────────────────
+  canSubmit: boolean
+  isSubmittingUp?: boolean
+  isSubmittingDown?: boolean
+  onUp: () => void
+  onDown: () => void
+
   onDeposit?: () => void
   onWithdraw?: () => void
-  onTopUpFund?: () => void
+
+  unrealizedPnl: string
 }
 
-const PRESETS = [50, 250, 500, 1001]
+const PRESETS = [50, 250, 500, 1001] as const
 const MAX_LEVERAGE = 1001
 
-function ChevDown({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M7 10l5 5 5-5z" />
-    </svg>
-  )
-}
-function PlusCircle() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
-    </svg>
-  )
-}
-function ArrowUp() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 4l-7 7h4v9h6v-9h4z" />
-    </svg>
-  )
-}
-function ArrowDown() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 20l7-7h-4V4h-6v9H5z" />
-    </svg>
-  )
-}
-function HelpCircle() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm.75 16h-1.5v-1.5h1.5V18zm1.76-6.25l-.67.69c-.54.55-.84 1-.84 2.06h-1.5v-.5c0-.74.3-1.41.84-1.95l.93-.95c.27-.26.42-.63.42-1.05 0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5H9a3 3 0 116 0c0 .66-.27 1.26-.7 1.7z" />
-    </svg>
-  )
-}
-function Wallet() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M21 7H5a1 1 0 010-2h13V3H5a3 3 0 00-3 3v12a3 3 0 003 3h16a1 1 0 001-1V8a1 1 0 00-1-1zm-3 8a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" />
-    </svg>
-  )
-}
-function Triangle() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-      <path d="M6 2l5 8H1z" />
-    </svg>
-  )
-}
+type Zone = 'safe' | 'warn' | 'danger'
 
-export function SimpleBetPanel({
-  pair = 'BTCUSD',
-  price = '78,053.6',
-  pricePnlPct = 0.93,
-  fundBalance = '20 USDT',
-  initialBet = 10,
-  initialLeverage = 10,
-  estimatedEntry = '$67,413.98',
-  liqIfLong = '$66,092.23 (-2.0%)',
-  marginRequired = '$400 USDT',
-  openingFee = '$10.00 (0.05%)',
+const zoneFromLeverage = (lev: number): Zone =>
+  lev <= 50 ? 'safe' : lev <= 250 ? 'warn' : 'danger'
+
+const zoneLabel = (z: Zone) =>
+  z === 'safe' ? 'Safe zone' : z === 'warn' ? 'Caution' : 'Danger zone'
+
+// Branded UP/DOWN arrows — kept inline because there's no 1:1 primitive.
+const UpArrow: React.FC = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 4l-7 7h4v9h6v-9h4z" />
+  </svg>
+)
+const DownArrow: React.FC = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12 20l7-7h-4V4h-6v9H5z" />
+  </svg>
+)
+const TriangleUp: React.FC = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+    <path d="M6 2l5 8H1z" />
+  </svg>
+)
+
+// ── Styled bits ────────────────────────────────────────────
+
+const Root = styled(PerpsPanel)`
+  width: 420px;
+  flex-shrink: 0;
+  align-self: stretch;
+  font-variant-numeric: tabular-nums;
+  & > div {
+    background: ${({ theme }) => theme.colors.card};
+    padding: 0;
+  }
+`
+
+// Symbol header strip
+const Head = styled(Flex)`
+  padding: 16px 20px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+`
+
+const HeadLeft = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const TokenChip = styled.span`
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #f7931a;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+`
+
+const Pair = styled.span`
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  padding: 0 6px;
+`
+
+const HeadRight = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`
+
+const HeadPrice = styled.span`
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+`
+
+const HeadPnl = styled.span<{ $positive: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  color: ${({ theme, $positive }) => ($positive ? theme.colors.success : theme.colors.failure)};
+`
+
+// Body
+const Body = styled.div`
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+`
+
+const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`
+
+const SectionHead = styled(Flex)`
+  align-items: center;
+  justify-content: space-between;
+`
+
+const PreTitle = styled(Text).attrs({ fontSize: '12px' })`
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.secondary};
+  text-transform: uppercase;
+  letter-spacing: 0.36px;
+`
+
+// Wallet / fund chip
+const FundChip = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: ${({ theme }) => theme.colors.input};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  color: ${({ theme }) => theme.colors.text};
+  transition: filter 0.12s;
+  &:hover {
+    filter: brightness(1.05);
+  }
+`
+
+const FundAmt = styled.span`
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12px;
+`
+
+// Bet input field
+const BetField = styled(Flex)`
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: ${({ theme }) => theme.colors.input};
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-radius: 16px;
+`
+
+const BetLabel = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.textSubtle};
+`
+
+const BetInputWrap = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+`
+
+const BetInput = styled.input`
+  width: 90px;
+  border: 0;
+  background: transparent;
+  text-align: right;
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.24px;
+  color: ${({ theme }) => theme.colors.text};
+  outline: none;
+  font-variant-numeric: tabular-nums;
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`
+
+const BetTokenButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const QuoteIcon = styled.span`
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #26a17b;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  margin-right: 4px;
+  flex-shrink: 0;
+`
+
+const QuoteSym = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+`
+
+// % shortcut row
+const PctRow = styled(Flex)`
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+`
+
+const PctButton = styled.button`
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12px;
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 4px;
+  cursor: pointer;
+  &:hover {
+    filter: brightness(1.1);
+  }
+`
+
+const PctDivider = styled.span`
+  width: 1px;
+  height: 16px;
+  background: ${({ theme }) => theme.colors.cardBorder};
+`
+
+// Leverage section
+const LevRow = styled(Flex)`
+  justify-content: space-between;
+  align-items: center;
+`
+
+const LevValue = styled.span`
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.28px;
+  line-height: 1.2;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const ZonePill = styled.span<{ $zone: Zone }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: ${({ theme, $zone }) =>
+    $zone === 'safe'
+      ? `color-mix(in srgb, ${theme.colors.success} 20%, transparent)`
+      : $zone === 'warn'
+        ? `color-mix(in srgb, ${theme.colors.warning} 20%, transparent)`
+        : `color-mix(in srgb, ${theme.colors.failure} 20%, transparent)`};
+  border: 1px solid
+    ${({ theme, $zone }) =>
+      $zone === 'safe'
+        ? `color-mix(in srgb, ${theme.colors.success} 40%, transparent)`
+        : $zone === 'warn'
+          ? `color-mix(in srgb, ${theme.colors.warning} 40%, transparent)`
+          : `color-mix(in srgb, ${theme.colors.failure} 40%, transparent)`};
+  color: ${({ theme, $zone }) => ($zone === 'danger' ? theme.colors.failure : theme.colors.text)};
+`
+
+// Hand-rolled leverage slider (the Slider primitive can't do a per-zone
+// gradient fill across the 1..MAX_LEVERAGE range — keeping range input).
+const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
+  position: relative;
+  width: 100%;
+  height: 16px;
+  background: linear-gradient(180deg, #e5fdff 0%, #f3efff 100%);
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-radius: 24px;
+  overflow: visible;
+`
+
+const LevFill = styled.span<{ $fillPct: number; $zone: Zone }>`
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: ${({ $fillPct }) => `${$fillPct}%`};
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+  background: ${({ theme, $zone }) =>
+    $zone === 'safe' ? theme.colors.success : $zone === 'warn' ? theme.colors.warning : theme.colors.failure};
+`
+
+const LevThumb = styled.span<{ $fillPct: number; $zone: Zone }>`
+  position: absolute;
+  top: 50%;
+  left: ${({ $fillPct }) => `${$fillPct}%`};
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: ${({ theme, $zone }) =>
+    $zone === 'safe' ? theme.colors.success : $zone === 'warn' ? theme.colors.warning : theme.colors.failure};
+  border: 2px solid #fff;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  cursor: grab;
+  pointer-events: none;
+  &:active {
+    cursor: grabbing;
+  }
+`
+
+const LevRangeInput = styled.input`
+  position: absolute;
+  inset: -4px 0;
+  width: 100%;
+  height: calc(100% + 8px);
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+`
+
+// Leverage tab row (preset values + custom field)
+const LevTabs = styled(Flex)`
+  align-items: center;
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  background: ${({ theme }) => theme.colors.input};
+  border-radius: 16px;
+  overflow: hidden;
+`
+
+const LevTab = styled.button<{ $active: boolean }>`
+  flex: 1;
+  border: 0;
+  background: ${({ $active, theme }) => ($active ? theme.colors.input : 'transparent')};
+  padding: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  color: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.textSubtle)};
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  cursor: pointer;
+  border-right: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  &:last-child {
+    border-right: 0;
+  }
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`
+
+const LevCustom = styled.div`
+  width: 78px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: ${({ theme }) => theme.colors.input};
+  border-right: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+`
+
+const LevCustomInput = styled.input`
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: inherit;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text};
+  outline: none;
+  font-variant-numeric: tabular-nums;
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`
+
+const LevCustomSuffix = styled.span`
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  padding-left: 4px;
+`
+
+// Duration row (static "Perpetual" placeholder — preserves layout)
+const DurationRow = styled(Flex)`
+  align-items: center;
+  justify-content: space-between;
+`
+
+// Stats summary
+const StatsCard = styled.div`
+  margin: 0 20px;
+  background: ${({ theme }) => theme.colors.input};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 16px;
+  overflow: hidden;
+`
+
+const StatsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 14px 12px;
+`
+
+const StatsRow = styled(Flex)`
+  align-items: center;
+  justify-content: space-between;
+`
+
+const StatsLabel = styled.span`
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  text-transform: uppercase;
+  letter-spacing: 0.24px;
+`
+
+const StatsValue = styled.span<{ $danger?: boolean }>`
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ theme, $danger }) => ($danger ? theme.colors.failure : theme.colors.text)};
+  text-transform: uppercase;
+  letter-spacing: 0.24px;
+  font-variant-numeric: tabular-nums;
+`
+
+// UP / DOWN buttons
+const DirectionRow = styled(Flex)`
+  gap: 8px;
+  padding: 0 14px 14px;
+`
+
+const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 56px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-bottom-width: 4px;
+  border-radius: 16px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.18px;
+  color: ${({ theme }) => theme.colors.invertedContrast};
+  cursor: pointer;
+  transition: filter 0.12s, transform 0.06s;
+  background: ${({ theme, $variant }) => ($variant === 'up' ? theme.colors.success : theme.colors.failure)};
+  &:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+    border-bottom-width: 2px;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+`
+
+// Deposit / Withdraw bottom tabs
+const DwRow = styled(Flex)`
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+`
+
+const DwButton = styled(Button)<{ $variant: 'primary' | 'secondary' }>`
+  flex: 1;
+  height: 40px;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s;
+  background: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.primary : theme.colors.input)};
+  color: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.invertedContrast : theme.colors.primary)};
+  border-bottom-color: ${({ $variant }) => ($variant === 'primary' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)')};
+  &:hover {
+    filter: brightness(1.08);
+  }
+`
+
+// Unrealized PnL card
+const PnlCard = styled(Flex)`
+  margin: 0 20px 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: ${({ theme }) => theme.colors.input};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 16px;
+`
+
+const PnlLabel = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.textSubtle};
+`
+
+const PnlValue = styled.span`
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.22px;
+  color: ${({ theme }) => theme.colors.text};
+  font-variant-numeric: tabular-nums;
+`
+
+// ── Component ─────────────────────────────────────────────
+
+export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
+  symbol,
+  baseAsset,
+  pair,
+  price,
+  pricePnlPct,
+  onSymbolClick,
+  bet,
+  onBetChange,
+  leverage,
+  onLeverageChange,
+  quoteAsset,
+  onQuoteAssetClick,
+  fundBalanceText,
+  onTopUpFund,
+  onPercentClick,
+  estimatedEntry,
+  liqIfLong,
+  marginRequired,
+  openingFee,
+  canSubmit,
+  isSubmittingUp = false,
+  isSubmittingDown = false,
   onUp,
   onDown,
   onDeposit,
   onWithdraw,
-  onTopUpFund,
-}: SimpleBetPanelProps) {
-  const [bet, setBet] = useState(initialBet)
-  const [leverage, setLeverage] = useState(initialLeverage)
-
-  const fillPct = Math.min(100, (leverage / MAX_LEVERAGE) * 100)
-  const zone = leverage <= 50 ? 'safe' : leverage <= 250 ? 'warn' : 'danger'
-  const zoneLabel = zone === 'safe' ? '🌿 Safe zone' : zone === 'warn' ? '⚠️ Caution' : '🔥 Danger zone'
-
-  const applyPct = (frac: number) => {
-    // Use the (mock) fund balance number portion for shortcut math.
-    const fundNum = Number(fundBalance.replace(/[^\d.]/g, ''))
-    if (Number.isFinite(fundNum) && fundNum > 0) setBet(Math.round(fundNum * frac * 100) / 100)
-  }
+  unrealizedPnl,
+}) => {
+  const fillPct = Math.min(100, Math.max(0, (leverage / MAX_LEVERAGE) * 100))
+  const zone = zoneFromLeverage(leverage)
+  const submitting = isSubmittingUp || isSubmittingDown
+  const upDisabled = !canSubmit || submitting
+  const downDisabled = !canSubmit || submitting
 
   return (
-    <section className="sbp-root" aria-label={`Simple bet panel · ${pair}`}>
+    <Root aria-label={`Simple bet panel · ${pair || symbol}`}>
       {/* Symbol header */}
-      <div className="sbp-head">
-        <button type="button" className="sbp-head-left">
-          <span className="sbp-token-icon">BTC</span>
-          <span className="sbp-pair">{pair}</span>
-          <ChevDown size={20} />
-        </button>
-        <div className="sbp-head-right">
-          <span className="sbp-head-price">{price}</span>
-          <span className="sbp-head-pnl">
-            <Triangle />
+      <Head>
+        <HeadLeft type="button" onClick={onSymbolClick}>
+          <TokenChip>{baseAsset}</TokenChip>
+          <Pair>{pair}</Pair>
+          <span aria-hidden>▾</span>
+        </HeadLeft>
+        <HeadRight>
+          <HeadPrice>{price}</HeadPrice>
+          <HeadPnl $positive={pricePnlPct >= 0}>
+            <TriangleUp />
             {pricePnlPct.toFixed(2)}%
-          </span>
-        </div>
-      </div>
+          </HeadPnl>
+        </HeadRight>
+      </Head>
 
       {/* Form body */}
-      <div className="sbp-body">
+      <Body>
         {/* My Perp Fund + bet input */}
-        <div className="sbp-section">
-          <div className="sbp-section-head">
-            <span className="sbp-pretitle">My Perp Fund</span>
-            <button type="button" className="sbp-fund-chip" onClick={onTopUpFund} aria-label="Top up fund">
-              <Wallet />
-              <span className="sbp-fund-amt">{fundBalance}</span>
-              <PlusCircle />
-            </button>
-          </div>
+        <Section>
+          <SectionHead>
+            <PreTitle>My Perp Fund</PreTitle>
+            <FundChip type="button" onClick={onTopUpFund} aria-label="Top up fund">
+              <WalletFilledIcon color="textSubtle" width="18px" />
+              <FundAmt>{fundBalanceText}</FundAmt>
+              <AddIcon color="textSubtle" width="16px" />
+            </FundChip>
+          </SectionHead>
 
-          <div className="sbp-bet-field">
-            <span className="sbp-bet-label">My Bet</span>
-            <span className="sbp-bet-input-wrap">
-              <input
-                className="sbp-bet-input"
+          <BetField>
+            <BetLabel>My Bet</BetLabel>
+            <BetInputWrap>
+              <BetInput
                 type="number"
                 inputMode="decimal"
                 value={bet}
-                onChange={(e) => setBet(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => onBetChange(e.target.value)}
                 aria-label="Bet amount"
+                placeholder="0"
               />
-              <span className="sbp-bet-token">
-                <span className="sbp-bet-token-icon">USDT</span>
-                <span className="sbp-bet-token-sym">USDT</span>
-                <ChevDown size={14} />
-              </span>
-            </span>
-          </div>
+              <BetTokenButton type="button" onClick={onQuoteAssetClick} aria-label="Choose quote asset">
+                <QuoteIcon>{quoteAsset}</QuoteIcon>
+                <QuoteSym>{quoteAsset}</QuoteSym>
+                <span aria-hidden>▾</span>
+              </BetTokenButton>
+            </BetInputWrap>
+          </BetField>
 
-          <div className="sbp-pct-row">
-            <button type="button" className="sbp-pct-btn" onClick={() => applyPct(0.25)}>25%</button>
-            <span className="sbp-pct-divider" />
-            <button type="button" className="sbp-pct-btn" onClick={() => applyPct(0.50)}>50%</button>
-            <span className="sbp-pct-divider" />
-            <button type="button" className="sbp-pct-btn" onClick={() => applyPct(1.00)}>MAX</button>
-          </div>
-        </div>
+          <PctRow>
+            <PctButton type="button" onClick={() => onPercentClick?.(0.25)}>
+              25%
+            </PctButton>
+            <PctDivider />
+            <PctButton type="button" onClick={() => onPercentClick?.(0.5)}>
+              50%
+            </PctButton>
+            <PctDivider />
+            <PctButton type="button" onClick={() => onPercentClick?.(1)}>
+              MAX
+            </PctButton>
+          </PctRow>
+        </Section>
 
         {/* Leverage */}
-        <div className="sbp-section">
-          <span className="sbp-pretitle">Leverage</span>
+        <Section>
+          <PreTitle>Leverage</PreTitle>
 
-          <div className="sbp-lev-row">
-            <span className="sbp-lev-value">{leverage}x</span>
-            <span className={`sbp-zone ${zone === 'warn' ? 'sbp-zone--warn' : zone === 'danger' ? 'sbp-zone--danger' : ''}`}>
-              {zoneLabel}
-              <span className="sbp-zone-info"><HelpCircle /></span>
-            </span>
-          </div>
+          <LevRow>
+            <LevValue>{leverage}x</LevValue>
+            <ZonePill $zone={zone}>
+              {zoneLabel(zone)}
+              <HelpIcon color="textSubtle" width="14px" />
+            </ZonePill>
+          </LevRow>
 
-          <div className="sbp-lev-track" aria-hidden>
-            <span className="sbp-lev-fill" style={{ width: `${fillPct}%` }} />
-            <span className="sbp-lev-thumb" style={{ left: `${fillPct}%` }} />
-            <input
-              className="sbp-lev-input"
+          <LevTrack $fillPct={fillPct} $zone={zone} aria-hidden>
+            <LevFill $fillPct={fillPct} $zone={zone} />
+            <LevThumb $fillPct={fillPct} $zone={zone} />
+            <LevRangeInput
               type="range"
               min={1}
               max={MAX_LEVERAGE}
               value={leverage}
-              onChange={(e) => setLeverage(Number(e.target.value))}
+              onChange={(e) => onLeverageChange(Number(e.target.value))}
               aria-label="Leverage"
             />
-          </div>
+          </LevTrack>
 
-          <div className="sbp-lev-tabs" role="tablist">
-            <span className="sbp-lev-custom">
-              <input
-                className="sbp-lev-custom-input"
+          <LevTabs role="tablist">
+            <LevCustom>
+              <LevCustomInput
                 type="number"
                 min={1}
                 max={MAX_LEVERAGE}
                 value={leverage}
-                onChange={(e) => setLeverage(Math.max(1, Math.min(MAX_LEVERAGE, Number(e.target.value))))}
+                onChange={(e) =>
+                  onLeverageChange(Math.max(1, Math.min(MAX_LEVERAGE, Number(e.target.value) || 1)))
+                }
                 aria-label="Custom leverage"
               />
-              <span className="sbp-lev-custom-suffix">x</span>
-            </span>
+              <LevCustomSuffix>x</LevCustomSuffix>
+            </LevCustom>
             {PRESETS.map((p) => (
-              <button
+              <LevTab
                 key={p}
                 type="button"
                 role="tab"
                 aria-selected={leverage === p}
-                className={`sbp-lev-tab${leverage === p ? ' sbp-lev-tab--active' : ''}`}
-                onClick={() => setLeverage(p)}
+                $active={leverage === p}
+                onClick={() => onLeverageChange(p)}
               >
                 {p}x
-              </button>
+              </LevTab>
             ))}
-          </div>
-        </div>
+          </LevTabs>
+        </Section>
 
-        {/* Duration */}
-        <div className="sbp-duration-row">
-          <span className="sbp-pretitle">Duration</span>
-          <button type="button" className="sbp-fund-chip">
-            <span className="sbp-fund-amt" style={{ fontSize: 14 }}>Perpetual</span>
-            <ChevDown size={14} />
-          </button>
-        </div>
-      </div>
+        {/* Duration (display-only placeholder — matches the original prototype) */}
+        <DurationRow>
+          <PreTitle>Duration</PreTitle>
+          <FundChip type="button" disabled>
+            <FundAmt style={{ fontSize: 14 }}>Perpetual</FundAmt>
+            <span aria-hidden>▾</span>
+          </FundChip>
+        </DurationRow>
+      </Body>
 
-      {/* Stats summary + UP/DOWN */}
-      <div className="sbp-stats-card" style={{ margin: '0 20px' }}>
-        <div className="sbp-stats-list">
-          <div className="sbp-stats-row">
-            <span className="sbp-stats-label">Estimated Entry</span>
-            <span className="sbp-stats-value">{estimatedEntry}</span>
-          </div>
-          <div className="sbp-stats-row">
-            <span className="sbp-stats-label">Liquidation if long</span>
-            <span className="sbp-stats-value sbp-stats-value--danger">{liqIfLong}</span>
-          </div>
-          <div className="sbp-stats-row">
-            <span className="sbp-stats-label">Margin required</span>
-            <span className="sbp-stats-value">{marginRequired}</span>
-          </div>
-          <div className="sbp-stats-row">
-            <span className="sbp-stats-label">Opening fee</span>
-            <span className="sbp-stats-value">{openingFee}</span>
-          </div>
-        </div>
+      {/* Stats + UP / DOWN */}
+      <StatsCard>
+        <StatsList>
+          <StatsRow>
+            <StatsLabel>Estimated Entry</StatsLabel>
+            <StatsValue>{estimatedEntry}</StatsValue>
+          </StatsRow>
+          <StatsRow>
+            <StatsLabel>Liquidation if long</StatsLabel>
+            <StatsValue $danger>{liqIfLong}</StatsValue>
+          </StatsRow>
+          <StatsRow>
+            <StatsLabel>Margin required</StatsLabel>
+            <StatsValue>{marginRequired}</StatsValue>
+          </StatsRow>
+          <StatsRow>
+            <StatsLabel>Opening fee</StatsLabel>
+            <StatsValue>{openingFee}</StatsValue>
+          </StatsRow>
+        </StatsList>
 
-        <div className="sbp-direction-row">
-          <button
+        <DirectionRow>
+          <DirectionButton
             type="button"
-            className="sbp-direction-btn sbp-direction-btn--up"
-            onClick={() => onUp?.({ bet, leverage })}
+            $variant="up"
+            disabled={upDisabled}
+            onClick={onUp}
+            aria-busy={isSubmittingUp}
           >
-            <ArrowUp />
-            UP
-          </button>
-          <button
+            <UpArrow />
+            {isSubmittingUp ? '...' : 'UP'}
+          </DirectionButton>
+          <DirectionButton
             type="button"
-            className="sbp-direction-btn sbp-direction-btn--down"
-            onClick={() => onDown?.({ bet, leverage })}
+            $variant="down"
+            disabled={downDisabled}
+            onClick={onDown}
+            aria-busy={isSubmittingDown}
           >
-            <ArrowDown />
-            DOWN
-          </button>
-        </div>
-      </div>
+            <DownArrow />
+            {isSubmittingDown ? '...' : 'DOWN'}
+          </DirectionButton>
+        </DirectionRow>
+      </StatsCard>
 
       {/* Deposit / Withdraw */}
-      <div className="sbp-dw-row">
-        <button type="button" className="sbp-dw-btn sbp-dw-btn--primary" onClick={onDeposit}>Deposit</button>
-        <button type="button" className="sbp-dw-btn sbp-dw-btn--secondary" onClick={onWithdraw}>Withdraw</button>
-      </div>
+      <DwRow>
+        <DwButton $variant="primary" onClick={onDeposit} type="button">
+          Deposit
+        </DwButton>
+        <DwButton $variant="secondary" onClick={onWithdraw} type="button">
+          Withdraw
+        </DwButton>
+      </DwRow>
 
       {/* Unrealized PnL */}
-      <div className="sbp-pnl-card">
-        <span className="sbp-pnl-label">
-          Unrealized PnL <HelpCircle />
-        </span>
-        <span className="sbp-pnl-value">$0</span>
-      </div>
-    </section>
+      <PnlCard>
+        <PnlLabel>
+          Unrealized PnL <HelpIcon color="textSubtle" width="14px" />
+        </PnlLabel>
+        <PnlValue>{unrealizedPnl}</PnlValue>
+      </PnlCard>
+    </Root>
   )
 }

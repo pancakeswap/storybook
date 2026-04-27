@@ -80,3 +80,9 @@ export type {
 
 export { EnableTradingModal } from './EnableTradingModal'
 export type { EnableTradingModalProps, EnableTradingPhase } from './EnableTradingModal'
+
+export { SimpleBetPanel } from './SimpleBetPanel'
+export type { SimpleBetPanelProps } from './SimpleBetPanel'
+
+export { SimpleTickerCard } from './SimpleTickerCard'
+export type { SimpleTickerCardProps } from './SimpleTickerCard'
