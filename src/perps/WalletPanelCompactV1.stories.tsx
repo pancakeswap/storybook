@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { WalletPanel } from './WalletPanel'
+import { WalletPanelCompactV1 } from './WalletPanelCompactV1'
 
-const meta: Meta<typeof WalletPanel> = {
-  title: 'Widgets/Wallet Panel',
-  component: WalletPanel,
+const meta: Meta<typeof WalletPanelCompactV1> = {
+  title: 'Widgets/Wallet Panel Compact V1',
+  component: WalletPanelCompactV1,
   parameters: { layout: 'centered' },
   argTypes: {
     initialTab:       { control: 'inline-radio', options: ['assets', 'tx', 'gift'] },
@@ -12,7 +12,7 @@ const meta: Meta<typeof WalletPanel> = {
   },
 }
 export default meta
-type Story = StoryObj<typeof WalletPanel>
+type Story = StoryObj<typeof WalletPanelCompactV1>
 
 export const Default: Story = {}
 
