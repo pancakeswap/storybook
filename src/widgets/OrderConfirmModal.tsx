@@ -105,6 +105,33 @@ const fmtPrice = (p?: string) =>
   p ? Number(p).toLocaleString(undefined, { maximumFractionDigits: 4 }) : '—'
 
 /**
+ * Maps the canonical Aster order-type enum onto a user-facing label that
+ * the consumer's translator can localize. Algo / advanced types fall back
+ * to the raw enum name (still readable, just not translated).
+ */
+const typeLabel = (
+  type: OrderType,
+  t: (key: string, options?: Record<string, string | number | undefined>) => string,
+): string => {
+  switch (type) {
+    case 'MARKET':
+      return t('Market')
+    case 'LIMIT':
+      return t('Limit')
+    case 'STOP':
+      return t('Stop Limit')
+    case 'STOP_MARKET':
+      return t('Stop Market')
+    case 'TAKE_PROFIT':
+      return t('Take Profit')
+    case 'TAKE_PROFIT_MARKET':
+      return t('Take Profit Market')
+    default:
+      return type
+  }
+}
+
+/**
  * Order-preview confirmation shown before placing the order. The
  * "Don't show this again" checkbox is purely a UI hint — the consumer
  * persists the preference (typically a localStorage atom) via the
@@ -142,7 +169,7 @@ export const OrderConfirmModal: React.FC<OrderConfirmModalProps> = ({
                 {details.side === 'BUY' ? t('Buy / Long') : t('Sell / Short')}
               </SideBadge>
               {' · '}
-              {details.type}
+              {typeLabel(details.type, t)}
             </Val>
           </Row>
           <Row>

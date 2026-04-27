@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useRef, useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
 import { Button, IconButton } from '../primitives/Button'
@@ -10,9 +11,10 @@ import { AddIcon } from '../primitives/Icons'
 import { PerpsPanel } from './primitives'
 
 export type OrderSide = 'BUY' | 'SELL'
-export type OrderTypeKey = 'market' | 'limit'
+export type OrderTypeKey = 'market' | 'limit' | 'stop-limit' | 'stop-market'
 export type SizeUnit = 'BASE' | 'QUOTE'
 export type MarginMode = 'CROSS' | 'ISOLATED'
+export type StopPriceSource = 'MARK' | 'LAST'
 
 /**
  * The full form-draft state. Mirrors pancake-frontend's
@@ -32,6 +34,13 @@ export interface OrderFormDraft {
   takeProfitPrice: string
   stopLossPrice: string
   timeInForce: 'GTC' | 'IOC' | 'FOK' | 'GTX'
+  /** Trigger price used by Stop Limit + Stop Market orders. */
+  stopPrice: string
+  /**
+   * Which oracle the trigger watches. `LAST` → Aster's `CONTRACT_PRICE`
+   * (last trade), `MARK` → `MARK_PRICE` (mark/index). Default `LAST`.
+   */
+  stopPriceSource: StopPriceSource
 }
 
 export interface OrderFormProps {
@@ -246,6 +255,75 @@ const PriceInput = styled.input`
   }
 `
 
+const StopSourceSelect = styled.button`
+  flex-shrink: 0;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  &:hover {
+    opacity: 0.8;
+  }
+`
+
+/**
+ * Floating panel anchored to the "Stop ▾" tab. Mirrors the visual of
+ * `DropdownMenu`'s portal panel but inlined here so the trigger can also
+ * act as the active-state tab — keeps the underline / colored-border
+ * cue consistent with the other tabs.
+ */
+const StopPanel = styled.div`
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 160px;
+  background: ${({ theme }) => theme.colors.input};
+  border-top: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-right: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-left: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 1px ${({ theme }) => theme.colors.secondary},
+    0 0 0 4px rgba(118, 69, 217, 0.2);
+  overflow: hidden;
+`
+
+const StopPanelItem = styled.button<{ $active: boolean }>`
+  background: ${({ $active, theme }) => ($active ? theme.colors.tertiary : 'transparent')};
+  border: 0;
+  padding: 10px 14px;
+  text-align: left;
+  font-family: Kanit, sans-serif;
+  font-size: 14px;
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  color: ${({ theme }) => theme.colors.text};
+  cursor: pointer;
+  &:hover {
+    background: ${({ theme }) => theme.colors.tertiary};
+  }
+`
+
+const TifSelect = styled.select`
+  flex-shrink: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Kanit, sans-serif;
+  cursor: pointer;
+`
+
 const InputTight = styled(Input)`
   height: 36px;
   font-size: 13px;
@@ -345,7 +423,58 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 
   const toggleTpSl = () => onDraftChange({ ...draft, tpSlEnabled: !draft.tpSlEnabled })
 
-  const needsLimitPrice = typeKey === 'limit'
+  const isStopOrder = typeKey === 'stop-limit' || typeKey === 'stop-market'
+  const needsLimitPrice = typeKey === 'limit' || typeKey === 'stop-limit'
+  const needsStopPrice = isStopOrder
+
+  // Stop-tab dropdown — anchored panel, same UX as primitives/DropdownMenu
+  // but inlined so the trigger can be a TypeTab and own the active underline.
+  const stopTabRef = useRef<HTMLButtonElement>(null)
+  const stopPanelRef = useRef<HTMLDivElement>(null)
+  const [stopMenuOpen, setStopMenuOpen] = useState(false)
+  const [stopMenuPos, setStopMenuPos] = useState({ top: 0, left: 0 })
+
+  useEffect(() => {
+    if (!stopMenuOpen || !stopTabRef.current || !stopPanelRef.current) return
+    const triggerRect = stopTabRef.current.getBoundingClientRect()
+    const panelRect = stopPanelRef.current.getBoundingClientRect()
+    const top = triggerRect.bottom + 4
+    const maxLeft = window.innerWidth - panelRect.width - 8
+    const left = Math.max(8, Math.min(triggerRect.left, maxLeft))
+    setStopMenuPos({ top, left })
+  }, [stopMenuOpen])
+
+  useEffect(() => {
+    if (!stopMenuOpen) return
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (
+        stopTabRef.current &&
+        !stopTabRef.current.contains(target) &&
+        stopPanelRef.current &&
+        !stopPanelRef.current.contains(target)
+      ) {
+        setStopMenuOpen(false)
+      }
+    }
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [stopMenuOpen])
+
+  const stopTabActive = isStopOrder
+  const stopTabLabel =
+    typeKey === 'stop-market' ? `${t('Stop Market')} ▾` : `${t('Stop Limit')} ▾`
+
+  const handleStopTabClick = () => {
+    // Always toggles the menu — selecting the visible variant via re-click
+    // is harmless. Mirrors asterdex's behavior on the same control.
+    setStopMenuOpen((open) => !open)
+  }
+
+  const pickStopVariant = (next: 'stop-limit' | 'stop-market') => {
+    onTypeKeyChange(next)
+    setStopMenuOpen(false)
+  }
 
   return (
     <Card>
@@ -355,6 +484,36 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             {k === 'market' ? t('Market') : t('Limit')}
           </TypeTab>
         ))}
+        <TypeTab
+          ref={stopTabRef}
+          $active={stopTabActive}
+          onClick={handleStopTabClick}
+          aria-haspopup="menu"
+          aria-expanded={stopMenuOpen}
+        >
+          {stopTabLabel}
+        </TypeTab>
+        {stopMenuOpen &&
+          typeof document !== 'undefined' &&
+          createPortal(
+            <StopPanel ref={stopPanelRef} style={{ top: stopMenuPos.top, left: stopMenuPos.left }} role="menu">
+              <StopPanelItem
+                $active={typeKey === 'stop-limit'}
+                role="menuitem"
+                onClick={() => pickStopVariant('stop-limit')}
+              >
+                {t('Stop Limit')}
+              </StopPanelItem>
+              <StopPanelItem
+                $active={typeKey === 'stop-market'}
+                role="menuitem"
+                onClick={() => pickStopVariant('stop-market')}
+              >
+                {t('Stop Market')}
+              </StopPanelItem>
+            </StopPanel>,
+            document.body,
+          )}
       </TypeTabs>
 
       <SideToggle>
@@ -394,6 +553,31 @@ export const OrderForm: React.FC<OrderFormProps> = ({
         </AvblValue>
       </AvblRow>
 
+      {needsStopPrice && (
+        <PriceInputRow>
+          <SizeLabel>{t('Stop')}</SizeLabel>
+          <PriceInput
+            value={draft.stopPrice}
+            onChange={(e) => onDraftChange({ ...draft, stopPrice: e.target.value })}
+            placeholder="0"
+            inputMode="decimal"
+            aria-label={t('Stop price')}
+          />
+          <StopSourceSelect
+            type="button"
+            onClick={() =>
+              onDraftChange({
+                ...draft,
+                stopPriceSource: draft.stopPriceSource === 'MARK' ? 'LAST' : 'MARK',
+              })
+            }
+            title={t('Trigger source')}
+          >
+            {draft.stopPriceSource === 'MARK' ? t('Mark') : t('Last')} ▾
+          </StopSourceSelect>
+        </PriceInputRow>
+      )}
+
       {needsLimitPrice && (
         <PriceInputRow>
           <SizeLabel>{t('Price')}</SizeLabel>
@@ -407,6 +591,27 @@ export const OrderForm: React.FC<OrderFormProps> = ({
           <UnitPicker as="div" onClick={undefined} style={{ cursor: 'default' }}>
             {quoteAsset}
           </UnitPicker>
+        </PriceInputRow>
+      )}
+
+      {typeKey === 'stop-limit' && (
+        <PriceInputRow>
+          <SizeLabel>{t('TIF')}</SizeLabel>
+          <Flex flex={1} />
+          <TifSelect
+            value={draft.timeInForce === 'GTX' ? 'GTC' : draft.timeInForce}
+            onChange={(e) =>
+              onDraftChange({
+                ...draft,
+                timeInForce: e.target.value as 'GTC' | 'IOC' | 'FOK',
+              })
+            }
+            aria-label={t('Time in force')}
+          >
+            <option value="GTC">GTC</option>
+            <option value="IOC">IOC</option>
+            <option value="FOK">FOK</option>
+          </TifSelect>
         </PriceInputRow>
       )}
 
@@ -496,8 +701,12 @@ export const OrderForm: React.FC<OrderFormProps> = ({
       <SummaryGrid>
         <SK>{t('Cost')}</SK>
         <SV>{preview.cost}</SV>
-        <SK>{t('Est. Liq. Price')}</SK>
-        <SV>{preview.liq}</SV>
+        {!isStopOrder && (
+          <>
+            <SK>{t('Est. Liq. Price')}</SK>
+            <SV>{preview.liq}</SV>
+          </>
+        )}
         <SK>{t('Fees')}</SK>
         <SV>{feeText}</SV>
       </SummaryGrid>

@@ -15,6 +15,8 @@ const seedDraft: OrderFormDraft = {
   takeProfitPrice: '',
   stopLossPrice: '',
   timeInForce: 'GTC',
+  stopPrice: '',
+  stopPriceSource: 'LAST',
 }
 
 const meta = {
@@ -59,6 +61,38 @@ export const Market: Story = {}
 
 export const Limit: Story = {
   args: { typeKey: 'limit', draft: { ...seedDraft, price: '78250' } },
+}
+
+export const StopLimitFilled: Story = {
+  args: {
+    typeKey: 'stop-limit',
+    draft: {
+      ...seedDraft,
+      stopPrice: '76000',
+      price: '75800',
+      quantity: '0.05',
+      stopPriceSource: 'LAST',
+      timeInForce: 'GTC',
+    },
+    preview: { cost: '15.18 USDT', liq: '—' },
+    sizePercent: 12,
+  },
+}
+
+export const StopMarketFilled: Story = {
+  args: {
+    typeKey: 'stop-market',
+    draft: {
+      ...seedDraft,
+      side: 'SELL',
+      stopPrice: '74500',
+      quantity: '0.05',
+      stopPriceSource: 'MARK',
+    },
+    cta: 'Sell / Short',
+    preview: { cost: '14.90 USDT', liq: '—' },
+    sizePercent: 12,
+  },
 }
 
 export const Selling: Story = {
