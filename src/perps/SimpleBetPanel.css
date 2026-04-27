@@ -1,0 +1,486 @@
+/* ── Simple-mode UP/DOWN bet panel (Figma 235:30152) ─────────
+ *  Right-rail "casino-style" perpetual entry — locked to a fixed
+ *  width (~506px) and stretched to full content height by the
+ *  page layout.
+ * ─────────────────────────────────────────────────────────── */
+
+.sbp-root {
+  width: 420px;
+  flex-shrink: 0;
+  background: var(--pcs-colors-card);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Kanit', sans-serif;
+  font-variant-numeric: tabular-nums;
+  color: var(--pcs-colors-text);
+  align-self: stretch;
+}
+
+/* ── Symbol header strip ─────────────────────────────────── */
+.sbp-head {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--pcs-colors-card-border);
+}
+
+.sbp-head-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  color: var(--pcs-colors-text);
+}
+
+.sbp-token-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #F7931A;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sbp-pair {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  padding: 0 6px;
+}
+
+.sbp-head-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.sbp-head-price {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+}
+.sbp-head-pnl {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+}
+
+/* ── Body (form) ─────────────────────────────────────────── */
+.sbp-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.sbp-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sbp-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sbp-pretitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pcs-colors-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.36px;
+}
+
+/* ── Wallet chip (fund balance) ──────────────────────────── */
+.sbp-fund-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: var(--pcs-colors-card-secondary, var(--pcs-colors-card));
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--pcs-colors-text);
+}
+.sbp-fund-chip:hover { filter: brightness(1.05); }
+.sbp-fund-chip svg { color: var(--pcs-colors-text-subtle); }
+.sbp-fund-amt { font-size: 12px; font-weight: 600; letter-spacing: 0.12px; }
+
+/* ── Bet input field ─────────────────────────────────────── */
+.sbp-bet-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--pcs-colors-input);
+  border: 1px solid var(--pcs-colors-input-secondary, var(--pcs-colors-card-border));
+  border-radius: 16px;
+}
+
+.sbp-bet-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pcs-colors-text-subtle);
+}
+
+.sbp-bet-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sbp-bet-input {
+  width: 70px;
+  border: 0;
+  background: transparent;
+  text-align: right;
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.24px;
+  color: var(--pcs-colors-text);
+  outline: none;
+  font-variant-numeric: tabular-nums;
+}
+.sbp-bet-input::-webkit-outer-spin-button,
+.sbp-bet-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.sbp-bet-token {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px 4px 4px;
+  border-radius: 999px;
+}
+.sbp-bet-token-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #26A17B;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  margin-right: 4px;
+}
+.sbp-bet-token-sym {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── % shortcut row ──────────────────────────────────────── */
+.sbp-pct-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+.sbp-pct-btn {
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12px;
+  color: var(--pcs-colors-primary60, var(--pcs-colors-primary));
+  padding: 4px;
+  cursor: pointer;
+}
+.sbp-pct-btn:hover { filter: brightness(1.1); }
+.sbp-pct-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--pcs-colors-card-border);
+}
+
+/* ── Leverage section ────────────────────────────────────── */
+.sbp-lev-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sbp-lev-value {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.28px;
+  line-height: 1.2;
+  color: var(--pcs-colors-text);
+}
+
+.sbp-zone {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--pcs-colors-success) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--pcs-colors-success) 40%, transparent);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pcs-colors-text);
+}
+.sbp-zone--warn {
+  background: color-mix(in srgb, var(--pcs-colors-warning) 20%, transparent);
+  border-color: color-mix(in srgb, var(--pcs-colors-warning) 40%, transparent);
+}
+.sbp-zone--danger {
+  background: color-mix(in srgb, var(--pcs-colors-failure) 20%, transparent);
+  border-color: color-mix(in srgb, var(--pcs-colors-failure) 40%, transparent);
+  color: var(--pcs-colors-failure);
+}
+.sbp-zone-info {
+  color: var(--pcs-colors-text-subtle);
+  display: inline-flex;
+}
+
+/* ── Leverage slider ─────────────────────────────────────── */
+.sbp-lev-track {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  background: linear-gradient(180deg, #E5FDFF 0%, #F3EFFF 100%);
+  border: 1px solid var(--pcs-colors-input-secondary, var(--pcs-colors-card-border));
+  border-radius: 24px;
+  overflow: visible;
+}
+.sbp-lev-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: var(--pcs-colors-warning);
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+}
+.sbp-lev-thumb {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--pcs-colors-warning);
+  border: 2px solid #fff;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  cursor: grab;
+}
+.sbp-lev-thumb:active { cursor: grabbing; }
+.sbp-lev-input {
+  position: absolute;
+  inset: -4px 0;
+  width: 100%;
+  height: calc(100% + 8px);
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* ── Leverage tab row (preset values + custom field) ─────── */
+.sbp-lev-tabs {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--pcs-colors-input-secondary, var(--pcs-colors-card-border));
+  background: var(--pcs-colors-input);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.sbp-lev-tab {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+}
+.sbp-lev-tab:hover { color: var(--pcs-colors-text); }
+.sbp-lev-tab--active {
+  background: var(--pcs-colors-input);
+  color: var(--pcs-colors-text);
+  font-weight: 600;
+  border-right: 1px solid var(--pcs-colors-input-secondary, var(--pcs-colors-card-border));
+}
+
+.sbp-lev-custom {
+  width: 78px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: var(--pcs-colors-input);
+  border-right: 1px solid var(--pcs-colors-input-secondary, var(--pcs-colors-card-border));
+}
+.sbp-lev-custom-input {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--pcs-colors-text);
+  outline: none;
+}
+.sbp-lev-custom-suffix {
+  font-size: 13px;
+  color: var(--pcs-colors-text-subtle);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  padding-left: 4px;
+}
+
+/* ── Duration row ────────────────────────────────────────── */
+.sbp-duration-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Stats summary ───────────────────────────────────────── */
+.sbp-stats-card {
+  background: var(--pcs-colors-card-secondary, var(--pcs-colors-input));
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.sbp-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 14px 12px;
+}
+.sbp-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sbp-stats-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pcs-colors-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.24px;
+}
+.sbp-stats-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pcs-colors-text);
+  text-transform: uppercase;
+  letter-spacing: 0.24px;
+}
+.sbp-stats-value--danger { color: var(--pcs-colors-failure); }
+
+/* ── UP / DOWN buttons ───────────────────────────────────── */
+.sbp-direction-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+
+.sbp-direction-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 56px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-bottom-width: 4px;
+  border-radius: 16px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.18px;
+  color: var(--pcs-colors-inverted-contrast, #fff);
+  cursor: pointer;
+  transition: filter 0.12s, transform 0.06s;
+}
+.sbp-direction-btn:hover  { filter: brightness(1.08); }
+.sbp-direction-btn:active { transform: translateY(1px); border-bottom-width: 2px; }
+.sbp-direction-btn--up   { background: var(--pcs-colors-success); }
+.sbp-direction-btn--down { background: var(--pcs-colors-failure); }
+
+/* ── Deposit/Withdraw tabs (bottom) ──────────────────────── */
+.sbp-dw-row {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--pcs-colors-card-border);
+}
+.sbp-dw-btn {
+  flex: 1;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s;
+}
+.sbp-dw-btn:hover { filter: brightness(1.08); }
+.sbp-dw-btn--primary {
+  background: var(--pcs-colors-primary);
+  color: var(--pcs-colors-inverted-contrast, #fff);
+  border-bottom-color: rgba(0, 0, 0, 0.2);
+}
+.sbp-dw-btn--secondary {
+  background: var(--pcs-colors-input);
+  color: var(--pcs-colors-primary60, var(--pcs-colors-primary));
+}
+
+/* ── Unrealized PnL row ──────────────────────────────────── */
+.sbp-pnl-card {
+  margin: 0 20px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--pcs-colors-card-secondary, var(--pcs-colors-input));
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 16px;
+}
+.sbp-pnl-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pcs-colors-text-subtle);
+}
+.sbp-pnl-label svg { color: var(--pcs-colors-text-subtle); }
+.sbp-pnl-value {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.22px;
+  color: var(--pcs-colors-text);
+}
