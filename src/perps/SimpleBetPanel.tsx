@@ -173,9 +173,9 @@ export function SimpleBetPanel({
             </span>
           </div>
 
-          <div className="sbp-lev-track" aria-hidden>
-            <span className="sbp-lev-fill" style={{ width: `${fillPct}%` }} />
-            <span className="sbp-lev-thumb" style={{ left: `${fillPct}%` }} />
+          <div className="sbp-lev-track">
+            <span className="sbp-lev-fill" style={{ width: `${fillPct}%` }} aria-hidden="true" />
+            <span className="sbp-lev-thumb" style={{ left: `${fillPct}%` }} aria-hidden="true" />
             <input
               className="sbp-lev-input"
               type="range"
@@ -187,7 +187,7 @@ export function SimpleBetPanel({
             />
           </div>
 
-          <div className="sbp-lev-tabs" role="tablist">
+          <div className="sbp-lev-tabs">
             <span className="sbp-lev-custom">
               <input
                 className="sbp-lev-custom-input"
@@ -204,8 +204,8 @@ export function SimpleBetPanel({
               <button
                 key={p}
                 type="button"
-                role="tab"
-                aria-selected={leverage === p}
+                aria-pressed={leverage === p}
+                aria-label={`Set leverage to ${p}x`}
                 className={`sbp-lev-tab${leverage === p ? ' sbp-lev-tab--active' : ''}`}
                 onClick={() => setLeverage(p)}
               >
