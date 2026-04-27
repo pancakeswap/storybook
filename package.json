@@ -47,9 +47,25 @@
     "styled-system": "^5.1.5"
   },
   "peerDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "styled-components": "6.0.7"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "@types/react-dom": {
+      "optional": true
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "^18.2.21",
+      "@types/react-dom": "^18.0.6"
+    }
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.1",
