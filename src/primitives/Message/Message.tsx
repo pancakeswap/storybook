@@ -87,7 +87,7 @@ const Message: React.FC<React.PropsWithChildren<MessageProps>> = ({
       <MessageContainer variant={variant} {...props}>
         <FlexDiv>
           {showIcon && (
-            <Box mr="12px" style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+            <Box mr="12px" style={{ display: 'flex', alignItems: 'flex-start', flexShrink: 0, lineHeight: 0 }}>
               {icon ?? (
                 <Icon
                   style={{ color: iconColors[variant] }}

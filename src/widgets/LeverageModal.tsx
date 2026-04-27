@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
-import Slider from '../primitives/Slider/Slider'
+import { BunnySlider } from './BunnySlider'
 import { Text } from '../primitives/Text'
 import Modal from '../primitives/Modal/Modal'
 import { ModalV2 } from '../primitives/Modal/ModalV2'
@@ -134,14 +134,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
             </StepButton>
           </Stepper>
 
-          {/*
-           * `width="100%"` is forwarded to the Slider's outer Box. Without
-           * it the Box has no intrinsic width (its inner BunnySlider /
-           * BarBackground / StyledInput are all `position: absolute`) and
-           * shrinks to 0 inside this flex column — which leaves the bunny
-           * + track collapsed against the left edge.
-           */}
-          <Slider
+          <BunnySlider
             name="perp-leverage"
             min={minLeverage}
             max={maxLeverage}
