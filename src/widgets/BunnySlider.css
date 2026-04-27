@@ -14,7 +14,7 @@
 .bs-root {
   position: relative;
   width: 100%;
-  height: 48px;
+  height: 32px;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -26,34 +26,23 @@
   filter: grayscale(100%);
 }
 
-/* Track line — pixel-thin lavender line across the slider */
+/* Track line — 2px lavender bar that runs through the slider centre.
+ * Starts at left=14 so the bunny butt SVG (15px wide) sits cleanly
+ * before it, then continues all the way to the right edge. */
 .bs-track {
   position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 24px;
-  height: 1px;
+  left: 14px;
+  right: 0;
+  top: 18px;
+  height: 2px;
   background: var(--pcs-colors-input-secondary, #D7CAEC);
   pointer-events: none;
 }
 
-/* Bunny butt — fixed at the left start. Width 17.3 px in Figma. */
-.bs-back {
-  position: absolute;
-  left: 0;
-  top: 15px;
-  width: 17.3px;
-  height: 17.3px;
-  pointer-events: none;
-  background-image: url('../primitives/Slider/svg/bunnybutt.svg');
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-
-/* Teal middle body — fills from after the butt to the thumb position */
+/* Teal middle body — fill bar painted on top of the track. */
 .bs-fill {
   position: absolute;
-  left: 8px;
+  left: 14px;
   top: 18px;
   height: 10px;
   background: var(--pcs-colors-primary, #1FC7D4);
@@ -61,17 +50,33 @@
   transition: width 0.06s linear;
 }
 
-/* Front body — the bunny head thumb that moves with the value */
+/* Bunny butt — the small back of the bunny that always sits before the
+ * track. SVG natural size is 15×32. */
+.bs-back {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 15px;
+  height: 32px;
+  pointer-events: none;
+  background-image: url('../primitives/Slider/svg/bunnybutt.svg');
+  background-size: 15px 32px;
+  background-repeat: no-repeat;
+}
+
+/* Front body — the bunny head thumb that follows the value. SVG is 24×32
+ * — render it at its natural size so the head sits above the bar with
+ * its body sat inside the fill. */
 .bs-front {
   position: absolute;
   top: 0;
-  width: 32px;
-  height: 48px;
+  width: 24px;
+  height: 32px;
   pointer-events: none;
   background-image: url('../primitives/Slider/svg/bunnyhead-main.svg');
-  background-position: bottom center;
+  background-position: center top;
   background-repeat: no-repeat;
-  background-size: 32px auto;
+  background-size: 24px 32px;
   transition: left 0.06s linear, transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .bs-front--max {
@@ -108,15 +113,15 @@
 .bs-input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 32px;
-  height: 48px;
+  width: 24px;
+  height: 32px;
   background: transparent;
   border: 0;
   cursor: grab;
 }
 .bs-input::-moz-range-thumb {
-  width: 32px;
-  height: 48px;
+  width: 24px;
+  height: 32px;
   background: transparent;
   border: 0;
   cursor: grab;

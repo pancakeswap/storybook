@@ -13,6 +13,8 @@ export interface MarketRow {
   priceChangePercent?: string
   /** Raw 24h quote volume (USDT). */
   quoteVolume?: string
+  /** Max leverage available on this market (e.g. 100 → "100x" pill). */
+  maxLeverage?: number
 }
 
 export interface MarketsDropdownProps {
@@ -43,7 +45,8 @@ const Root = styled.div`
   border-radius: 16px;
   padding: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  max-height: 420px;
+  height: 50vh;
+  max-height: 50vh;
   display: flex;
   flex-direction: column;
 `
@@ -144,6 +147,19 @@ const Symbol = styled(Flex)`
   align-items: center;
   gap: 8px;
   font-weight: 600;
+  min-width: 0;
+`
+
+/** Mirrors SymbolHeader's LevPill — small purple-on-tertiary leverage chip. */
+const LevPill = styled.span`
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.secondary};
+  flex-shrink: 0;
+  line-height: 1.4;
 `
 
 const CoinBadge = styled.span`
@@ -336,6 +352,7 @@ export const MarketsDropdown: React.FC<MarketsDropdownProps> = ({
                     )}
                   </CoinBadge>
                   <span>{r.symbol}</span>
+                  {r.maxLeverage != null && <LevPill>{r.maxLeverage}x</LevPill>}
                 </Symbol>
                 <Val>{fmtPrice(r.lastPrice)}</Val>
                 <Val $tone={changeNum >= 0 ? 'up' : 'down'}>{fmtPct(r.priceChangePercent)}</Val>

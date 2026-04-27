@@ -38,7 +38,43 @@ export interface OpenOrderRow {
   status: string
 }
 
-export type PositionsPanelTab = 'positions' | 'orders' | 'history'
+export interface TradeHistoryRow {
+  /** Stable React key — typically the tradeId. */
+  id: string | number
+  /** Local date string, e.g. '2025-04-17'. */
+  date: string
+  /** Local time string, e.g. '01:37:26'. */
+  time: string
+  symbol: string
+  side: 'BUY' | 'SELL'
+  /** Pre-formatted execution price. */
+  price: string
+  /** Pre-formatted quantity, e.g. '30 USDT' or '0.012 BTC'. */
+  quantity: string
+  /** Pre-formatted fee with unit. */
+  fee: string
+  /** Pre-formatted realized P&L (signed), e.g. '+0.01 USDT'. */
+  realizedProfit: string
+}
+
+export interface TransactionHistoryRow {
+  /** Stable React key — typically the txId. */
+  id: string | number
+  date: string
+  time: string
+  /** Transaction type, e.g. 'Realized PNL', 'Funding', 'Deposit'. */
+  type: string
+  /** Pre-formatted amount with unit, e.g. '30 USDT'. */
+  amount: string
+  symbol: string
+}
+
+export type PositionsPanelTab =
+  | 'positions'
+  | 'orders'
+  | 'history'
+  | 'trades'
+  | 'transactions'
 
 export interface PositionsPanelProps {
   /** Controlled active tab. */
@@ -46,6 +82,12 @@ export interface PositionsPanelProps {
   onTabChange: (tab: PositionsPanelTab) => void
   positions: PositionRow[]
   openOrders: OpenOrderRow[]
+  /** Fills the user has executed (settled trades). */
+  tradeHistory?: TradeHistoryRow[]
+  /** Account ledger entries — funding, realized PnL, deposits, etc. */
+  transactionHistory?: TransactionHistoryRow[]
+  /** Share-to-social callback for a trade row (optional). */
+  onShareTrade?: (trade: TradeHistoryRow) => void
   /**
    * Hook-like function called inside each position row to get the live
    * mark price for that symbol. MUST obey the rules of hooks (always
@@ -101,8 +143,37 @@ const Empty = styled(Flex)`
 const PositionsTable = styled.div`
   display: grid;
   grid-template-columns: repeat(8, minmax(min-content, 1fr)) auto;
-  gap: 6px 16px;
+  /* Cells sit flush horizontally so the row-hover background reads as
+   * one continuous strip. Per-cell horizontal padding (applied below)
+   * keeps content from touching. */
+  column-gap: 0;
+  row-gap: 6px;
   font-variant-numeric: tabular-nums;
+  & > * {
+    padding: 20px 18px;
+  }
+`
+
+/* Wraps a row's cells with display:contents so the cells stay direct
+ * children of the parent grid, while letting `:hover > *` paint every
+ * cell in the row with one continuous card-secondary background. */
+const RowGroup = styled.div`
+  display: contents;
+  & > * {
+    transition: background 0.12s;
+  }
+  &:hover > * {
+    background: ${({ theme }) => theme.colors.cardSecondary};
+  }
+  /* Round the outer ends of the strip so it reads as a pill. */
+  &:hover > *:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+  &:hover > *:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 `
 
 const ActionCell = styled(Flex)`
@@ -111,11 +182,11 @@ const ActionCell = styled(Flex)`
 `
 
 const TpSlCell = styled.div`
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.2;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
 `
 
 const TpSlValue = styled.span<{ $kind: 'tp' | 'sl' }>`
@@ -125,8 +196,70 @@ const TpSlValue = styled.span<{ $kind: 'tp' | 'sl' }>`
 const OrdersTable = styled.div`
   display: grid;
   grid-template-columns: repeat(7, minmax(min-content, 1fr)) auto;
-  gap: 6px 16px;
+  /* Match the Positions table spacing: zero column-gap so row hover
+   * reads as one strip, and 16px cell padding for breathing room. */
+  column-gap: 0;
+  row-gap: 6px;
   font-variant-numeric: tabular-nums;
+  & > * {
+    padding: 20px 18px;
+  }
+`
+
+const TradesTable = styled.div`
+  display: grid;
+  grid-template-columns: 148px 156px 1fr 1fr 1fr 1fr;
+  column-gap: 0;
+  row-gap: 6px;
+  font-variant-numeric: tabular-nums;
+  & > * {
+    padding: 20px 18px;
+  }
+`
+
+const TxTable = styled.div`
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  column-gap: 0;
+  row-gap: 6px;
+  font-variant-numeric: tabular-nums;
+  & > * {
+    padding: 20px 18px;
+  }
+`
+
+/** Stacked date / time cell — the figma renders these on two lines. */
+const StackedTime = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  & > span:last-child {
+    color: ${({ theme }) => theme.colors.textSubtle};
+  }
+`
+
+/** Stacked symbol / side cell used in Trade History. */
+const StackedSymbol = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 1.5;
+`
+
+const ShareBtn = styled.button`
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  &:hover { color: ${({ theme }) => theme.colors.text}; }
 `
 
 const Th = styled(Text).attrs({ fontSize: '10px', color: 'textSubtle' })`
@@ -134,7 +267,7 @@ const Th = styled(Text).attrs({ fontSize: '10px', color: 'textSubtle' })`
   letter-spacing: 0.04em;
 `
 
-const Td = styled(Text).attrs({ fontSize: '12px' })`
+const Td = styled(Text).attrs({ fontSize: '14px' })`
   font-variant-numeric: tabular-nums;
 `
 
@@ -232,6 +365,9 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
   onTabChange,
   positions,
   openOrders,
+  tradeHistory = [],
+  transactionHistory = [],
+  onShareTrade,
   useMarkPriceForSymbol,
   computeLiqPrice,
   onClosePosition,
@@ -241,7 +377,7 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
   t = identity,
 }) => {
   const theme = useTheme()
-  const tabOrder: PositionsPanelTab[] = ['positions', 'orders', 'history']
+  const tabOrder: PositionsPanelTab[] = ['positions', 'orders', 'history', 'trades', 'transactions']
   const activeIndex = tabOrder.indexOf(tab)
 
   return (
@@ -253,7 +389,13 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
         <UnderlineTab>
           {t('Open Orders')} ({openOrders.length})
         </UnderlineTab>
-        <UnderlineTab>{t('History')}</UnderlineTab>
+        <UnderlineTab>{t('Order History')}</UnderlineTab>
+        <UnderlineTab>
+          {t('Trade History')} ({tradeHistory.length})
+        </UnderlineTab>
+        <UnderlineTab>
+          {t('Transaction History')} ({transactionHistory.length})
+        </UnderlineTab>
       </UnderlineTabs>
 
       <Body>
@@ -276,7 +418,7 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
               <Th>{t('TP/SL')}</Th>
               <Th />
               {positions.map((p) => (
-                <React.Fragment key={p.id}>
+                <RowGroup key={p.id}>
                   <PositionTableRow
                     p={p}
                     useMarkPriceForSymbol={useMarkPriceForSymbol}
@@ -286,7 +428,7 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
                     closingSymbol={closingSymbol}
                     t={t}
                   />
-                </React.Fragment>
+                </RowGroup>
               ))}
             </PositionsTable>
           ))}
@@ -309,7 +451,7 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
               <Th>{t('Status')}</Th>
               <Th />
               {openOrders.map((o) => (
-                <React.Fragment key={o.id}>
+                <RowGroup key={o.id}>
                   <Td bold>{o.symbol}</Td>
                   <Td style={{ color: o.side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
                     {o.side}
@@ -319,10 +461,12 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
                   <Td>{o.origQty}</Td>
                   <Td>{o.executedQty}</Td>
                   <Td>{o.status}</Td>
-                  <Button scale="xs" variant="secondary" onClick={() => onCancelOrder(o)}>
-                    {t('Cancel')}
-                  </Button>
-                </React.Fragment>
+                  <ActionCell>
+                    <Button scale="xs" variant="secondary" onClick={() => onCancelOrder(o)}>
+                      {t('Cancel')}
+                    </Button>
+                  </ActionCell>
+                </RowGroup>
               ))}
             </OrdersTable>
           ))}
@@ -330,10 +474,106 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
         {tab === 'history' && (
           <Empty>
             <Text fontSize="12px" color="textSubtle">
-              {t('History coming soon')}
+              {t('Order history coming soon')}
             </Text>
           </Empty>
         )}
+
+        {tab === 'trades' &&
+          (tradeHistory.length === 0 ? (
+            <Empty>
+              <Text fontSize="12px" color="textSubtle">
+                {t('No trades yet')}
+              </Text>
+            </Empty>
+          ) : (
+            <TradesTable>
+              <Th>{t('Time')}</Th>
+              <Th>{t('Symbol')}</Th>
+              <Th>{t('Price')}</Th>
+              <Th>{t('Quantity')}</Th>
+              <Th>{t('Fee')}</Th>
+              <Th>{t('Realized profit')}</Th>
+              {tradeHistory.map((tr) => {
+                const sideColor = tr.side === 'BUY' ? theme.colors.success : theme.colors.failure
+                const profitUp = tr.realizedProfit.startsWith('+')
+                return (
+                  <RowGroup key={tr.id}>
+                    <Td as="div">
+                      <StackedTime>
+                        <span>{tr.date}</span>
+                        <span>{tr.time}</span>
+                      </StackedTime>
+                    </Td>
+                    <Td as="div">
+                      <StackedSymbol>
+                        <span>{tr.symbol}</span>
+                        <span style={{ color: sideColor, fontSize: 12 }}>
+                          {tr.side === 'BUY' ? t('Buy') : t('Sell')}
+                        </span>
+                      </StackedSymbol>
+                    </Td>
+                    <Td>{tr.price}</Td>
+                    <Td>{tr.quantity}</Td>
+                    <Td>{tr.fee}</Td>
+                    <Td as="div">
+                      <Flex alignItems="center" style={{ gap: 8 }}>
+                        <span style={{ color: profitUp ? theme.colors.success : theme.colors.failure }}>
+                          {tr.realizedProfit}
+                        </span>
+                        {onShareTrade && (
+                          <ShareBtn
+                            type="button"
+                            onClick={() => onShareTrade(tr)}
+                            aria-label={t('Share trade')}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                              <path
+                                d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </ShareBtn>
+                        )}
+                      </Flex>
+                    </Td>
+                  </RowGroup>
+                )
+              })}
+            </TradesTable>
+          ))}
+
+        {tab === 'transactions' &&
+          (transactionHistory.length === 0 ? (
+            <Empty>
+              <Text fontSize="12px" color="textSubtle">
+                {t('No transactions yet')}
+              </Text>
+            </Empty>
+          ) : (
+            <TxTable>
+              <Th>{t('Time')}</Th>
+              <Th>{t('Type')}</Th>
+              <Th>{t('Amount')}</Th>
+              <Th>{t('Symbol')}</Th>
+              {transactionHistory.map((x) => (
+                <RowGroup key={x.id}>
+                  <Td as="div">
+                    <StackedTime>
+                      <span>{x.date}</span>
+                      <span>{x.time}</span>
+                    </StackedTime>
+                  </Td>
+                  <Td>{x.type}</Td>
+                  <Td>{x.amount}</Td>
+                  <Td>{x.symbol}</Td>
+                </RowGroup>
+              ))}
+            </TxTable>
+          ))}
       </Body>
     </Card>
   )

@@ -4,13 +4,13 @@ import { fn } from 'storybook/test'
 import { MarketsDropdown, type MarketRow } from './MarketsDropdown'
 
 const MOCK_MARKETS: MarketRow[] = [
-  { symbol: 'BTCUSDT', lastPrice: '84185.5', priceChangePercent: '-0.52', quoteVolume: '19401160' },
-  { symbol: 'ETHUSDT', lastPrice: '3245.8', priceChangePercent: '1.04', quoteVolume: '9831422' },
-  { symbol: 'SOLUSDT', lastPrice: '182.35', priceChangePercent: '3.14', quoteVolume: '4120999' },
-  { symbol: 'BNBUSDT', lastPrice: '608.1', priceChangePercent: '-0.18', quoteVolume: '2810500' },
-  { symbol: 'XRPUSDT', lastPrice: '2.412', priceChangePercent: '5.67', quoteVolume: '1920345' },
-  { symbol: 'DOGEUSDT', lastPrice: '0.1821', priceChangePercent: '-2.33', quoteVolume: '1128870' },
-  { symbol: 'AVAXUSDT', lastPrice: '41.27', priceChangePercent: '0.44', quoteVolume: '740120' },
+  { symbol: 'BTCUSDT', lastPrice: '84185.5', priceChangePercent: '-0.52', quoteVolume: '19401160', maxLeverage: 125 },
+  { symbol: 'ETHUSDT', lastPrice: '3245.8',  priceChangePercent: '1.04',  quoteVolume: '9831422',  maxLeverage: 100 },
+  { symbol: 'SOLUSDT', lastPrice: '182.35',  priceChangePercent: '3.14',  quoteVolume: '4120999',  maxLeverage: 75 },
+  { symbol: 'BNBUSDT', lastPrice: '608.1',   priceChangePercent: '-0.18', quoteVolume: '2810500',  maxLeverage: 75 },
+  { symbol: 'XRPUSDT', lastPrice: '2.412',   priceChangePercent: '5.67',  quoteVolume: '1920345',  maxLeverage: 50 },
+  { symbol: 'DOGEUSDT',lastPrice: '0.1821',  priceChangePercent: '-2.33', quoteVolume: '1128870',  maxLeverage: 50 },
+  { symbol: 'AVAXUSDT',lastPrice: '41.27',   priceChangePercent: '0.44',  quoteVolume: '740120',   maxLeverage: 25 },
 ]
 
 const meta = {

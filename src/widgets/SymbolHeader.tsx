@@ -380,8 +380,6 @@ export const SymbolHeader: React.FC<SymbolHeaderProps> = ({
           )
         : null}
 
-      <LevPill>{leverage}x</LevPill>
-
       <Price aria-label={`Last price: ${lastPrice ?? ''}`}>{lastPrice ?? '—'}</Price>
 
       <Stats role="list">
