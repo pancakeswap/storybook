@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './SimplePerpsPage.css'
 import { SimpleBetPanel } from '../widgets/SimpleBetPanel'
-import { PositionsPanel } from '../widgets/PositionsPanel'
+import { PositionsPanel, type PositionsPanelTab } from '../widgets/PositionsPanel'
 import { DepositModal } from '../widgets/DepositModal'
 
 export interface SimplePerpsPageProps {
@@ -43,6 +43,7 @@ function ModeBar() {
 export function SimplePerpsPage({ initialPair: _initialPair = 'BTC/USD' }: SimplePerpsPageProps) {
   const [tf, setTf] = useState<Tf>('1d')
   const [depositOpen, setDepositOpen] = useState(false)
+  const [positionsTab, setPositionsTab] = useState<PositionsPanelTab>('positions')
 
   return (
     <section className="sp-root" aria-label="Perpetuals · Simple mode">
@@ -114,7 +115,17 @@ export function SimplePerpsPage({ initialPair: _initialPair = 'BTC/USD' }: Simpl
 
           {/* Positions table */}
           <div className="sp-positions-card">
-            <PositionsPanel />
+            <PositionsPanel
+              tab={positionsTab}
+              onTabChange={setPositionsTab}
+              positions={[]}
+              openOrders={[]}
+              useMarkPriceForSymbol={() => 0}
+              computeLiqPrice={() => 0}
+              onClosePosition={() => {}}
+              onEditTpSl={() => {}}
+              onCancelOrder={() => {}}
+            />
           </div>
         </div>
 
