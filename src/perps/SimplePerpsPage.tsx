@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import './SimplePerpsPage.css'
-import { Navbar } from './Navbar'
 import { SimpleBetPanel } from './SimpleBetPanel'
-import { PositionsTable } from './PositionsTable'
-import { DepositModal } from './DepositModal'
-import { ModalV2 } from '../ui/widgets/Modal'
+import { PositionsPanel } from '../widgets/PositionsPanel'
+import { DepositModal } from '../widgets/DepositModal'
 
 export interface SimplePerpsPageProps {
   initialPair?: string
@@ -27,9 +25,6 @@ export function SimplePerpsPage({ initialPair: _initialPair = 'BTC/USD' }: Simpl
 
   return (
     <section className="sp-root" aria-label="Perpetuals · Simple mode">
-      {/* Navbar with Simple/Pro toggle (Simple = active here) */}
-      <Navbar mode="simple" walletBalance="$6,488.98" onDeposit={() => setDepositOpen(true)} />
-
       <div className="sp-body">
         {/* ── Left column: ticker + chart + positions ──────── */}
         <div className="sp-left">
@@ -96,7 +91,15 @@ export function SimplePerpsPage({ initialPair: _initialPair = 'BTC/USD' }: Simpl
 
           {/* Positions table */}
           <div className="sp-positions-card">
-            <PositionsTable />
+            <PositionsPanel
+              tab="positions"
+              onTabChange={() => {}}
+              positions={[]}
+              openOrders={[]}
+              onClosePosition={() => {}}
+              onEditTpSl={() => {}}
+              onCancelOrder={() => {}}
+            />
           </div>
         </div>
 
@@ -105,9 +108,21 @@ export function SimplePerpsPage({ initialPair: _initialPair = 'BTC/USD' }: Simpl
       </div>
 
       {/* Deposit modal — same widget the Pro page uses */}
-      <ModalV2 isOpen={depositOpen} onDismiss={() => setDepositOpen(false)} closeOnOverlayClick>
-        <DepositModal open={depositOpen} onClose={() => setDepositOpen(false)} />
-      </ModalV2>
+      <DepositModal
+        isOpen={depositOpen}
+        onClose={() => setDepositOpen(false)}
+        step="select"
+        evmAddress="0x1234…abcd"
+        assets={[]}
+        onSelectAsset={() => {}}
+        amount=""
+        onAmountChange={() => {}}
+        onPercentClick={() => {}}
+        submitState="idle"
+        canContinue={false}
+        onContinue={() => {}}
+        onBack={() => setDepositOpen(false)}
+      />
     </section>
   )
 }
