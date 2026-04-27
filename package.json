@@ -26,6 +26,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:lib": "vite build --config vite.lib.config.ts",
+    "dev:lib": "vite build --config vite.lib.config.ts --watch",
     "prepare": "npm run build:lib",
     "lint": "eslint .",
     "preview": "vite preview",
