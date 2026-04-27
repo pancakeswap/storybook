@@ -1,0 +1,616 @@
+/* ── Wallet Panel — 3 composition buckets (Spot / Perp / Farming) ─── */
+
+.wp-root {
+  width: 400px;
+  max-width: 100%;
+  background: var(--pcs-colors-card);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 24px;
+  padding: 16px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--pcs-shadows-card);
+  font-family: 'Kanit', sans-serif;
+  color: var(--pcs-colors-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Header chips (wallet + chain) ──────────────────────────── */
+.wp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.wp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 8px 10px 8px 8px;
+  background: var(--pcs-colors-input);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--pcs-colors-text);
+  transition: filter 0.12s;
+}
+.wp-chip:hover { filter: brightness(1.05); }
+
+.wp-chip-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--pcs-colors-card);
+  border: 1px solid var(--pcs-colors-card-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pcs-colors-secondary);
+  flex-shrink: 0;
+}
+
+.wp-chip-addr {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.wp-chain-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #1A1A1A;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #F0B90B;
+  flex-shrink: 0;
+}
+
+.wp-chev { color: var(--pcs-colors-text-subtle); flex-shrink: 0; }
+
+/* ── Tabs (Assets / Transactions / Gift) ────────────────────── */
+.wp-tabs {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 29px;
+}
+
+.wp-tab {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.wp-tab:hover { color: var(--pcs-colors-text); }
+.wp-tab--active { color: var(--pcs-colors-secondary); }
+
+/* ── Total + PnL hero ───────────────────────────────────────── */
+.wp-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wp-hero-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wp-hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pcs-colors-text-subtle);
+}
+
+.wp-eye {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  display: inline-flex;
+  cursor: pointer;
+  color: var(--pcs-colors-text-subtle);
+}
+.wp-eye:hover { color: var(--pcs-colors-text); }
+
+.wp-total-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wp-total {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--pcs-colors-text);
+}
+
+.wp-hero-sub {
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+}
+.wp-hero-sub .wp-up   { color: var(--pcs-colors-success); font-weight: 600; }
+.wp-hero-sub .wp-down { color: var(--pcs-colors-failure); font-weight: 600; }
+
+/* ── Segmented control (24H / 7D / All) ─────────────────────── */
+.wp-seg {
+  display: inline-flex;
+  align-items: center;
+  background: var(--pcs-colors-input);
+  border-radius: 999px;
+  padding: 2px;
+  height: 28px;
+}
+
+.wp-seg-btn {
+  border: 0;
+  background: transparent;
+  color: var(--pcs-colors-text-subtle);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 0 10px;
+  height: 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s;
+}
+.wp-seg-btn--active {
+  background: var(--pcs-colors-card);
+  color: var(--pcs-colors-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+}
+
+/* ── PnL pill ───────────────────────────────────────────────── */
+.wp-pnl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+.wp-pnl-pill--lg {
+  padding: 4px 10px;
+  font-size: 14px;
+  gap: 4px;
+}
+.wp-pnl-pill--up {
+  background: color-mix(in srgb, var(--pcs-colors-success) 20%, transparent);
+  color: var(--pcs-colors-success);
+}
+.wp-pnl-pill--down {
+  background: color-mix(in srgb, var(--pcs-colors-failure) 20%, transparent);
+  color: var(--pcs-colors-failure);
+}
+
+/* ── Composition strip (top overview) ───────────────────────── */
+.wp-overview {
+  background: var(--pcs-colors-input);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wp-comp-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pcs-colors-text-subtle) 18%, transparent);
+  display: flex;
+  gap: 2px;
+  overflow: hidden;
+}
+.wp-comp-seg { height: 100%; }
+
+.wp-comp-legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.wp-comp-leg-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.wp-comp-leg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.wp-comp-leg-label { color: var(--pcs-colors-text-subtle); }
+.wp-comp-leg-pct   { color: var(--pcs-colors-text); font-weight: 700; }
+
+/* Bucket accent colors */
+.wp-spot    { color: var(--pcs-colors-secondary); }
+.wp-perp    { color: var(--pcs-colors-warning); }
+.wp-farming { color: var(--pcs-colors-success); }
+
+.wp-spot-bg    { background: var(--pcs-colors-secondary); }
+.wp-perp-bg    { background: var(--pcs-colors-warning); }
+.wp-farming-bg { background: var(--pcs-colors-success); }
+
+/* ── Hide small balances toggle pill ────────────────────────── */
+.wp-hide-small {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 8px 12px;
+  background: var(--pcs-colors-input);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  width: fit-content;
+}
+.wp-hide-small-label {
+  font-size: 14px;
+  color: var(--pcs-colors-text-subtle);
+}
+
+/* ── Bucket list ────────────────────────────────────────────── */
+.wp-buckets {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Bucket card ────────────────────────────────────────────── */
+.wp-bucket {
+  background: var(--pcs-colors-card);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.wp-bucket--expanded {
+  border-color: color-mix(in srgb, var(--pcs-colors-secondary) 35%, var(--pcs-colors-card-border));
+  box-shadow: var(--pcs-shadows-card);
+}
+
+.wp-bucket-head {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--pcs-colors-text);
+}
+
+.wp-bucket-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wp-bucket-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.wp-bucket-icon--spot {
+  background: color-mix(in srgb, var(--pcs-colors-secondary) 18%, transparent);
+  color: var(--pcs-colors-secondary);
+}
+.wp-bucket-icon--perp {
+  background: color-mix(in srgb, var(--pcs-colors-warning) 22%, transparent);
+  color: var(--pcs-colors-warning);
+}
+.wp-bucket-icon--farming {
+  background: color-mix(in srgb, var(--pcs-colors-success) 20%, transparent);
+  color: var(--pcs-colors-success);
+}
+
+.wp-bucket-meta { flex: 1; min-width: 0; }
+.wp-bucket-label    { font-size: 15px; font-weight: 700; color: var(--pcs-colors-text); }
+.wp-bucket-sublabel { font-size: 12px; color: var(--pcs-colors-text-subtle); }
+
+.wp-bucket-amount-wrap { text-align: right; }
+.wp-bucket-amount { font-size: 16px; font-weight: 700; color: var(--pcs-colors-text); }
+.wp-bucket-pnl-row { margin-top: 3px; display: flex; justify-content: flex-end; }
+
+.wp-bucket-chev {
+  color: var(--pcs-colors-text-subtle);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.wp-bucket-chev--up { transform: rotate(180deg); }
+
+.wp-bucket-pct-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wp-pct-track {
+  flex: 1;
+  height: 4px;
+  background: color-mix(in srgb, var(--pcs-colors-text-subtle) 18%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.wp-pct-fill { height: 100%; border-radius: 999px; }
+.wp-pct-label {
+  font-size: 11px;
+  color: var(--pcs-colors-text-subtle);
+  font-weight: 600;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ── Bucket details ─────────────────────────────────────────── */
+.wp-details {
+  padding: 0 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wp-hairline {
+  height: 1px;
+  background: var(--pcs-colors-card-border);
+}
+.wp-desc {
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+  line-height: 1.45;
+}
+
+.wp-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pcs-colors-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0 4px;
+  margin-bottom: 4px;
+}
+
+/* ── Token row ──────────────────────────────────────────────── */
+.wp-token-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+}
+
+.wp-token-icon {
+  position: relative;
+  flex-shrink: 0;
+}
+.wp-token-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--pcs-colors-input);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pcs-colors-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+.wp-chain-badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid var(--pcs-colors-card);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  font-weight: 700;
+  color: #fff;
+}
+.wp-chain-badge--bnb { background: #1A1A1A; }
+.wp-chain-badge--eth { background: #627EEA; }
+
+.wp-tk-meta { flex: 1; min-width: 0; }
+.wp-tk-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.wp-tk-symbol { font-size: 15px; font-weight: 700; color: var(--pcs-colors-text); }
+.wp-tk-name   { font-size: 13px; color: var(--pcs-colors-text-subtle); }
+.wp-tk-amount { font-size: 13px; font-weight: 600; color: var(--pcs-colors-text); margin-top: 2px; }
+
+.wp-tk-right { text-align: right; }
+.wp-tk-value { font-size: 15px; font-weight: 700; color: var(--pcs-colors-text); }
+.wp-tk-pnl   { margin-top: 4px; display: flex; justify-content: flex-end; }
+
+/* ── Margin bar (Perp) ──────────────────────────────────────── */
+.wp-margin-card {
+  background: var(--pcs-colors-input);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wp-margin-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--pcs-colors-text-subtle);
+}
+.wp-margin-row strong { color: var(--pcs-colors-text); font-weight: 600; }
+.wp-margin-track {
+  height: 6px;
+  background: color-mix(in srgb, var(--pcs-colors-text-subtle) 18%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.wp-margin-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--pcs-colors-warning) 0%, var(--pcs-colors-failure) 100%);
+}
+.wp-margin-avail {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+.wp-margin-avail .label { color: var(--pcs-colors-text-subtle); }
+.wp-margin-avail .value { color: var(--pcs-colors-text); font-weight: 700; }
+
+/* ── Position row (Perp) ────────────────────────────────────── */
+.wp-pos-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 4px;
+}
+.wp-pos-meta { flex: 1; min-width: 0; }
+.wp-pos-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wp-pos-pair { font-size: 14px; font-weight: 700; color: var(--pcs-colors-text); }
+.wp-pos-side {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.wp-pos-side--long {
+  background: color-mix(in srgb, var(--pcs-colors-success) 20%, transparent);
+  color: var(--pcs-colors-success);
+}
+.wp-pos-side--short {
+  background: color-mix(in srgb, var(--pcs-colors-failure) 20%, transparent);
+  color: var(--pcs-colors-failure);
+}
+.wp-pos-detail { font-size: 12px; color: var(--pcs-colors-text-subtle); margin-top: 2px; }
+.wp-pos-right { text-align: right; }
+.wp-pos-unreal { font-size: 14px; font-weight: 700; color: var(--pcs-colors-success); }
+.wp-pos-pnl { margin-top: 3px; display: flex; justify-content: flex-end; }
+
+/* ── CAKE rewards card (Farming) ────────────────────────────── */
+.wp-cake-card {
+  background: linear-gradient(111.68deg,
+    color-mix(in srgb, var(--pcs-colors-secondary) 12%, var(--pcs-colors-input)) 0%,
+    color-mix(in srgb, var(--pcs-colors-primary) 12%, var(--pcs-colors-input)) 100%);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.wp-cake-meta { flex: 1; min-width: 0; }
+.wp-cake-label { font-size: 12px; font-weight: 500; color: var(--pcs-colors-text-subtle); }
+.wp-cake-amt   { font-size: 16px; font-weight: 700; color: var(--pcs-colors-text); }
+.wp-cake-usd   { font-size: 12px; color: var(--pcs-colors-text-subtle); }
+
+/* ── LP position row (Farming) ──────────────────────────────── */
+.wp-lp-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 4px;
+}
+.wp-lp-pair-icon {
+  width: 36px;
+  height: 36px;
+  position: relative;
+  flex-shrink: 0;
+}
+.wp-lp-pair-icon .wp-token-circle:nth-child(1) {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+.wp-lp-pair-icon .wp-token-circle:nth-child(2) {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+  border: 2px solid var(--pcs-colors-card);
+}
+.wp-lp-meta { flex: 1; min-width: 0; }
+.wp-lp-head { display: flex; align-items: center; gap: 6px; }
+.wp-lp-pair { font-size: 14px; font-weight: 700; color: var(--pcs-colors-text); }
+.wp-lp-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+.wp-lp-tag--in {
+  background: color-mix(in srgb, var(--pcs-colors-success) 20%, transparent);
+  color: var(--pcs-colors-success);
+}
+.wp-lp-tag--out {
+  background: color-mix(in srgb, var(--pcs-colors-warning) 22%, transparent);
+  color: var(--pcs-colors-warning);
+}
+.wp-lp-detail { font-size: 12px; color: var(--pcs-colors-text-subtle); margin-top: 2px; }
+.wp-lp-detail .apr { color: var(--pcs-colors-success); font-weight: 600; }
+.wp-lp-value { font-size: 14px; font-weight: 700; color: var(--pcs-colors-text); }
+
+/* ── Action buttons row inside details ──────────────────────── */
+.wp-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* ── Bridge link footer ─────────────────────────────────────── */
+.wp-bridge {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+.wp-bridge-btn {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--pcs-colors-primary);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+}
+.wp-bridge-btn:hover { filter: brightness(1.1); }
