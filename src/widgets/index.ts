@@ -29,7 +29,7 @@ export { PerpsErrorMessage } from './PerpsErrorMessage'
 export type { PerpsErrorMessageProps, PerpsErrorVariant } from './PerpsErrorMessage'
 
 export { WithdrawModal } from './WithdrawModal'
-export type { WithdrawModalProps } from './WithdrawModal'
+export type { WithdrawModalProps, WithdrawStep, WithdrawTokenRow } from './WithdrawModal'
 
 export { OrderConfirmModal } from './OrderConfirmModal'
 export type { OrderConfirmModalProps, OrderConfirmDetails, OrderSide, OrderType } from './OrderConfirmModal'
