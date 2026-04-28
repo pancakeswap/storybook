@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { OrderBook } from '../widgets/OrderBook'
 import { OrderForm, type OrderFormDraft } from '../widgets/OrderForm'
 import { DepositModal } from '../widgets/DepositModal'
@@ -6,8 +6,30 @@ import { SymbolHeader } from '../widgets/SymbolHeader'
 import { AccountPanel } from '../widgets/AccountPanel'
 import { PositionsPanel } from '../widgets/PositionsPanel'
 import { MarketsDropdown, type MarketRow } from '../widgets/MarketsDropdown'
+import { MobilePerpsPage } from './MobilePerpsPage'
 import '../widgets/perps.css'
 import './PerpsPage.css'
+
+/** Mobile breakpoint — at or below this width the page renders the
+ *  dedicated MobilePerpsPage layout instead of the desktop
+ *  chart+OB+OrderForm grid. */
+const MOBILE_MAX_WIDTH = 767
+
+function useIsMobile() {
+  const get = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH}px)`).matches
+  const [isMobile, setIsMobile] = useState<boolean>(get)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH}px)`)
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+    setIsMobile(mq.matches)
+    mq.addEventListener?.('change', handler)
+    return () => mq.removeEventListener?.('change', handler)
+  }, [])
+  return isMobile
+}
 
 export interface PerpsPageProps {
   initialPair?: string
@@ -28,9 +50,17 @@ export function PerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: PerpsPagePr
   const [, setEditTpSlId] = useState<string | null>(null)
   const [favorites, setFavorites] = useState<string[]>([])
   const [activeSymbol, setActiveSymbol] = useState('BTCUSDT')
+  const isMobile = useIsMobile()
 
   const handleClosePosition = (_id: string) => {
     // demo stub — real positions would come from consumer state
+  }
+
+  // Below the mobile breakpoint, swap the desktop chart+OB+OrderForm grid
+  // for the dedicated MobilePerpsPage layout so the same story responds
+  // correctly on mobile viewports.
+  if (isMobile) {
+    return <MobilePerpsPage initialPair={activeSymbol} />
   }
 
   return (

@@ -50,6 +50,9 @@ export const ModalCloseButton: React.FC<
         onDismiss?.();
       }}
       aria-label="Close the dialog"
+      // Pulls the close-button 4px closer to the modal's right edge so
+      // the icon optically aligns with the header padding.
+      mr="-4px"
       {...props}
     >
       <CloseIcon color="textSubtle" width="24px" />
