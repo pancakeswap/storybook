@@ -1,7 +1,9 @@
 import type { Preview, Decorator } from '@storybook/react-vite'
 import { ThemeProvider as SCThemeProvider } from 'styled-components'
-import { ThemeProvider } from '../src/ui/ThemeProvider'
-import { pcsTheme } from '../src/ui/components/theme'
+import { ThemeProvider } from '../src/design-system/ThemeProvider'
+import { pcsTheme } from '../src/primitives/theme'
+import { MatchBreakpointsProvider } from '../src/contexts'
+import { ModalProvider } from '../src/primitives/Modal'
 import { PhoneFrame, TabletFrame } from './DeviceFrame'
 import './preview.css'
 
@@ -10,7 +12,11 @@ const withTheme: Decorator = (Story, context) => {
   return (
     <ThemeProvider forcedTheme={theme}>
       <SCThemeProvider theme={pcsTheme}>
-        <Story />
+        <MatchBreakpointsProvider>
+          <ModalProvider>
+            <Story />
+          </ModalProvider>
+        </MatchBreakpointsProvider>
       </SCThemeProvider>
     </ThemeProvider>
   )

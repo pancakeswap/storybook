@@ -1,0 +1,63 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.lib.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "verbatimModuleSyntax": false,
+    "isolatedModules": true,
+
+    /* Type emission only — vite handles JS, vite-plugin-dts handles d.ts. */
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noEmit": false
+  },
+  "include": [
+    "src/lib-shims.d.ts",
+    "src/index.ts",
+    "src/primitives/**/*.ts",
+    "src/primitives/**/*.tsx",
+    "src/contexts/**/*.ts",
+    "src/contexts/**/*.tsx",
+    "src/hooks/**/*.ts",
+    "src/hooks/**/*.tsx",
+    "src/util/**/*.ts",
+    "src/design-system/breakpoints.ts",
+    "src/design-system/ThemeProvider.tsx",
+    "src/design-system/theme.ts",
+    "src/design-system/tokens.ts",
+    "src/widgets/index.ts",
+    "src/widgets/primitives.tsx",
+    "src/widgets/AccountPanel.tsx",
+    "src/widgets/BookTradesPanel.tsx",
+    "src/widgets/ChartPanel.tsx",
+    "src/widgets/DepositModal.tsx",
+    "src/widgets/EnableTradingModal.tsx",
+    "src/widgets/LeverageModal.tsx",
+    "src/widgets/MarketsDropdown.tsx",
+    "src/widgets/OrderBook.tsx",
+    "src/widgets/OrderConfirmModal.tsx",
+    "src/widgets/OrderForm.tsx",
+    "src/widgets/PerpsErrorMessage.tsx",
+    "src/widgets/PositionsPanel.tsx",
+    "src/widgets/RecentTrades.tsx",
+    "src/widgets/SymbolHeader.tsx",
+    "src/widgets/TpSlModal.tsx",
+    "src/widgets/WithdrawModal.tsx"
+  ],
+  "exclude": [
+    "**/*.stories.ts",
+    "**/*.stories.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
+}

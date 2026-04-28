@@ -1,0 +1,83 @@
+name: Rebuild dist
+
+# Why this exists:
+# pancake-frontend imports `@pancakeswap/storybook/widgets` from a git ref,
+# resolving to the committed `dist/` (no `prepare` script — that path was
+# OOMing on Vercel). That means whenever someone edits `src/` and forgets to
+# run `pnpm build:lib` before pushing, downstream consumers see stale code.
+# This workflow rebuilds dist on push and commits it back so devs only have
+# to touch src/.
+#
+# Plan B (later, before launch): publish as a real npm package via GitHub
+# Packages and pin a version in pancake-frontend; this workflow becomes a
+# release/publish job instead of a commit-back job.
+
+on:
+  push:
+    branches-ignore:
+      - 'gh-pages'
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'vite.lib.config.ts'
+      - 'tsconfig*.json'
+
+# Default GITHUB_TOKEN can write to the repo with `contents: write`. No PAT
+# required.
+permissions:
+  contents: write
+
+# Avoid stacking redundant rebuilds when a branch gets multiple pushes in
+# quick succession — the most recent push wins.
+concurrency:
+  group: rebuild-dist-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+
+    # Belt-and-braces guard against the bot triggering itself. The
+    # `[skip ci]` token in the commit message is the primary mechanism
+    # (GitHub honors it), this `if` catches any path where it gets
+    # stripped (rebases, force-pushes, etc.).
+    if: github.actor != 'github-actions[bot]'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need full ref so we can push back without "shallow update not
+          # allowed".
+          fetch-depth: 0
+          # Use the default token; explicit so the push step inherits it.
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          # pnpm-lock.yaml is v9 → pin pnpm major to match. action-setup@v4
+          # requires either this `version` key or a `packageManager` field
+          # in package.json; we don't have the latter.
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build library bundle
+        run: pnpm build:lib
+
+      - name: Commit dist if changed
+        run: |
+          if [[ -z "$(git status --porcelain dist/)" ]]; then
+            echo "dist/ unchanged — nothing to commit"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add dist/
+          git commit -m "ci: rebuild dist [skip ci]"
+          git push origin HEAD:${GITHUB_REF#refs/heads/}
