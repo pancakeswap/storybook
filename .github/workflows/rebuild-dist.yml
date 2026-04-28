@@ -54,6 +54,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: pnpm/action-setup@v4
+        with:
+          # pnpm-lock.yaml is v9 → pin pnpm major to match. action-setup@v4
+          # requires either this `version` key or a `packageManager` field
+          # in package.json; we don't have the latter.
+          version: 9
 
       - uses: actions/setup-node@v4
         with:
