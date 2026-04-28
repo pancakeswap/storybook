@@ -2,6 +2,12 @@ import { useState } from 'react'
 import styled from 'styled-components'
 import { SimpleBetPanel, type SimpleBetPanelProps } from '../widgets/SimpleBetPanel'
 import { SimpleTickerCard } from '../widgets/SimpleTickerCard'
+import { SimpleChartCard } from '../widgets/SimpleChartCard'
+import {
+  SimplePositionsCard,
+  type SimplePositionRow,
+  type SimplePositionsTab,
+} from '../widgets/SimplePositionsCard'
 import { DepositModal } from '../widgets/DepositModal'
 
 export interface SimplePerpsPageProps {
@@ -10,6 +16,36 @@ export interface SimplePerpsPageProps {
 
 const TFS = ['1d', '1h', '30m', '15m', '5m'] as const
 type Tf = (typeof TFS)[number]
+
+const Y_TICKS = ['670', '660', '650', '640', '630', '620', '610', 'USD'] as const
+const X_TICKS = [
+  '5:00 AM',
+  '9:00 AM',
+  '1:00 PM',
+  '5:00 PM',
+  '9:00 PM',
+  '1:00 AM',
+  '5:00 AM',
+  '9:00 AM',
+  '1:00 PM',
+] as const
+
+const SAMPLE_POSITIONS: readonly SimplePositionRow[] = [
+  {
+    id: 'bnb-long',
+    symbol: 'BNB',
+    chainLabel: 'BNB CHAIN',
+    iconColor: '#F3BA2F',
+    direction: 'up',
+    unrealizedPnl: '+$10.09',
+    pnlSign: 'positive',
+    entryPrice: '$649.98',
+    liqPrice: '$637.00',
+    liqDistancePct: 90,
+    liqStatus: 'safe',
+    liqStatusLabel: 'Safe',
+  },
+] as const
 
 // ── Page styled-components (port of SimplePerpsPage.css) ──────
 
@@ -172,242 +208,6 @@ const LeftCol = styled.div`
     ${({ theme }) => theme.colors.card} 0%,
     ${({ theme }) => theme.colors.input} 100%
   );
-`
-
-// Chart card
-const ChartCard = styled.div`
-  width: 1058px;
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom-width: 2px;
-  border-radius: 24px;
-  padding: 16px 24px 24px;
-  height: 480px;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`
-
-const ChartTfRow = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 24px;
-`
-
-const ChartTfBtn = styled.button<{ $active: boolean }>`
-  border: 0;
-  background: transparent;
-  font-family: inherit;
-  padding: 0;
-  font-size: ${({ $active }) => ($active ? '13px' : '14px')};
-  font-weight: ${({ $active }) => ($active ? 700 : 400)};
-  color: ${({ $active, theme }) => ($active ? theme.colors.primary : theme.colors.textSubtle)};
-  cursor: pointer;
-`
-
-const ChartCanvas = styled.div`
-  position: relative;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-`
-
-const ChartGrid = styled.div`
-  flex: 1;
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 40px;
-  gap: 8px;
-`
-
-const ChartSvgWrap = styled.div`
-  position: relative;
-  overflow: visible;
-`
-
-const ChartYAxis = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.textSubtle};
-  text-align: left;
-  padding-top: 6px;
-  padding-bottom: 24px;
-`
-
-const ChartXAxis = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.textSubtle};
-  padding-top: 8px;
-`
-
-const ChartCurrentPill = styled.span`
-  position: absolute;
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 12px;
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.invertedContrast};
-  font-size: 16px;
-  font-family: 'Kanit', sans-serif;
-  font-weight: 600;
-  pointer-events: none;
-`
-
-// Positions card frame
-const PositionsCard = styled.div`
-  width: 1058px;
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom-width: 2px;
-  border-radius: 24px;
-  overflow: hidden;
-`
-
-/* ── Inline simple positions table (Figma-specific layout) ──────── */
-
-const PosTabsRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 0 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
-`
-
-const PosTab = styled.button<{ $active?: boolean }>`
-  border: 0;
-  background: transparent;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: ${({ $active }) => ($active ? 600 : 400)};
-  color: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.textSubtle)};
-  cursor: pointer;
-  padding: 16px 0;
-  border-bottom: 2px solid ${({ $active, theme }) => ($active ? theme.colors.text : 'transparent')};
-  &:hover { color: ${({ theme }) => theme.colors.text}; }
-`
-
-const PosTable = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 56px;
-  align-items: center;
-`
-
-const PosTh = styled.div`
-  padding: 16px;
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.textSubtle};
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-`
-
-const PosTd = styled.div`
-  padding: 16px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.text};
-  font-variant-numeric: tabular-nums;
-`
-
-const PosTokenCell = styled(PosTd)`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-`
-
-const PosTokenIcon = styled.span`
-  display: inline-flex;
-  width: 40px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #F3BA2F;
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-`
-
-const PosTokenMeta = styled.div`
-  display: flex;
-  flex-direction: column;
-  line-height: 1.3;
-`
-
-const PosTokenSymbol = styled.span`
-  font-size: 16px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text};
-`
-
-const PosTokenSub = styled.span`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.textSubtle};
-`
-
-const PosDirectionPill = styled(PosTd)`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid ${({ theme }) => theme.colors.success};
-  color: ${({ theme }) => theme.colors.success};
-  font-size: 14px;
-  font-weight: 600;
-  width: fit-content;
-  margin: 16px;
-`
-
-const PosPnl = styled(PosTd)`
-  color: ${({ theme }) => theme.colors.success};
-  font-weight: 600;
-  font-size: 16px;
-`
-
-const PosLiqDistance = styled(PosTd)`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-`
-
-const PosLiqTrack = styled.div`
-  flex: 1;
-  height: 6px;
-  border-radius: 999px;
-  background: ${({ theme }) => theme.colors.input};
-  overflow: hidden;
-  max-width: 94px;
-`
-
-const PosLiqFill = styled.div`
-  height: 100%;
-  width: 90%;
-  background: ${({ theme }) => theme.colors.success};
-  border-radius: 999px;
-`
-
-const PosCloseBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  margin: 16px 12px;
-  padding: 0;
-  border: 0;
-  border-radius: 8px;
-  background: ${({ theme }) => theme.colors.input};
-  color: ${({ theme }) => theme.colors.failure};
-  cursor: pointer;
-  &:hover { filter: brightness(0.95); }
 `
 
 /* ── Collateral picker modal (opens when + is clicked on My Perp Fund) ── */
@@ -714,6 +514,7 @@ const mockBetPanelArgs = (
 
 export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProps = {}) {
   const [tf, setTf] = useState<Tf>('1d')
+  const [positionsTab, setPositionsTab] = useState<SimplePositionsTab>('positions')
   const [depositOpen, setDepositOpen] = useState(false)
   const [collateralOpen, setCollateralOpen] = useState(false)
   const [bet, setBet] = useState('')
@@ -737,157 +538,24 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
             nextFunding="4h 12m"
           />
 
-          <ChartCard>
-            <ChartTfRow role="tablist">
-              {TFS.map((t) => (
-                <ChartTfBtn
-                  key={t}
-                  type="button"
-                  role="tab"
-                  aria-selected={tf === t}
-                  $active={tf === t}
-                  onClick={() => setTf(t)}
-                >
-                  {t}
-                </ChartTfBtn>
-              ))}
-            </ChartTfRow>
-            <ChartCanvas>
-              <ChartGrid>
-                <ChartSvgWrap>
-                  <svg
-                    viewBox="0 0 1000 360"
-                    preserveAspectRatio="none"
-                    style={{ width: '100%', height: '100%', display: 'block' }}
-                    aria-hidden
-                  >
-                    <defs>
-                      <linearGradient id="simple-chart-fill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#1FC7D4" stopOpacity="0.30" />
-                        <stop offset="100%" stopColor="#1FC7D4" stopOpacity="0.02" />
-                      </linearGradient>
-                    </defs>
-                    {/* Filled area below the curve */}
-                    <path
-                      d="
-                        M 0 290
-                        C 60 290, 110 280, 170 250
-                        C 230 220, 290 175, 360 145
-                        C 420 120, 470 110, 510 130
-                        C 560 150, 590 195, 660 230
-                        C 720 260, 770 280, 830 250
-                        C 880 230, 920 195, 960 200
-                        L 1000 200
-                        L 1000 360
-                        L 0 360
-                        Z
-                      "
-                      fill="url(#simple-chart-fill)"
-                    />
-                    {/* Line on top */}
-                    <path
-                      d="
-                        M 0 290
-                        C 60 290, 110 280, 170 250
-                        C 230 220, 290 175, 360 145
-                        C 420 120, 470 110, 510 130
-                        C 560 150, 590 195, 660 230
-                        C 720 260, 770 280, 830 250
-                        C 880 230, 920 195, 960 200
-                        L 1000 200
-                      "
-                      fill="none"
-                      stroke="#1FC7D4"
-                      strokeWidth="2"
-                    />
-                    {/* Dashed current-price line at end */}
-                    <line
-                      x1="0"
-                      y1="200"
-                      x2="990"
-                      y2="200"
-                      stroke="#1FC7D4"
-                      strokeWidth="1"
-                      strokeDasharray="4 4"
-                      opacity="0.7"
-                    />
-                  </svg>
-                  <ChartCurrentPill style={{ right: -8, top: 'calc(200/360 * 100% - 14px)' }}>
-                    640
-                  </ChartCurrentPill>
-                </ChartSvgWrap>
-                <ChartYAxis aria-hidden>
-                  <span>670</span>
-                  <span>660</span>
-                  <span>650</span>
-                  <span>640</span>
-                  <span>630</span>
-                  <span>620</span>
-                  <span>610</span>
-                  <span>USD</span>
-                </ChartYAxis>
-              </ChartGrid>
-              <ChartXAxis aria-hidden>
-                <span>5:00 AM</span>
-                <span>9:00 AM</span>
-                <span>1:00 PM</span>
-                <span>5:00 PM</span>
-                <span>9:00 PM</span>
-                <span>1:00 AM</span>
-                <span>5:00 AM</span>
-                <span>9:00 AM</span>
-                <span>1:00 PM</span>
-              </ChartXAxis>
-            </ChartCanvas>
-          </ChartCard>
+          <SimpleChartCard
+            timeframe={tf}
+            timeframes={TFS}
+            onTimeframeChange={(next) => setTf(next as Tf)}
+            points={[]}
+            currentPriceLabel="640"
+            yTicks={Y_TICKS}
+            xTicks={X_TICKS}
+          />
 
-          <PositionsCard>
-            <PosTabsRow role="tablist">
-              <PosTab type="button" role="tab" aria-selected $active>
-                Positions
-              </PosTab>
-              <PosTab type="button" role="tab" aria-selected={false}>
-                Open Orders
-              </PosTab>
-              <PosTab type="button" role="tab" aria-selected={false}>
-                Transaction history
-              </PosTab>
-            </PosTabsRow>
-            <PosTable role="table">
-              <PosTh>Token</PosTh>
-              <PosTh>Direction</PosTh>
-              <PosTh>Unrealized PnL</PosTh>
-              <PosTh>Entry Price</PosTh>
-              <PosTh>Liq. Price</PosTh>
-              <PosTh>Distance to Liq</PosTh>
-              <PosTh />
-
-              <PosTokenCell>
-                <PosTokenIcon>B</PosTokenIcon>
-                <PosTokenMeta>
-                  <PosTokenSymbol>BNB</PosTokenSymbol>
-                  <PosTokenSub>BNB CHAIN</PosTokenSub>
-                </PosTokenMeta>
-              </PosTokenCell>
-              <PosDirectionPill>
-                ↑ Up/Long
-              </PosDirectionPill>
-              <PosPnl>+$10.09</PosPnl>
-              <PosTd>$649.98</PosTd>
-              <PosTd>$637.00</PosTd>
-              <PosLiqDistance>
-                <PosLiqTrack>
-                  <PosLiqFill />
-                </PosLiqTrack>
-                <span>Safe</span>
-              </PosLiqDistance>
-              <PosCloseBtn type="button" aria-label="Close position">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                </svg>
-              </PosCloseBtn>
-            </PosTable>
-          </PositionsCard>
+          <SimplePositionsCard
+            tab={positionsTab}
+            onTabChange={setPositionsTab}
+            positions={SAMPLE_POSITIONS}
+            openOrders={[]}
+            historyEmpty
+            onClosePosition={() => undefined}
+          />
         </LeftCol>
 
         {/* Right column: UP/DOWN bet panel */}

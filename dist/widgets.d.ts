@@ -3,6 +3,15 @@ import { IStyledComponent } from 'styled-components';
 import { ResponsiveValue } from 'styled-system';
 import { SimpleBetPanel } from './SimpleBetPanel';
 import { SimpleBetPanelProps } from './SimpleBetPanel';
+import { SimpleChartCard } from './SimpleChartCard';
+import { SimpleChartCardProps } from './SimpleChartCard';
+import { SimpleOpenOrderRow } from './SimplePositionsCard';
+import { SimplePositionDirection } from './SimplePositionsCard';
+import { SimplePositionLiqStatus } from './SimplePositionsCard';
+import { SimplePositionRow } from './SimplePositionsCard';
+import { SimplePositionsCard } from './SimplePositionsCard';
+import { SimplePositionsCardProps } from './SimplePositionsCard';
+import { SimplePositionsTab } from './SimplePositionsCard';
 import { SimpleTickerCard } from './SimpleTickerCard';
 import { SimpleTickerCardProps } from './SimpleTickerCard';
 import { Theme } from 'styled-system';
@@ -1058,6 +1067,24 @@ export declare interface RecentTradesProps {
 export { SimpleBetPanel }
 
 export { SimpleBetPanelProps }
+
+export { SimpleChartCard }
+
+export { SimpleChartCardProps }
+
+export { SimpleOpenOrderRow }
+
+export { SimplePositionDirection }
+
+export { SimplePositionLiqStatus }
+
+export { SimplePositionRow }
+
+export { SimplePositionsCard }
+
+export { SimplePositionsCardProps }
+
+export { SimplePositionsTab }
 
 export { SimpleTickerCard }
 
