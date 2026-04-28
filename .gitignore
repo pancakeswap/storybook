@@ -11,7 +11,9 @@ lerna-debug.log*
 node_modules
 
 # Build output
-dist
+# `dist/` is checked in so consumers (pancake-frontend via github:tarball)
+# don't run `vite build` during pnpm install — that pulled in every devDep
+# (storybook, vitest, playwright, …) and OOM'd Vercel's build container.
 dist-ssr
 storybook-static
 
