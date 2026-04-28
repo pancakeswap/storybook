@@ -1989,8 +1989,8 @@ var Tt = O.div`
 			children: o("Close")
 		})] })
 	] });
-}, Fn = ({ tab: e, onTabChange: t, positions: n, openOrders: i, tradeHistory: a = [], transactionHistory: o = [], onShareTrade: s, useMarkPriceForSymbol: c, computeLiqPrice: l, onClosePosition: u, onEditTpSl: d, onCancelOrder: f, closingSymbol: p = null, t: h = Nn }) => {
-	let g = k(), v = [
+}, Fn = ({ tab: e, onTabChange: t, positions: n, openOrders: i, tradeHistory: a = [], transactionHistory: o = [], onShareTrade: s, useMarkPriceForSymbol: c, computeLiqPrice: l, onClosePosition: u, onEditTpSl: d, onCancelOrder: f, closingSymbol: p = null, cancellingOrderId: h = null, t: g = Nn }) => {
+	let v = k(), y = [
 		"positions",
 		"orders",
 		"history",
@@ -1998,30 +1998,30 @@ var Tt = O.div`
 		"transactions"
 	];
 	return /* @__PURE__ */ M(yn, { children: [/* @__PURE__ */ M(R, {
-		activeIndex: v.indexOf(e),
-		onItemClick: (e) => t(v[e]),
+		activeIndex: y.indexOf(e),
+		onItemClick: (e) => t(y[e]),
 		children: [
 			/* @__PURE__ */ M(L, { children: [
-				h("Positions"),
+				g("Positions"),
 				" (",
 				n.length,
 				")"
 			] }),
 			/* @__PURE__ */ M(L, { children: [
-				h("Open Orders"),
+				g("Open Orders"),
 				" (",
 				i.length,
 				")"
 			] }),
-			/* @__PURE__ */ j(L, { children: h("Order History") }),
+			/* @__PURE__ */ j(L, { children: g("Order History") }),
 			/* @__PURE__ */ M(L, { children: [
-				h("Trade History"),
+				g("Trade History"),
 				" (",
 				a.length,
 				")"
 			] }),
 			/* @__PURE__ */ M(L, { children: [
-				h("Transaction History"),
+				g("Transaction History"),
 				" (",
 				o.length,
 				")"
@@ -2031,16 +2031,16 @@ var Tt = O.div`
 		e === "positions" && (n.length === 0 ? /* @__PURE__ */ j(xn, { children: /* @__PURE__ */ j(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: h("No open positions")
+			children: g("No open positions")
 		}) }) : /* @__PURE__ */ M(Sn, { children: [
-			/* @__PURE__ */ j(J, { children: h("Symbol") }),
-			/* @__PURE__ */ j(J, { children: h("Size") }),
-			/* @__PURE__ */ j(J, { children: h("Entry") }),
-			/* @__PURE__ */ j(J, { children: h("Mark") }),
-			/* @__PURE__ */ j(J, { children: h("Lev") }),
-			/* @__PURE__ */ j(J, { children: h("Liq") }),
-			/* @__PURE__ */ j(J, { children: h("uPnL") }),
-			/* @__PURE__ */ j(J, { children: h("TP/SL") }),
+			/* @__PURE__ */ j(J, { children: g("Symbol") }),
+			/* @__PURE__ */ j(J, { children: g("Size") }),
+			/* @__PURE__ */ j(J, { children: g("Entry") }),
+			/* @__PURE__ */ j(J, { children: g("Mark") }),
+			/* @__PURE__ */ j(J, { children: g("Lev") }),
+			/* @__PURE__ */ j(J, { children: g("Liq") }),
+			/* @__PURE__ */ j(J, { children: g("uPnL") }),
+			/* @__PURE__ */ j(J, { children: g("TP/SL") }),
 			/* @__PURE__ */ j(J, {}),
 			n.map((e) => /* @__PURE__ */ j(Cn, { children: /* @__PURE__ */ j(Pn, {
 				p: e,
@@ -2049,62 +2049,67 @@ var Tt = O.div`
 				onClose: u,
 				onEditTpSl: d,
 				closingSymbol: p,
-				t: h
+				t: g
 			}) }, e.id))
 		] })),
 		e === "orders" && (i.length === 0 ? /* @__PURE__ */ j(xn, { children: /* @__PURE__ */ j(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: h("No open orders")
+			children: g("No open orders")
 		}) }) : /* @__PURE__ */ M(Dn, { children: [
-			/* @__PURE__ */ j(J, { children: h("Symbol") }),
-			/* @__PURE__ */ j(J, { children: h("Side") }),
-			/* @__PURE__ */ j(J, { children: h("Type") }),
-			/* @__PURE__ */ j(J, { children: h("Price") }),
-			/* @__PURE__ */ j(J, { children: h("Size") }),
-			/* @__PURE__ */ j(J, { children: h("Filled") }),
-			/* @__PURE__ */ j(J, { children: h("Status") }),
+			/* @__PURE__ */ j(J, { children: g("Symbol") }),
+			/* @__PURE__ */ j(J, { children: g("Side") }),
+			/* @__PURE__ */ j(J, { children: g("Type") }),
+			/* @__PURE__ */ j(J, { children: g("Price") }),
+			/* @__PURE__ */ j(J, { children: g("Size") }),
+			/* @__PURE__ */ j(J, { children: g("Filled") }),
+			/* @__PURE__ */ j(J, { children: g("Status") }),
 			/* @__PURE__ */ j(J, {}),
-			i.map((e) => /* @__PURE__ */ M(Cn, { children: [
-				/* @__PURE__ */ j(Y, {
-					bold: !0,
-					children: e.symbol
-				}),
-				/* @__PURE__ */ j(Y, {
-					style: { color: e.side === "BUY" ? g.colors.success : g.colors.failure },
-					children: e.side
-				}),
-				/* @__PURE__ */ j(Y, { children: e.type }),
-				/* @__PURE__ */ j(Y, { children: e.price }),
-				/* @__PURE__ */ j(Y, { children: e.origQty }),
-				/* @__PURE__ */ j(Y, { children: e.executedQty }),
-				/* @__PURE__ */ j(Y, { children: e.status }),
-				/* @__PURE__ */ j(wn, { children: /* @__PURE__ */ j(_, {
-					scale: "xs",
-					variant: "secondary",
-					onClick: () => f(e),
-					children: h("Cancel")
-				}) })
-			] }, e.id))
+			i.map((e) => {
+				let t = h === e.id;
+				return /* @__PURE__ */ M(Cn, { children: [
+					/* @__PURE__ */ j(Y, {
+						bold: !0,
+						children: e.symbol
+					}),
+					/* @__PURE__ */ j(Y, {
+						style: { color: e.side === "BUY" ? v.colors.success : v.colors.failure },
+						children: e.side
+					}),
+					/* @__PURE__ */ j(Y, { children: e.type }),
+					/* @__PURE__ */ j(Y, { children: e.price }),
+					/* @__PURE__ */ j(Y, { children: e.origQty }),
+					/* @__PURE__ */ j(Y, { children: e.executedQty }),
+					/* @__PURE__ */ j(Y, { children: e.status }),
+					/* @__PURE__ */ j(wn, { children: /* @__PURE__ */ j(_, {
+						scale: "xs",
+						variant: "secondary",
+						disabled: t,
+						isLoading: t,
+						onClick: () => f(e),
+						children: g("Cancel")
+					}) })
+				] }, e.id);
+			})
 		] })),
 		e === "history" && /* @__PURE__ */ j(xn, { children: /* @__PURE__ */ j(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: h("Order history coming soon")
+			children: g("Order history coming soon")
 		}) }),
 		e === "trades" && (a.length === 0 ? /* @__PURE__ */ j(xn, { children: /* @__PURE__ */ j(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: h("No trades yet")
+			children: g("No trades yet")
 		}) }) : /* @__PURE__ */ M(On, { children: [
-			/* @__PURE__ */ j(J, { children: h("Time") }),
-			/* @__PURE__ */ j(J, { children: h("Symbol") }),
-			/* @__PURE__ */ j(J, { children: h("Price") }),
-			/* @__PURE__ */ j(J, { children: h("Quantity") }),
-			/* @__PURE__ */ j(J, { children: h("Fee") }),
-			/* @__PURE__ */ j(J, { children: h("Realized profit") }),
+			/* @__PURE__ */ j(J, { children: g("Time") }),
+			/* @__PURE__ */ j(J, { children: g("Symbol") }),
+			/* @__PURE__ */ j(J, { children: g("Price") }),
+			/* @__PURE__ */ j(J, { children: g("Quantity") }),
+			/* @__PURE__ */ j(J, { children: g("Fee") }),
+			/* @__PURE__ */ j(J, { children: g("Realized profit") }),
 			a.map((e) => {
-				let t = e.side === "BUY" ? g.colors.success : g.colors.failure, n = e.realizedProfit.startsWith("+");
+				let t = e.side === "BUY" ? v.colors.success : v.colors.failure, n = e.realizedProfit.startsWith("+");
 				return /* @__PURE__ */ M(Cn, { children: [
 					/* @__PURE__ */ j(Y, {
 						as: "div",
@@ -2117,7 +2122,7 @@ var Tt = O.div`
 								color: t,
 								fontSize: 12
 							},
-							children: e.side === "BUY" ? h("Buy") : h("Sell")
+							children: e.side === "BUY" ? g("Buy") : g("Sell")
 						})] })
 					}),
 					/* @__PURE__ */ j(Y, { children: e.price }),
@@ -2129,12 +2134,12 @@ var Tt = O.div`
 							alignItems: "center",
 							style: { gap: 8 },
 							children: [/* @__PURE__ */ j("span", {
-								style: { color: n ? g.colors.success : g.colors.failure },
+								style: { color: n ? v.colors.success : v.colors.failure },
 								children: e.realizedProfit
 							}), s && /* @__PURE__ */ j(Mn, {
 								type: "button",
 								onClick: () => s(e),
-								"aria-label": h("Share trade"),
+								"aria-label": g("Share trade"),
 								children: /* @__PURE__ */ j("svg", {
 									width: "14",
 									height: "14",
@@ -2158,12 +2163,12 @@ var Tt = O.div`
 		e === "transactions" && (o.length === 0 ? /* @__PURE__ */ j(xn, { children: /* @__PURE__ */ j(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: h("No transactions yet")
+			children: g("No transactions yet")
 		}) }) : /* @__PURE__ */ M(kn, { children: [
-			/* @__PURE__ */ j(J, { children: h("Time") }),
-			/* @__PURE__ */ j(J, { children: h("Type") }),
-			/* @__PURE__ */ j(J, { children: h("Amount") }),
-			/* @__PURE__ */ j(J, { children: h("Symbol") }),
+			/* @__PURE__ */ j(J, { children: g("Time") }),
+			/* @__PURE__ */ j(J, { children: g("Type") }),
+			/* @__PURE__ */ j(J, { children: g("Amount") }),
+			/* @__PURE__ */ j(J, { children: g("Symbol") }),
 			o.map((e) => /* @__PURE__ */ M(Cn, { children: [
 				/* @__PURE__ */ j(Y, {
 					as: "div",

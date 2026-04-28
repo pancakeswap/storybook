@@ -119,6 +119,13 @@ export interface PositionsPanelProps {
    * rows so the consumer can track it without remapping positions.
    */
   closingSymbol?: string | null
+  /**
+   * `id` of the open order whose Cancel button is in-flight — disables
+   * the button + shows a spinner. Same pattern as `closingSymbol`,
+   * scoped per-row instead of per-symbol so multiple cancels in flight
+   * across different orders for the same symbol stay independent.
+   */
+  cancellingOrderId?: OpenOrderRow['id'] | null
   /** Translator. */
   t?: (key: string) => string
 }
@@ -374,6 +381,7 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
   onEditTpSl,
   onCancelOrder,
   closingSymbol = null,
+  cancellingOrderId = null,
   t = identity,
 }) => {
   const theme = useTheme()
@@ -450,24 +458,33 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
               <Th>{t('Filled')}</Th>
               <Th>{t('Status')}</Th>
               <Th />
-              {openOrders.map((o) => (
-                <RowGroup key={o.id}>
-                  <Td bold>{o.symbol}</Td>
-                  <Td style={{ color: o.side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
-                    {o.side}
-                  </Td>
-                  <Td>{o.type}</Td>
-                  <Td>{o.price}</Td>
-                  <Td>{o.origQty}</Td>
-                  <Td>{o.executedQty}</Td>
-                  <Td>{o.status}</Td>
-                  <ActionCell>
-                    <Button scale="xs" variant="secondary" onClick={() => onCancelOrder(o)}>
-                      {t('Cancel')}
-                    </Button>
-                  </ActionCell>
-                </RowGroup>
-              ))}
+              {openOrders.map((o) => {
+                const isCancelling = cancellingOrderId === o.id
+                return (
+                  <RowGroup key={o.id}>
+                    <Td bold>{o.symbol}</Td>
+                    <Td style={{ color: o.side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
+                      {o.side}
+                    </Td>
+                    <Td>{o.type}</Td>
+                    <Td>{o.price}</Td>
+                    <Td>{o.origQty}</Td>
+                    <Td>{o.executedQty}</Td>
+                    <Td>{o.status}</Td>
+                    <ActionCell>
+                      <Button
+                        scale="xs"
+                        variant="secondary"
+                        disabled={isCancelling}
+                        isLoading={isCancelling}
+                        onClick={() => onCancelOrder(o)}
+                      >
+                        {t('Cancel')}
+                      </Button>
+                    </ActionCell>
+                  </RowGroup>
+                )
+              })}
             </OrdersTable>
           ))}
 

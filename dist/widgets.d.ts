@@ -1030,6 +1030,13 @@ export declare interface PositionsPanelProps {
      * rows so the consumer can track it without remapping positions.
      */
     closingSymbol?: string | null;
+    /**
+     * `id` of the open order whose Cancel button is in-flight — disables
+     * the button + shows a spinner. Same pattern as `closingSymbol`,
+     * scoped per-row instead of per-symbol so multiple cancels in flight
+     * across different orders for the same symbol stay independent.
+     */
+    cancellingOrderId?: OpenOrderRow['id'] | null;
     /** Translator. */
     t?: (key: string) => string;
 }
