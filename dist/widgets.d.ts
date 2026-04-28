@@ -1031,10 +1031,11 @@ export declare interface PositionsPanelProps {
      */
     closingSymbol?: string | null;
     /**
-     * `id` of the open order whose Cancel button is in-flight — disables
-     * the button + shows a spinner. Same pattern as `closingSymbol`,
-     * scoped per-row instead of per-symbol so multiple cancels in flight
-     * across different orders for the same symbol stay independent.
+     * `id` of the open order whose Cancel button is in-flight. The matching
+     * row's button shows a spinner and is disabled until the consumer
+     * clears this back to `null`. Same pattern as {@link closingSymbol}
+     * but scoped per-row (not per-symbol), so cancels for two orders on
+     * the same symbol stay independent.
      */
     cancellingOrderId?: OpenOrderRow['id'] | null;
     /** Translator. */
