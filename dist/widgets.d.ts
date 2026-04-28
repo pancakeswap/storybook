@@ -325,6 +325,8 @@ export declare interface MarketRow {
     priceChangePercent?: string;
     /** Raw 24h quote volume (USDT). */
     quoteVolume?: string;
+    /** Max leverage available on this market (e.g. 100 → "100x" pill). */
+    maxLeverage?: number;
 }
 
 /**
@@ -502,7 +504,15 @@ export declare interface OrderFormDraft {
     reduceOnly: boolean;
     tpSlEnabled: boolean;
     takeProfitPrice: string;
+    /** Estimated PnL in USDT at the TP trigger price. */
+    takeProfitPnl?: string;
+    /** Trigger source for the TP leg — `LAST` (last trade) or `MARK`. */
+    takeProfitSource?: StopPriceSource;
     stopLossPrice: string;
+    /** Estimated PnL in USDT at the SL trigger price. */
+    stopLossPnl?: string;
+    /** Trigger source for the SL leg — `LAST` (last trade) or `MARK`. */
+    stopLossSource?: StopPriceSource;
     timeInForce: 'GTC' | 'IOC' | 'FOK' | 'GTX';
     /** Trigger price used by Stop Limit + Stop Market orders. */
     stopPrice: string;
@@ -983,6 +993,12 @@ export declare interface PositionsPanelProps {
     onTabChange: (tab: PositionsPanelTab) => void;
     positions: PositionRow[];
     openOrders: OpenOrderRow[];
+    /** Fills the user has executed (settled trades). */
+    tradeHistory?: TradeHistoryRow[];
+    /** Account ledger entries — funding, realized PnL, deposits, etc. */
+    transactionHistory?: TransactionHistoryRow[];
+    /** Share-to-social callback for a trade row (optional). */
+    onShareTrade?: (trade: TradeHistoryRow) => void;
     /**
      * Hook-like function called inside each position row to get the live
      * mark price for that symbol. MUST obey the rules of hooks (always
@@ -1018,7 +1034,7 @@ export declare interface PositionsPanelProps {
     t?: (key: string) => string;
 }
 
-export declare type PositionsPanelTab = 'positions' | 'orders' | 'history';
+export declare type PositionsPanelTab = 'positions' | 'orders' | 'history' | 'trades' | 'transactions';
 
 export declare interface RecentTradeRow {
     /** Stable React key — usually the trade id from the venue. */
@@ -1191,6 +1207,37 @@ export declare interface TpSlModalProps {
     onClose: () => void;
     /** Translator. */
     t?: (key: string) => string;
+}
+
+declare interface TradeHistoryRow {
+    /** Stable React key — typically the tradeId. */
+    id: string | number;
+    /** Local date string, e.g. '2025-04-17'. */
+    date: string;
+    /** Local time string, e.g. '01:37:26'. */
+    time: string;
+    symbol: string;
+    side: 'BUY' | 'SELL';
+    /** Pre-formatted execution price. */
+    price: string;
+    /** Pre-formatted quantity, e.g. '30 USDT' or '0.012 BTC'. */
+    quantity: string;
+    /** Pre-formatted fee with unit. */
+    fee: string;
+    /** Pre-formatted realized P&L (signed), e.g. '+0.01 USDT'. */
+    realizedProfit: string;
+}
+
+declare interface TransactionHistoryRow {
+    /** Stable React key — typically the txId. */
+    id: string | number;
+    date: string;
+    time: string;
+    /** Transaction type, e.g. 'Realized PNL', 'Funding', 'Deposit'. */
+    type: string;
+    /** Pre-formatted amount with unit, e.g. '30 USDT'. */
+    amount: string;
+    symbol: string;
 }
 
 export declare const UnderlineTab: default_2.FC<UnderlineTabProps>;
