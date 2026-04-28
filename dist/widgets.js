@@ -1,4 +1,4 @@
-import { C as e, Gt as t, L as n, M as r, O as i, R as a, S as o, Wn as s, Y as c, k as l, r as u, t as d, tt as f, w as p, x as m, xi as h, y as g, z as _ } from "./chunks/Modal-DugE82X4.js";
+import { C as e, Gt as t, L as n, M as r, O as i, R as a, S as o, Wn as s, Y as c, k as l, r as u, t as d, tt as f, w as p, x as m, xi as h, y as g, z as _ } from "./chunks/Modal-Vr0QDvCZ.js";
 import v, { Children as y, cloneElement as b, useCallback as x, useEffect as S, useId as C, useLayoutEffect as w, useMemo as T, useRef as E, useState as D } from "react";
 import O, { useTheme as k } from "styled-components";
 import { Fragment as A, jsx as j, jsxs as M } from "react/jsx-runtime";
@@ -819,6 +819,23 @@ var oe = O(m)`
   max-height: 50vh;
   display: flex;
   flex-direction: column;
+
+  /* On mobile viewports the dropdown takes over the screen as a
+   * full-page action sheet — same behaviour as the symbol-pill on
+   * MobilePerpsPage, but applied directly to the widget so it works
+   * when used standalone too. */
+  @media (max-width: 767px) {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    z-index: 200;
+    padding: 12px 12px 16px;
+  }
 `, Ye = O(m)`
   gap: 16px;
   margin-bottom: 12px;
@@ -875,11 +892,13 @@ var oe = O(m)`
   text-align: left;
   background: transparent;
   border: 0;
+  border-radius: 8px;
   cursor: pointer;
   color: ${({ theme: e }) => e.colors.text};
   font-size: 14px;
+  transition: background 0.12s;
   &:hover {
-    background: ${({ theme: e }) => e.colors.input};
+    background: ${({ theme: e }) => e.colors.cardSecondary};
   }
 `, nt = O.button`
   background: transparent;
@@ -1843,11 +1862,15 @@ var Tt = O.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 20px 18px;
+    padding: 16px 12px;
   }
 `, Cn = O.div`
   display: contents;
+  /* Padding lives on the cells (RowGroup is display:contents so any
+   * padding set here would be dropped) — gives the hover strip visible
+   * breathing room around the content, matching the MarketsDropdown row. */
   & > * {
+    padding: 16px 12px;
     transition: background 0.12s;
   }
   &:hover > * {
@@ -1882,7 +1905,7 @@ var Tt = O.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 20px 18px;
+    padding: 16px 12px;
   }
 `, On = O.div`
   display: grid;
@@ -1891,7 +1914,7 @@ var Tt = O.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 20px 18px;
+    padding: 16px 12px;
   }
 `, kn = O.div`
   display: grid;
@@ -1900,7 +1923,7 @@ var Tt = O.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 20px 18px;
+    padding: 16px 12px;
   }
 `, An = O.div`
   display: flex;
