@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import './WalletPanelCompactV1.css'
 import { Checkbox } from '../ui/components/Checkbox'
+import walletIcon from '../assets/wallet.png'
+import perpsChartIcon from '../assets/perps-chart.png'
 
 /* ── Types ─────────────────────────────────────────────────── */
 
@@ -36,6 +38,7 @@ interface Bucket {
   description?: string
   tokens?: SpotToken[]
   positions?: PerpPosition[]
+  balanceTokens?: SpotToken[]
 }
 
 export interface WalletData {
@@ -52,7 +55,7 @@ export interface WalletPanelCompactV1Props {
   initialExpanded?: 'spot' | 'perp' | null
   onBridge?: () => void
   onSpotAction?: (action: 'send' | 'receive' | 'swap') => void
-  onPerpAction?: (action: 'deposit' | 'withdraw' | 'manage') => void
+  onPerpAction?: (action: 'deposit' | 'withdraw' | 'manage' | 'transfer') => void
 }
 
 /* ── Mock data ─────────────────────────────────────────────── */
@@ -80,11 +83,16 @@ const DEFAULT_DATA: WalletData = {
       sublabel: 'Aster contract',
       amount: 973.35,
       pnl: { '24h': -0.22, '7d': 8.12, 'all': 23.18 },
-      description: 'Total value of your active positions, including unrealized PnL. Updates in real time.',
+      description: 'Total value of your assets and active positions, including unrealized PnL. Updates in real time.',
       positions: [
         { symbol: 'ETH', side: 'Long',  leverage: '500X', pnlUsd: 209.87, pnlPct: 0.5, color: '#627EEA' },
         { symbol: 'BTC', side: 'Short', leverage: '250X', pnlUsd: 425.26, pnlPct: 0.5, color: '#F7931A' },
         { symbol: 'BNB', side: 'Long',  leverage: '500X', pnlUsd: 338.11, pnlPct: 0.5, color: '#F0B90B' },
+      ],
+      balanceTokens: [
+        { symbol: 'USDC', name: 'Circle USD', amount: '256.29 USDC', value: 257.35, pnl: 0.01, network: 'BNB', color: '#2775CA' },
+        { symbol: 'ETH',  name: 'Ethereum',   amount: '0.11 ETH',   value: 254.09, pnl: 0.5,  network: 'BNB', color: '#627EEA' },
+        { symbol: 'BNB',  name: 'Binance',    amount: '0.09 BNB',   value: 56.44,  pnl: 0.5,  network: 'BNB', color: '#F0B90B' },
       ],
     },
   },
@@ -138,6 +146,14 @@ const TriangleUp = ({ size = 12 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
     <path d="M6 3l4.5 6h-9z" />
   </svg>
+)
+
+const SpotWalletGlyph = () => (
+  <img src={walletIcon} alt="" width="40" height="40" style={{ display: 'block' }} />
+)
+
+const PerpsChartGlyph = () => (
+  <img src={perpsChartIcon} alt="" width="40" height="40" style={{ display: 'block' }} />
 )
 
 const TriangleDown = ({ size = 12 }: { size?: number }) => (
@@ -298,9 +314,10 @@ function BucketSummaryRow({
   const pnl = bucket.pnl[timeframe]
   return (
     <div className={`wpc1-row wpc1-row--${bucket.key}`}>
-      <span className={`wpc1-row-bar wpc1-row-bar--${bucket.key}`} aria-hidden />
       <div className="wpc1-row-inner">
-        <div className="wpc1-row-icon" aria-hidden />
+        <div className={`wpc1-row-icon wpc1-row-icon--${bucket.key}`} aria-hidden>
+          {bucket.key === 'spot' ? <SpotWalletGlyph /> : <PerpsChartGlyph />}
+        </div>
         <div className="wpc1-row-meta">
           <div className="wpc1-bucket-label">{bucket.label}</div>
           <div className="wpc1-bucket-sub">{bucket.sublabel}</div>
@@ -349,6 +366,7 @@ function BucketDetail({
   onPerpAction?: WalletPanelCompactV1Props['onPerpAction']
   onBridge?: () => void
 }) {
+  const [expandedStat, setExpandedStat] = useState<'balance' | 'pnl' | null>(null)
   const pnl = bucket.pnl[timeframe]
   const pnlDelta = bucket.amount * (pnl / 100)
   const tfLabel = timeframe === '24h' ? '24 hours' : timeframe === '7d' ? '7 days' : 'lifetime'
@@ -371,78 +389,167 @@ function BucketDetail({
         <TfToggle value={timeframe} onChange={onTfChange} options={tfOptions} />
       </div>
 
-      {/* Hero: bucket amount + PnL pill */}
-      <div className="wpc1-hero">
-        <div className="wpc1-hero-amount-row">
-          <span className="wpc1-hero-amount">
-            <span className="wpc1-hero-amount-int">{fmtUsd(bucket.amount).split('.')[0]}</span>
-            <span className="wpc1-hero-amount-dec">.{fmtUsd(bucket.amount).split('.')[1] ?? '00'}</span>
-          </span>
-          <PnLPill value={pnl} lg />
+      {/* Top group: hero + track + description (8px gaps internally) */}
+      <div className="wpc1-detail-top">
+        <div className="wpc1-hero">
+          <div className="wpc1-hero-amount-row">
+            <span className="wpc1-hero-amount">
+              <span className="wpc1-hero-amount-int">{fmtUsd(bucket.amount).split('.')[0]}</span>
+              <span className="wpc1-hero-amount-dec">.{fmtUsd(bucket.amount).split('.')[1] ?? '00'}</span>
+            </span>
+            <PnLPill value={pnl} lg />
+          </div>
+          <div className="wpc1-hero-sub">
+            {isSpot ? (
+              <>
+                <span className={pnl >= 0 ? 'wpc1-hero-sub-up' : 'wpc1-hero-sub-down'}>
+                  {pnl >= 0 ? '+' : '-'}
+                  {fmtUsd(Math.abs(pnlDelta)).replace('-', '')}
+                </span>
+                <span className="wpc1-hero-sub-rest">{` over the past ${tfLabel}`}</span>
+              </>
+            ) : (
+              <span className="wpc1-hero-sub-rest">{bucket.sublabel}</span>
+            )}
+          </div>
         </div>
-        <div className="wpc1-hero-sub">
-          {isSpot ? (
-            <>
-              <span className={pnl >= 0 ? 'wpc1-hero-sub-up' : 'wpc1-hero-sub-down'}>
-                {pnl >= 0 ? '+' : '-'}
-                {fmtUsd(Math.abs(pnlDelta)).replace('-', '')}
-              </span>
-              <span className="wpc1-hero-sub-rest">{` over the past ${tfLabel}`}</span>
-            </>
-          ) : (
-            <span className="wpc1-hero-sub-rest">{bucket.sublabel}</span>
-          )}
+
+        <div className="wpc1-track-row">
+          <div className="wpc1-track">
+            <div
+              className={`wpc1-track-fill wpc1-track-fill--${bucket.key}`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <span className="wpc1-track-pct">{pct.toFixed(0)}%</span>
         </div>
+
+        {bucket.description && <p className="wpc1-bucket-desc">{bucket.description}</p>}
       </div>
 
-      {/* Progress track */}
-      <div className="wpc1-track-row">
-        <div className="wpc1-track">
-          <div
-            className={`wpc1-track-fill wpc1-track-fill--${bucket.key}`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-        <span className="wpc1-track-pct">{pct.toFixed(0)}%</span>
-      </div>
-
-      {/* Description */}
-      {bucket.description && <p className="wpc1-bucket-desc">{bucket.description}</p>}
-
-      {/* Hide small balances pill */}
-      <label className="wpc1-hide-small">
-        <div className="wpc1-hide-small-inner">
-          <span className="wpc1-hide-small-label">Hide small balances</span>
-          <span className="wpc1-hide-small-info" aria-hidden>
-            <InfoCircle size={16} />
-          </span>
-          <Checkbox
-            scale="sm"
-            checked={hideSmall}
-            onChange={(e) => setHideSmall(e.target.checked)}
-          />
-        </div>
-      </label>
-
-      {/* List */}
-      <div className="wpc1-tk-list">
-        {isSpot && tokens?.map((tk, i) => <TokenRow key={tk.symbol + i} tk={tk} />)}
-        {!isSpot && positions?.map((p, i) => <PositionRow key={p.symbol + i} p={p} />)}
-      </div>
-
-      {/* Action buttons */}
       {isSpot ? (
-        <div className="wpc1-actions">
-          <button type="button" className="wpc1-action-btn" onClick={() => onSpotAction?.('send')}>Send</button>
-          <button type="button" className="wpc1-action-btn" onClick={() => onSpotAction?.('receive')}>Receive</button>
-          <button type="button" className="wpc1-action-btn wpc1-action-btn--primary" onClick={() => onSpotAction?.('swap')}>Swap</button>
-        </div>
+        <>
+          <label className="wpc1-hide-small">
+            <div className="wpc1-hide-small-inner">
+              <span className="wpc1-hide-small-label">Hide small balances</span>
+              <span className="wpc1-hide-small-info" aria-hidden>
+                <InfoCircle size={16} />
+              </span>
+              <Checkbox
+                scale="sm"
+                checked={hideSmall}
+                onChange={(e) => setHideSmall(e.target.checked)}
+              />
+            </div>
+          </label>
+          <div className="wpc1-tk-list">
+            {tokens?.map((tk, i) => <TokenRow key={tk.symbol + i} tk={tk} />)}
+          </div>
+          <div className="wpc1-actions">
+            <button type="button" className="wpc1-action-btn" onClick={() => onSpotAction?.('send')}>Send</button>
+            <button type="button" className="wpc1-action-btn" onClick={() => onSpotAction?.('receive')}>Receive</button>
+            <button type="button" className="wpc1-action-btn wpc1-action-btn--primary" onClick={() => onSpotAction?.('swap')}>Swap</button>
+          </div>
+        </>
       ) : (
-        <div className="wpc1-actions">
-          <button type="button" className="wpc1-action-btn" onClick={() => onPerpAction?.('deposit')}>Deposit</button>
-          <button type="button" className="wpc1-action-btn" onClick={() => onPerpAction?.('withdraw')}>Withdraw</button>
-          <button type="button" className="wpc1-action-btn wpc1-action-btn--primary" onClick={() => onPerpAction?.('manage')}>Manage</button>
-        </div>
+        <>
+          <div className="wpc1-perp-stats">
+            <div className="wpc1-perp-stats-row">
+              <span className="wpc1-perp-stats-label">Balance</span>
+              <div className="wpc1-perp-stats-right">
+                <span className="wpc1-perp-stats-value">{fmtUsd(567.79)}</span>
+                <span className="wpc1-pnl-flat wpc1-pnl-flat--up">
+                  <TriangleUp size={12} />
+                  <span>1.72%</span>
+                </span>
+                <button
+                  type="button"
+                  className={`wpc1-bucket-caret${expandedStat === 'balance' ? ' wpc1-bucket-caret--up' : ''}`}
+                  aria-label={expandedStat === 'balance' ? 'Collapse Balance' : 'Expand Balance'}
+                  aria-expanded={expandedStat === 'balance'}
+                  onClick={() => setExpandedStat((e) => (e === 'balance' ? null : 'balance'))}
+                >
+                  <span className="wpc1-bucket-caret-icon">
+                    <ArrowDropDown />
+                  </span>
+                </button>
+              </div>
+            </div>
+            {expandedStat === 'balance' && (
+              <div className="wpc1-perp-stats-expand">
+                <div className="wpc1-perp-stats-divider" />
+                <label className="wpc1-hide-small">
+                  <div className="wpc1-hide-small-inner">
+                    <span className="wpc1-hide-small-label">Hide small balances</span>
+                    <span className="wpc1-hide-small-info" aria-hidden>
+                      <InfoCircle size={16} />
+                    </span>
+                    <Checkbox
+                      scale="sm"
+                      checked={hideSmall}
+                      onChange={(e) => setHideSmall(e.target.checked)}
+                    />
+                  </div>
+                </label>
+                <div className="wpc1-tk-list">
+                  {(bucket.balanceTokens || []).map((tk, i) => (
+                    <TokenRow key={tk.symbol + i} tk={tk} />
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="wpc1-perp-stats-divider" />
+            <div className="wpc1-perp-stats-row">
+              <span className="wpc1-perp-stats-label">Unrealized PnL</span>
+              <div className="wpc1-perp-stats-right">
+                <span className="wpc1-perp-stats-value">405.56</span>
+                <span className="wpc1-pnl-flat wpc1-pnl-flat--down">
+                  <TriangleDown size={12} />
+                  <span>0.22%</span>
+                </span>
+                <button
+                  type="button"
+                  className={`wpc1-bucket-caret${expandedStat === 'pnl' ? ' wpc1-bucket-caret--up' : ''}`}
+                  aria-label={expandedStat === 'pnl' ? 'Collapse Unrealized PnL' : 'Expand Unrealized PnL'}
+                  aria-expanded={expandedStat === 'pnl'}
+                  onClick={() => setExpandedStat((e) => (e === 'pnl' ? null : 'pnl'))}
+                >
+                  <span className="wpc1-bucket-caret-icon">
+                    <ArrowDropDown />
+                  </span>
+                </button>
+              </div>
+            </div>
+            {expandedStat === 'pnl' && (
+              <div className="wpc1-perp-stats-expand">
+                <div className="wpc1-perp-stats-divider" />
+                <label className="wpc1-hide-small">
+                  <div className="wpc1-hide-small-inner">
+                    <span className="wpc1-hide-small-label">Hide small balances</span>
+                    <span className="wpc1-hide-small-info" aria-hidden>
+                      <InfoCircle size={16} />
+                    </span>
+                    <Checkbox
+                      scale="sm"
+                      checked={hideSmall}
+                      onChange={(e) => setHideSmall(e.target.checked)}
+                    />
+                  </div>
+                </label>
+                <div className="wpc1-tk-list">
+                  {(bucket.positions || []).map((p, i) => (
+                    <PositionRow key={p.symbol + i} p={p} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="wpc1-actions">
+            <button type="button" className="wpc1-action-btn" onClick={() => onPerpAction?.('transfer')}>Transfer</button>
+            <button type="button" className="wpc1-action-btn" onClick={() => onPerpAction?.('withdraw')}>Withdraw</button>
+            <button type="button" className="wpc1-action-btn wpc1-action-btn--primary" onClick={() => onPerpAction?.('deposit')}>Deposit</button>
+          </div>
+        </>
       )}
 
       {/* Bridge */}

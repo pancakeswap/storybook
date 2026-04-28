@@ -322,27 +322,12 @@
   gap: 8px;
   align-self: stretch;
 }
-.wpc1-row-bar {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 36px;
-  border-radius: 99px;
-}
-.wpc1-row-bar--spot {
-  background: linear-gradient(180deg, #53DEE9 0%, #1FC7D4 100%);
-}
-.wpc1-row-bar--perp {
-  background: var(--pcs-colors-secondary);
-}
 .wpc1-row-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: #F3EEFF;
-  border: 1px solid var(--pcs-colors-card-border);
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 .wpc1-row-meta {
@@ -804,6 +789,72 @@
   font-size: 14px;
   padding: 0 6px;
   gap: 2px;
+}
+
+/* ── Detail view top group (hero + track + description) ──────── */
+.wpc1-detail-top {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 8px;
+}
+
+/* ── Perp detail stats card (Balance + Unrealized PnL) ────────── */
+.wpc1-perp-stats {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  border-radius: 16px;
+  border-top: 1px solid var(--pcs-colors-card-border);
+  border-right: 1px solid var(--pcs-colors-card-border);
+  border-bottom: 2px solid var(--pcs-colors-card-border);
+  border-left: 1px solid var(--pcs-colors-card-border);
+  background: var(--pcs-colors-card-secondary);
+  overflow: hidden;
+}
+.wpc1-perp-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  align-self: stretch;
+}
+.wpc1-perp-stats-divider {
+  height: 1px;
+  background: var(--pcs-colors-card-border);
+  align-self: stretch;
+}
+.wpc1-perp-stats-label {
+  color: var(--pcs-colors-text);
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 150%;
+}
+.wpc1-perp-stats-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.wpc1-perp-stats-value {
+  color: var(--pcs-colors-text);
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+}
+.wpc1-perp-stats-expand {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+.wpc1-perp-stats-expand .wpc1-hide-small {
+  margin-top: 4px;
 }
 
 /* ── Action buttons row ───────────────────────────────────────── */
