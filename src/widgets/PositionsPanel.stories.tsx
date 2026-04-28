@@ -6,6 +6,8 @@ import {
   type OpenOrderRow,
   type PositionRow,
   type PositionsPanelTab,
+  type TradeHistoryRow,
+  type TransactionHistoryRow,
 } from './PositionsPanel'
 
 const MOCK_POSITIONS: PositionRow[] = [
@@ -56,6 +58,27 @@ const MOCK_ORDERS: OpenOrderRow[] = [
 
 const mockMarkPrice = (s: string) => (s === 'BTCUSDT' ? 78900 : 3180)
 
+const MOCK_TRADES: TradeHistoryRow[] = [
+  {
+    id: 't1', date: '2025-04-17', time: '01:37:26', symbol: 'BTCUSDT', side: 'BUY',
+    price: '86,000', quantity: '30 USDT', fee: '0.0002 USDT', realizedProfit: '+0.01 USDT',
+  },
+  {
+    id: 't2', date: '2025-04-17', time: '01:37:26', symbol: 'BTCUSDT', side: 'BUY',
+    price: '86,000', quantity: '30 USDT', fee: '0.0002 USDT', realizedProfit: '+0.01 USDT',
+  },
+  {
+    id: 't3', date: '2025-04-17', time: '01:37:26', symbol: 'ETHUSDT', side: 'SELL',
+    price: '3,210', quantity: '120 USDT', fee: '0.0008 USDT', realizedProfit: '-0.42 USDT',
+  },
+]
+
+const MOCK_TXS: TransactionHistoryRow[] = [
+  { id: 'x1', date: '2025-04-17', time: '01:37:26', type: 'Realized PNL', amount: '30 USDT', symbol: 'BTCUSDT' },
+  { id: 'x2', date: '2025-04-17', time: '01:37:26', type: 'Realized PNL', amount: '30 USDT', symbol: 'BTCUSDT' },
+  { id: 'x3', date: '2025-04-17', time: '01:35:14', type: 'Funding',      amount: '-0.12 USDT', symbol: 'ETHUSDT' },
+]
+
 const meta = {
   title: 'Widgets/Positions Panel 🆕',
   component: PositionsPanel,
@@ -64,10 +87,13 @@ const meta = {
     tab: 'positions',
     positions: MOCK_POSITIONS,
     openOrders: MOCK_ORDERS,
+    tradeHistory: MOCK_TRADES,
+    transactionHistory: MOCK_TXS,
     onTabChange: fn(),
     onClosePosition: fn(),
     onEditTpSl: fn(),
     onCancelOrder: fn(),
+    onShareTrade: fn(),
     useMarkPriceForSymbol: mockMarkPrice,
     computeLiqPrice: ({ side, entryPrice, leverage }) => {
       const maintMargin = 1 / leverage - 0.005
@@ -83,7 +109,11 @@ export const Positions: Story = {}
 
 export const OpenOrders: Story = { args: { tab: 'orders' } }
 
-export const History: Story = { args: { tab: 'history' } }
+export const OrderHistory: Story = { args: { tab: 'history' } }
+
+export const TradeHistory: Story = { args: { tab: 'trades' } }
+
+export const TransactionHistory: Story = { args: { tab: 'transactions' } }
 
 export const EmptyPositions: Story = { args: { positions: [] } }
 

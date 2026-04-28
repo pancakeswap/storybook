@@ -38,24 +38,47 @@ export interface TpSlModalProps {
   t?: (key: string) => string
 }
 
+/* ── Styles tuned to Figma 18:4886 ─────────────────────────
+ *  - Sections sit on the modal's card-primary surface (no inner
+ *    grouping card), matching the flat figma layout.
+ *  - Input fields use input-primary bg + input-secondary border
+ *    with 12px corner radius — the standard PCS perp input look.
+ * ────────────────────────────────────────────────────────── */
 const Section = styled(Flex)`
   flex-direction: column;
   gap: 8px;
-  padding: 12px;
-  border-radius: 12px;
-  background: ${({ theme }) => theme.colors.input};
 `
 
 const Row = styled(Flex)`
   gap: 8px;
 `
 
-const FieldLabel = styled(Text).attrs({ fontSize: '11px', color: 'textSubtle' })``
+const Divider = styled.div`
+  height: 1px;
+  width: 100%;
+  background: ${({ theme }) => theme.colors.cardBorder};
+  margin: 4px 0;
+`
+
+const FieldLabel = styled(Text).attrs({ fontSize: '14px', color: 'textSubtle' })``
 
 const InputTight = styled(Input)`
-  height: 36px;
-  font-size: 13px;
+  height: 37px;
+  padding: 8px 12px;
+  font-size: 14px;
   font-variant-numeric: tabular-nums;
+  background: ${({ theme }) => theme.colors.input};
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-radius: 12px;
+  color: ${({ theme }) => theme.colors.text};
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.textSubtle};
+  }
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.secondary};
+  }
 `
 
 const SummaryRow = styled(Flex)`
@@ -182,32 +205,43 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
       <Modal title={t('Set TP / SL')} onDismiss={onClose}>
         <Flex flexDirection="column" style={{ gap: 12, minWidth: 340, maxWidth: 440 }}>
           <SummaryRow>
-            <Text fontSize="12px" color="textSubtle">
+            <Text fontSize="14px" color="textSubtle">
               {t('Symbol')}
             </Text>
-            <Text fontSize="12px" bold>
+            <Text
+              fontSize="14px"
+              bold
+              style={{
+                color:
+                  positionSide === 'LONG'
+                    ? theme.colors.success
+                    : theme.colors.failure,
+              }}
+            >
               {symbol} · {positionSide}
             </Text>
           </SummaryRow>
           <SummaryRow>
-            <Text fontSize="12px" color="textSubtle">
+            <Text fontSize="14px" color="textSubtle">
               {t('Entry')}
             </Text>
-            <Text fontSize="12px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
               {Number.isFinite(entryPrice) ? entryPrice.toFixed(2) : '—'}
             </Text>
           </SummaryRow>
           <SummaryRow>
-            <Text fontSize="12px" color="textSubtle">
+            <Text fontSize="14px" color="textSubtle">
               {t('Mark')}
             </Text>
-            <Text fontSize="12px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+            <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
               {Number.isFinite(markPrice) ? markPrice.toFixed(2) : '—'}
             </Text>
           </SummaryRow>
 
+          <Divider />
+
           <Section>
-            <Text fontSize="13px" bold color={theme.colors.success}>
+            <Text fontSize="14px" bold color={theme.colors.success}>
               {t('Take Profit')}
             </Text>
             <Row>
@@ -233,7 +267,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
           </Section>
 
           <Section>
-            <Text fontSize="13px" bold color={theme.colors.failure}>
+            <Text fontSize="14px" bold color={theme.colors.failure}>
               {t('Stop Loss')}
             </Text>
             <Row>
@@ -259,7 +293,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
           </Section>
 
           {warning && (
-            <Text fontSize="12px" color="failure">
+            <Text fontSize="14px" color="failure">
               {warning}
             </Text>
           )}

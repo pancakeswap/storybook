@@ -5,6 +5,7 @@ import { DepositModal } from '../widgets/DepositModal'
 import { SymbolHeader } from '../widgets/SymbolHeader'
 import { AccountPanel } from '../widgets/AccountPanel'
 import { PositionsPanel } from '../widgets/PositionsPanel'
+import { MarketsDropdown, type MarketRow } from '../widgets/MarketsDropdown'
 import '../widgets/perps.css'
 import './PerpsPage.css'
 
@@ -12,9 +13,21 @@ export interface PerpsPageProps {
   initialPair?: string
 }
 
+const DEMO_MARKETS: MarketRow[] = [
+  { symbol: 'BTCUSDT', lastPrice: '84185.5', priceChangePercent: '-0.52', quoteVolume: '19401160', maxLeverage: 125 },
+  { symbol: 'ETHUSDT', lastPrice: '3245.8',  priceChangePercent: '1.04',  quoteVolume: '9831422',  maxLeverage: 100 },
+  { symbol: 'SOLUSDT', lastPrice: '182.35',  priceChangePercent: '3.14',  quoteVolume: '4120999',  maxLeverage: 75 },
+  { symbol: 'BNBUSDT', lastPrice: '608.1',   priceChangePercent: '-0.18', quoteVolume: '2810500',  maxLeverage: 75 },
+  { symbol: 'XRPUSDT', lastPrice: '2.412',   priceChangePercent: '5.67',  quoteVolume: '1920345',  maxLeverage: 50 },
+  { symbol: 'DOGEUSDT',lastPrice: '0.1821',  priceChangePercent: '-2.33', quoteVolume: '1128870',  maxLeverage: 50 },
+  { symbol: 'AVAXUSDT',lastPrice: '41.27',   priceChangePercent: '0.44',  quoteVolume: '740120',   maxLeverage: 25 },
+]
+
 export function PerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: PerpsPageProps) {
   const [modal, setModal] = useState<null | 'deposit' | 'withdraw'>(null)
   const [, setEditTpSlId] = useState<string | null>(null)
+  const [favorites, setFavorites] = useState<string[]>([])
+  const [activeSymbol, setActiveSymbol] = useState('BTCUSDT')
 
   const handleClosePosition = (_id: string) => {
     // demo stub — real positions would come from consumer state
@@ -67,8 +80,8 @@ export function PerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: PerpsPagePr
               <div className="pp-left">
                 <div className="pp-left-top">
                   <SymbolHeader
-                    symbol="BTCUSDT"
-                    pairLabel="BTC - USDT"
+                    symbol={activeSymbol}
+                    pairLabel={`${activeSymbol.replace('USDT', '')} - USDT`}
                     leverage={25}
                     lastPrice="84185.5"
                     markPrice="84190.1"
@@ -77,6 +90,19 @@ export function PerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: PerpsPagePr
                     nextFundingTime={Date.now() + 3_420_000}
                     change24h="-0.52"
                     volume24h="1940116000"
+                    renderMarketsDropdown={(close) => (
+                      <MarketsDropdown
+                        markets={DEMO_MARKETS}
+                        favorites={favorites}
+                        onToggleFavorite={(s) =>
+                          setFavorites((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
+                        }
+                        onSelect={(s) => {
+                          setActiveSymbol(s)
+                          close()
+                        }}
+                      />
+                    )}
                   />
                   <div className="pp-chart" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#7a6eaa' }}>
                     Chart goes here

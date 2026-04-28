@@ -51,14 +51,15 @@ export function BunnySlider({
 
   const safeMax = max <= min ? min + 1 : max
   const pct = Math.max(0, Math.min(1, (value - min) / (safeMax - min)))
-  const thumbW = 32
-  const startX = 0          // bunny butt left edge
-  const usableW = Math.max(0, trackW - thumbW)
-  const headLeft = startX + usableW * pct
-  // Middle teal fill: from just after the butt up to the thumb's left edge.
-  const fillStart = 8
-  const fillEnd = headLeft + 9     // overlap slightly under the thumb so no gap
-  const fillW = Math.max(0, fillEnd - fillStart)
+  const thumbW = 24
+  // Slider area sits to the right of the fixed bunny butt (15 px) — give
+  // a small overlap so the butt blends into the start of the bar.
+  const sliderLeft = 14
+  const usableW = Math.max(0, trackW - sliderLeft - thumbW)
+  const headLeft = sliderLeft + usableW * pct
+  // Teal fill stretches from the slider start to ~middle of the bunny
+  // head so the body visually sits inside the bar.
+  const fillW = headLeft - sliderLeft + thumbW / 2
 
   const isMax = pct >= 0.999
 
@@ -71,7 +72,7 @@ export function BunnySlider({
     >
       <span className="bs-track" />
       <span className="bs-back" />
-      <span className="bs-fill" style={{ width: fillW }} />
+      <span className="bs-fill" style={{ width: Math.max(0, fillW) }} />
       <span
         className={`bs-front${isMax ? ' bs-front--max' : ''}`}
         style={{ left: headLeft }}

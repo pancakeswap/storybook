@@ -32,7 +32,15 @@ export interface OrderFormDraft {
   reduceOnly: boolean
   tpSlEnabled: boolean
   takeProfitPrice: string
+  /** Estimated PnL in USDT at the TP trigger price. */
+  takeProfitPnl?: string
+  /** Trigger source for the TP leg — `LAST` (last trade) or `MARK`. */
+  takeProfitSource?: StopPriceSource
   stopLossPrice: string
+  /** Estimated PnL in USDT at the SL trigger price. */
+  stopLossPnl?: string
+  /** Trigger source for the SL leg — `LAST` (last trade) or `MARK`. */
+  stopLossSource?: StopPriceSource
   timeInForce: 'GTC' | 'IOC' | 'FOK' | 'GTX'
   /** Trigger price used by Stop Limit + Stop Market orders. */
   stopPrice: string
@@ -142,7 +150,7 @@ const SideButton = styled.button<{ $active: boolean; $side: OrderSide }>`
   border: 0;
   background: ${({ $active, $side, theme }) =>
     $active ? ($side === 'BUY' ? theme.colors.success : theme.colors.failure) : 'transparent'};
-  color: ${({ $active, theme }) => ($active ? '#fff' : theme.colors.textSubtle)};
+  color: ${({ $active, theme }) => ($active ? theme.colors.invertedContrast : theme.colors.textSubtle)};
   font-weight: ${({ $active }) => ($active ? 600 : 400)};
   font-size: 16px;
   padding: 6px 8px;
@@ -338,9 +346,55 @@ const TpSlInputs = styled(Flex)`
   gap: 8px;
 `
 
+/* ── Last / Mark source toggle (used for each TP/SL leg) ──── */
+const SourceToggleWrap = styled.div`
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 999px;
+  padding: 2px;
+  background: ${({ theme }) => theme.colors.input};
+`
+const SourceToggleBtn = styled.button<{ $active: boolean }>`
+  border: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  background: ${({ $active, theme }) => ($active ? theme.colors.card : 'transparent')};
+  color: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.textSubtle)};
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+`
+const TpSlSourceToggle: React.FC<{
+  value: StopPriceSource
+  onChange: (v: StopPriceSource) => void
+}> = ({ value, onChange }) => (
+  <SourceToggleWrap role="tablist" aria-label="Trigger source">
+    <SourceToggleBtn
+      type="button"
+      role="tab"
+      aria-selected={value === 'LAST'}
+      $active={value === 'LAST'}
+      onClick={() => onChange('LAST')}
+    >
+      Last
+    </SourceToggleBtn>
+    <SourceToggleBtn
+      type="button"
+      role="tab"
+      aria-selected={value === 'MARK'}
+      $active={value === 'MARK'}
+      onClick={() => onChange('MARK')}
+    >
+      Mark
+    </SourceToggleBtn>
+  </SourceToggleWrap>
+)
+
 const SubmitButton = styled(Button)<{ $side: OrderSide }>`
   background: ${({ $side, theme }) => ($side === 'BUY' ? theme.colors.success : theme.colors.failure)};
-  color: #fff;
+  color: ${({ theme }) => theme.colors.invertedContrast};
   border: 0;
   border-bottom: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 16px;
@@ -654,30 +708,81 @@ export const OrderForm: React.FC<OrderFormProps> = ({
       </Flex>
 
       {draft.tpSlEnabled && (
-        <TpSlInputs>
-          <Box style={{ flex: 1 }}>
-            <Text fontSize="14px" color="textSubtle" mb="4px">
-              {t('Take Profit')}
-            </Text>
-            <InputTight
-              value={draft.takeProfitPrice}
-              onChange={(e) => onDraftChange({ ...draft, takeProfitPrice: e.target.value })}
-              placeholder="0.00"
-              inputMode="decimal"
-            />
+        <Flex flexDirection="column" style={{ gap: 12 }}>
+          {/* ── Take Profit leg ─────────────────────────────────── */}
+          <Box>
+            <Flex alignItems="center" justifyContent="space-between" mb="6px">
+              <Text fontSize="13px" bold color="success">
+                {t('Take Profit')}
+              </Text>
+              <TpSlSourceToggle
+                value={draft.takeProfitSource ?? 'LAST'}
+                onChange={(src) => onDraftChange({ ...draft, takeProfitSource: src })}
+              />
+            </Flex>
+            <TpSlInputs>
+              <Box style={{ flex: 1 }}>
+                <Text fontSize="12px" color="textSubtle" mb="4px">
+                  {t('Trigger Price')}
+                </Text>
+                <InputTight
+                  value={draft.takeProfitPrice}
+                  onChange={(e) => onDraftChange({ ...draft, takeProfitPrice: e.target.value })}
+                  placeholder="0.00"
+                  inputMode="decimal"
+                />
+              </Box>
+              <Box style={{ flex: 1 }}>
+                <Text fontSize="12px" color="textSubtle" mb="4px">
+                  {t('PnL (USDT)')}
+                </Text>
+                <InputTight
+                  value={draft.takeProfitPnl ?? ''}
+                  onChange={(e) => onDraftChange({ ...draft, takeProfitPnl: e.target.value })}
+                  placeholder="0.00"
+                  inputMode="decimal"
+                />
+              </Box>
+            </TpSlInputs>
           </Box>
-          <Box style={{ flex: 1 }}>
-            <Text fontSize="14px" color="textSubtle" mb="4px">
-              {t('Stop Loss')}
-            </Text>
-            <InputTight
-              value={draft.stopLossPrice}
-              onChange={(e) => onDraftChange({ ...draft, stopLossPrice: e.target.value })}
-              placeholder="0.00"
-              inputMode="decimal"
-            />
+
+          {/* ── Stop Loss leg ───────────────────────────────────── */}
+          <Box>
+            <Flex alignItems="center" justifyContent="space-between" mb="6px">
+              <Text fontSize="13px" bold color="failure">
+                {t('Stop Loss')}
+              </Text>
+              <TpSlSourceToggle
+                value={draft.stopLossSource ?? 'LAST'}
+                onChange={(src) => onDraftChange({ ...draft, stopLossSource: src })}
+              />
+            </Flex>
+            <TpSlInputs>
+              <Box style={{ flex: 1 }}>
+                <Text fontSize="12px" color="textSubtle" mb="4px">
+                  {t('Trigger Price')}
+                </Text>
+                <InputTight
+                  value={draft.stopLossPrice}
+                  onChange={(e) => onDraftChange({ ...draft, stopLossPrice: e.target.value })}
+                  placeholder="0.00"
+                  inputMode="decimal"
+                />
+              </Box>
+              <Box style={{ flex: 1 }}>
+                <Text fontSize="12px" color="textSubtle" mb="4px">
+                  {t('PnL (USDT)')}
+                </Text>
+                <InputTight
+                  value={draft.stopLossPnl ?? ''}
+                  onChange={(e) => onDraftChange({ ...draft, stopLossPnl: e.target.value })}
+                  placeholder="0.00"
+                  inputMode="decimal"
+                />
+              </Box>
+            </TpSlInputs>
           </Box>
-        </TpSlInputs>
+        </Flex>
       )}
 
       {errorSlot}

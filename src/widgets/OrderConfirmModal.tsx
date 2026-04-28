@@ -58,10 +58,6 @@ const Row = styled(Flex)`
   justify-content: space-between;
   align-items: center;
   padding: 6px 0;
-  border-bottom: 1px dashed ${({ theme }) => theme.colors.cardBorder};
-  &:last-of-type {
-    border-bottom: 0;
-  }
 `
 
 const Key = styled(Text).attrs({ fontSize: '12px', color: 'textSubtle' })``

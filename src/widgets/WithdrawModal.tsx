@@ -154,13 +154,26 @@ const TokenGlyph = styled.div<{ $size?: number }>`
   overflow: hidden;
 `
 
+/* AmountField — styled to match the PCS swap-page input field
+ * (input-primary bg + input-secondary border + inset top shadow,
+ * focus glows with the secondary purple ring). */
 const AmountField = styled(Flex)`
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   border-radius: 16px;
   background: ${({ theme }) => theme.colors.input};
+  box-shadow: ${({ theme }) =>
+    `inset 0px 2px 0px -1px ${theme.colors.cardBorder}`};
+  transition: border-color 0.12s, box-shadow 0.12s;
+  &:focus-within {
+    border-color: ${({ theme }) => theme.colors.secondary};
+    box-shadow:
+      inset 0px 2px 0px -1px ${({ theme }) => theme.colors.cardBorder},
+      0 0 0 4px ${({ theme }) =>
+        `color-mix(in srgb, ${theme.colors.secondary} 20%, transparent)`};
+  }
 `
 
 const AmountInput = styled.input`

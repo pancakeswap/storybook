@@ -192,7 +192,7 @@ const Row = styled.div<{ $side: 'bid' | 'ask' }>`
 const Price = styled.span<{ $side: 'bid' | 'ask' }>`
   position: relative;
   z-index: 1;
-  color: ${({ $side, theme }) => ($side === 'bid' ? theme.colors.success : theme.colors.failure)};
+  color: ${({ $side, theme }) => ($side === 'bid' ? '#129E7D' : theme.colors.failure)};
 `
 
 const Cell = styled.span<{ $align?: 'center' | 'right' }>`
@@ -463,8 +463,10 @@ export const OrderBook: React.FC<OrderBookProps> = ({
   const depthBarStyle = (side: 'bid' | 'ask', fill: number): React.CSSProperties => {
     const base = side === 'bid' ? theme.colors.success : theme.colors.failure
     const pct = Math.max(0, Math.min(100, fill * 100)).toFixed(2)
-    const strong = `color-mix(in srgb, ${base} 60%, transparent)`
-    const faint = `color-mix(in srgb, ${base} 20%, transparent)`
+    // Each stop is mixed at half its previous intensity (60→30, 20→10)
+    // so the overall gradient reads at ~50% opacity.
+    const strong = `color-mix(in srgb, ${base} 30%, transparent)`
+    const faint = `color-mix(in srgb, ${base} 10%, transparent)`
     return {
       background: `linear-gradient(to right, ${strong} 0%, ${faint} ${pct}%, transparent ${pct}%, transparent 100%)`,
     }
