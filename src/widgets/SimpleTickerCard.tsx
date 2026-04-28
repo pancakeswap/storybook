@@ -22,15 +22,17 @@ export interface SimpleTickerCardProps {
 // ── Styled ────────────────────────────────────────────────
 
 const Card = styled.div`
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom-width: 2px;
-  border-radius: 24px;
-  padding: 24px;
   display: flex;
-  align-items: center;
+  width: 1058px;
+  padding: 24px;
   justify-content: space-between;
-  gap: 16px;
+  align-items: center;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.card};
   font-variant-numeric: tabular-nums;
 `
 
