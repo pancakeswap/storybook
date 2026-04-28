@@ -27,31 +27,45 @@
     "build": "tsc -b && vite build",
     "build:lib": "vite build --config vite.lib.config.ts",
     "dev:lib": "vite build --config vite.lib.config.ts --watch",
-    "prepare": "npm run build:lib",
     "lint": "eslint .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.34.0",
     "@radix-ui/react-dismissable-layer": "^1.1.11",
     "@styled-system/should-forward-prop": "^5.1.5",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "lightweight-charts": "^5.1.0",
     "lodash": "^4.18.1",
-    "next-themes": "^0.4.6",
     "primereact": "^10.9.7",
     "sonner": "^2.0.7",
     "styled-system": "^5.1.5"
   },
   "peerDependencies": {
+    "@types/react": "^18.2.21",
+    "@types/react-dom": "^18.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "styled-components": "6.0.7"
   },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "@types/react-dom": {
+      "optional": true
+    }
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "^18.2.21",
+      "@types/react-dom": "^18.0.6"
+    }
+  },
   "devDependencies": {
+    "@chakra-ui/react": "^3.34.0",
     "@chromatic-com/storybook": "^5.1.1",
     "@eslint/js": "^9.39.4",
     "@storybook/addon-a11y": "^10.3.3",
@@ -75,6 +89,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-storybook": "^10.3.3",
     "globals": "^17.4.0",
+    "next-themes": "^0.4.6",
     "playwright": "^1.59.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

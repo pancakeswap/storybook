@@ -43,9 +43,9 @@ export const pcsTheme = {
     disabled: v('disabled'),
 
     // Sub-scale colors referenced by button variants
-    primary10: v('primary-10'),
-    primary20: v('primary-20'),
-    primary60: v('primary-60'),
+    primary10: v('primary10'),
+    primary20: v('primary20'),
+    primary60: v('primary60'),
 
     gradientBubblegum: v('bubblegum'),
 

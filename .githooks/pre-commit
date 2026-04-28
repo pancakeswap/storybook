@@ -1,0 +1,31 @@
+#!/bin/sh
+# Block accidental commits of locally-built dist/.
+#
+# Why: `dist/` is rebuilt by the `rebuild-dist.yml` GitHub Action on every
+# push to a non-main branch and committed back as github-actions[bot]. Local
+# `pnpm dev:lib` watches and rewrites dist on every src save; if the dev
+# `git add -A`, those local builds end up in the commit and fight with the
+# bot's clean, deterministic output.
+#
+# This hook lets src-only commits through and blocks any commit that touches
+# dist/. Use `git commit --no-verify` to bypass for genuine emergency
+# fixes (the bot will then pick up your dist on the next push anyway).
+
+if git diff --cached --name-only | grep -qE '^dist/'; then
+  cat >&2 <<'MSG'
+
+✗ Refusing to commit: dist/ files are staged.
+
+  dist/ is auto-built and committed by the GitHub Action on push
+  (.github/workflows/rebuild-dist.yml). Don't ship local builds —
+  they cause hash drift and pollute the diff.
+
+  Un-stage with:
+    git reset HEAD dist/
+
+  If you really need to bypass (emergency, CI broken, etc.):
+    git commit --no-verify
+
+MSG
+  exit 1
+fi
