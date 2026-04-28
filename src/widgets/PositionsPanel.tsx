@@ -158,7 +158,7 @@ const PositionsTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 20px 18px;
+    padding: 16px 12px;
   }
 `
 
@@ -167,7 +167,11 @@ const PositionsTable = styled.div`
  * cell in the row with one continuous card-secondary background. */
 const RowGroup = styled.div`
   display: contents;
+  /* Padding lives on the cells (RowGroup is display:contents so any
+   * padding set here would be dropped) — gives the hover strip visible
+   * breathing room around the content, matching the MarketsDropdown row. */
   & > * {
+    padding: 16px 12px;
     transition: background 0.12s;
   }
   &:hover > * {
@@ -210,7 +214,7 @@ const OrdersTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 20px 18px;
+    padding: 16px 12px;
   }
 `
 
@@ -221,7 +225,7 @@ const TradesTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 20px 18px;
+    padding: 16px 12px;
   }
 `
 
@@ -232,7 +236,7 @@ const TxTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 20px 18px;
+    padding: 16px 12px;
   }
 `
 

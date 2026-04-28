@@ -49,6 +49,23 @@ const Root = styled.div`
   max-height: 50vh;
   display: flex;
   flex-direction: column;
+
+  /* On mobile viewports the dropdown takes over the screen as a
+   * full-page action sheet — same behaviour as the symbol-pill on
+   * MobilePerpsPage, but applied directly to the widget so it works
+   * when used standalone too. */
+  @media (max-width: 767px) {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    z-index: 200;
+    padding: 12px 12px 16px;
+  }
 `
 
 const Tabs = styled(Flex)`
@@ -119,11 +136,13 @@ const Row = styled.button`
   text-align: left;
   background: transparent;
   border: 0;
+  border-radius: 8px;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.text};
   font-size: 14px;
+  transition: background 0.12s;
   &:hover {
-    background: ${({ theme }) => theme.colors.input};
+    background: ${({ theme }) => theme.colors.cardSecondary};
   }
 `
 
