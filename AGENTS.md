@@ -88,6 +88,7 @@ src/
   - `@pancakeswap/storybook/primitives` → `dist/primitives.js`
 - `vite.lib.config.ts#exclude` lists files that must NOT have declarations emitted (`src/pages/**`, `WalletPanel.tsx`) — they're internal to Storybook, not part of the published API.
 - Storybook dev: `pnpm storybook`. Vite playground: `pnpm dev`.
+- **`dist/` is built by CI**, not humans. `.github/workflows/rebuild-dist.yml` runs `pnpm build:lib` on each push to a non-`gh-pages` branch and commits dist back as `github-actions[bot]` with `[skip ci]`. Don't commit local dist — a pre-commit hook in `.githooks/pre-commit` blocks it. **One-time setup after clone:** `git config core.hooksPath .githooks` (otherwise the hook is dormant). Use `git commit --no-verify` only for emergency fixes when CI is unavailable.
 
 ### What goes where
 
