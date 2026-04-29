@@ -174,14 +174,20 @@ const Root = styled(PerpsPanel)`
   flex-shrink: 0;
   flex-direction: column;
   align-self: stretch;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
   background: ${({ theme }) => theme.colors.card};
+  overflow: hidden;
   font-variant-numeric: tabular-nums;
   & > div {
     display: flex;
-    padding: 24px;
+    padding: 0;
+    border-radius: 0;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
     flex: 1 0 0;
     align-self: stretch;
     background: ${({ theme }) => theme.colors.card};
@@ -193,6 +199,7 @@ const TopCard = styled.div`
   flex: 1 0 0;
   flex-direction: column;
   align-self: stretch;
+  padding: 24px;
 `
 
 const UpDownCard = styled.div`
@@ -931,7 +938,7 @@ const Bottom = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-top: 16px;
+  padding: 24px;
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
 `
 
