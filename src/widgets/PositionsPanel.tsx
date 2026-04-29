@@ -1,5 +1,5 @@
 import React from 'react'
-import styled, { useTheme } from 'styled-components'
+import styled, { css, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
@@ -241,6 +241,17 @@ const OrdersTable = styled.div`
   }
 `
 
+/* Shared scroll mixin for the history tabs. Without this each history
+ * table grew to fit every row — a 100-entry history pushed the whole
+ * page-bottom panel below the fold. The grid stays intact (rather than
+ * splitting headers + body into separate scroll containers, which
+ * would desync column widths) and `Th` cells use `position: sticky`
+ * so the header row anchors to the top while rows scroll under it. */
+const historyTableScroll = css`
+  max-height: 360px;
+  overflow-y: auto;
+`
+
 const TradesTable = styled.div`
   display: grid;
   grid-template-columns: 148px 156px 1fr 1fr 1fr 1fr;
@@ -250,6 +261,7 @@ const TradesTable = styled.div`
   & > * {
     padding: 16px 12px;
   }
+  ${historyTableScroll}
 `
 
 const TxTable = styled.div`
@@ -261,6 +273,7 @@ const TxTable = styled.div`
   & > * {
     padding: 16px 12px;
   }
+  ${historyTableScroll}
 `
 
 const OrderHistoryTable = styled.div`
@@ -272,6 +285,7 @@ const OrderHistoryTable = styled.div`
   & > * {
     padding: 16px 12px;
   }
+  ${historyTableScroll}
 `
 
 /** Stacked date / time cell — the figma renders these on two lines. */
@@ -311,6 +325,14 @@ const ShareBtn = styled.button`
 const Th = styled(Text).attrs({ fontSize: '10px', color: 'textSubtle' })`
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  /* Anchor the header row when the history tables overflow + scroll.
+     position: sticky is a no-op when the parent doesn't scroll, so
+     this is also safe on the Positions / Open Orders tables (which
+     don't use the scroll mixin today). */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: ${({ theme }) => theme.colors.card};
 `
 
 const Td = styled(Text).attrs({ fontSize: '14px' })`
