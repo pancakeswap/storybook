@@ -5373,6 +5373,7 @@ var Ri = I.div`
   background: ${({ theme: e }) => e.colors.card};
   overflow: hidden;
   font-variant-numeric: tabular-nums;
+
   & > div {
     display: flex;
     padding: 0;
@@ -5383,12 +5384,33 @@ var Ri = I.div`
     align-self: stretch;
     background: ${({ theme: e }) => e.colors.card};
   }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    width: 357px;
+  }
+
+  @media (max-width: 967.98px) {
+    width: auto;
+    align-self: stretch;
+    border-radius: 24px;
+    & > div {
+      flex: 0 0 auto;
+    }
+  }
 `, Oo = I.div`
   display: flex;
   flex: 1 0 0;
   flex-direction: column;
   align-self: stretch;
   padding: 24px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 575.98px) {
+    padding: 16px;
+  }
 `, ko = I.div`
   display: flex;
   width: 458px;
@@ -5401,11 +5423,32 @@ var Ri = I.div`
   border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.cardSecondary};
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    width: auto;
+    align-self: stretch;
+    border-radius: 16px;
+    border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+    border-right: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+    border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
+    border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+    background: ${({ theme: e }) => e.colors.cardSecondary};
+  }
+
+  @media (max-width: 967.98px) {
+    width: auto;
+    align-self: stretch;
+  }
 `, Ao = I.div`
   display: flex;
   gap: 8px;
   align-self: stretch;
   padding: 0;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    height: 56px;
+    align-items: center;
+  }
 `, jo = I.div`
   display: flex;
   flex-direction: column;
@@ -5586,6 +5629,12 @@ var Mo = I.div`
     -webkit-appearance: none;
     margin: 0;
   }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    color: ${({ theme: e }) => e.colors.textSubtle};
+    font-size: 32px;
+    letter-spacing: -0.32px;
+  }
 `, Wo = I.button`
   display: flex;
   align-items: flex-end;
@@ -5733,6 +5782,11 @@ var Zo = I(T)`
   font-weight: 600;
   line-height: 120%;
   letter-spacing: -0.4px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    font-size: 32px;
+    letter-spacing: -0.32px;
+  }
 `, ns = {
 	safe: "#129E7D",
 	warn: "#FFB237",
@@ -5796,6 +5850,7 @@ var Zo = I(T)`
 `, us = I.div`
   position: relative;
   height: 21px;
+  flex-shrink: 0;
   align-self: stretch;
   border-radius: 24px;
   border: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
@@ -5805,6 +5860,10 @@ var Zo = I(T)`
 
   html.dark & {
     background: ${({ theme: e }) => e.colors.backgroundBubblegum};
+  }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    height: 16px;
   }
 `, ds = I.span`
   position: absolute;
@@ -6065,6 +6124,10 @@ var xs = I.div`
   border-bottom: 4px solid rgba(0, 0, 0, 0.2);
   border-left: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 24px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    border-radius: 16px;
+  }
   font-family: Kanit;
   font-size: 24px;
   font-style: normal;
@@ -6124,6 +6187,14 @@ var xs = I.div`
   gap: 16px;
   padding: 24px;
   border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 575.98px) {
+    padding: 16px;
+  }
 `, As = I(T)`
   display: flex;
   padding: 16px;
@@ -6162,6 +6233,12 @@ var xs = I.div`
   line-height: 120%;
   letter-spacing: -0.32px;
   font-variant-numeric: tabular-nums;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    font-size: 24px;
+    line-height: 150%;
+    letter-spacing: -0.24px;
+  }
 `, Ns = ({ selected: e, options: t, onSelect: n, onClickFallback: r }) => {
 	let [i, a] = F(!1), o = P(null);
 	j(() => {
@@ -6396,6 +6473,11 @@ var xs = I.div`
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.card};
   font-variant-numeric: tabular-nums;
+
+  @media (max-width: 575.98px) {
+    padding: 16px;
+    gap: 8px;
+  }
 `, Is = I.button`
   display: inline-flex;
   align-items: center;
@@ -6408,6 +6490,10 @@ var xs = I.div`
   color: ${({ theme: e }) => e.colors.text};
   text-align: left;
   flex-shrink: 0;
+
+  @media (max-width: 575.98px) {
+    flex: 1;
+  }
 `, Ls = I.span`
   width: 64px;
   height: 64px;
@@ -6420,6 +6506,12 @@ var xs = I.div`
   font-size: 16px;
   font-weight: 700;
   flex-shrink: 0;
+
+  @media (max-width: 575.98px) {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
 `, Rs = I.span`
   display: inline-flex;
   width: 64px;
@@ -6436,6 +6528,12 @@ var xs = I.div`
     object-fit: contain;
     display: block;
   }
+
+  @media (max-width: 575.98px) {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+  }
 `;
 I.span`
   display: inline-flex;
@@ -6446,6 +6544,16 @@ var zs = I.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
+
+  @media (max-width: 575.98px) {
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    & > :first-child {
+      flex: 1;
+    }
+  }
 `, Bs = I.span`
   display: inline-flex;
   align-items: center;
@@ -6462,6 +6570,13 @@ var zs = I.div`
   border-bottom: 2px solid ${({ theme: e }) => e.colors.inputSecondary};
   border-left: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
+
+  @media (max-width: 575.98px) {
+    height: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
 `, Hs = I.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -6475,6 +6590,11 @@ var zs = I.div`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
+
+  @media (max-width: 575.98px) {
+    font-size: 20px;
+    letter-spacing: -0.2px;
+  }
 `, Us = I.span`
   display: flex;
   width: 20px;
@@ -6482,17 +6602,48 @@ var zs = I.div`
   justify-content: center;
   align-items: center;
   color: ${({ theme: e }) => e.colors.textSubtle};
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
 `, Ws = I.span`
+  display: none;
+
+  @media (max-width: 575.98px) {
+    display: inline-flex;
+    padding: 2px;
+    align-items: center;
+    gap: 4px;
+    border-radius: 8px;
+    border-top: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+    border-right: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+    border-bottom: 2px solid ${({ theme: e }) => e.colors.inputSecondary};
+    border-left: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+    background: ${({ theme: e }) => e.colors.input};
+    color: ${({ theme: e }) => e.colors.textSubtle};
+    flex-shrink: 0;
+  }
+`, Gs = I.span`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`, Gs = I.span`
+`, Ks = I.span`
   font-size: 32px;
   font-weight: 600;
   letter-spacing: -0.32px;
   line-height: 1.2;
   color: ${({ theme: e }) => e.colors.text};
-`, Ks = I.span`
+
+  @media (max-width: 575.98px) {
+    font-family: Kanit;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+    color: ${({ theme: e }) => e.colors.text};
+  }
+`, qs = I.span`
   display: flex;
   padding: 0 6px;
   justify-content: center;
@@ -6506,11 +6657,15 @@ var zs = I.div`
   html.dark & {
     background: ${({ $positive: e }) => e ? "#0C3A32" : "#3E1C39"};
   }
-`, qs = I.span`
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
+`, Js = I.span`
   display: inline-flex;
   align-items: center;
   color: ${({ $positive: e }) => e ? "#129E7D" : "#ED4B9E"};
-`, Js = I.div`
+`, Ys = I.div`
   display: flex;
   align-items: center;
   flex: 0 1 auto;
@@ -6518,12 +6673,12 @@ var zs = I.div`
   overflow: hidden;
   position: relative;
   justify-content: flex-start;
-`, Ys = I(T)`
+`, Xs = I(T)`
   align-items: center;
   gap: 24px;
   height: 56px;
   flex-shrink: 0;
-`, Xs = I.span`
+`, Zs = I.span`
   position: absolute;
   right: 0;
   top: 50%;
@@ -6539,19 +6694,52 @@ var zs = I.div`
   pointer-events: none;
   opacity: ${({ $visible: e }) => e ? 1 : 0};
   transition: opacity 0.15s;
-`, Zs = I.div`
+`, Qs = I.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;
-`, Qs = I.span`
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    display: ${({ $hideOnLaptop: e }) => e ? "none" : "flex"};
+  }
+
+  @media (min-width: 576px) and (max-width: 967.98px) {
+    display: ${({ $hideOnLaptop: e }) => e ? "none" : "flex"};
+  }
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
+`, $s = I.span`
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, $s = I.span`
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    color: ${({ theme: e }) => e.colors.textSubtle};
+    font-feature-settings: 'liga' off;
+    font-family: Kanit;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;
+  }
+`, ec = I.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
-`, ec = () => /* @__PURE__ */ B("svg", {
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    color: ${({ theme: e }) => e.colors.text};
+    font-feature-settings: 'liga' off;
+    font-family: Kanit;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+  }
+`, tc = () => /* @__PURE__ */ B("svg", {
 	width: "12",
 	height: "12",
 	viewBox: "0 0 12 12",
@@ -6561,7 +6749,7 @@ var zs = I.div`
 		d: "M1.90301 9.83956C1.65374 9.83956 1.47213 9.73331 1.35818 9.52081C1.24423 9.30831 1.25374 9.0988 1.3867 8.89228L5.49051 2.73574C5.61516 2.5553 5.78491 2.46509 5.99977 2.46509C6.21462 2.46509 6.38437 2.5553 6.50901 2.73574L10.6128 8.89228C10.7458 9.0988 10.7553 9.30831 10.6414 9.52081C10.5274 9.73331 10.3458 9.83956 10.0965 9.83956H1.90301Z",
 		fill: "currentColor"
 	})
-}), tc = () => /* @__PURE__ */ B("svg", {
+}), nc = () => /* @__PURE__ */ B("svg", {
 	width: "12",
 	height: "12",
 	viewBox: "0 0 12 12",
@@ -6571,7 +6759,7 @@ var zs = I.div`
 		d: "M1.90301 2.16044C1.65374 2.16044 1.47213 2.26669 1.35818 2.47919C1.24423 2.69169 1.25374 2.9012 1.3867 3.10772L5.49051 9.26426C5.61516 9.4447 5.78491 9.53491 5.99977 9.53491C6.21462 9.53491 6.38437 9.4447 6.50901 9.26426L10.6128 3.10772C10.7458 2.9012 10.7553 2.69169 10.6414 2.47919C10.5274 2.26669 10.3458 2.16044 10.0965 2.16044H1.90301Z",
 		fill: "currentColor"
 	})
-}), nc = () => /* @__PURE__ */ B("svg", {
+}), rc = () => /* @__PURE__ */ B("svg", {
 	width: "20",
 	height: "20",
 	viewBox: "0 0 20 20",
@@ -6581,7 +6769,7 @@ var zs = I.div`
 		d: "M7.25878 9.75835L9.41712 11.9167C9.74212 12.2417 10.2671 12.2417 10.5921 11.9167L12.7504 9.75835C13.2754 9.23335 12.9004 8.33335 12.1588 8.33335H7.84212C7.10045 8.33335 6.73378 9.23335 7.25878 9.75835Z",
 		fill: "currentColor"
 	})
-}), rc = I.div`
+}), ic = I.div`
   position: fixed;
   inset: 0;
   display: flex;
@@ -6589,7 +6777,7 @@ var zs = I.div`
   justify-content: center;
   background: rgba(40, 13, 95, 0.60);
   z-index: 1000;
-`, ic = I.div`
+`, ac = I.div`
   display: flex;
   width: 697px;
   flex-direction: column;
@@ -6605,12 +6793,12 @@ var zs = I.div`
     0 4px 8px 0 rgba(0, 0, 0, 0.16);
   padding: 16px;
   gap: 16px;
-`, ac = I.div`
+`, oc = I.div`
   display: flex;
   align-items: center;
   gap: 16px;
   align-self: stretch;
-`, oc = I.button`
+`, sc = I.button`
   border: 0;
   background: transparent;
   padding: 4px 0;
@@ -6620,7 +6808,7 @@ var zs = I.div`
   color: ${({ $active: e, theme: t }) => e ? t.colors.secondary : t.colors.textSubtle};
   cursor: pointer;
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, sc = I.label`
+`, cc = I.label`
   display: flex;
   padding: 7px 8px 9px 16px;
   align-items: flex-start;
@@ -6633,7 +6821,7 @@ var zs = I.div`
   border-left: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, cc = I.input`
+`, lc = I.input`
   flex: 1;
   border: 0;
   background: transparent;
@@ -6642,13 +6830,13 @@ var zs = I.div`
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.text};
   &::placeholder { color: ${({ theme: e }) => e.colors.textSubtle}; }
-`, lc = I.div`
+`, uc = I.div`
   display: grid;
   grid-template-columns: 24px 1fr 1fr 1fr 1fr;
   align-items: center;
   align-self: stretch;
   row-gap: 4px;
-`, uc = I.div`
+`, dc = I.div`
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -6663,30 +6851,30 @@ var zs = I.div`
   &:nth-child(3),
   &:nth-child(4),
   &:nth-child(5) { justify-content: flex-end; }
-`, dc = I.button`
+`, fc = I.button`
   display: contents;
   border: 0;
   background: transparent;
   cursor: pointer;
   font-family: inherit;
   text-align: left;
-`, fc = I.div`
+`, pc = I.div`
   padding: 12px 12px;
   font-family: Kanit;
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
   font-variant-numeric: tabular-nums;
-  ${dc}:hover & { background: ${({ theme: e }) => e.colors.cardSecondary}; }
-`, pc = I(fc)`
+  ${fc}:hover & { background: ${({ theme: e }) => e.colors.cardSecondary}; }
+`, mc = I(pc)`
   padding-left: 8px;
   padding-right: 0;
   color: #F0B90B;
-`, mc = I(fc)`
+`, hc = I(pc)`
   display: inline-flex;
   align-items: center;
   gap: 12px;
-`, hc = I.span`
+`, gc = I.span`
   width: 28px;
   height: 28px;
   border-radius: 999px;
@@ -6698,19 +6886,19 @@ var zs = I.div`
   font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
-`, gc = I(fc)`
+`, _c = I(pc)`
   text-align: right;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
-`, _c = I.span`
+`, vc = I.span`
   display: inline-flex;
   align-items: center;
   gap: 2px;
   color: ${({ theme: e, $up: t }) => t ? e.colors.success : e.colors.failure};
   font-weight: 600;
-`, vc = [
+`, yc = [
 	{
 		symbol: "BTC",
 		lastPrice: "$590.75",
@@ -6735,48 +6923,48 @@ var zs = I.div`
 		color: "#627EEA",
 		starred: !0
 	}
-], yc = ({ isOpen: e, onClose: t }) => e ? /* @__PURE__ */ B(rc, {
+], bc = ({ isOpen: e, onClose: t }) => e ? /* @__PURE__ */ B(ic, {
 	onClick: t,
-	children: /* @__PURE__ */ V(ic, {
+	children: /* @__PURE__ */ V(ac, {
 		onClick: (e) => e.stopPropagation(),
 		children: [
-			/* @__PURE__ */ V(ac, { children: [/* @__PURE__ */ B(oc, {
+			/* @__PURE__ */ V(oc, { children: [/* @__PURE__ */ B(sc, {
 				type: "button",
 				$active: !0,
 				children: "Favorites"
-			}), /* @__PURE__ */ B(oc, {
+			}), /* @__PURE__ */ B(sc, {
 				type: "button",
 				children: "All markets"
 			})] }),
-			/* @__PURE__ */ V(sc, { children: [/* @__PURE__ */ B("svg", {
+			/* @__PURE__ */ V(cc, { children: [/* @__PURE__ */ B("svg", {
 				width: "20",
 				height: "20",
 				viewBox: "0 0 24 24",
 				fill: "currentColor",
 				"aria-hidden": !0,
 				children: /* @__PURE__ */ B("path", { d: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" })
-			}), /* @__PURE__ */ B(cc, {
+			}), /* @__PURE__ */ B(lc, {
 				type: "text",
 				placeholder: "All tokens"
 			})] }),
-			/* @__PURE__ */ V(lc, {
+			/* @__PURE__ */ V(uc, {
 				role: "table",
 				children: [
-					/* @__PURE__ */ B(uc, { children: "SYMBOLS" }),
-					/* @__PURE__ */ B(uc, {}),
-					/* @__PURE__ */ B(uc, { children: "LAST PRICE" }),
-					/* @__PURE__ */ B(uc, { children: "1D CHANGE" }),
-					/* @__PURE__ */ B(uc, { children: "1D VOLUME (USDT)" }),
-					vc.map((e) => /* @__PURE__ */ V(dc, {
+					/* @__PURE__ */ B(dc, { children: "SYMBOLS" }),
+					/* @__PURE__ */ B(dc, {}),
+					/* @__PURE__ */ B(dc, { children: "LAST PRICE" }),
+					/* @__PURE__ */ B(dc, { children: "1D CHANGE" }),
+					/* @__PURE__ */ B(dc, { children: "1D VOLUME (USDT)" }),
+					yc.map((e) => /* @__PURE__ */ V(fc, {
 						type: "button",
 						children: [
-							/* @__PURE__ */ B(pc, { children: "★" }),
-							/* @__PURE__ */ V(mc, { children: [/* @__PURE__ */ B(hc, {
+							/* @__PURE__ */ B(mc, { children: "★" }),
+							/* @__PURE__ */ V(hc, { children: [/* @__PURE__ */ B(gc, {
 								$color: e.color,
 								children: e.symbol.slice(0, 1)
 							}), /* @__PURE__ */ B("span", { children: e.symbol })] }),
-							/* @__PURE__ */ B(gc, { children: e.lastPrice }),
-							/* @__PURE__ */ B(gc, { children: /* @__PURE__ */ V(_c, {
+							/* @__PURE__ */ B(_c, { children: e.lastPrice }),
+							/* @__PURE__ */ B(_c, { children: /* @__PURE__ */ V(vc, {
 								$up: e.change >= 0,
 								children: [
 									e.change >= 0 ? "▲" : "▼",
@@ -6785,14 +6973,14 @@ var zs = I.div`
 									"%"
 								]
 							}) }),
-							/* @__PURE__ */ B(gc, { children: e.volume })
+							/* @__PURE__ */ B(_c, { children: e.volume })
 						]
 					}, e.symbol))
 				]
 			})
 		]
 	})
-}) : null, bc = ({ baseAsset: e, pair: t, price: n, pricePnlPct: r, volume24h: i, openInterest: a, fundingRate: o, nextFunding: s, onSymbolClick: c, renderTokenIcon: l }) => {
+}) : null, xc = ({ baseAsset: e, pair: t, price: n, pricePnlPct: r, volume24h: i, openInterest: a, fundingRate: o, nextFunding: s, onSymbolClick: c, renderTokenIcon: l }) => {
 	let u = r >= 0, d = l?.(), f = P(null), p = P(null), [m, h] = F(!1), [g, _] = F(!1);
 	return j(() => {
 		let e = f.current, t = p.current;
@@ -6808,32 +6996,48 @@ var zs = I.div`
 				c?.(), _(!0);
 			},
 			"aria-label": `Change market · ${t}`,
-			children: [d == null ? /* @__PURE__ */ B(Ls, { children: e }) : /* @__PURE__ */ B(Rs, { children: d }), /* @__PURE__ */ V(zs, { children: [/* @__PURE__ */ B(Bs, { children: /* @__PURE__ */ V(Vs, { children: [/* @__PURE__ */ B(Hs, { children: t }), /* @__PURE__ */ B(Us, {
-				"aria-hidden": !0,
-				children: /* @__PURE__ */ B(nc, {})
-			})] }) }), /* @__PURE__ */ V(Ws, { children: [/* @__PURE__ */ B(Gs, { children: n }), /* @__PURE__ */ V(Ks, {
-				$positive: u,
-				children: [
-					/* @__PURE__ */ B(qs, {
-						$positive: u,
-						children: B(u ? ec : tc, {})
-					}),
-					r.toFixed(2),
-					"%"
-				]
-			})] })] })]
+			children: [d == null ? /* @__PURE__ */ B(Ls, { children: e }) : /* @__PURE__ */ B(Rs, { children: d }), /* @__PURE__ */ V(zs, { children: [
+				/* @__PURE__ */ B(Bs, { children: /* @__PURE__ */ V(Vs, { children: [/* @__PURE__ */ B(Hs, { children: t }), /* @__PURE__ */ B(Us, {
+					"aria-hidden": !0,
+					children: /* @__PURE__ */ B(rc, {})
+				})] }) }),
+				/* @__PURE__ */ V(Gs, { children: [/* @__PURE__ */ B(Ks, { children: n }), /* @__PURE__ */ V(qs, {
+					$positive: u,
+					children: [
+						/* @__PURE__ */ B(Js, {
+							$positive: u,
+							children: B(u ? tc : nc, {})
+						}),
+						r.toFixed(2),
+						"%"
+					]
+				})] }),
+				/* @__PURE__ */ B(Ws, {
+					"aria-hidden": !0,
+					children: /* @__PURE__ */ B(rc, {})
+				})
+			] })]
 		}),
-		/* @__PURE__ */ V(Js, {
+		/* @__PURE__ */ V(Ys, {
 			ref: f,
-			children: [/* @__PURE__ */ V(Ys, {
+			children: [/* @__PURE__ */ V(Xs, {
 				ref: p,
 				children: [
-					/* @__PURE__ */ V(Zs, { children: [/* @__PURE__ */ B(Qs, { children: "24h Volume" }), /* @__PURE__ */ B($s, { children: i })] }),
-					/* @__PURE__ */ V(Zs, { children: [/* @__PURE__ */ B(Qs, { children: "Open Interest" }), /* @__PURE__ */ B($s, { children: a })] }),
-					/* @__PURE__ */ V(Zs, { children: [/* @__PURE__ */ B(Qs, { children: "Funding Rate" }), /* @__PURE__ */ B($s, { children: o })] }),
-					/* @__PURE__ */ V(Zs, { children: [/* @__PURE__ */ B(Qs, { children: "Next Funding" }), /* @__PURE__ */ B($s, { children: s })] })
+					/* @__PURE__ */ V(Qs, { children: [/* @__PURE__ */ B($s, { children: "24h Volume" }), /* @__PURE__ */ B(ec, { children: i })] }),
+					/* @__PURE__ */ V(Qs, {
+						$hideOnLaptop: !0,
+						children: [/* @__PURE__ */ B($s, { children: "Open Interest" }), /* @__PURE__ */ B(ec, { children: a })]
+					}),
+					/* @__PURE__ */ V(Qs, {
+						$hideOnLaptop: !0,
+						children: [/* @__PURE__ */ B($s, { children: "Funding Rate" }), /* @__PURE__ */ B(ec, { children: o })]
+					}),
+					/* @__PURE__ */ V(Qs, {
+						$hideOnLaptop: !0,
+						children: [/* @__PURE__ */ B($s, { children: "Next Funding" }), /* @__PURE__ */ B(ec, { children: s })]
+					})
 				]
-			}), /* @__PURE__ */ B(Xs, {
+			}), /* @__PURE__ */ B(Zs, {
 				$visible: m,
 				"aria-hidden": !0,
 				children: /* @__PURE__ */ B("svg", {
@@ -6845,12 +7049,12 @@ var zs = I.div`
 				})
 			})]
 		}),
-		/* @__PURE__ */ B(yc, {
+		/* @__PURE__ */ B(bc, {
 			isOpen: g,
 			onClose: () => _(!1)
 		})
 	] });
-}, xc = I(H)`
+}, Sc = I(H)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -6871,11 +7075,11 @@ var zs = I.div`
     flex-direction: column;
     gap: 12px;
   }
-`, Sc = I.div`
+`, Cc = I.div`
   display: inline-flex;
   align-items: center;
   gap: 24px;
-`, Cc = I.button`
+`, wc = I.button`
   border: 0;
   background: transparent;
   font-family: inherit;
@@ -6884,21 +7088,21 @@ var zs = I.div`
   font-weight: ${({ $active: e }) => e ? 700 : 400};
   color: ${({ $active: e, theme: t }) => e ? t.colors.primary : t.colors.textSubtle};
   cursor: pointer;
-`, wc = I.div`
+`, Tc = I.div`
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
-`, Tc = I.div`
+`, Ec = I.div`
   flex: 1;
   position: relative;
   display: grid;
   grid-template-columns: 1fr 40px;
   gap: 8px;
-`, Ec = I.div`
+`, Dc = I.div`
   position: relative;
   overflow: visible;
-`, Dc = I.div`
+`, Oc = I.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -6907,13 +7111,13 @@ var zs = I.div`
   text-align: left;
   padding-top: 6px;
   padding-bottom: 24px;
-`, Oc = I.div`
+`, kc = I.div`
   display: flex;
   justify-content: space-between;
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   padding-top: 8px;
-`, kc = I.span`
+`, Ac = I.span`
   position: absolute;
   display: inline-flex;
   align-items: center;
@@ -6925,26 +7129,26 @@ var zs = I.div`
   font-family: 'Kanit', sans-serif;
   font-weight: 600;
   pointer-events: none;
-`, Ac = 1e3, jc = 360, Mc = 20, Nc = 70;
-function Pc(e) {
+`, jc = 1e3, Mc = 360, Nc = 20, Pc = 70;
+function Fc(e) {
 	if (e.length < 2) return null;
-	let t = Math.min(...e.map((e) => e.price)), n = Math.max(...e.map((e) => e.price)) - t || 1, r = e.map((t, n) => n / (e.length - 1) * Ac), i = e.map((e) => Mc + (1 - (e.price - t) / n) * (jc - Mc - Nc)), a = `M ${r[0].toFixed(2)} ${i[0].toFixed(2)}`;
+	let t = Math.min(...e.map((e) => e.price)), n = Math.max(...e.map((e) => e.price)) - t || 1, r = e.map((t, n) => n / (e.length - 1) * jc), i = e.map((e) => Nc + (1 - (e.price - t) / n) * (Mc - Nc - Pc)), a = `M ${r[0].toFixed(2)} ${i[0].toFixed(2)}`;
 	for (let e = 0; e < r.length - 1; e++) {
 		let t = r[e - 1] ?? r[e], n = i[e - 1] ?? i[e], o = r[e], s = i[e], c = r[e + 1], l = i[e + 1], u = r[e + 2] ?? r[e + 1], d = i[e + 2] ?? i[e + 1], f = o + (c - t) / 6, p = s + (l - n) / 6, m = c - (u - o) / 6, h = l - (d - s) / 6;
 		a += ` C ${f.toFixed(2)} ${p.toFixed(2)}, ${m.toFixed(2)} ${h.toFixed(2)}, ${c.toFixed(2)} ${l.toFixed(2)}`;
 	}
-	let o = `${a} L ${Ac} ${jc} L 0 ${jc} Z`, s = i[i.length - 1];
+	let o = `${a} L ${jc} ${Mc} L 0 ${Mc} Z`, s = i[i.length - 1];
 	return {
 		line: a,
 		area: o,
 		endY: s
 	};
 }
-var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n", Ic = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n  L 1000 360\n  L 0 360\n  Z\n", Lc = 200, Rc = ({ timeframe: e, timeframes: t, onTimeframeChange: n, points: r, currentPriceLabel: i, yTicks: a, xTicks: o }) => {
-	let s = R(), c = `simple-chart-fill-${ee().replace(/:/g, "")}`, l = s?.colors?.primary ?? "#1FC7D4", u = N(() => Pc(r), [r]), d = u?.line ?? Fc, f = u?.area ?? Ic, p = u?.endY ?? Lc;
-	return /* @__PURE__ */ V(xc, { children: [/* @__PURE__ */ B(Sc, {
+var Ic = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n", Lc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n  L 1000 360\n  L 0 360\n  Z\n", Rc = 200, zc = ({ timeframe: e, timeframes: t, onTimeframeChange: n, points: r, currentPriceLabel: i, yTicks: a, xTicks: o }) => {
+	let s = R(), c = `simple-chart-fill-${ee().replace(/:/g, "")}`, l = s?.colors?.primary ?? "#1FC7D4", u = N(() => Fc(r), [r]), d = u?.line ?? Ic, f = u?.area ?? Lc, p = u?.endY ?? Rc;
+	return /* @__PURE__ */ V(Sc, { children: [/* @__PURE__ */ B(Cc, {
 		role: "tablist",
-		children: t.map((t) => /* @__PURE__ */ B(Cc, {
+		children: t.map((t) => /* @__PURE__ */ B(wc, {
 			type: "button",
 			role: "tab",
 			"aria-selected": e === t,
@@ -6952,8 +7156,8 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			onClick: () => n(t),
 			children: t
 		}, t))
-	}), /* @__PURE__ */ V(wc, { children: [/* @__PURE__ */ V(Tc, { children: [/* @__PURE__ */ V(Ec, { children: [/* @__PURE__ */ V("svg", {
-		viewBox: `0 0 ${Ac} ${jc}`,
+	}), /* @__PURE__ */ V(Tc, { children: [/* @__PURE__ */ V(Ec, { children: [/* @__PURE__ */ V(Dc, { children: [/* @__PURE__ */ V("svg", {
+		viewBox: `0 0 ${jc} ${Mc}`,
 		preserveAspectRatio: "none",
 		style: {
 			width: "100%",
@@ -6991,7 +7195,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ B("line", {
 				x1: "0",
 				y1: p,
-				x2: Ac - 10,
+				x2: jc - 10,
 				y2: p,
 				stroke: l,
 				strokeWidth: "1",
@@ -6999,20 +7203,20 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				opacity: "0.7"
 			})
 		]
-	}), /* @__PURE__ */ B(kc, {
+	}), /* @__PURE__ */ B(Ac, {
 		style: {
 			right: -8,
-			top: `calc(${p}/${jc} * 100% - 14px)`
+			top: `calc(${p}/${Mc} * 100% - 14px)`
 		},
 		children: i
-	})] }), /* @__PURE__ */ B(Dc, {
+	})] }), /* @__PURE__ */ B(Oc, {
 		"aria-hidden": !0,
 		children: a.map((e, t) => /* @__PURE__ */ B("span", { children: e }, `${e}-${t}`))
-	})] }), /* @__PURE__ */ B(Oc, {
+	})] }), /* @__PURE__ */ B(kc, {
 		"aria-hidden": !0,
 		children: o.map((e, t) => /* @__PURE__ */ B("span", { children: e }, `${e}-${t}`))
 	})] })] });
-}, zc = I(H)`
+}, Bc = I(H)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -7025,7 +7229,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     background: transparent;
     padding: 0;
   }
-`, Bc = I.div`
+`, Vc = I.div`
   display: flex;
   align-items: center;
   gap: 4px;
@@ -7033,7 +7237,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   padding: 0;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   align-self: stretch;
-`, Vc = I.button`
+`, Hc = I.button`
   display: flex;
   padding: ${({ $active: e }) => e ? "12px 12px 12px 16px" : "12px 12px"};
   justify-content: center;
@@ -7050,11 +7254,164 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-weight: ${({ $active: e }) => e ? 600 : 400};
   color: ${({ $active: e, theme: t }) => e ? t.colors.secondary : t.colors.textSubtle};
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, Hc = I.div`
+`, Uc = I.div`
   display: grid;
   grid-template-columns: 180px 1fr 1fr 1fr 1fr 1fr 1fr 56px;
   align-items: center;
-`, Uc = I.div`
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    grid-template-columns: 180px 1fr 1fr 1fr 56px;
+  }
+
+  @media (max-width: 967.98px) {
+    display: none;
+  }
+`, Wc = I.div`
+  display: none;
+
+  @media (max-width: 967.98px) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+`, Gc = I.div`
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 16px;
+  border-radius: 16px;
+  border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-right: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  background: ${({ theme: e }) => e.colors.cardSecondary};
+  gap: 16px;
+`, Kc = I.div`
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+`, qc = I.span`
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: ${({ $color: e }) => e};
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-right: 12px;
+`, Jc = I.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`, Yc = I.span`
+  color: ${({ theme: e }) => e.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+`, Xc = I.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: ${({ $direction: e }) => e === "up" ? "#129E7D" : "#ED4B9E"};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  text-transform: uppercase;
+`, Zc = I.span`
+  color: ${({ $sign: e, theme: t }) => e === "positive" ? "#129E7D" : e === "negative" ? "#ED4B9E" : t.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`, Qc = I.span`
+  display: block;
+  height: 1px;
+  align-self: stretch;
+  background: ${({ theme: e }) => e.colors.cardBorder};
+`, $c = I.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: stretch;
+`, el = I.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+`, tl = I.span`
+  color: ${({ theme: e }) => e.colors.textSubtle};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+`, nl = I.span`
+  color: ${({ $danger: e, $safe: t, theme: n }) => t ? "#129E7D" : e ? "#ED4B9E" : n.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`, rl = I.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: stretch;
+`, il = I.div`
+  height: 12px;
+  align-self: stretch;
+  border-radius: 999px;
+  background: ${({ theme: e }) => e.colors.input};
+  overflow: hidden;
+`, al = I.div`
+  height: 100%;
+  width: ${({ $pct: e }) => `${Math.max(0, Math.min(100, e))}%`};
+  background: ${({ $status: e, theme: t }) => e === "safe" ? t.colors.success : e === "warn" ? t.colors.warning : t.colors.failure};
+`, ol = I.button`
+  display: flex;
+  height: 48px;
+  padding: 12px;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 16px;
+  border-top: 1px solid #ED4B9E;
+  border-right: 1px solid #ED4B9E;
+  border-bottom: 2px solid #ED4B9E;
+  border-left: 1px solid #ED4B9E;
+  background: transparent;
+  color: #ED4B9E;
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover { background: #FFF0F9; }
+`, sl = I.div`
+  display: contents;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    display: none;
+  }
+`, cl = I.div`
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr 1fr;
   align-items: center;
@@ -7074,7 +7431,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   align-items: center;
   gap: 4px;
   justify-content: ${({ $align: e }) => e === "right" ? "flex-end" : "flex-start"};
-`, Wc = () => /* @__PURE__ */ V("svg", {
+`, ll = () => /* @__PURE__ */ V("svg", {
 	width: "14",
 	height: "14",
 	viewBox: "0 0 14 14",
@@ -7087,7 +7444,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 		d: "M5.23333 7.59979C5.01857 7.59979 4.83608 7.52464 4.68588 7.37433C4.53557 7.22412 4.46042 7.04163 4.46042 6.82687V3.84298L3.68808 4.61531C3.54274 4.76075 3.36511 4.83348 3.15521 4.83348C2.94531 4.83348 2.76282 4.76075 2.60775 4.61531C2.45258 4.46568 2.375 4.28456 2.375 4.07193C2.375 3.85931 2.44981 3.67541 2.59944 3.52025L4.68485 1.43483C4.75972 1.36007 4.84488 1.30363 4.94035 1.26552C5.03592 1.2275 5.13358 1.2085 5.23333 1.2085C5.33308 1.2085 5.43074 1.2275 5.52631 1.26552C5.62178 1.30363 5.70695 1.36007 5.78181 1.43483L7.8735 3.53483C8.02312 3.69 8.09692 3.87146 8.09488 4.07922C8.09274 4.28699 8.01408 4.46568 7.85892 4.61531C7.70929 4.76075 7.52924 4.8345 7.31875 4.83654C7.10826 4.83868 6.92821 4.76493 6.77858 4.61531L6.00625 3.84298V6.82687C6.00625 7.04163 5.9311 7.22412 5.78079 7.37433C5.63058 7.52464 5.4481 7.59979 5.23333 7.59979Z",
 		fill: "#BDC2C4"
 	})]
-}), Gc = I.button`
+}), ul = I.button`
   display: flex;
   padding: 1px 2px 3px 2px;
   align-items: flex-start;
@@ -7112,7 +7469,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   line-height: 150%;
   text-align: right;
   font-variant-numeric: tabular-nums;
-`, Kc = I.div`
+`, dl = I.div`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -7129,7 +7486,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     object-fit: contain;
     display: block;
   }
-`, qc = I.span`
+`, fl = I.span`
   display: inline-flex;
   width: 40px;
   height: 40px;
@@ -7140,11 +7497,11 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   color: #fff;
   font-weight: 700;
   font-size: 14px;
-`, Jc = I.div`
+`, pl = I.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
-`, Yc = I.span`
+`, ml = I.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -7157,7 +7514,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-`, Xc = I.span`
+`, hl = I.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -7173,7 +7530,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   letter-spacing: 0.24px;
   text-transform: uppercase;
   white-space: nowrap;
-`, Zc = I($)`
+`, gl = I($)`
   color: ${({ $sign: e, theme: t }) => e === "positive" ? "#129E7D" : e === "negative" ? "#ED4B9E" : t.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -7183,24 +7540,24 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
-`, Qc = I($)`
+`, _l = I($)`
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-`, $c = I.div`
+`, vl = I.div`
   flex: 1;
   height: 6px;
   border-radius: 999px;
   background: ${({ theme: e }) => e.colors.input};
   overflow: hidden;
   max-width: 94px;
-`, el = I.div`
+`, yl = I.div`
   height: 100%;
   width: ${({ $pct: e }) => `${Math.max(0, Math.min(100, e))}%`};
   background: ${({ $status: e, theme: t }) => e === "safe" ? t.colors.success : e === "warn" ? t.colors.warning : t.colors.failure};
   border-radius: 999px;
-`, tl = I.button`
+`, bl = I.button`
   display: flex;
   width: 32px;
   height: 32px;
@@ -7223,7 +7580,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   html.dark & {
     background: #3E1C39;
   }
-`, nl = I.div`
+`, xl = I.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7231,24 +7588,24 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   padding: 16px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 14px;
-`, rl = I.span`
+`, Sl = I.span`
   color: ${({ $side: e, theme: t }) => e === "BUY" ? t.colors.success : t.colors.failure};
   font-weight: 600;
-`, il = {
+`, Cl = {
 	BNB: "#F0B90B",
 	BTC: "#F7931A",
 	ETH: "#627EEA",
 	USDC: "#2775CA",
 	USDT: "#26A17B",
 	CAKE: "#23CAD5"
-}, al = (e) => il[e.toUpperCase()] ?? "#7A6EAA", ol = (e) => e === "up" ? "Up" : "Down", sl = () => /* @__PURE__ */ B("svg", {
+}, wl = (e) => Cl[e.toUpperCase()] ?? "#7A6EAA", Tl = (e) => e === "up" ? "Up" : "Down", El = () => /* @__PURE__ */ B("svg", {
 	width: "18",
 	height: "18",
 	viewBox: "0 0 24 24",
 	fill: "currentColor",
 	"aria-hidden": !0,
 	children: /* @__PURE__ */ B("path", { d: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" })
-}), cl = () => /* @__PURE__ */ B("svg", {
+}), Dl = () => /* @__PURE__ */ B("svg", {
 	width: "16",
 	height: "16",
 	viewBox: "0 0 16 16",
@@ -7258,12 +7615,12 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 		d: "M7.368 8.632V10.6c0 .179.06.329.18.45.121.121.27.182.448.182.179 0 .329-.061.452-.182.123-.121.184-.271.184-.45V8.632h1.968c.179 0 .329-.06.45-.18.121-.121.182-.27.182-.448 0-.178-.061-.329-.182-.452-.121-.123-.271-.184-.45-.184H8.632V5.4c0-.179-.06-.329-.18-.45-.121-.121-.27-.182-.448-.182-.178 0-.329.061-.452.182-.123.121-.184.271-.184.45v1.968H5.4c-.179 0-.329.06-.45.18-.121.12-.182.27-.182.448 0 .178.061.329.182.452.121.123.271.184.45.184h1.968ZM8.005 14.535c-.902 0-1.75-.17-2.544-.51a6.553 6.553 0 0 1-2.083-1.402 6.563 6.563 0 0 1-1.398-2.084 6.535 6.535 0 0 1-.51-2.547c0-.905.17-1.751.51-2.539a6.55 6.55 0 0 1 1.398-2.078 6.544 6.544 0 0 1 2.083-1.398 6.535 6.535 0 0 1 2.547-.51c.905 0 1.752.17 2.54.51a6.55 6.55 0 0 1 2.075 1.398 6.582 6.582 0 0 1 1.4 2.082c.34.79.51 1.637.51 2.539 0 .902-.17 1.75-.51 2.543a6.582 6.582 0 0 1-1.4 2.083 6.55 6.55 0 0 1-2.079 1.402 6.535 6.535 0 0 1-2.539.51Zm-.005-1.383c1.434 0 2.651-.5 3.652-1.5 1-1.001 1.5-2.218 1.5-3.652 0-1.434-.5-2.651-1.5-3.652-1.001-1-2.218-1.5-3.652-1.5-1.434 0-2.651.5-3.652 1.5-1 1.001-1.5 2.218-1.5 3.652 0 1.434.5 2.651 1.5 3.652 1.001 1 2.218 1.5 3.652 1.5Z",
 		fill: "currentColor"
 	})
-}), ll = I($)`
+}), Ol = I($)`
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
-`, ul = I.button`
+`, kl = I.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -7276,11 +7633,11 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   cursor: pointer;
   border-radius: 6px;
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, dl = ({ tab: e, onTabChange: t, positions: n, openOrders: r, historyEmpty: i = !0, onClosePosition: a, renderTokenIcon: o }) => /* @__PURE__ */ V(zc, { children: [
-	/* @__PURE__ */ V(Bc, {
+`, Al = ({ tab: e, onTabChange: t, positions: n, openOrders: r, historyEmpty: i = !0, onClosePosition: a, renderTokenIcon: o }) => /* @__PURE__ */ V(Bc, { children: [
+	/* @__PURE__ */ V(Vc, {
 		role: "tablist",
 		children: [
-			/* @__PURE__ */ B(Vc, {
+			/* @__PURE__ */ B(Hc, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "positions",
@@ -7288,7 +7645,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				onClick: () => t("positions"),
 				children: "Positions"
 			}),
-			/* @__PURE__ */ B(Vc, {
+			/* @__PURE__ */ B(Hc, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "orders",
@@ -7296,7 +7653,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				onClick: () => t("orders"),
 				children: "Open Orders"
 			}),
-			/* @__PURE__ */ B(Vc, {
+			/* @__PURE__ */ B(Hc, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "history",
@@ -7306,93 +7663,125 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			})
 		]
 	}),
-	e === "positions" && (n.length === 0 ? /* @__PURE__ */ B(nl, { children: "No open positions" }) : /* @__PURE__ */ V(Hc, {
+	e === "positions" && n.length > 0 && /* @__PURE__ */ B(Wc, { children: n.map((e) => /* @__PURE__ */ V(Gc, { children: [
+		/* @__PURE__ */ V(Kc, { children: [
+			o?.(e) ?? /* @__PURE__ */ B(qc, {
+				$color: e.iconColor ?? wl(e.symbol),
+				children: e.symbol.slice(0, 1)
+			}),
+			/* @__PURE__ */ V(Jc, { children: [/* @__PURE__ */ B(Yc, { children: e.symbol }), /* @__PURE__ */ V(Xc, {
+				$direction: e.direction,
+				children: [Tl(e.direction), e.leverageText ? ` · ${e.leverageText}` : ""]
+			})] }),
+			/* @__PURE__ */ B(Zc, {
+				$sign: e.pnlSign,
+				children: e.unrealizedPnl
+			})
+		] }),
+		/* @__PURE__ */ B(Qc, {}),
+		/* @__PURE__ */ V($c, { children: [
+			/* @__PURE__ */ V(el, { children: [/* @__PURE__ */ B(tl, { children: "Entry Price" }), /* @__PURE__ */ B(nl, { children: e.entryPrice })] }),
+			/* @__PURE__ */ V(el, { children: [/* @__PURE__ */ B(tl, { children: "Liq Price" }), /* @__PURE__ */ B(nl, { children: e.liqPrice })] }),
+			/* @__PURE__ */ V(rl, { children: [/* @__PURE__ */ V(el, { children: [/* @__PURE__ */ B(tl, { children: "Distance to Liq" }), /* @__PURE__ */ B(nl, {
+				$safe: e.liqStatus === "safe",
+				$danger: e.liqStatus === "danger",
+				children: e.liqStatusLabel
+			})] }), /* @__PURE__ */ B(il, { children: /* @__PURE__ */ B(al, {
+				$pct: e.liqDistancePct,
+				$status: e.liqStatus
+			}) })] })
+		] }),
+		/* @__PURE__ */ B(ol, {
+			type: "button",
+			onClick: () => a(e.id),
+			children: "Close"
+		})
+	] }, `tablet-${e.id}`)) }),
+	e === "positions" && (n.length === 0 ? /* @__PURE__ */ B(xl, { children: "No open positions" }) : /* @__PURE__ */ V(Uc, {
 		role: "table",
 		children: [
 			/* @__PURE__ */ B(Q, { children: "Token" }),
 			/* @__PURE__ */ V(Q, {
 				$align: "right",
-				children: ["Unrealized PnL", /* @__PURE__ */ B(Gc, {
+				children: ["Unrealized PnL", /* @__PURE__ */ B(ul, {
 					type: "button",
 					"aria-label": "Sort by unrealized PnL",
-					children: /* @__PURE__ */ B(Wc, {})
+					children: /* @__PURE__ */ B(ll, {})
 				})]
 			}),
-			/* @__PURE__ */ V(Q, {
+			/* @__PURE__ */ V(sl, { children: [/* @__PURE__ */ V(Q, {
 				$align: "right",
-				children: ["Initial Margin", /* @__PURE__ */ B(Gc, {
+				children: ["Initial Margin", /* @__PURE__ */ B(ul, {
 					type: "button",
 					"aria-label": "Sort by initial margin",
-					children: /* @__PURE__ */ B(Wc, {})
+					children: /* @__PURE__ */ B(ll, {})
 				})]
-			}),
-			/* @__PURE__ */ V(Q, {
+			}), /* @__PURE__ */ V(Q, {
 				$align: "right",
-				children: ["Size (USD)", /* @__PURE__ */ B(Gc, {
+				children: ["Size (USD)", /* @__PURE__ */ B(ul, {
 					type: "button",
 					"aria-label": "Sort by size",
-					children: /* @__PURE__ */ B(Wc, {})
+					children: /* @__PURE__ */ B(ll, {})
 				})]
-			}),
+			})] }),
 			/* @__PURE__ */ V(Q, {
 				$align: "right",
-				children: ["Entry Price", /* @__PURE__ */ B(Gc, {
+				children: ["Entry Price", /* @__PURE__ */ B(ul, {
 					type: "button",
 					"aria-label": "Sort by entry price",
-					children: /* @__PURE__ */ B(Wc, {})
+					children: /* @__PURE__ */ B(ll, {})
 				})]
 			}),
 			/* @__PURE__ */ V(Q, {
 				$align: "right",
-				children: ["Liq. Price", /* @__PURE__ */ B(Gc, {
+				children: ["Liq. Price", /* @__PURE__ */ B(ul, {
 					type: "button",
 					"aria-label": "Sort by liq. price",
-					children: /* @__PURE__ */ B(Wc, {})
+					children: /* @__PURE__ */ B(ll, {})
 				})]
 			}),
-			/* @__PURE__ */ V(Q, {
+			/* @__PURE__ */ B(sl, { children: /* @__PURE__ */ V(Q, {
 				$align: "right",
-				children: ["Distance to Liq", /* @__PURE__ */ B(Gc, {
+				children: ["Distance to Liq", /* @__PURE__ */ B(ul, {
 					type: "button",
 					"aria-label": "Sort by distance to liq",
-					children: /* @__PURE__ */ B(Wc, {})
+					children: /* @__PURE__ */ B(ll, {})
 				})]
-			}),
+			}) }),
 			/* @__PURE__ */ B(Q, {}),
 			n.map((e) => /* @__PURE__ */ V(D.Fragment, { children: [
-				/* @__PURE__ */ V(Kc, { children: [o?.(e) ?? /* @__PURE__ */ B(qc, {
-					$color: e.iconColor ?? al(e.symbol),
+				/* @__PURE__ */ V(dl, { children: [o?.(e) ?? /* @__PURE__ */ B(fl, {
+					$color: e.iconColor ?? wl(e.symbol),
 					children: e.symbol.slice(0, 1)
-				}), /* @__PURE__ */ V(Jc, { children: [/* @__PURE__ */ B(Yc, { children: e.symbol }), /* @__PURE__ */ V(Xc, {
+				}), /* @__PURE__ */ V(pl, { children: [/* @__PURE__ */ B(ml, { children: e.symbol }), /* @__PURE__ */ V(hl, {
 					$direction: e.direction,
-					children: [ol(e.direction), e.leverageText ? ` | ${e.leverageText}` : ""]
+					children: [Tl(e.direction), e.leverageText ? ` | ${e.leverageText}` : ""]
 				})] })] }),
-				/* @__PURE__ */ B(Zc, {
+				/* @__PURE__ */ B(gl, {
 					$sign: e.pnlSign,
 					children: e.unrealizedPnl
 				}),
-				/* @__PURE__ */ V(ll, { children: [e.initialMargin, /* @__PURE__ */ B(ul, {
+				/* @__PURE__ */ V(sl, { children: [/* @__PURE__ */ V(Ol, { children: [e.initialMargin, /* @__PURE__ */ B(kl, {
 					type: "button",
 					"aria-label": "Add margin",
-					children: /* @__PURE__ */ B(cl, {})
-				})] }),
-				/* @__PURE__ */ B($, { children: e.sizeUsd }),
+					children: /* @__PURE__ */ B(Dl, {})
+				})] }), /* @__PURE__ */ B($, { children: e.sizeUsd })] }),
 				/* @__PURE__ */ B($, { children: e.entryPrice }),
 				/* @__PURE__ */ B($, { children: e.liqPrice }),
-				/* @__PURE__ */ V(Qc, { children: [/* @__PURE__ */ B($c, { children: /* @__PURE__ */ B(el, {
+				/* @__PURE__ */ B(sl, { children: /* @__PURE__ */ V(_l, { children: [/* @__PURE__ */ B(vl, { children: /* @__PURE__ */ B(yl, {
 					$pct: e.liqDistancePct,
 					$status: e.liqStatus
-				}) }), /* @__PURE__ */ B("span", { children: e.liqStatusLabel })] }),
-				/* @__PURE__ */ B(tl, {
+				}) }), /* @__PURE__ */ B("span", { children: e.liqStatusLabel })] }) }),
+				/* @__PURE__ */ B(bl, {
 					type: "button",
 					"aria-label": "Close position",
 					onClick: () => a(e.id),
-					children: /* @__PURE__ */ B(sl, {})
+					children: /* @__PURE__ */ B(El, {})
 				})
 			] }, e.id))
 		]
 	})),
-	e === "orders" && (r.length === 0 ? /* @__PURE__ */ B(nl, { children: "No open orders" }) : /* @__PURE__ */ V(Uc, {
+	e === "orders" && (r.length === 0 ? /* @__PURE__ */ B(xl, { children: "No open orders" }) : /* @__PURE__ */ V(cl, {
 		role: "table",
 		children: [
 			/* @__PURE__ */ B(Q, { children: "Symbol" }),
@@ -7404,7 +7793,7 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ B(Q, { children: "Status" }),
 			r.map((e) => /* @__PURE__ */ V(D.Fragment, { children: [
 				/* @__PURE__ */ B($, { children: e.symbol }),
-				/* @__PURE__ */ B($, { children: /* @__PURE__ */ B(rl, {
+				/* @__PURE__ */ B($, { children: /* @__PURE__ */ B(Sl, {
 					$side: e.side,
 					children: e.side
 				}) }),
@@ -7416,9 +7805,9 @@ var Fc = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			] }, e.id))
 		]
 	})),
-	e === "history" && /* @__PURE__ */ B(nl, { children: "No transaction history" })
+	e === "history" && /* @__PURE__ */ B(xl, { children: "No transaction history" })
 ] });
 //#endregion
-export { _e as AccountPanel, Ni as BookTradesPanel, Oi as ChartPanel, oo as DepositModal, co as EnableTradingModal, Se as LeverageModal, Nt as MarketsDropdown, hr as OrderBook, ut as OrderConfirmModal, Ra as OrderForm, Fe as PerpsErrorMessage, H as PerpsPanel, Ir as PositionsPanel, je as RecentTrades, Ps as SimpleBetPanel, Rc as SimpleChartCard, dl as SimplePositionsCard, bc as SimpleTickerCard, rn as SymbolHeader, _i as TpSlModal, U as UnderlineTab, W as UnderlineTabs, nt as WithdrawModal };
+export { _e as AccountPanel, Ni as BookTradesPanel, Oi as ChartPanel, oo as DepositModal, co as EnableTradingModal, Se as LeverageModal, Nt as MarketsDropdown, hr as OrderBook, ut as OrderConfirmModal, Ra as OrderForm, Fe as PerpsErrorMessage, H as PerpsPanel, Ir as PositionsPanel, je as RecentTrades, Ps as SimpleBetPanel, zc as SimpleChartCard, Al as SimplePositionsCard, xc as SimpleTickerCard, rn as SymbolHeader, _i as TpSlModal, U as UnderlineTab, W as UnderlineTabs, nt as WithdrawModal };
 
 //# sourceMappingURL=widgets.js.map
