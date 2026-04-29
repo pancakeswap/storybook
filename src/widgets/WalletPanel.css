@@ -1,0 +1,155 @@
+/* ── Wallet Panel (Figma 71:5823) ────────────────────────────
+ * Layout:
+ *   ┌── outer card (card-secondary bg) ──────────────┐
+ *   │ [avatar] 0x…address  [copy]                    │
+ *   │                                                 │
+ *   │ ┌── inner card (card-primary bg) ────────────┐ │
+ *   │ │ Total Value                                 │ │
+ *   │ │ $5.93                                       │ │
+ *   │ │ ┌ Deposit ─┐ ┌ Withdraw ─┐                │ │
+ *   │ │ Preference                                  │ │
+ *   │ │ Assets Mode   …Multi-Assets Mode  ›        │ │
+ *   │ │ Position Mode  …One-way Mode      ⓘ        │ │
+ *   │ │ Order Confirmation                   ›      │ │
+ *   │ └────────────────────────────────────────────┘ │
+ *   │                                                 │
+ *   │ 🌐 View on explorer                             │
+ *   │ 🔌 API management                               │
+ *   │ ⏻ Disconnect                                    │
+ *   └─────────────────────────────────────────────────┘
+ * ─────────────────────────────────────────────────────────── */
+
+.wp-root {
+  width: 320px;
+  padding: 16px;
+  background: var(--pcs-colors-card-secondary);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-variant-numeric: tabular-nums;
+  box-shadow: var(--pcs-shadows-dropdown, 0 12px 32px -16px rgba(0, 0, 0, 0.6));
+}
+
+/* ── Address header ───────────────────────────────────────── */
+.wp-address-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wp-address {
+  /* Address text — sits between avatar and copy button */
+}
+
+.wp-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--pcs-colors-text-subtle);
+  cursor: pointer;
+  transition: color 0.12s;
+}
+.wp-icon-btn:hover { color: var(--pcs-colors-text); }
+
+/* ── Inner card (total value + buttons + prefs) ───────────── */
+.wp-inner-card {
+  padding: 16px;
+  background: var(--pcs-colors-card);
+  border: 1px solid var(--pcs-colors-card-border);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Total value block */
+.wp-total {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Deposit / Withdraw row */
+.wp-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Preference section */
+.wp-prefs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wp-pref-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wp-pref-row--static { cursor: default; }
+.wp-pref-row:not(.wp-pref-row--static):hover .wp-pref-right {
+  filter: brightness(1.15);
+}
+
+.wp-pref-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--pcs-colors-text);
+  transition: filter 0.12s;
+}
+.wp-pref-right > svg { color: var(--pcs-colors-text-subtle); }
+
+.wp-info-btn {
+  padding: 3px;
+  width: 24px;
+  height: 24px;
+}
+
+/* ── Outer menu list ──────────────────────────────────────── */
+.wp-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wp-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: filter 0.12s;
+}
+.wp-menu-item:hover { filter: brightness(1.2); }
+
+.wp-menu-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--pcs-colors-text-subtle);
+  flex-shrink: 0;
+}
