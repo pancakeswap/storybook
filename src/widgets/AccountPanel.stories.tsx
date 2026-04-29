@@ -81,3 +81,36 @@ export const ReadyNegative: Story = {
     },
   },
 }
+
+/**
+ * Slim mobile-row variant. Triggered automatically by the mobile
+ * breakpoint via `useMatchBreakpoints` — to preview here we override
+ * the Storybook viewport. Renders just a label + bold equity figure
+ * on the left and a primary "Deposit" button on the right.
+ */
+export const Mobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    layout: 'fullscreen',
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ width: 360, display: 'flex' }}>
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    walletDisplay: '0x1234…abcd',
+    canDeposit: true,
+    canWithdraw: true,
+    state: {
+      kind: 'ready',
+      equity: '$13.55',
+      available: '987.21',
+      unrealizedPnl: '+0.00',
+      pnlSign: 'zero',
+      marginMode: 'Cross',
+    },
+  },
+}

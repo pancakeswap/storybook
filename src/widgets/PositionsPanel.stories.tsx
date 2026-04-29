@@ -4,7 +4,9 @@ import { fn } from 'storybook/test'
 import {
   PositionsPanel,
   type OpenOrderRow,
+  type OrderHistoryRow,
   type PositionRow,
+  type PositionsHistoryTab,
   type PositionsPanelTab,
   type TradeHistoryRow,
   type TransactionHistoryRow,
@@ -122,5 +124,55 @@ export const Interactive: Story = {
   render: (args) => {
     const [tab, setTab] = useState<PositionsPanelTab>('positions')
     return <PositionsPanel {...args} tab={tab} onTabChange={setTab} />
+  },
+}
+
+const MOCK_ORDER_HISTORY: OrderHistoryRow[] = [
+  {
+    id: 'oh1', date: '2025-04-17', time: '01:37:26', symbol: 'BTCUSDT', side: 'BUY',
+    type: 'Limit', price: '86,000', origQty: '0.01 BTC', executedQty: '0.01 BTC', status: 'FILLED',
+  },
+  {
+    id: 'oh2', date: '2025-04-16', time: '22:14:08', symbol: 'ETHUSDT', side: 'SELL',
+    type: 'Stop Market', price: 'Market / Trig 3,210', origQty: '0.5 ETH', executedQty: '0', status: 'CANCELED',
+  },
+]
+
+/**
+ * Mobile variant — same widget, narrow viewport. Renders the
+ * `Open Orders | Positions | Assets | TWAP` tab strip, the filters row,
+ * and an empty-state body, plus the History sheet portal opened from
+ * the clock icon.
+ */
+export const Mobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    layout: 'fullscreen',
+  },
+  render: (args) => {
+    const [tab, setTab] = useState<PositionsPanelTab>('positions')
+    const [hideOther, setHideOther] = useState(false)
+    const [historyOpen, setHistoryOpen] = useState(false)
+    const [historyTab, setHistoryTab] = useState<PositionsHistoryTab>('orders')
+    return (
+      <PositionsPanel
+        {...args}
+        isMobile
+        tab={tab}
+        onTabChange={setTab}
+        positionsCount={1}
+        hideOtherSymbols={hideOther}
+        onHideOtherSymbolsChange={setHideOther}
+        instrumentFilterLabel="All instruments"
+        onInstrumentFilterClick={fn()}
+        historyOpen={historyOpen}
+        onHistoryToggle={setHistoryOpen}
+        historyTab={historyTab}
+        onHistoryTabChange={setHistoryTab}
+        orderHistory={MOCK_ORDER_HISTORY}
+        tradeHistory={MOCK_TRADES}
+        transactionHistory={MOCK_TXS}
+      />
+    )
   },
 }

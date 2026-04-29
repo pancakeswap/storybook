@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import styled, { useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Text } from '../primitives/Text'
-import { ChevronDownIcon } from '../primitives/Icons'
+import { ChartDisableIcon, ChartIcon, ChevronDownIcon, StarFillIcon, StarLineIcon } from '../primitives/Icons'
+import { useMatchBreakpoints } from '../contexts'
 
 export interface SymbolHeaderProps {
   /** Full venue symbol — used as React key + aria labels. */
@@ -39,6 +40,15 @@ export interface SymbolHeaderProps {
   // ── Favorite ──────────────────────────────────────────────────
   favorited?: boolean
   onToggleFavorite?: () => void
+
+  // ── Chart toggle (mobile only) ────────────────────────────────
+  /**
+   * Mobile variant only — controls the chart-icon toggle button shown
+   * in the mobile symbol row. When `onChartToggle` is undefined the
+   * button is not rendered (desktop has its own chart panel).
+   */
+  chartOpen?: boolean
+  onChartToggle?: () => void
 
   // ── Markets dropdown ──────────────────────────────────────────
   /**
@@ -287,7 +297,16 @@ const identity = (s: string) => s
  * can drop in without the widget knowing about data sources. Portal
  * anchoring + outside-click / Escape dismissal stay here.
  */
-export const SymbolHeader: React.FC<SymbolHeaderProps> = ({
+export const SymbolHeader: React.FC<SymbolHeaderProps> = (props) => {
+  // Auto-responsive: switch to mobile layout when the viewport drops
+  // into the mobile breakpoint. Same pattern as OrderForm — desktop
+  // call sites don't need to pass any flag.
+  const { isMobile } = useMatchBreakpoints()
+  if (isMobile) return <MobileSymbolHeader {...props} />
+  return <DesktopSymbolHeader {...props} />
+}
+
+const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   symbol,
   pairLabel,
   logoUrl,
@@ -447,3 +466,266 @@ export const SymbolHeader: React.FC<SymbolHeaderProps> = ({
     </Root>
   )
 }
+
+// ════════════════════════════════════════════════════════════════
+// Mobile variant
+// ════════════════════════════════════════════════════════════════
+
+const MobileRoot = styled(Flex)`
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.backgroundAlt};
+  font-variant-numeric: tabular-nums;
+`
+
+const MobileSymBtn = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  &[aria-disabled='true'] {
+    cursor: default;
+  }
+`
+
+const MobileCoinBadge = styled.span<{ $bg?: string }>`
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: ${({ $bg }) => $bg ?? '#F7931A'};
+  overflow: hidden;
+`
+
+const MobilePairText = styled.span`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const MobilePerpTag = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: ${({ theme }) => theme.colors.input};
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 11px;
+`
+
+const MobileChev = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  display: inline-flex;
+  align-items: center;
+`
+
+const MobileChange = styled.span<{ $negative?: boolean }>`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ $negative, theme }) => ($negative ? theme.colors.failure : theme.colors.success)};
+`
+
+const MobileSpacer = styled.span`
+  flex: 1;
+`
+
+const MobileIconBtn = styled.button<{ $starred?: boolean; $active?: boolean }>`
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: ${({ $starred, $active, theme }) => {
+    if ($starred) return theme.colors.warning
+    if ($active) return theme.colors.primary
+    return theme.colors.textSubtle
+  }};
+  &:hover {
+    color: ${({ $starred, $active, theme }) => {
+      if ($starred) return theme.colors.warning
+      if ($active) return theme.colors.primary
+      return theme.colors.text
+    }};
+  }
+`
+
+// Full-width sheet anchored under the symbol pill — matches the page's
+// previous `.mp-markets-pop` behaviour: 12px side margin, capped at 480px.
+const MobileDropdownPortal = styled.div`
+  position: fixed;
+  z-index: 1000;
+`
+
+/**
+ * Mobile-optimised symbol row — single line: coin badge, pair text,
+ * "Perp" tag, chevron (whole left cluster opens the markets dropdown),
+ * 24h % change, spacer, favorite + chart-toggle icon buttons.
+ *
+ * Visually mirrors the legacy `.mp-sym` row in MobilePerpsPage so the
+ * page can drop its inline implementation without a layout shift.
+ */
+const MobileSymbolHeader: React.FC<SymbolHeaderProps> = ({
+  symbol,
+  pairLabel,
+  logoUrl,
+  change24h,
+  favorited = false,
+  onToggleFavorite,
+  chartOpen = false,
+  onChartToggle,
+  renderMarketsDropdown,
+  marketsOpen,
+  onMarketsOpenChange,
+  t = identity,
+}) => {
+  const isControlled = marketsOpen !== undefined
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = isControlled ? marketsOpen : internalOpen
+  const setOpen = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)) => {
+      const nextOpen = typeof next === 'function' ? next(open) : next
+      if (!isControlled) setInternalOpen(nextOpen)
+      onMarketsOpenChange?.(nextOpen)
+    },
+    [isControlled, open, onMarketsOpenChange],
+  )
+
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null)
+
+  // Anchor the markets sheet under the trigger, full body width minus
+  // 12px gutters, capped at 480px (same contract as the legacy page).
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return undefined
+    const place = () => {
+      const r = triggerRef.current!.getBoundingClientRect()
+      const margin = 12
+      const left = Math.max(margin, r.left)
+      const width = Math.min(window.innerWidth - margin * 2, 480)
+      setPos({ top: r.bottom + 4, left, width })
+    }
+    place()
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [open])
+
+  // Outside-click + Escape close.
+  useEffect(() => {
+    if (!open) return undefined
+    const onDown = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (triggerRef.current?.contains(target)) return
+      if (panelRef.current?.contains(target)) return
+      setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const close = useCallback(() => setOpen(false), [setOpen])
+  const change24hNegative = Number(change24h) < 0
+  const baseAsset = pairLabel.split(/[- ]/)[0] ?? pairLabel
+
+  const trigger = !!renderMarketsDropdown
+
+  return (
+    <MobileRoot aria-label={`${symbol} ticker`}>
+      <MobileSymBtn
+        ref={triggerRef}
+        role="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-disabled={!trigger}
+        tabIndex={trigger ? 0 : -1}
+        onClick={() => trigger && setOpen((o) => !o)}
+        onKeyDown={(e) => {
+          if (!trigger) return
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setOpen((o) => !o)
+          }
+        }}
+      >
+        <MobileCoinBadge $bg={logoUrl ? 'transparent' : undefined}>
+          {logoUrl ? <CoinImg src={logoUrl} alt={pairLabel} /> : baseAsset}
+        </MobileCoinBadge>
+        <MobilePairText>{symbol}</MobilePairText>
+        <MobilePerpTag>{t('Perp')}</MobilePerpTag>
+        <MobileChev>
+          <ChevronDownIcon width="16px" color="textSubtle" />
+        </MobileChev>
+      </MobileSymBtn>
+
+      {change24h !== undefined && (
+        <MobileChange $negative={change24hNegative}>{formatPctRaw(change24h)}</MobileChange>
+      )}
+
+      <MobileSpacer />
+
+      {onToggleFavorite && (
+        <MobileIconBtn
+          type="button"
+          $starred={favorited}
+          aria-label={favorited ? t('Unfavorite') : t('Favorite')}
+          aria-pressed={favorited}
+          onClick={onToggleFavorite}
+        >
+          {favorited ? (
+            <StarFillIcon width="20px" aria-hidden="true" />
+          ) : (
+            <StarLineIcon width="20px" aria-hidden="true" />
+          )}
+        </MobileIconBtn>
+      )}
+
+      {onChartToggle && (
+        <MobileIconBtn
+          type="button"
+          $active={chartOpen}
+          aria-label={chartOpen ? t('Hide chart') : t('Show chart')}
+          aria-pressed={chartOpen}
+          onClick={onChartToggle}
+        >
+          {chartOpen ? <ChartDisableIcon width="20px" /> : <ChartIcon width="20px" />}
+        </MobileIconBtn>
+      )}
+
+      {open && pos && typeof document !== 'undefined' && renderMarketsDropdown
+        ? createPortal(
+            <MobileDropdownPortal
+              ref={panelRef}
+              style={{ top: pos.top, left: pos.left, width: pos.width }}
+            >
+              {renderMarketsDropdown(close)}
+            </MobileDropdownPortal>,
+            document.body,
+          )
+        : null}
+    </MobileRoot>
+  )
+}
+

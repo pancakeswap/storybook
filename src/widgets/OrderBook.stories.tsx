@@ -79,3 +79,40 @@ export const Interactive: Story = {
     )
   },
 }
+
+/**
+ * Mobile variant — auto-selected via `useMatchBreakpoints` when the
+ * viewport drops to phone width. Renders the column layout used by
+ * MobilePerpsPage: funding row at top, asks → mid block → bids, with
+ * a footer view-toggle (bottom sheet) and tick-size dropdown.
+ */
+export const Mobile: Story = {
+  parameters: { viewport: { defaultViewport: 'iphone17Pro' }, layout: 'fullscreen' },
+  decorators: [
+    (Story) => (
+      <div style={{ width: '50%', height: '100vh', display: 'flex' }}>
+        <Story />
+      </div>
+    ),
+  ],
+  render: (args) => {
+    const [view, setView] = useState<OrderBookView>('both')
+    const [priceStep, setPriceStep] = useState('0.1')
+    const [sizeUnit, setSizeUnit] = useState<OrderBookSizeUnit>('BASE')
+    return (
+      <OrderBook
+        {...args}
+        view={view}
+        onViewChange={setView}
+        priceStep={priceStep}
+        onPriceStepChange={setPriceStep}
+        sizeUnit={sizeUnit}
+        onSizeUnitChange={setSizeUnit}
+        fundingRateText="0.0006%"
+        fundingCountdownText="05:06:37"
+        midPriceText="77,823.5"
+        midSubText="$77,824.4"
+      />
+    )
+  },
+}

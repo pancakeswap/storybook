@@ -47,6 +47,7 @@ export { PositionsPanel } from './PositionsPanel'
 export type {
   PositionsPanelProps,
   PositionsPanelTab,
+  PositionsHistoryTab,
   PositionRow,
   OpenOrderRow,
   OrderHistoryRow,

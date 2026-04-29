@@ -1,8 +1,11 @@
 import React from 'react'
+import { createPortal } from 'react-dom'
 import styled, { css, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
+import { ChevronDownIcon, CloseIcon, HistoryIcon } from '../primitives/Icons'
+import { useMatchBreakpoints } from '../contexts'
 import { PerpsPanel, UnderlineTab, UnderlineTabs } from './primitives'
 
 export interface PositionRow {
@@ -96,6 +99,13 @@ export type PositionsPanelTab =
   | 'history'
   | 'trades'
   | 'transactions'
+  /** Mobile-only — list of holdings, no desktop equivalent yet. */
+  | 'assets'
+  /** Mobile-only — TWAP orders, no desktop equivalent yet. */
+  | 'twap'
+
+/** History sheet inner-tab (mobile only). */
+export type PositionsHistoryTab = 'orders' | 'trades' | 'tx'
 
 export interface PositionsPanelProps {
   /** Controlled active tab. */
@@ -152,6 +162,36 @@ export interface PositionsPanelProps {
   cancellingOrderId?: OpenOrderRow['id'] | null
   /** Translator. */
   t?: (key: string) => string
+
+  // ── Mobile-only props ────────────────────────────────────────
+  /**
+   * Force the mobile layout. Defaults to `useMatchBreakpoints().isMobile`
+   * — same auto-detection pattern as `OrderForm`.
+   */
+  isMobile?: boolean
+  /**
+   * Optional positions count override. The mobile tab strip renders
+   * `Positions (N)` and consumers may want to pass a server-derived
+   * count rather than `positions.length`.
+   */
+  positionsCount?: number
+  /** Mobile filter row — "Hide other symbols" checkbox state. */
+  hideOtherSymbols?: boolean
+  onHideOtherSymbolsChange?: (next: boolean) => void
+  /** Mobile filter row — instrument filter button label (default `All instruments`). */
+  instrumentFilterLabel?: string
+  /** Mobile filter row — invoked when the instrument-filter button is clicked. */
+  onInstrumentFilterClick?: () => void
+  /**
+   * Mobile-only: open state of the full-page History sheet portal. The
+   * sheet covers the viewport and renders the orderHistory / tradeHistory
+   * / transactionHistory tabs.
+   */
+  historyOpen?: boolean
+  onHistoryToggle?: (open: boolean) => void
+  /** Mobile-only: active sub-tab inside the History sheet. */
+  historyTab?: PositionsHistoryTab
+  onHistoryTabChange?: (tab: PositionsHistoryTab) => void
 }
 
 const Card = styled(PerpsPanel)`
@@ -448,8 +488,20 @@ const PositionTableRow: React.FC<{
  * Per-row business actions (Close / Cancel / TP+SL editor) fire
  * callbacks — consumer owns the signed API calls + toast + modal. The
  * widget just renders.
+ *
+ * Auto-responsive: dispatches to {@link MobilePositionsPanel} when the
+ * viewport is mobile (or when `isMobile` is forced via prop). The mobile
+ * variant exposes a different tab set (`Open Orders | Positions | Assets
+ * | TWAP`) and owns a full-page History sheet portal.
  */
-export const PositionsPanel: React.FC<PositionsPanelProps> = ({
+export const PositionsPanel: React.FC<PositionsPanelProps> = (props) => {
+  const { isMobile: isMobileBp } = useMatchBreakpoints()
+  const isMobile = props.isMobile ?? isMobileBp
+  if (isMobile) return <MobilePositionsPanel {...props} />
+  return <DesktopPositionsPanel {...props} />
+}
+
+const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   tab,
   onTabChange,
   positions,
@@ -709,5 +761,511 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
           ))}
       </Body>
     </Card>
+  )
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * Mobile variant
+ * ──────────────────────────────────────────────────────────────
+ *
+ * Replaces the four legacy classes from MobilePerpsPage.css:
+ *   `mp-tabs`, `mp-tab`, `mp-filters`, `mp-empty` (+ their helpers)
+ * plus the inline full-page `History` portal that previously lived in
+ * MobilePerpsPage.tsx (~lines 587–792). All visuals are owned by the
+ * widget so consumers don't reach into mp-* class names.
+ */
+
+/** Mobile tab strip — top of the panel, white-active + 2px primary underline. */
+const MobileTabsBar = styled.nav`
+  display: flex;
+  align-items: center;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  padding: 0 12px;
+`
+
+const MobileTabBtn = styled.button<{ $active: boolean }>`
+  border: 0;
+  background: transparent;
+  padding: 12px 8px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  color: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.textSubtle)};
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  &::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: -1px;
+    height: 2px;
+    background: ${({ theme }) => theme.colors.primary};
+    opacity: ${({ $active }) => ($active ? 1 : 0)};
+  }
+`
+
+const MobileTabsSpacer = styled.span`
+  flex: 1;
+`
+
+const MobileIconBtn = styled.button`
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`
+
+const MobileFiltersRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+`
+
+const MobileFiltersSep = styled.span`
+  width: 1px;
+  height: 16px;
+  background: ${({ theme }) => theme.colors.cardBorder};
+`
+
+const MobileInstrumentBtn = styled.button`
+  background: transparent;
+  border: 0;
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+`
+
+const MobileCheckLabel = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+`
+
+const MobileEmpty = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 12px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 14px;
+`
+
+/** Wrapper that strips the desktop card chrome — the mobile page already
+ *  separates this section visually with the tab strip's borders. */
+const MobileRoot = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.colors.card};
+`
+
+/* History portal */
+const HistorySheet = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: ${({ theme }) => theme.colors.card};
+  display: flex;
+  flex-direction: column;
+`
+
+const HistorySheetHeader = styled.header`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  flex-shrink: 0;
+`
+
+const HistorySheetTitle = styled.span`
+  flex: 1;
+  font-weight: 600;
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const HistorySheetClose = styled.button`
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: pointer;
+  border-radius: 8px;
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`
+
+const HistoryTabsBar = styled.nav`
+  display: flex;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  padding: 0 12px;
+  flex-shrink: 0;
+`
+
+const HistoryTabBtn = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: 12px 8px;
+  border: 0;
+  background: transparent;
+  color: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.textSubtle)};
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  cursor: pointer;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: -1px;
+    height: 2px;
+    background: ${({ theme }) => theme.colors.primary};
+    opacity: ${({ $active }) => ($active ? 1 : 0)};
+  }
+`
+
+const HistoryBody = styled.div`
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+`
+
+const HistoryEmpty = styled.div`
+  text-align: center;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 14px;
+  padding: 48px 0;
+`
+
+const HistoryRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  gap: 12px;
+`
+
+const HistoryRowMain = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+`
+
+const HistoryRowTitle = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-weight: 600;
+`
+
+const HistoryRowMeta = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 12px;
+`
+
+const HistoryRowAside = styled.div`
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+`
+
+interface MobileTabConfig {
+  key: PositionsPanelTab
+  label: string
+  count?: number
+  emptyText: string
+}
+
+const HISTORY_TABS: { key: PositionsHistoryTab; label: string; emptyKey: string }[] = [
+  { key: 'orders', label: 'Order History', emptyKey: 'No order history yet' },
+  { key: 'trades', label: 'Trade History', emptyKey: 'No trade history yet' },
+  { key: 'tx', label: 'Transactions', emptyKey: 'No transactions yet' },
+]
+
+/**
+ * Renders the History sheet portal — opened from the mobile tab strip's
+ * clock button. Shows the same data already passed via
+ * `orderHistory[]` / `tradeHistory[]` / `transactionHistory[]`,
+ * presented in a narrow stacked layout.
+ */
+const MobileHistorySheet: React.FC<{
+  open: boolean
+  onClose: () => void
+  tab: PositionsHistoryTab
+  onTabChange: (tab: PositionsHistoryTab) => void
+  orderHistory: OrderHistoryRow[]
+  tradeHistory: TradeHistoryRow[]
+  transactionHistory: TransactionHistoryRow[]
+  t: (key: string) => string
+}> = ({ open, onClose, tab, onTabChange, orderHistory, tradeHistory, transactionHistory, t }) => {
+  const theme = useTheme()
+  if (!open || typeof document === 'undefined') return null
+
+  return createPortal(
+    <HistorySheet role="dialog" aria-modal="true" aria-label={t('History')}>
+      <HistorySheetHeader>
+        <HistorySheetTitle>{t('History')}</HistorySheetTitle>
+        <HistorySheetClose type="button" aria-label={t('Close')} onClick={onClose}>
+          <CloseIcon width="20px" aria-hidden="true" />
+        </HistorySheetClose>
+      </HistorySheetHeader>
+
+      <HistoryTabsBar role="tablist">
+        {HISTORY_TABS.map((h) => (
+          <HistoryTabBtn
+            key={h.key}
+            type="button"
+            role="tab"
+            aria-selected={tab === h.key}
+            $active={tab === h.key}
+            onClick={() => onTabChange(h.key)}
+          >
+            {t(h.label)}
+          </HistoryTabBtn>
+        ))}
+      </HistoryTabsBar>
+
+      <HistoryBody>
+        {tab === 'orders' &&
+          (orderHistory.length === 0 ? (
+            <HistoryEmpty>{t('No order history yet')}</HistoryEmpty>
+          ) : (
+            orderHistory.map((o) => (
+              <HistoryRow key={o.id}>
+                <HistoryRowMain>
+                  <HistoryRowTitle>
+                    {o.symbol}{' '}
+                    <span
+                      style={{
+                        color: o.side === 'BUY' ? theme.colors.success : theme.colors.failure,
+                        fontWeight: 400,
+                      }}
+                    >
+                      {o.side === 'BUY' ? t('Buy') : t('Sell')}
+                    </span>
+                  </HistoryRowTitle>
+                  <HistoryRowMeta>
+                    {o.date} {o.time}
+                  </HistoryRowMeta>
+                  <HistoryRowMeta>
+                    {o.type} · {o.price} · {o.executedQty}/{o.origQty}
+                  </HistoryRowMeta>
+                </HistoryRowMain>
+                <HistoryRowAside>
+                  <span style={{ color: theme.colors.textSubtle, fontSize: 12 }}>{o.status}</span>
+                </HistoryRowAside>
+              </HistoryRow>
+            ))
+          ))}
+
+        {tab === 'trades' &&
+          (tradeHistory.length === 0 ? (
+            <HistoryEmpty>{t('No trade history yet')}</HistoryEmpty>
+          ) : (
+            tradeHistory.map((tr) => {
+              const profitUp = tr.realizedProfit.startsWith('+')
+              return (
+                <HistoryRow key={tr.id}>
+                  <HistoryRowMain>
+                    <HistoryRowTitle>
+                      {tr.symbol}{' '}
+                      <span
+                        style={{
+                          color: tr.side === 'BUY' ? theme.colors.success : theme.colors.failure,
+                          fontWeight: 400,
+                        }}
+                      >
+                        {tr.side === 'BUY' ? t('Buy') : t('Sell')}
+                      </span>
+                    </HistoryRowTitle>
+                    <HistoryRowMeta>
+                      {tr.date} {tr.time}
+                    </HistoryRowMeta>
+                    <HistoryRowMeta>
+                      {tr.price} · {tr.quantity} · {t('fee')} {tr.fee}
+                    </HistoryRowMeta>
+                  </HistoryRowMain>
+                  <HistoryRowAside>
+                    <span
+                      style={{
+                        color: profitUp ? theme.colors.success : theme.colors.failure,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {tr.realizedProfit}
+                    </span>
+                  </HistoryRowAside>
+                </HistoryRow>
+              )
+            })
+          ))}
+
+        {tab === 'tx' &&
+          (transactionHistory.length === 0 ? (
+            <HistoryEmpty>{t('No transactions yet')}</HistoryEmpty>
+          ) : (
+            transactionHistory.map((x) => {
+              const positive = x.amount.startsWith('+')
+              return (
+                <HistoryRow key={x.id}>
+                  <HistoryRowMain>
+                    <HistoryRowTitle>{x.type}</HistoryRowTitle>
+                    <HistoryRowMeta>
+                      {x.date} {x.time}
+                    </HistoryRowMeta>
+                  </HistoryRowMain>
+                  <HistoryRowAside>
+                    <span
+                      style={{
+                        color: positive ? theme.colors.success : theme.colors.failure,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {x.amount}
+                    </span>
+                    <HistoryRowMeta>{x.symbol}</HistoryRowMeta>
+                  </HistoryRowAside>
+                </HistoryRow>
+              )
+            })
+          ))}
+      </HistoryBody>
+    </HistorySheet>,
+    document.body,
+  )
+}
+
+const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
+  tab,
+  onTabChange,
+  positions,
+  openOrders,
+  orderHistory = [],
+  tradeHistory = [],
+  transactionHistory = [],
+  positionsCount,
+  hideOtherSymbols = false,
+  onHideOtherSymbolsChange,
+  instrumentFilterLabel,
+  onInstrumentFilterClick,
+  historyOpen = false,
+  onHistoryToggle,
+  historyTab = 'orders',
+  onHistoryTabChange,
+  t = identity,
+}) => {
+  // Mobile tab order — differs from desktop. Open Orders / Positions /
+  // Assets / TWAP. Desktop tabs (history/trades/transactions) live in
+  // the History sheet on mobile.
+  const tabs: MobileTabConfig[] = [
+    {
+      key: 'orders',
+      label: t('Open Orders'),
+      count: openOrders.length,
+      emptyText: t('No open order found'),
+    },
+    {
+      key: 'positions',
+      label: t('Positions'),
+      count: positionsCount ?? positions.length,
+      emptyText: t('No open positions'),
+    },
+    { key: 'assets', label: t('Assets'), emptyText: t('No assets to display') },
+    { key: 'twap', label: t('TWAP'), emptyText: t('No TWAP orders') },
+  ]
+
+  const active = tabs.find((x) => x.key === tab) ?? tabs[0]
+
+  const handleTabClick = (key: PositionsPanelTab) => {
+    if (key !== tab) onTabChange(key)
+  }
+
+  return (
+    <MobileRoot>
+      <MobileTabsBar role="tablist">
+        {tabs.map((c) => (
+          <MobileTabBtn
+            key={c.key}
+            type="button"
+            role="tab"
+            aria-selected={c.key === tab}
+            $active={c.key === tab}
+            onClick={() => handleTabClick(c.key)}
+          >
+            {c.label}
+            {typeof c.count === 'number' && c.count > 0 ? ` (${c.count})` : ''}
+          </MobileTabBtn>
+        ))}
+        <MobileTabsSpacer />
+        <MobileIconBtn
+          type="button"
+          aria-label={t('History')}
+          onClick={() => onHistoryToggle?.(true)}
+        >
+          <HistoryIcon width="20px" aria-hidden="true" />
+        </MobileIconBtn>
+      </MobileTabsBar>
+
+      <MobileFiltersRow>
+        <MobileInstrumentBtn type="button" onClick={onInstrumentFilterClick}>
+          {instrumentFilterLabel ?? t('All instruments')} <ChevronDownIcon width="14px" aria-hidden="true" />
+        </MobileInstrumentBtn>
+        <MobileFiltersSep />
+        <MobileCheckLabel>
+          <input
+            type="checkbox"
+            checked={hideOtherSymbols}
+            onChange={(e) => onHideOtherSymbolsChange?.(e.target.checked)}
+          />
+          <span>{t('Hide other symbols')}</span>
+        </MobileCheckLabel>
+      </MobileFiltersRow>
+
+      {/* Empty state — the mobile mocks always render an empty state for
+       *  this list area; row rendering for assets / twap is consumer-owned
+       *  and not yet defined. Open Orders / Positions still fall through
+       *  to the tab's `emptyText`. */}
+      <MobileEmpty>{active.emptyText}</MobileEmpty>
+
+      <MobileHistorySheet
+        open={historyOpen}
+        onClose={() => onHistoryToggle?.(false)}
+        tab={historyTab}
+        onTabChange={(next) => onHistoryTabChange?.(next)}
+        orderHistory={orderHistory}
+        tradeHistory={tradeHistory}
+        transactionHistory={transactionHistory}
+        t={t}
+      />
+    </MobileRoot>
   )
 }

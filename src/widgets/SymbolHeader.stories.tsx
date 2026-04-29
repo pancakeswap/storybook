@@ -68,3 +68,48 @@ export const WithDropdown: Story = {
     )
   },
 }
+
+/**
+ * Mobile variant — the widget auto-switches at the mobile breakpoint.
+ * Includes the favorite + chart-toggle icon buttons and a tappable left
+ * cluster that opens the markets dropdown as a full-width sheet.
+ */
+export const Mobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'iphone17Pro' },
+    globals: { viewport: { value: 'iphone17Pro' } },
+  },
+  render: (args) => {
+    const [favorites, setFavorites] = useState<string[]>(['BTCUSDT'])
+    const [activeSymbol, setActiveSymbol] = useState('BTCUSDT')
+    const [chartOpen, setChartOpen] = useState(false)
+    return (
+      <SymbolHeader
+        {...args}
+        symbol={activeSymbol}
+        pairLabel={`${activeSymbol.replace('USDT', '')} - USDT`}
+        favorited={favorites.includes(activeSymbol)}
+        onToggleFavorite={() =>
+          setFavorites((prev) =>
+            prev.includes(activeSymbol) ? prev.filter((s) => s !== activeSymbol) : [...prev, activeSymbol],
+          )
+        }
+        chartOpen={chartOpen}
+        onChartToggle={() => setChartOpen((v) => !v)}
+        renderMarketsDropdown={(close) => (
+          <MarketsDropdown
+            markets={MOCK_MARKETS}
+            favorites={favorites}
+            onToggleFavorite={(sym) =>
+              setFavorites((prev) => (prev.includes(sym) ? prev.filter((s) => s !== sym) : [...prev, sym]))
+            }
+            onSelect={(sym) => {
+              setActiveSymbol(sym)
+              close()
+            }}
+          />
+        )}
+      />
+    )
+  },
+}

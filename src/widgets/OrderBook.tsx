@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import styled, { useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
+import { ChevronDownIcon } from '../primitives/Icons'
+import { useMatchBreakpoints } from '../contexts'
 import { PerpsPanel } from './primitives'
 
 export type OrderBookView = 'both' | 'bids' | 'asks'
@@ -42,6 +45,22 @@ export interface OrderBookProps {
   embedded?: boolean
   /** Translator. */
   t?: (key: string) => string
+
+  // ── Mobile-only datums (optional; ignored on desktop) ─────────
+  /** "Funding (8h) / Countdown" stat — first line shown above the ladder. */
+  fundingRateText?: string
+  /** Countdown "05:06:37" string — paired with `fundingRateText`. */
+  fundingCountdownText?: string
+  /** Big mid-price displayed between asks and bids on mobile. */
+  midPriceText?: string
+  /** Sub-price under `midPriceText` (e.g. "$77,824.4"). */
+  midSubText?: string
+  /**
+   * Tick-size dropdown options on mobile. Defaults to
+   * `['0.1','0.5','1','5','10','50','100']`. The selected value is
+   * driven by `priceStep`; selection emits `onPriceStepChange`.
+   */
+  priceStepOptions?: string[]
 }
 
 const MAX_VISIBLE_ROWS = 10
@@ -365,6 +384,378 @@ const AsksIcon: React.FC<{ askColor: string; listColor: string }> = ({ askColor,
 
 const identity = (s: string) => s
 
+/* ── Mobile variant ────────────────────────────────────────── */
+
+const MOBILE_PRICE_STEPS_DEFAULT = ['0.1', '0.5', '1', '5', '10', '50', '100']
+
+const MWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 8px 8px 0;
+  font-size: 12px;
+  height: 100%;
+  width: 100%;
+  background: ${({ theme }) => theme.colors.card};
+`
+
+const MFunding = styled.div`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  margin-bottom: 8px;
+  strong {
+    color: ${({ theme }) => theme.colors.text};
+    font-weight: 400;
+  }
+`
+
+const MHead = styled.div`
+  display: flex;
+  justify-content: space-between;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 11px;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+`
+
+const MHeadSize = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+`
+
+const MRow = styled.div<{ $side: 'bid' | 'ask' }>`
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+  color: ${({ $side, theme }) => ($side === 'bid' ? '#129E7D' : theme.colors.failure)};
+`
+
+const MBar = styled.span`
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -1;
+  pointer-events: none;
+`
+
+const MMid = styled.div`
+  text-align: center;
+  padding: 8px 0;
+`
+
+const MMidPrice = styled.div`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const MMidSub = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+`
+
+const MFoot = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 4px;
+  /* Sit directly below the last bid row in normal flow. Earlier we used
+     margin-top: auto to glue this to the column bottom, but when the
+     adjacent OrderForm column is taller than the order book the grid row
+     stretches MWrap and the footer ends up below the iPhone viewport. */
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+`
+
+const MIconBtn = styled.button`
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: pointer;
+  padding: 0;
+`
+
+const MStepBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 12px;
+  font-family: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+`
+
+const MStepMenu = styled.div`
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  min-width: 80px;
+  background: ${({ theme }) => theme.colors.card};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 8px;
+  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  z-index: 50;
+`
+
+const MStepItem = styled.button<{ $active: boolean }>`
+  display: block;
+  width: 100%;
+  text-align: right;
+  padding: 8px 12px;
+  border: 0;
+  background: ${({ $active, theme }) => ($active ? theme.colors.input : 'transparent')};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+`
+
+/* Bottom-sheet view selector (Both / Asks only / Bids only) */
+const SheetBackdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 250;
+`
+
+const Sheet = styled.div`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 260;
+  background: ${({ theme }) => theme.colors.card};
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 8px 0 16px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+`
+
+const SheetHandle = styled.div`
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.textSubtle};
+  opacity: 0.4;
+  margin: 4px auto 12px;
+`
+
+const SheetItem = styled.button<{ $active: boolean }>`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border: 0;
+  background: ${({ $active, theme }) => ($active ? theme.colors.input : 'transparent')};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+`
+
+const SheetCheck = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 16px;
+`
+
+const MobileOrderBook: React.FC<OrderBookProps> = ({
+  asks,
+  bids,
+  baseAsset,
+  quoteAsset,
+  tickSize,
+  pricePrecision = 2,
+  view,
+  onViewChange,
+  priceStep,
+  onPriceStepChange,
+  hidden,
+  t = identity,
+  fundingRateText,
+  fundingCountdownText,
+  midPriceText,
+  midSubText,
+  priceStepOptions = MOBILE_PRICE_STEPS_DEFAULT,
+}) => {
+  const theme = useTheme()
+  const [stepOpen, setStepOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const stepWrapRef = useRef<HTMLDivElement>(null)
+  useClickOutside(stepWrapRef, () => setStepOpen(false))
+
+  // Reuse the desktop aggregator + cumulator pipeline so depth bars, price
+  // bucketing and bid/ask ordering are consistent across breakpoints.
+  // `aggregateLevels` early-returns the input untouched when multiplier is 1,
+  // so we cannot rely on its sort order — normalise both sides explicitly
+  // (asks ascending by price, bids descending) before slicing/reversing for
+  // the desired top-down display order: highest ask first, then mid, then
+  // highest bid.
+  const rows = useMemo(() => {
+    const stepValue = Math.max(tickSize, Number(priceStep) || tickSize)
+    const aggMultiplier = Math.max(1, Math.round(stepValue / tickSize))
+    const aggAsks = aggregateLevels(asks, 'ask', tickSize, aggMultiplier, pricePrecision)
+    const aggBids = aggregateLevels(bids, 'bid', tickSize, aggMultiplier, pricePrecision)
+    const sortedAsks = [...aggAsks].sort(([a], [b]) => Number(a) - Number(b))
+    const sortedBids = [...aggBids].sort(([a], [b]) => Number(b) - Number(a))
+    return {
+      asks: sortedAsks.slice(0, MAX_VISIBLE_ROWS).reverse(),
+      bids: sortedBids.slice(0, MAX_VISIBLE_ROWS),
+    }
+  }, [asks, bids, priceStep, tickSize, pricePrecision])
+
+  const maxQty = useMemo(() => {
+    let m = 0
+    for (const [, q] of rows.asks) m = Math.max(m, Number(q) || 0)
+    for (const [, q] of rows.bids) m = Math.max(m, Number(q) || 0)
+    return m || 1
+  }, [rows])
+
+  const askBg = `color-mix(in srgb, ${theme.colors.failure} 18%, transparent)`
+  const bidBg = `color-mix(in srgb, #129E7D 18%, transparent)`
+
+  const renderRow = (price: string, qty: string, side: 'bid' | 'ask') => {
+    const pct = Math.max(6, Math.min(100, (Number(qty) / maxQty) * 100))
+    return (
+      <MRow key={`${side}-${price}`} $side={side}>
+        <MBar style={{ width: `${pct}%`, background: side === 'ask' ? askBg : bidBg }} />
+        <span>{price}</span>
+        <span>{Number(qty).toFixed(3)}</span>
+      </MRow>
+    )
+  }
+
+  const VIEW_OPTIONS: ReadonlyArray<{ key: OrderBookView; label: string }> = [
+    { key: 'both', label: t('Both') },
+    { key: 'asks', label: t('Asks only') },
+    { key: 'bids', label: t('Bids only') },
+  ]
+
+  const askColor = theme.colors.failure
+  const bidColor = '#129E7D'
+  const listColor = theme.colors.textSubtle
+
+  return (
+    <MWrap style={hidden ? { display: 'none' } : undefined}>
+      {(fundingRateText || fundingCountdownText) && (
+        <MFunding>
+          {t('Funding (8h) / Countdown')}
+          <strong>
+            {fundingRateText ?? '—'} / {fundingCountdownText ?? '—'}
+          </strong>
+        </MFunding>
+      )}
+      <MHead>
+        <span>
+          {t('Price')}
+          <br />({quoteAsset})
+        </span>
+        <MHeadSize>
+          {t('Size')}
+          <br />({baseAsset}) <ChevronDownIcon width="14px" aria-hidden="true" />
+        </MHeadSize>
+      </MHead>
+
+      {view !== 'bids' && rows.asks.map(([p, q]) => renderRow(p, q, 'ask'))}
+
+      {view === 'both' && (
+        <MMid>
+          <MMidPrice>{midPriceText ?? rows.bids[0]?.[0] ?? '—'}</MMidPrice>
+          {midSubText && <MMidSub>{midSubText}</MMidSub>}
+        </MMid>
+      )}
+
+      {view !== 'asks' && rows.bids.map(([p, q]) => renderRow(p, q, 'bid'))}
+
+      <MFoot>
+        <MIconBtn
+          type="button"
+          aria-label={t('Choose view')}
+          aria-haspopup="dialog"
+          onClick={() => setSheetOpen(true)}
+        >
+          {view === 'both' && <BothIcon bidColor={bidColor} askColor={askColor} listColor={listColor} />}
+          {view === 'asks' && <AsksIcon askColor={askColor} listColor={listColor} />}
+          {view === 'bids' && <BidsIcon bidColor={bidColor} listColor={listColor} />}
+        </MIconBtn>
+
+        <div ref={stepWrapRef} style={{ position: 'relative' }}>
+          <MStepBtn
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded={stepOpen}
+            onClick={() => setStepOpen((v) => !v)}
+          >
+            {priceStep} <ChevronDownIcon width="14px" aria-hidden="true" />
+          </MStepBtn>
+          {stepOpen && (
+            <MStepMenu role="listbox">
+              {priceStepOptions.map((s) => (
+                <MStepItem
+                  key={s}
+                  type="button"
+                  role="option"
+                  aria-selected={s === priceStep}
+                  $active={s === priceStep}
+                  onClick={() => {
+                    onPriceStepChange(s)
+                    setStepOpen(false)
+                  }}
+                >
+                  {s}
+                </MStepItem>
+              ))}
+            </MStepMenu>
+          )}
+        </div>
+      </MFoot>
+
+      {sheetOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <>
+            <SheetBackdrop onClick={() => setSheetOpen(false)} />
+            <Sheet role="dialog" aria-label={t('Choose view')}>
+              <SheetHandle />
+              {VIEW_OPTIONS.map((o) => (
+                <SheetItem
+                  key={o.key}
+                  type="button"
+                  $active={view === o.key}
+                  onClick={() => {
+                    onViewChange(o.key)
+                    setSheetOpen(false)
+                  }}
+                >
+                  <span>{o.label}</span>
+                  {view === o.key && <SheetCheck>✓</SheetCheck>}
+                </SheetItem>
+              ))}
+            </Sheet>
+          </>,
+          document.body,
+        )}
+    </MWrap>
+  )
+}
+
 /**
  * Live depth book — bid/ask ladder with heatbar backgrounds, price-step
  * aggregation dropdown, size-unit toggle, and view-mode toggle
@@ -376,7 +767,13 @@ const identity = (s: string) => s
  * had "100" from BTCUSDT and switched to ASTER) — the widget snaps to
  * the finest available option and emits a change.
  */
-export const OrderBook: React.FC<OrderBookProps> = ({
+export const OrderBook: React.FC<OrderBookProps> = (props) => {
+  const { isMobile } = useMatchBreakpoints()
+  if (isMobile) return <MobileOrderBook {...props} />
+  return <DesktopOrderBook {...props} />
+}
+
+const DesktopOrderBook: React.FC<OrderBookProps> = ({
   asks,
   bids,
   baseAsset,
