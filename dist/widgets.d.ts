@@ -40,6 +40,12 @@ export declare interface AccountPanelProps {
      * prop — widget defaults to identity.
      */
     t?: (key: string, options?: Record<string, string | number | undefined>) => string;
+    /**
+     * Label shown to the left of the equity figure in the slim mobile-row
+     * variant. Defaults to "Perpetual Account". Translate at the call site
+     * (e.g. `mobileLabel={t('Perpetual Account')}`).
+     */
+    mobileLabel?: string;
 }
 
 /**
@@ -101,6 +107,11 @@ declare type BoxProps = React.HTMLAttributes<HTMLDivElement>;
  * file; the actual chart implementation is provided by the consumer
  * via `children` (TradingView paid library in pancake-frontend, or
  * whatever else upstream wants).
+ *
+ * Auto-responsive: drops to `MobileChartPanel` when
+ * `useMatchBreakpoints().isMobile` is true. Mobile adds an inline
+ * timeframe tab row + an optional floating price pill — desktop keeps
+ * the original `children` + `minHeight` API untouched.
  */
 export declare const ChartPanel: default_2.FC<ChartPanelProps>;
 
@@ -108,16 +119,38 @@ export declare interface ChartPanelProps {
     /**
      * The actual chart widget. The consumer plugs in its
      * TradingView / lightweight-charts / etc. implementation here so
-     * this widget stays free of any chart-library dependency.
+     * this widget stays free of any chart-library dependency. On mobile,
+     * if `children` is empty the widget renders the storybook fixture
+     * gradient/line so the panel still has something to show.
      */
-    children: default_2.ReactNode;
+    children?: default_2.ReactNode;
     /**
-     * Minimum height for the chart area. Defaults to 420px (matches the
-     * pancake-frontend perps page). Pass a string ("60vh") or number
-     * (pixels). The panel grows to fill remaining space if the parent
-     * uses flex.
+     * Minimum height for the chart area (desktop). Defaults to 420px
+     * (matches the pancake-frontend perps page). Pass a string ("60vh")
+     * or number (pixels). The panel grows to fill remaining space if the
+     * parent uses flex.
      */
     minHeight?: string | number;
+    /**
+     * Timeframes shown in the mobile tab row. Defaults to
+     * `['1m','5m','15m','1h','4h','1d']`. Desktop ignores this — the
+     * desktop chart-library typically owns its own timeframe UI.
+     */
+    timeframes?: readonly string[];
+    /** Currently active timeframe (mobile). */
+    activeTimeframe?: string;
+    /** Fired when the user taps a timeframe tab (mobile). */
+    onTimeframeChange?: (tf: string) => void;
+    /**
+     * Optional small floating price pill rendered on the right edge of
+     * the mobile canvas. When undefined, no pill is rendered.
+     */
+    priceLabel?: string;
+    /**
+     * Minimum height of the mobile chart canvas in pixels. Defaults to
+     * 220 to match the original mobile-perps mockup.
+     */
+    mobileMinHeight?: number;
 }
 
 /**
@@ -419,6 +452,20 @@ export declare interface OrderBookProps {
     embedded?: boolean;
     /** Translator. */
     t?: (key: string) => string;
+    /** "Funding (8h) / Countdown" stat — first line shown above the ladder. */
+    fundingRateText?: string;
+    /** Countdown "05:06:37" string — paired with `fundingRateText`. */
+    fundingCountdownText?: string;
+    /** Big mid-price displayed between asks and bids on mobile. */
+    midPriceText?: string;
+    /** Sub-price under `midPriceText` (e.g. "$77,824.4"). */
+    midSubText?: string;
+    /**
+     * Tick-size dropdown options on mobile. Defaults to
+     * `['0.1','0.5','1','5','10','50','100']`. The selected value is
+     * driven by `priceStep`; selection emits `onPriceStepChange`.
+     */
+    priceStepOptions?: string[];
 }
 
 export declare type OrderBookSizeUnit = 'BASE' | 'QUOTE';
@@ -1002,6 +1049,9 @@ export declare interface PositionRow {
     slStopPrice?: string;
 }
 
+/** History sheet inner-tab (mobile only). */
+export declare type PositionsHistoryTab = 'orders' | 'trades' | 'tx';
+
 export declare type PositionSide = 'LONG' | 'SHORT';
 
 /**
@@ -1012,6 +1062,11 @@ export declare type PositionSide = 'LONG' | 'SHORT';
  * Per-row business actions (Close / Cancel / TP+SL editor) fire
  * callbacks — consumer owns the signed API calls + toast + modal. The
  * widget just renders.
+ *
+ * Auto-responsive: dispatches to {@link MobilePositionsPanel} when the
+ * viewport is mobile (or when `isMobile` is forced via prop). The mobile
+ * variant exposes a different tab set (`Open Orders | Positions | Assets
+ * | TWAP`) and owns a full-page History sheet portal.
  */
 export declare const PositionsPanel: default_2.FC<PositionsPanelProps>;
 
@@ -1070,9 +1125,41 @@ export declare interface PositionsPanelProps {
     cancellingOrderId?: OpenOrderRow['id'] | null;
     /** Translator. */
     t?: (key: string) => string;
+    /**
+     * Force the mobile layout. Defaults to `useMatchBreakpoints().isMobile`
+     * — same auto-detection pattern as `OrderForm`.
+     */
+    isMobile?: boolean;
+    /**
+     * Optional positions count override. The mobile tab strip renders
+     * `Positions (N)` and consumers may want to pass a server-derived
+     * count rather than `positions.length`.
+     */
+    positionsCount?: number;
+    /** Mobile filter row — "Hide other symbols" checkbox state. */
+    hideOtherSymbols?: boolean;
+    onHideOtherSymbolsChange?: (next: boolean) => void;
+    /** Mobile filter row — instrument filter button label (default `All instruments`). */
+    instrumentFilterLabel?: string;
+    /** Mobile filter row — invoked when the instrument-filter button is clicked. */
+    onInstrumentFilterClick?: () => void;
+    /**
+     * Mobile-only: open state of the full-page History sheet portal. The
+     * sheet covers the viewport and renders the orderHistory / tradeHistory
+     * / transactionHistory tabs.
+     */
+    historyOpen?: boolean;
+    onHistoryToggle?: (open: boolean) => void;
+    /** Mobile-only: active sub-tab inside the History sheet. */
+    historyTab?: PositionsHistoryTab;
+    onHistoryTabChange?: (tab: PositionsHistoryTab) => void;
 }
 
-export declare type PositionsPanelTab = 'positions' | 'orders' | 'history' | 'trades' | 'transactions';
+export declare type PositionsPanelTab = 'positions' | 'orders' | 'history' | 'trades' | 'transactions'
+/** Mobile-only — list of holdings, no desktop equivalent yet. */
+| 'assets'
+/** Mobile-only — TWAP orders, no desktop equivalent yet. */
+| 'twap';
 
 export declare interface RecentTradeRow {
     /** Stable React key — usually the trade id from the venue. */
@@ -1190,6 +1277,13 @@ export declare interface SymbolHeaderProps {
     volume24h?: string;
     favorited?: boolean;
     onToggleFavorite?: () => void;
+    /**
+     * Mobile variant only — controls the chart-icon toggle button shown
+     * in the mobile symbol row. When `onChartToggle` is undefined the
+     * button is not rendered (desktop has its own chart panel).
+     */
+    chartOpen?: boolean;
+    onChartToggle?: () => void;
     /**
      * Render-prop for the markets picker that pops below the pair pill.
      * Called with a `close` callback the consumer's onSelect handler
