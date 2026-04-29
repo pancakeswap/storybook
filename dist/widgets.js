@@ -4291,14 +4291,20 @@ var rr = A.div`
   flex-shrink: 0;
   flex-direction: column;
   align-self: stretch;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-right: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.card};
+  overflow: hidden;
   font-variant-numeric: tabular-nums;
   & > div {
     display: flex;
-    padding: 24px;
+    padding: 0;
+    border-radius: 0;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
     flex: 1 0 0;
     align-self: stretch;
     background: ${({ theme: e }) => e.colors.card};
@@ -4308,6 +4314,7 @@ var rr = A.div`
   flex: 1 0 0;
   flex-direction: column;
   align-self: stretch;
+  padding: 24px;
 `, Gi = A.div`
   display: flex;
   width: 458px;
@@ -4982,19 +4989,23 @@ var Na = A.div`
   align-self: stretch;
   gap: 8px;
 `, Ba = A(y)`
-  flex: 1;
-  height: 40px;
+  display: flex;
+  padding: 11px 12px 13px 12px;
+  justify-content: center;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
   border: 0;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: 16px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: filter 0.12s;
-  background: ${({ theme: e, $variant: t }) => t === "primary" ? e.colors.primary : e.colors.input};
+  background: ${({ theme: e, $variant: t }) => t === "primary" ? e.colors.primary : e.colors.tertiary};
   color: ${({ theme: e, $variant: t }) => t === "primary" ? e.colors.invertedContrast : e.colors.primary};
-  border-bottom-color: ${({ $variant: e }) => e === "primary" ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.1)"};
+  border-bottom: 2px solid
+    ${({ $variant: e }) => e === "primary" ? "rgba(0, 0, 0, 0.20)" : "rgba(0, 0, 0, 0.10)"};
   &:hover {
     filter: brightness(1.08);
   }
@@ -5003,28 +5014,45 @@ var Na = A.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-top: 16px;
+  padding: 24px;
   border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
 `, Ha = A(g)`
-  align-self: stretch;
-  align-items: center;
+  display: flex;
+  padding: 16px;
   justify-content: space-between;
-  padding: 12px 14px;
-  background: ${({ theme: e }) => e.colors.input};
-  border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-  border-radius: 16px;
+  align-items: center;
+  align-self: stretch;
+  background: ${({ theme: e }) => e.colors.cardSecondary};
+  border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-right: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-radius: 24px;
 `, Ua = A.span`
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 14px;
-  font-weight: 600;
+  overflow: hidden;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Wa = A.span`
-  font-size: 22px;
+  text-align: center;
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 20px;
+  font-style: normal;
   font-weight: 600;
-  letter-spacing: -0.22px;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+`, Wa = A.span`
   color: ${({ theme: e }) => e.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 120%;
+  letter-spacing: -0.32px;
   font-variant-numeric: tabular-nums;
 `, Ga = ({ selected: e, options: t, onSelect: n, onClickFallback: r }) => {
 	let [i, a] = k(!1), o = O(null);
@@ -5300,6 +5328,7 @@ var Na = A.div`
   font-family: inherit;
   color: ${({ theme: e }) => e.colors.text};
   text-align: left;
+  flex-shrink: 0;
 `, Ya = A.span`
   width: 64px;
   height: 64px;
@@ -5328,30 +5357,52 @@ var Na = A.div`
     object-fit: contain;
     display: block;
   }
-`, Za = A.span`
+`;
+A.span`
   display: inline-flex;
   align-items: center;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Qa = A.div`
+`;
+var Za = A.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-`, $a = A.span`
+`, Qa = A.span`
   display: inline-flex;
   align-items: center;
   gap: 8px;
+`, $a = A.span`
+  display: flex;
+  height: 24px;
+  padding: 2px 2px 2px 8px;
+  align-items: center;
+  gap: 4px;
+  border-radius: 8px;
+  border-top: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+  border-right: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+  border-bottom: 2px solid ${({ theme: e }) => e.colors.inputSecondary};
+  border-left: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+  background: ${({ theme: e }) => e.colors.input};
 `, eo = A.span`
-  font-size: 16px;
-  font-weight: 600;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
   color: ${({ theme: e }) => e.colors.text};
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
 `, to = A.span`
-  display: inline-flex;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: ${({ theme: e }) => e.colors.textSubtle};
-  color: ${({ theme: e }) => e.colors.invertedContrast};
-  font-size: 12px;
-  letter-spacing: 0.12px;
+  display: flex;
+  width: 20px;
+  align-self: stretch;
+  justify-content: center;
+  align-items: center;
+  color: ${({ theme: e }) => e.colors.textSubtle};
 `, no = A.span`
   display: inline-flex;
   align-items: center;
@@ -5371,74 +5422,338 @@ var Na = A.div`
   background: ${({ theme: e, $positive: t }) => t ? `color-mix(in srgb, ${e.colors.success} 18%, transparent)` : `color-mix(in srgb, ${e.colors.failure} 18%, transparent)`};
   font-size: 16px;
   color: ${({ theme: e }) => e.colors.text};
-`, ao = A(g)`
+`, ao = A.div`
+  display: flex;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  justify-content: flex-start;
+`, oo = A(g)`
   align-items: center;
   gap: 24px;
   height: 56px;
-`, oo = A.div`
+  flex-shrink: 0;
+`, so = A.span`
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  width: 36px;
+  height: 56px;
+  align-items: center;
+  justify-content: flex-end;
+  color: ${({ theme: e }) => e.colors.textSubtle};
+  background: linear-gradient(90deg, transparent 0%, ${({ theme: e }) => e.colors.card} 40%);
+  padding-right: 4px;
+  pointer-events: none;
+  opacity: ${({ $visible: e }) => e ? 1 : 0};
+  transition: opacity 0.15s;
+`, co = A.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-`, so = A.span`
+  flex-shrink: 0;
+`, lo = A.span`
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, co = A.span`
+`, uo = A.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
-`, lo = () => /* @__PURE__ */ N("svg", {
+`, fo = () => /* @__PURE__ */ N("svg", {
 	width: "12",
 	height: "12",
 	viewBox: "0 0 12 12",
 	fill: "currentColor",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ N("path", { d: "M6 2l5 8H1z" })
-}), uo = () => /* @__PURE__ */ N("svg", {
+}), po = () => /* @__PURE__ */ N("svg", {
 	width: "12",
 	height: "12",
 	viewBox: "0 0 12 12",
 	fill: "currentColor",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ N("path", { d: "M6 10L1 2h10z" })
-}), fo = () => /* @__PURE__ */ N("svg", {
-	width: "14",
-	height: "14",
-	viewBox: "0 0 14 14",
+}), mo = () => /* @__PURE__ */ N("svg", {
+	width: "20",
+	height: "20",
+	viewBox: "0 0 20 20",
 	fill: "none",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ N("path", {
-		d: "M3 5l4 4 4-4",
-		stroke: "currentColor",
-		strokeWidth: "1.6",
-		strokeLinecap: "round",
-		strokeLinejoin: "round"
+		d: "M7.25878 9.75835L9.41712 11.9167C9.74212 12.2417 10.2671 12.2417 10.5921 11.9167L12.7504 9.75835C13.2754 9.23335 12.9004 8.33335 12.1588 8.33335H7.84212C7.10045 8.33335 6.73378 9.23335 7.25878 9.75835Z",
+		fill: "currentColor"
 	})
-}), po = ({ baseAsset: e, pair: t, price: n, pricePnlPct: r, volume24h: i, openInterest: a, fundingRate: o, nextFunding: s, onSymbolClick: c, renderTokenIcon: l }) => {
-	let u = r >= 0, d = l?.();
-	return /* @__PURE__ */ P(qa, { children: [/* @__PURE__ */ P(Ja, {
-		type: "button",
-		onClick: c,
-		disabled: !c,
-		"aria-label": `Change market · ${t}`,
-		children: [d == null ? /* @__PURE__ */ N(Ya, { children: e }) : /* @__PURE__ */ N(Xa, { children: d }), /* @__PURE__ */ P(Qa, { children: [/* @__PURE__ */ P($a, { children: [
-			/* @__PURE__ */ N(eo, { children: t }),
-			/* @__PURE__ */ N(to, { children: "Perp" }),
-			c ? /* @__PURE__ */ N(Za, { children: /* @__PURE__ */ N(fo, {}) }) : null
-		] }), /* @__PURE__ */ P(no, { children: [/* @__PURE__ */ N(ro, { children: n }), /* @__PURE__ */ P(io, {
-			$positive: u,
-			children: [
-				N(u ? lo : uo, {}),
-				r.toFixed(2),
-				"%"
-			]
-		})] })] })]
-	}), /* @__PURE__ */ P(ao, { children: [
-		/* @__PURE__ */ P(oo, { children: [/* @__PURE__ */ N(so, { children: "24h Volume" }), /* @__PURE__ */ N(co, { children: i })] }),
-		/* @__PURE__ */ P(oo, { children: [/* @__PURE__ */ N(so, { children: "Open Interest" }), /* @__PURE__ */ N(co, { children: a })] }),
-		/* @__PURE__ */ P(oo, { children: [/* @__PURE__ */ N(so, { children: "Funding Rate" }), /* @__PURE__ */ N(co, { children: o })] }),
-		/* @__PURE__ */ P(oo, { children: [/* @__PURE__ */ N(so, { children: "Next Funding" }), /* @__PURE__ */ N(co, { children: s })] })
-	] })] });
-}, mo = A(I)`
+}), ho = A.div`
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(40, 13, 95, 0.60);
+  z-index: 1000;
+`, go = A.div`
+  display: flex;
+  width: 697px;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-right: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
+  border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  background: ${({ theme: e }) => e.colors.card};
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+  padding: 16px;
+  gap: 16px;
+`, _o = A.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  align-self: stretch;
+`, vo = A.button`
+  border: 0;
+  background: transparent;
+  padding: 4px 0;
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: ${({ $active: e }) => e ? 600 : 400};
+  color: ${({ $active: e, theme: t }) => e ? t.colors.secondary : t.colors.textSubtle};
+  cursor: pointer;
+  &:hover { color: ${({ theme: e }) => e.colors.text}; }
+`, yo = A.label`
+  display: flex;
+  padding: 7px 8px 9px 16px;
+  align-items: flex-start;
+  gap: 8px;
+  align-self: stretch;
+  border-radius: 16px;
+  border-top: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+  border-right: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+  border-bottom: 2px solid ${({ theme: e }) => e.colors.inputSecondary};
+  border-left: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
+  background: ${({ theme: e }) => e.colors.input};
+  color: ${({ theme: e }) => e.colors.textSubtle};
+`, bo = A.input`
+  flex: 1;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-family: Kanit;
+  font-size: 14px;
+  color: ${({ theme: e }) => e.colors.text};
+  &::placeholder { color: ${({ theme: e }) => e.colors.textSubtle}; }
+`, xo = A.div`
+  display: grid;
+  grid-template-columns: 24px 1fr 1fr 1fr 1fr;
+  align-items: center;
+  align-self: stretch;
+  row-gap: 4px;
+`, So = A.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 12px;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ theme: e }) => e.colors.secondary};
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  &:nth-child(1) { padding-left: 8px; padding-right: 0; }
+  &:nth-child(3),
+  &:nth-child(4),
+  &:nth-child(5) { justify-content: flex-end; }
+`, Co = A.button`
+  display: contents;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+`, wo = A.div`
+  padding: 12px 12px;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme: e }) => e.colors.text};
+  font-variant-numeric: tabular-nums;
+  ${Co}:hover & { background: ${({ theme: e }) => e.colors.cardSecondary}; }
+`, To = A(wo)`
+  padding-left: 8px;
+  padding-right: 0;
+  color: #F0B90B;
+`, Eo = A(wo)`
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+`, Do = A.span`
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: ${({ $color: e }) => e};
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+`, Oo = A(wo)`
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+`, ko = A.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: ${({ theme: e, $up: t }) => t ? e.colors.success : e.colors.failure};
+  font-weight: 600;
+`, Ao = [
+	{
+		symbol: "BTC",
+		lastPrice: "$590.75",
+		change: -1.2,
+		volume: "0.542 BNB",
+		color: "#F0B90B",
+		starred: !0
+	},
+	{
+		symbol: "CAKE",
+		lastPrice: "$1.46",
+		change: .8,
+		volume: "144.11 CAKE",
+		color: "#23CAD5",
+		starred: !0
+	},
+	{
+		symbol: "ETH",
+		lastPrice: "$2,181.25",
+		change: -.6,
+		volume: "0.206 ETH",
+		color: "#627EEA",
+		starred: !0
+	}
+], jo = ({ isOpen: e, onClose: t }) => e ? /* @__PURE__ */ N(ho, {
+	onClick: t,
+	children: /* @__PURE__ */ P(go, {
+		onClick: (e) => e.stopPropagation(),
+		children: [
+			/* @__PURE__ */ P(_o, { children: [/* @__PURE__ */ N(vo, {
+				type: "button",
+				$active: !0,
+				children: "Favorites"
+			}), /* @__PURE__ */ N(vo, {
+				type: "button",
+				children: "All markets"
+			})] }),
+			/* @__PURE__ */ P(yo, { children: [/* @__PURE__ */ N("svg", {
+				width: "20",
+				height: "20",
+				viewBox: "0 0 24 24",
+				fill: "currentColor",
+				"aria-hidden": !0,
+				children: /* @__PURE__ */ N("path", { d: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" })
+			}), /* @__PURE__ */ N(bo, {
+				type: "text",
+				placeholder: "All tokens"
+			})] }),
+			/* @__PURE__ */ P(xo, {
+				role: "table",
+				children: [
+					/* @__PURE__ */ N(So, { children: "SYMBOLS" }),
+					/* @__PURE__ */ N(So, {}),
+					/* @__PURE__ */ N(So, { children: "LAST PRICE" }),
+					/* @__PURE__ */ N(So, { children: "1D CHANGE" }),
+					/* @__PURE__ */ N(So, { children: "1D VOLUME (USDT)" }),
+					Ao.map((e) => /* @__PURE__ */ P(Co, {
+						type: "button",
+						children: [
+							/* @__PURE__ */ N(To, { children: "★" }),
+							/* @__PURE__ */ P(Eo, { children: [/* @__PURE__ */ N(Do, {
+								$color: e.color,
+								children: e.symbol.slice(0, 1)
+							}), /* @__PURE__ */ N("span", { children: e.symbol })] }),
+							/* @__PURE__ */ N(Oo, { children: e.lastPrice }),
+							/* @__PURE__ */ N(Oo, { children: /* @__PURE__ */ P(ko, {
+								$up: e.change >= 0,
+								children: [
+									e.change >= 0 ? "▲" : "▼",
+									" ",
+									Math.abs(e.change).toFixed(1),
+									"%"
+								]
+							}) }),
+							/* @__PURE__ */ N(Oo, { children: e.volume })
+						]
+					}, e.symbol))
+				]
+			})
+		]
+	})
+}) : null, Mo = ({ baseAsset: e, pair: t, price: n, pricePnlPct: r, volume24h: i, openInterest: a, fundingRate: o, nextFunding: s, onSymbolClick: c, renderTokenIcon: l }) => {
+	let u = r >= 0, d = l?.(), f = O(null), p = O(null), [m, h] = k(!1), [g, _] = k(!1);
+	return w(() => {
+		let e = f.current, t = p.current;
+		if (!e || !t) return;
+		let n = () => h(t.scrollWidth > e.clientWidth + 1);
+		n();
+		let r = new ResizeObserver(n);
+		return r.observe(e), r.observe(t), () => r.disconnect();
+	}, []), /* @__PURE__ */ P(qa, { children: [
+		/* @__PURE__ */ P(Ja, {
+			type: "button",
+			onClick: () => {
+				c?.(), _(!0);
+			},
+			"aria-label": `Change market · ${t}`,
+			children: [d == null ? /* @__PURE__ */ N(Ya, { children: e }) : /* @__PURE__ */ N(Xa, { children: d }), /* @__PURE__ */ P(Za, { children: [/* @__PURE__ */ N(Qa, { children: /* @__PURE__ */ P($a, { children: [/* @__PURE__ */ N(eo, { children: t }), /* @__PURE__ */ N(to, {
+				"aria-hidden": !0,
+				children: /* @__PURE__ */ N(mo, {})
+			})] }) }), /* @__PURE__ */ P(no, { children: [/* @__PURE__ */ N(ro, { children: n }), /* @__PURE__ */ P(io, {
+				$positive: u,
+				children: [
+					N(u ? fo : po, {}),
+					r.toFixed(2),
+					"%"
+				]
+			})] })] })]
+		}),
+		/* @__PURE__ */ P(ao, {
+			ref: f,
+			children: [/* @__PURE__ */ P(oo, {
+				ref: p,
+				children: [
+					/* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: "24h Volume" }), /* @__PURE__ */ N(uo, { children: i })] }),
+					/* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: "Open Interest" }), /* @__PURE__ */ N(uo, { children: a })] }),
+					/* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: "Funding Rate" }), /* @__PURE__ */ N(uo, { children: o })] }),
+					/* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: "Next Funding" }), /* @__PURE__ */ N(uo, { children: s })] })
+				]
+			}), /* @__PURE__ */ N(so, {
+				$visible: m,
+				"aria-hidden": !0,
+				children: /* @__PURE__ */ N("svg", {
+					width: "20",
+					height: "20",
+					viewBox: "0 0 20 20",
+					fill: "currentColor",
+					children: /* @__PURE__ */ N("path", { d: "M7.05 14.95 12 10 7.05 5.05 8.46 3.64 14.83 10l-6.37 6.36z" })
+				})
+			})]
+		}),
+		/* @__PURE__ */ N(jo, {
+			isOpen: g,
+			onClose: () => _(!1)
+		})
+	] });
+}, No = A(I)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -5459,11 +5774,11 @@ var Na = A.div`
     flex-direction: column;
     gap: 12px;
   }
-`, ho = A.div`
+`, Po = A.div`
   display: inline-flex;
   align-items: center;
   gap: 24px;
-`, go = A.button`
+`, Fo = A.button`
   border: 0;
   background: transparent;
   font-family: inherit;
@@ -5472,21 +5787,21 @@ var Na = A.div`
   font-weight: ${({ $active: e }) => e ? 700 : 400};
   color: ${({ $active: e, theme: t }) => e ? t.colors.primary : t.colors.textSubtle};
   cursor: pointer;
-`, _o = A.div`
+`, Io = A.div`
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
-`, vo = A.div`
+`, Lo = A.div`
   flex: 1;
   position: relative;
   display: grid;
   grid-template-columns: 1fr 40px;
   gap: 8px;
-`, yo = A.div`
+`, Ro = A.div`
   position: relative;
   overflow: visible;
-`, bo = A.div`
+`, zo = A.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -5495,13 +5810,13 @@ var Na = A.div`
   text-align: left;
   padding-top: 6px;
   padding-bottom: 24px;
-`, xo = A.div`
+`, Bo = A.div`
   display: flex;
   justify-content: space-between;
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   padding-top: 8px;
-`, So = A.span`
+`, Vo = A.span`
   position: absolute;
   display: inline-flex;
   align-items: center;
@@ -5513,26 +5828,26 @@ var Na = A.div`
   font-family: 'Kanit', sans-serif;
   font-weight: 600;
   pointer-events: none;
-`, Co = 1e3, wo = 360, To = 20, Eo = 70;
-function Do(e) {
+`, Ho = 1e3, Uo = 360, Wo = 20, Go = 70;
+function Ko(e) {
 	if (e.length < 2) return null;
-	let t = Math.min(...e.map((e) => e.price)), n = Math.max(...e.map((e) => e.price)) - t || 1, r = e.map((t, n) => n / (e.length - 1) * Co), i = e.map((e) => To + (1 - (e.price - t) / n) * (wo - To - Eo)), a = `M ${r[0].toFixed(2)} ${i[0].toFixed(2)}`;
+	let t = Math.min(...e.map((e) => e.price)), n = Math.max(...e.map((e) => e.price)) - t || 1, r = e.map((t, n) => n / (e.length - 1) * Ho), i = e.map((e) => Wo + (1 - (e.price - t) / n) * (Uo - Wo - Go)), a = `M ${r[0].toFixed(2)} ${i[0].toFixed(2)}`;
 	for (let e = 0; e < r.length - 1; e++) {
 		let t = r[e - 1] ?? r[e], n = i[e - 1] ?? i[e], o = r[e], s = i[e], c = r[e + 1], l = i[e + 1], u = r[e + 2] ?? r[e + 1], d = i[e + 2] ?? i[e + 1], f = o + (c - t) / 6, p = s + (l - n) / 6, m = c - (u - o) / 6, h = l - (d - s) / 6;
 		a += ` C ${f.toFixed(2)} ${p.toFixed(2)}, ${m.toFixed(2)} ${h.toFixed(2)}, ${c.toFixed(2)} ${l.toFixed(2)}`;
 	}
-	let o = `${a} L ${Co} ${wo} L 0 ${wo} Z`, s = i[i.length - 1];
+	let o = `${a} L ${Ho} ${Uo} L 0 ${Uo} Z`, s = i[i.length - 1];
 	return {
 		line: a,
 		area: o,
 		endY: s
 	};
 }
-var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n", ko = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n  L 1000 360\n  L 0 360\n  Z\n", Ao = 200, jo = ({ timeframe: e, timeframes: t, onTimeframeChange: n, points: r, currentPriceLabel: i, yTicks: a, xTicks: o }) => {
-	let s = j(), c = `simple-chart-fill-${T().replace(/:/g, "")}`, l = s?.colors?.primary ?? "#1FC7D4", u = D(() => Do(r), [r]), d = u?.line ?? Oo, f = u?.area ?? ko, p = u?.endY ?? Ao;
-	return /* @__PURE__ */ P(mo, { children: [/* @__PURE__ */ N(ho, {
+var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n", Jo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n  L 1000 360\n  L 0 360\n  Z\n", Yo = 200, Xo = ({ timeframe: e, timeframes: t, onTimeframeChange: n, points: r, currentPriceLabel: i, yTicks: a, xTicks: o }) => {
+	let s = j(), c = `simple-chart-fill-${T().replace(/:/g, "")}`, l = s?.colors?.primary ?? "#1FC7D4", u = D(() => Ko(r), [r]), d = u?.line ?? qo, f = u?.area ?? Jo, p = u?.endY ?? Yo;
+	return /* @__PURE__ */ P(No, { children: [/* @__PURE__ */ N(Po, {
 		role: "tablist",
-		children: t.map((t) => /* @__PURE__ */ N(go, {
+		children: t.map((t) => /* @__PURE__ */ N(Fo, {
 			type: "button",
 			role: "tab",
 			"aria-selected": e === t,
@@ -5540,8 +5855,8 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			onClick: () => n(t),
 			children: t
 		}, t))
-	}), /* @__PURE__ */ P(_o, { children: [/* @__PURE__ */ P(vo, { children: [/* @__PURE__ */ P(yo, { children: [/* @__PURE__ */ P("svg", {
-		viewBox: `0 0 ${Co} ${wo}`,
+	}), /* @__PURE__ */ P(Io, { children: [/* @__PURE__ */ P(Lo, { children: [/* @__PURE__ */ P(Ro, { children: [/* @__PURE__ */ P("svg", {
+		viewBox: `0 0 ${Ho} ${Uo}`,
 		preserveAspectRatio: "none",
 		style: {
 			width: "100%",
@@ -5579,7 +5894,7 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ N("line", {
 				x1: "0",
 				y1: p,
-				x2: Co - 10,
+				x2: Ho - 10,
 				y2: p,
 				stroke: l,
 				strokeWidth: "1",
@@ -5587,20 +5902,20 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				opacity: "0.7"
 			})
 		]
-	}), /* @__PURE__ */ N(So, {
+	}), /* @__PURE__ */ N(Vo, {
 		style: {
 			right: -8,
-			top: `calc(${p}/${wo} * 100% - 14px)`
+			top: `calc(${p}/${Uo} * 100% - 14px)`
 		},
 		children: i
-	})] }), /* @__PURE__ */ N(bo, {
+	})] }), /* @__PURE__ */ N(zo, {
 		"aria-hidden": !0,
 		children: a.map((e, t) => /* @__PURE__ */ N("span", { children: e }, `${e}-${t}`))
-	})] }), /* @__PURE__ */ N(xo, {
+	})] }), /* @__PURE__ */ N(Bo, {
 		"aria-hidden": !0,
 		children: o.map((e, t) => /* @__PURE__ */ N("span", { children: e }, `${e}-${t}`))
 	})] })] });
-}, Mo = A(I)`
+}, Zo = A(I)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -5613,48 +5928,62 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     background: transparent;
     padding: 0;
   }
-`, No = A.div`
+`, Qo = A.div`
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 0 24px;
+  gap: 4px;
+  padding: 8px 16px;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-`, Po = A.button`
+  align-self: stretch;
+`, $o = A.button`
+  display: flex;
+  padding: ${({ $active: e }) => e ? "12px 12px 12px 16px" : "12px 12px"};
+  justify-content: center;
+  align-items: center;
   border: 0;
+  border-radius: 16px;
   background: transparent;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: ${({ $active: e }) => e ? 600 : 400};
-  color: ${({ $active: e, theme: t }) => e ? t.colors.text : t.colors.textSubtle};
   cursor: pointer;
-  padding: 16px 0;
-  border-bottom: 2px solid ${({ $active: e, theme: t }) => e ? t.colors.text : "transparent"};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 150%;
+  font-weight: ${({ $active: e }) => e ? 600 : 400};
+  color: ${({ $active: e, theme: t }) => e ? t.colors.secondary : t.colors.textSubtle};
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, Fo = A.div`
+`, es = A.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 56px;
   align-items: center;
-`, Io = A.div`
+`, ts = A.div`
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr 1fr;
   align-items: center;
 `, Q = A.div`
   padding: 16px 10px;
+  color: ${({ theme: e }) => e.colors.secondary};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
   font-size: 12px;
+  font-style: normal;
   font-weight: 600;
-  color: ${({ theme: e }) => e.colors.textSubtle};
+  line-height: 150%;
+  letter-spacing: 0.24px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  /* "Distance to Liq" / "Unrealized PnL" wrap on narrow viewports without
-     this — keep header copy on one line and let the table reclaim space
-     via the trimmed horizontal padding above. */
   white-space: nowrap;
 `, $ = A.div`
   padding: 16px 10px;
-  font-size: 14px;
   color: ${({ theme: e }) => e.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  text-align: right;
   font-variant-numeric: tabular-nums;
-`, Lo = A($)`
+`, ns = A($)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -5677,7 +6006,7 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     object-fit: contain;
     display: block;
   }
-`, Ro = A.span`
+`, rs = A.span`
   display: inline-flex;
   width: 40px;
   height: 40px;
@@ -5688,18 +6017,18 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   color: #fff;
   font-weight: 700;
   font-size: 14px;
-`, zo = A.div`
+`, is = A.div`
   display: flex;
   flex-direction: column;
   line-height: 1.3;
-`, Bo = A.span`
+`, as = A.span`
   font-size: 16px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
-`, Vo = A.span`
+`, os = A.span`
   font-size: 12px;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Ho = A($)`
+`, ss = A($)`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -5717,27 +6046,33 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
      glyph and label wrap into two lines on narrow grids and the pill
      visually breaks. */
   white-space: nowrap;
-`, Uo = A($)`
-  color: ${({ $sign: e, theme: t }) => e === "positive" ? t.colors.success : e === "negative" ? t.colors.failure : t.colors.text};
+`, cs = A($)`
+  color: ${({ $sign: e, theme: t }) => e === "positive" ? "var(--pcs-colors-positive60, #129E7D)" : e === "negative" ? t.colors.failure : t.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 20px;
+  font-style: normal;
   font-weight: 600;
-  font-size: 16px;
-`, Wo = A($)`
+  line-height: 150%;
+  letter-spacing: -0.2px;
+`, ls = A($)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`, Go = A.div`
+`, us = A.div`
   flex: 1;
   height: 6px;
   border-radius: 999px;
   background: ${({ theme: e }) => e.colors.input};
   overflow: hidden;
   max-width: 94px;
-`, Ko = A.div`
+`, ds = A.div`
   height: 100%;
   width: ${({ $pct: e }) => `${Math.max(0, Math.min(100, e))}%`};
   background: ${({ $status: e, theme: t }) => e === "safe" ? t.colors.success : e === "warn" ? t.colors.warning : t.colors.failure};
   border-radius: 999px;
-`, qo = A.button`
+`, fs = A.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -5751,7 +6086,7 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   color: ${({ theme: e }) => e.colors.failure};
   cursor: pointer;
   &:hover { filter: brightness(0.95); }
-`, Jo = A.div`
+`, ps = A.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -5759,28 +6094,28 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   padding: 16px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 14px;
-`, Yo = A.span`
+`, ms = A.span`
   color: ${({ $side: e, theme: t }) => e === "BUY" ? t.colors.success : t.colors.failure};
   font-weight: 600;
-`, Xo = {
+`, hs = {
 	BNB: "#F0B90B",
 	BTC: "#F7931A",
 	ETH: "#627EEA",
 	USDC: "#2775CA",
 	USDT: "#26A17B",
 	CAKE: "#23CAD5"
-}, Zo = (e) => Xo[e.toUpperCase()] ?? "#7A6EAA", Qo = (e) => e === "up" ? "↑" : "↓", $o = (e) => e === "up" ? "Up/Long" : "Down/Short", es = () => /* @__PURE__ */ N("svg", {
+}, gs = (e) => hs[e.toUpperCase()] ?? "#7A6EAA", _s = (e) => e === "up" ? "↑" : "↓", vs = (e) => e === "up" ? "Up/Long" : "Down/Short", ys = () => /* @__PURE__ */ N("svg", {
 	width: "18",
 	height: "18",
 	viewBox: "0 0 24 24",
 	fill: "currentColor",
 	"aria-hidden": !0,
 	children: /* @__PURE__ */ N("path", { d: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" })
-}), ts = ({ tab: e, onTabChange: t, positions: n, openOrders: r, historyEmpty: i = !0, onClosePosition: a, renderTokenIcon: o }) => /* @__PURE__ */ P(Mo, { children: [
-	/* @__PURE__ */ P(No, {
+}), bs = ({ tab: e, onTabChange: t, positions: n, openOrders: r, historyEmpty: i = !0, onClosePosition: a, renderTokenIcon: o }) => /* @__PURE__ */ P(Zo, { children: [
+	/* @__PURE__ */ P(Qo, {
 		role: "tablist",
 		children: [
-			/* @__PURE__ */ N(Po, {
+			/* @__PURE__ */ N($o, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "positions",
@@ -5788,7 +6123,7 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				onClick: () => t("positions"),
 				children: "Positions"
 			}),
-			/* @__PURE__ */ N(Po, {
+			/* @__PURE__ */ N($o, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "orders",
@@ -5796,7 +6131,7 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				onClick: () => t("orders"),
 				children: "Open Orders"
 			}),
-			/* @__PURE__ */ N(Po, {
+			/* @__PURE__ */ N($o, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "history",
@@ -5806,7 +6141,7 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			})
 		]
 	}),
-	e === "positions" && (n.length === 0 ? /* @__PURE__ */ N(Jo, { children: "No open positions" }) : /* @__PURE__ */ P(Fo, {
+	e === "positions" && (n.length === 0 ? /* @__PURE__ */ N(ps, { children: "No open positions" }) : /* @__PURE__ */ P(es, {
 		role: "table",
 		children: [
 			/* @__PURE__ */ N(Q, { children: "Token" }),
@@ -5817,38 +6152,38 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ N(Q, { children: "Distance to Liq" }),
 			/* @__PURE__ */ N(Q, {}),
 			n.map((e) => /* @__PURE__ */ P(b.Fragment, { children: [
-				/* @__PURE__ */ P(Lo, { children: [o?.(e) ?? /* @__PURE__ */ N(Ro, {
-					$color: e.iconColor ?? Zo(e.symbol),
+				/* @__PURE__ */ P(ns, { children: [o?.(e) ?? /* @__PURE__ */ N(rs, {
+					$color: e.iconColor ?? gs(e.symbol),
 					children: e.symbol.slice(0, 1)
-				}), /* @__PURE__ */ P(zo, { children: [/* @__PURE__ */ N(Bo, { children: e.symbol }), /* @__PURE__ */ N(Vo, { children: e.chainLabel })] })] }),
-				/* @__PURE__ */ P(Ho, {
+				}), /* @__PURE__ */ P(is, { children: [/* @__PURE__ */ N(as, { children: e.symbol }), /* @__PURE__ */ N(os, { children: e.chainLabel })] })] }),
+				/* @__PURE__ */ P(ss, {
 					$direction: e.direction,
 					children: [
-						Qo(e.direction),
+						_s(e.direction),
 						" ",
-						$o(e.direction)
+						vs(e.direction)
 					]
 				}),
-				/* @__PURE__ */ N(Uo, {
+				/* @__PURE__ */ N(cs, {
 					$sign: e.pnlSign,
 					children: e.unrealizedPnl
 				}),
 				/* @__PURE__ */ N($, { children: e.entryPrice }),
 				/* @__PURE__ */ N($, { children: e.liqPrice }),
-				/* @__PURE__ */ P(Wo, { children: [/* @__PURE__ */ N(Go, { children: /* @__PURE__ */ N(Ko, {
+				/* @__PURE__ */ P(ls, { children: [/* @__PURE__ */ N(us, { children: /* @__PURE__ */ N(ds, {
 					$pct: e.liqDistancePct,
 					$status: e.liqStatus
 				}) }), /* @__PURE__ */ N("span", { children: e.liqStatusLabel })] }),
-				/* @__PURE__ */ N(qo, {
+				/* @__PURE__ */ N(fs, {
 					type: "button",
 					"aria-label": "Close position",
 					onClick: () => a(e.id),
-					children: /* @__PURE__ */ N(es, {})
+					children: /* @__PURE__ */ N(ys, {})
 				})
 			] }, e.id))
 		]
 	})),
-	e === "orders" && (r.length === 0 ? /* @__PURE__ */ N(Jo, { children: "No open orders" }) : /* @__PURE__ */ P(Io, {
+	e === "orders" && (r.length === 0 ? /* @__PURE__ */ N(ps, { children: "No open orders" }) : /* @__PURE__ */ P(ts, {
 		role: "table",
 		children: [
 			/* @__PURE__ */ N(Q, { children: "Symbol" }),
@@ -5860,7 +6195,7 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ N(Q, { children: "Status" }),
 			r.map((e) => /* @__PURE__ */ P(b.Fragment, { children: [
 				/* @__PURE__ */ N($, { children: e.symbol }),
-				/* @__PURE__ */ N($, { children: /* @__PURE__ */ N(Yo, {
+				/* @__PURE__ */ N($, { children: /* @__PURE__ */ N(ms, {
 					$side: e.side,
 					children: e.side
 				}) }),
@@ -5872,9 +6207,9 @@ var Oo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			] }, e.id))
 		]
 	})),
-	e === "history" && /* @__PURE__ */ N(Jo, { children: "No transaction history" })
+	e === "history" && /* @__PURE__ */ N(ps, { children: "No transaction history" })
 ] });
 //#endregion
-export { ie as AccountPanel, Qn as BookTradesPanel, qn as ChartPanel, Ti as DepositModal, Di as EnableTradingModal, le as LeverageModal, ht as MarketsDropdown, vn as OrderBook, Ke as OrderConfirmModal, ri as OrderForm, Se as PerpsErrorMessage, I as PerpsPanel, In as PositionsPanel, ve as RecentTrades, Ka as SimpleBetPanel, jo as SimpleChartCard, ts as SimplePositionsCard, po as SimpleTickerCard, zt as SymbolHeader, Wn as TpSlModal, z as UnderlineTab, B as UnderlineTabs, Re as WithdrawModal };
+export { ie as AccountPanel, Qn as BookTradesPanel, qn as ChartPanel, Ti as DepositModal, Di as EnableTradingModal, le as LeverageModal, ht as MarketsDropdown, vn as OrderBook, Ke as OrderConfirmModal, ri as OrderForm, Se as PerpsErrorMessage, I as PerpsPanel, In as PositionsPanel, ve as RecentTrades, Ka as SimpleBetPanel, Xo as SimpleChartCard, bs as SimplePositionsCard, Mo as SimpleTickerCard, zt as SymbolHeader, Wn as TpSlModal, z as UnderlineTab, B as UnderlineTabs, Re as WithdrawModal };
 
 //# sourceMappingURL=widgets.js.map
