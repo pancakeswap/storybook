@@ -4229,39 +4229,24 @@ var rr = A.div`
 	250,
 	500,
 	1001
-], ki = 1001, Ai = 50 / 1001, ji = 250 / 1001, Mi = (e, t) => e <= t * Ai ? "safe" : e <= t * ji ? "warn" : "danger", Ni = 500 / 1001, Pi = (e, t) => e > t * Ni, Fi = (e, t) => e > t * ji, Ii = (e) => e === "safe" ? "Safe zone" : e === "warn" ? "Caution" : "Danger zone", Li = () => /* @__PURE__ */ N("svg", {
-	width: "20",
-	height: "20",
+], ki = 1001, Ai = 50 / 1001, ji = 250 / 1001, Mi = (e, t) => e <= t * Ai ? "safe" : e <= t * ji ? "warn" : "danger", Ni = 500 / 1001, Pi = (e, t) => e > t * Ni, Fi = (e, t) => e > t * ji, Ii = (e) => e === "safe" ? "Safe zone" : e === "warn" ? "High leverage" : "Danger zone", Li = (e) => e === "safe" ? "🌿" : e === "warn" ? "⚡️" : "🔥", Ri = (e) => e === "safe" ? "A good place to start. You'll feel the market without getting rekt." : e === "warn" ? "Liquidation triggers around a 1% move." : "1% move against you liquidates. Only risk what you can afford to lose.", zi = () => /* @__PURE__ */ N("svg", {
+	width: "24",
+	height: "24",
 	viewBox: "0 0 24 24",
-	fill: "currentColor",
-	"aria-hidden": "true",
-	children: /* @__PURE__ */ N("path", { d: "M12 4l-7 7h4v9h6v-9h4z" })
-}), Ri = () => /* @__PURE__ */ N("svg", {
-	width: "20",
-	height: "20",
-	viewBox: "0 0 24 24",
-	fill: "currentColor",
-	"aria-hidden": "true",
-	children: /* @__PURE__ */ N("path", { d: "M12 20l7-7h-4V4h-6v9H5z" })
-}), zi = () => /* @__PURE__ */ N("svg", {
-	width: "16",
-	height: "16",
-	viewBox: "0 0 16 16",
 	fill: "none",
 	"aria-hidden": "true",
-	style: { aspectRatio: "1 / 1" },
 	children: /* @__PURE__ */ N("path", {
-		d: "M7.99636 11.2598C8.18224 11.2598 8.3393 11.1966 8.46752 11.0702C8.59563 10.9436 8.65969 10.7869 8.65969 10.6V7.85984C8.65969 7.67284 8.5968 7.51612 8.47102 7.38967C8.34524 7.26323 8.18936 7.20001 8.00336 7.20001C7.81747 7.20001 7.66041 7.26323 7.53219 7.38967C7.40408 7.51612 7.34002 7.67284 7.34002 7.85984V10.6C7.34002 10.7869 7.40291 10.9436 7.52869 11.0702C7.65447 11.1966 7.81036 11.2598 7.99636 11.2598ZM7.99636 6.07968C8.18791 6.07968 8.34969 6.0149 8.48169 5.88534C8.61358 5.75567 8.67952 5.59506 8.67952 5.40351C8.67952 5.21195 8.61474 5.05018 8.48519 4.91818C8.35552 4.78629 8.19491 4.72034 8.00336 4.72034C7.8118 4.72034 7.65002 4.78512 7.51802 4.91467C7.38613 5.04434 7.32019 5.20495 7.32019 5.39651C7.32019 5.58806 7.38497 5.74984 7.51452 5.88184C7.64419 6.01373 7.8048 6.07968 7.99636 6.07968ZM8.00452 14.5355C7.10241 14.5355 6.25452 14.3654 5.46086 14.0252C4.66708 13.685 3.97263 13.2173 3.37752 12.6223C2.78252 12.0272 2.31491 11.3331 1.97469 10.5398C1.63447 9.74662 1.46436 8.89745 1.46436 7.99234C1.46436 7.08734 1.63447 6.24079 1.97469 5.45267C2.31491 4.66445 2.78252 3.97279 3.37752 3.37767C3.97263 2.78267 4.6668 2.31506 5.46002 1.97484C6.25324 1.63462 7.10241 1.46451 8.00752 1.46451C8.91252 1.46451 9.75908 1.63462 10.5472 1.97484C11.3354 2.31506 12.0271 2.78267 12.6222 3.37767C13.2172 3.97279 13.6848 4.66567 14.025 5.45634C14.3652 6.24701 14.5354 7.09334 14.5354 7.99534C14.5354 8.89745 14.3652 9.74534 14.025 10.539C13.6848 11.3328 13.2172 12.0272 12.6222 12.6223C12.0271 13.2173 11.3342 13.685 10.5435 14.0252C9.75286 14.3654 8.90652 14.5355 8.00452 14.5355ZM7.99986 13.1522C9.43363 13.1522 10.6508 12.652 11.6514 11.6515C12.6518 10.651 13.152 9.43379 13.152 8.00001C13.152 6.56623 12.6518 5.34906 11.6514 4.34851C10.6508 3.34806 9.43363 2.84784 7.99986 2.84784C6.56608 2.84784 5.34891 3.34806 4.34836 4.34851C3.34791 5.34906 2.84769 6.56623 2.84769 8.00001C2.84769 9.43379 3.34791 10.651 4.34836 11.6515C5.34891 12.652 6.56608 13.1522 7.99986 13.1522Z",
+		d: "M10.9629 8.57864L6.79069 12.7509C6.58302 12.9586 6.33844 13.0634 6.05694 13.0654C5.77544 13.0674 5.5251 12.9628 5.30594 12.7516C5.1026 12.5403 5.00194 12.2939 5.00394 12.0124C5.00594 11.7309 5.1111 11.4861 5.31944 11.2781L11.2714 5.33339C11.3736 5.23139 11.4873 5.15456 11.6124 5.10289C11.7376 5.05122 11.8683 5.02539 12.0044 5.02539C12.1406 5.02539 12.2713 5.05122 12.3964 5.10289C12.5216 5.15456 12.6319 5.22797 12.7272 5.32314L18.6829 11.2791C18.8983 11.4945 19.0059 11.7367 19.0059 12.0059C19.0059 12.2751 18.9023 12.5153 18.6949 12.7266C18.4758 12.9378 18.225 13.0434 17.9427 13.0434C17.6604 13.0434 17.4164 12.9378 17.2107 12.7266L13.0379 8.57864V18.3664C13.0379 18.6571 12.9383 18.9025 12.7389 19.1026C12.5394 19.303 12.295 19.4031 12.0057 19.4031C11.7164 19.4031 11.4702 19.303 11.2672 19.1026C11.0644 18.9025 10.9629 18.6571 10.9629 18.3664V8.57864Z",
 		fill: "currentColor"
 	})
 }), Bi = () => /* @__PURE__ */ N("svg", {
-	width: "16",
-	height: "16",
-	viewBox: "0 0 16 16",
+	width: "24",
+	height: "24",
+	viewBox: "0 0 24 24",
 	fill: "none",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ N("path", {
-		d: "M7.63537 9.36302L5.17504 6.90152C5.13704 6.86352 5.10854 6.82279 5.08954 6.77935C5.07054 6.73591 5.06104 6.69207 5.06104 6.64785C5.06104 6.55941 5.0932 6.48074 5.15753 6.41185C5.22187 6.34285 5.30565 6.30835 5.40887 6.30835H10.5909C10.6941 6.30835 10.7779 6.34368 10.8422 6.41435C10.9065 6.4849 10.9387 6.56552 10.9387 6.65618C10.9387 6.67263 10.9007 6.75418 10.8247 6.90085L8.36437 9.36302C8.31459 9.41279 8.25726 9.45013 8.19237 9.47502C8.12759 9.49991 8.06342 9.51235 7.99987 9.51235C7.93631 9.51235 7.87215 9.49991 7.80737 9.47502C7.74248 9.45013 7.68515 9.41279 7.63537 9.36302Z",
+		d: "M10.9997 5V16.17L6.11973 11.29C5.72973 10.9 5.08973 10.9 4.69973 11.29C4.30973 11.68 4.30973 12.31 4.69973 12.7L11.2897 19.29C11.6797 19.68 12.3097 19.68 12.6997 19.29L19.2897 12.7C19.6797 12.31 19.6797 11.68 19.2897 11.29C18.8997 10.9 18.2697 10.9 17.8797 11.29L12.9997 16.17V5C12.9997 4.45 12.5497 4 11.9997 4C11.4497 4 10.9997 4.45 10.9997 5Z",
 		fill: "currentColor"
 	})
 }), Vi = () => /* @__PURE__ */ N("svg", {
@@ -4272,10 +4257,31 @@ var rr = A.div`
 	"aria-hidden": "true",
 	style: { aspectRatio: "1 / 1" },
 	children: /* @__PURE__ */ N("path", {
-		d: "M7.36802 8.63184V10.6C7.36802 10.779 7.42824 10.9291 7.54869 11.0502C7.66913 11.1713 7.81836 11.2318 7.99636 11.2318C8.17436 11.2318 8.32474 11.1713 8.44752 11.0502C8.5703 10.9291 8.63169 10.779 8.63169 10.6V8.63184H10.5999C10.7789 8.63184 10.9289 8.57162 11.05 8.45117C11.1711 8.33073 11.2317 8.18151 11.2317 8.00351C11.2317 7.82551 11.1711 7.67512 11.05 7.55234C10.9289 7.42956 10.7789 7.36818 10.5999 7.36818H8.63169V5.40001C8.63169 5.22101 8.57147 5.07095 8.45102 4.94984C8.33058 4.82873 8.18136 4.76818 8.00336 4.76818C7.82536 4.76818 7.67497 4.82873 7.55219 4.94984C7.42941 5.07095 7.36802 5.22101 7.36802 5.40001V7.36818H5.39986C5.22086 7.36818 5.0708 7.4284 4.94969 7.54884C4.82858 7.66929 4.76802 7.81851 4.76802 7.99651C4.76802 8.17451 4.82858 8.3249 4.94969 8.44767C5.0708 8.57045 5.22086 8.63184 5.39986 8.63184H7.36802ZM8.00452 14.5355C7.10241 14.5355 6.25452 14.3654 5.46086 14.0252C4.66708 13.685 3.97263 13.2173 3.37752 12.6223C2.78252 12.0272 2.31491 11.3331 1.97469 10.5398C1.63447 9.74662 1.46436 8.89745 1.46436 7.99234C1.46436 7.08734 1.63447 6.24079 1.97469 5.45267C2.31491 4.66445 2.78252 3.97279 3.37752 3.37767C3.97263 2.78267 4.6668 2.31506 5.46002 1.97484C6.25324 1.63462 7.10241 1.46451 8.00752 1.46451C8.91252 1.46451 9.75908 1.63462 10.5472 1.97484C11.3354 2.31506 12.0271 2.78267 12.6222 3.37767C13.2172 3.97279 13.6848 4.66567 14.025 5.45634C14.3652 6.24701 14.5354 7.09334 14.5354 7.99534C14.5354 8.89745 14.3652 9.74534 14.025 10.539C13.6848 11.3328 13.2172 12.0272 12.6222 12.6223C12.0271 13.2173 11.3342 13.685 10.5435 14.0252C9.75286 14.3654 8.90652 14.5355 8.00452 14.5355ZM7.99986 13.1522C9.43363 13.1522 10.6508 12.652 11.6514 11.6515C12.6518 10.651 13.152 9.43379 13.152 8.00001C13.152 6.56623 12.6518 5.34906 11.6514 4.34851C10.6508 3.34806 9.43363 2.84784 7.99986 2.84784C6.56608 2.84784 5.34891 3.34806 4.34836 4.34851C3.34791 5.34906 2.84769 6.56623 2.84769 8.00001C2.84769 9.43379 3.34791 10.651 4.34836 11.6515C5.34891 12.652 6.56608 13.1522 7.99986 13.1522Z",
+		d: "M7.99636 11.2598C8.18224 11.2598 8.3393 11.1966 8.46752 11.0702C8.59563 10.9436 8.65969 10.7869 8.65969 10.6V7.85984C8.65969 7.67284 8.5968 7.51612 8.47102 7.38967C8.34524 7.26323 8.18936 7.20001 8.00336 7.20001C7.81747 7.20001 7.66041 7.26323 7.53219 7.38967C7.40408 7.51612 7.34002 7.67284 7.34002 7.85984V10.6C7.34002 10.7869 7.40291 10.9436 7.52869 11.0702C7.65447 11.1966 7.81036 11.2598 7.99636 11.2598ZM7.99636 6.07968C8.18791 6.07968 8.34969 6.0149 8.48169 5.88534C8.61358 5.75567 8.67952 5.59506 8.67952 5.40351C8.67952 5.21195 8.61474 5.05018 8.48519 4.91818C8.35552 4.78629 8.19491 4.72034 8.00336 4.72034C7.8118 4.72034 7.65002 4.78512 7.51802 4.91467C7.38613 5.04434 7.32019 5.20495 7.32019 5.39651C7.32019 5.58806 7.38497 5.74984 7.51452 5.88184C7.64419 6.01373 7.8048 6.07968 7.99636 6.07968ZM8.00452 14.5355C7.10241 14.5355 6.25452 14.3654 5.46086 14.0252C4.66708 13.685 3.97263 13.2173 3.37752 12.6223C2.78252 12.0272 2.31491 11.3331 1.97469 10.5398C1.63447 9.74662 1.46436 8.89745 1.46436 7.99234C1.46436 7.08734 1.63447 6.24079 1.97469 5.45267C2.31491 4.66445 2.78252 3.97279 3.37752 3.37767C3.97263 2.78267 4.6668 2.31506 5.46002 1.97484C6.25324 1.63462 7.10241 1.46451 8.00752 1.46451C8.91252 1.46451 9.75908 1.63462 10.5472 1.97484C11.3354 2.31506 12.0271 2.78267 12.6222 3.37767C13.2172 3.97279 13.6848 4.66567 14.025 5.45634C14.3652 6.24701 14.5354 7.09334 14.5354 7.99534C14.5354 8.89745 14.3652 9.74534 14.025 10.539C13.6848 11.3328 13.2172 12.0272 12.6222 12.6223C12.0271 13.2173 11.3342 13.685 10.5435 14.0252C9.75286 14.3654 8.90652 14.5355 8.00452 14.5355ZM7.99986 13.1522C9.43363 13.1522 10.6508 12.652 11.6514 11.6515C12.6518 10.651 13.152 9.43379 13.152 8.00001C13.152 6.56623 12.6518 5.34906 11.6514 4.34851C10.6508 3.34806 9.43363 2.84784 7.99986 2.84784C6.56608 2.84784 5.34891 3.34806 4.34836 4.34851C3.34791 5.34906 2.84769 6.56623 2.84769 8.00001C2.84769 9.43379 3.34791 10.651 4.34836 11.6515C5.34891 12.652 6.56608 13.1522 7.99986 13.1522Z",
 		fill: "currentColor"
 	})
 }), Hi = () => /* @__PURE__ */ N("svg", {
+	width: "16",
+	height: "16",
+	viewBox: "0 0 16 16",
+	fill: "none",
+	"aria-hidden": "true",
+	children: /* @__PURE__ */ N("path", {
+		d: "M7.63537 9.36302L5.17504 6.90152C5.13704 6.86352 5.10854 6.82279 5.08954 6.77935C5.07054 6.73591 5.06104 6.69207 5.06104 6.64785C5.06104 6.55941 5.0932 6.48074 5.15753 6.41185C5.22187 6.34285 5.30565 6.30835 5.40887 6.30835H10.5909C10.6941 6.30835 10.7779 6.34368 10.8422 6.41435C10.9065 6.4849 10.9387 6.56552 10.9387 6.65618C10.9387 6.67263 10.9007 6.75418 10.8247 6.90085L8.36437 9.36302C8.31459 9.41279 8.25726 9.45013 8.19237 9.47502C8.12759 9.49991 8.06342 9.51235 7.99987 9.51235C7.93631 9.51235 7.87215 9.49991 7.80737 9.47502C7.74248 9.45013 7.68515 9.41279 7.63537 9.36302Z",
+		fill: "currentColor"
+	})
+}), Ui = () => /* @__PURE__ */ N("svg", {
+	width: "16",
+	height: "16",
+	viewBox: "0 0 16 16",
+	fill: "none",
+	"aria-hidden": "true",
+	style: { aspectRatio: "1 / 1" },
+	children: /* @__PURE__ */ N("path", {
+		d: "M7.36802 8.63184V10.6C7.36802 10.779 7.42824 10.9291 7.54869 11.0502C7.66913 11.1713 7.81836 11.2318 7.99636 11.2318C8.17436 11.2318 8.32474 11.1713 8.44752 11.0502C8.5703 10.9291 8.63169 10.779 8.63169 10.6V8.63184H10.5999C10.7789 8.63184 10.9289 8.57162 11.05 8.45117C11.1711 8.33073 11.2317 8.18151 11.2317 8.00351C11.2317 7.82551 11.1711 7.67512 11.05 7.55234C10.9289 7.42956 10.7789 7.36818 10.5999 7.36818H8.63169V5.40001C8.63169 5.22101 8.57147 5.07095 8.45102 4.94984C8.33058 4.82873 8.18136 4.76818 8.00336 4.76818C7.82536 4.76818 7.67497 4.82873 7.55219 4.94984C7.42941 5.07095 7.36802 5.22101 7.36802 5.40001V7.36818H5.39986C5.22086 7.36818 5.0708 7.4284 4.94969 7.54884C4.82858 7.66929 4.76802 7.81851 4.76802 7.99651C4.76802 8.17451 4.82858 8.3249 4.94969 8.44767C5.0708 8.57045 5.22086 8.63184 5.39986 8.63184H7.36802ZM8.00452 14.5355C7.10241 14.5355 6.25452 14.3654 5.46086 14.0252C4.66708 13.685 3.97263 13.2173 3.37752 12.6223C2.78252 12.0272 2.31491 11.3331 1.97469 10.5398C1.63447 9.74662 1.46436 8.89745 1.46436 7.99234C1.46436 7.08734 1.63447 6.24079 1.97469 5.45267C2.31491 4.66445 2.78252 3.97279 3.37752 3.37767C3.97263 2.78267 4.6668 2.31506 5.46002 1.97484C6.25324 1.63462 7.10241 1.46451 8.00752 1.46451C8.91252 1.46451 9.75908 1.63462 10.5472 1.97484C11.3354 2.31506 12.0271 2.78267 12.6222 3.37767C13.2172 3.97279 13.6848 4.66567 14.025 5.45634C14.3652 6.24701 14.5354 7.09334 14.5354 7.99534C14.5354 8.89745 14.3652 9.74534 14.025 10.539C13.6848 11.3328 13.2172 12.0272 12.6222 12.6223C12.0271 13.2173 11.3342 13.685 10.5435 14.0252C9.75286 14.3654 8.90652 14.5355 8.00452 14.5355ZM7.99986 13.1522C9.43363 13.1522 10.6508 12.652 11.6514 11.6515C12.6518 10.651 13.152 9.43379 13.152 8.00001C13.152 6.56623 12.6518 5.34906 11.6514 4.34851C10.6508 3.34806 9.43363 2.84784 7.99986 2.84784C6.56608 2.84784 5.34891 3.34806 4.34836 4.34851C3.34791 5.34906 2.84769 6.56623 2.84769 8.00001C2.84769 9.43379 3.34791 10.651 4.34836 11.6515C5.34891 12.652 6.56608 13.1522 7.99986 13.1522Z",
+		fill: "currentColor"
+	})
+}), Wi = () => /* @__PURE__ */ N("svg", {
 	width: "18",
 	height: "18",
 	viewBox: "0 0 18 18",
@@ -4285,7 +4291,7 @@ var rr = A.div`
 		d: "M4.10361 15.4524C3.67261 15.4524 3.30549 15.3008 3.00224 14.9975C2.69899 14.6943 2.54736 14.3272 2.54736 13.8962V4.1038C2.54736 3.6728 2.69899 3.30567 3.00224 3.00242C3.30549 2.69917 3.67261 2.54755 4.10361 2.54755H13.896C14.327 2.54755 14.6941 2.69917 14.9974 3.00242C15.3006 3.30567 15.4522 3.6728 15.4522 4.1038H9.4588C8.72668 4.1038 8.10111 4.3633 7.58211 4.8823C7.06311 5.4013 6.80361 6.02686 6.80361 6.75898V11.25C6.80361 11.9821 7.06311 12.6062 7.58211 13.1222C8.10111 13.6382 8.72668 13.8962 9.4588 13.8962H15.4522C15.4522 14.3309 15.3006 14.699 14.9974 15.0004C14.6941 15.3017 14.327 15.4524 13.896 15.4524H4.10361ZM9.4588 12.6C9.09055 12.6 8.77199 12.467 8.50311 12.2012C8.23424 11.9353 8.0998 11.6182 8.0998 11.25V6.75898C8.0998 6.39073 8.23424 6.07217 8.50311 5.8033C8.77199 5.53442 9.09055 5.39998 9.4588 5.39998H14.9932C15.3615 5.39998 15.6801 5.53442 15.9489 5.8033C16.2178 6.07217 16.3522 6.39073 16.3522 6.75898V11.25C16.3522 11.6182 16.2178 11.9353 15.9489 12.2012C15.6801 12.467 15.3615 12.6 14.9932 12.6H9.4588ZM12.1498 10.125C12.4623 10.125 12.7279 10.0156 12.9467 9.79686C13.1654 9.57811 13.2748 9.31248 13.2748 8.99998C13.2748 8.68748 13.1654 8.42186 12.9467 8.20311C12.7279 7.98436 12.4623 7.87498 12.1498 7.87498C11.8373 7.87498 11.5717 7.98436 11.3529 8.20311C11.1342 8.42186 11.0248 8.68748 11.0248 8.99998C11.0248 9.31248 11.1342 9.57811 11.3529 9.79686C11.5717 10.0156 11.8373 10.125 12.1498 10.125Z",
 		fill: "currentColor"
 	})
-}), Ui = A(I)`
+}), Gi = A(I)`
   display: flex;
   width: 506px;
   flex-shrink: 0;
@@ -4309,13 +4315,13 @@ var rr = A.div`
     align-self: stretch;
     background: ${({ theme: e }) => e.colors.card};
   }
-`, Wi = A.div`
+`, Ki = A.div`
   display: flex;
   flex: 1 0 0;
   flex-direction: column;
   align-self: stretch;
   padding: 24px;
-`, Gi = A.div`
+`, qi = A.div`
   display: flex;
   width: 458px;
   flex-direction: column;
@@ -4327,12 +4333,12 @@ var rr = A.div`
   border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.cardSecondary};
-`, Ki = A.div`
+`, Ji = A.div`
   display: flex;
   gap: 8px;
   align-self: stretch;
-  padding: 0 16px 16px 16px;
-`, qi = A.div`
+  padding: 0;
+`, Yi = A.div`
   display: flex;
   flex-direction: column;
   align-self: stretch;
@@ -4389,24 +4395,24 @@ A(g)`
   font-size: 12px;
   color: ${({ theme: e, $positive: t }) => t ? e.colors.success : e.colors.failure};
 `;
-var Ji = A.div`
+var Xi = A.div`
   align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 16px;
-`, Yi = A.div`
+`, Zi = A.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`, Xi = A(g)`
+`, Qi = A(g)`
   align-items: center;
   justify-content: space-between;
-`, Zi = A(i).attrs({ fontSize: "12px" })`
+`, $i = A(i).attrs({ fontSize: "12px" })`
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.secondary};
   text-transform: uppercase;
   letter-spacing: 0.36px;
-`, Qi = A.button`
+`, ea = A.button`
   display: flex;
   padding: 8px;
   align-items: center;
@@ -4424,7 +4430,7 @@ var Ji = A.div`
   &:hover {
     filter: brightness(0.98);
   }
-`, $i = A.span`
+`, ta = A.span`
   overflow: hidden;
   color: ${({ theme: e }) => e.colors.text};
   text-align: right;
@@ -4438,7 +4444,7 @@ var Ji = A.div`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-`, ea = A.div`
+`, na = A.label`
   display: flex;
   min-width: 296px;
   padding: 16px;
@@ -4450,20 +4456,27 @@ var Ji = A.div`
   border: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
-`, ta = A.div`
+  cursor: text;
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
+`, ra = A.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   align-self: stretch;
-`, na = A.span`
+`, ia = A.span`
   align-self: stretch;
   color: ${({ theme: e }) => e.colors.failure};
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
   font-feature-settings: 'liga' off;
-`, ra = A.span`
+`, aa = A.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -4477,11 +4490,11 @@ var Ji = A.div`
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
-`, ia = A.span`
+`, oa = A.span`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-`, aa = A.input`
+`, sa = A.input`
   width: 90px;
   border: 0;
   background: transparent;
@@ -4505,7 +4518,7 @@ var Ji = A.div`
     -webkit-appearance: none;
     margin: 0;
   }
-`, oa = A.button`
+`, ca = A.button`
   display: flex;
   align-items: flex-end;
   padding: 0;
@@ -4517,7 +4530,7 @@ var Ji = A.div`
     margin-left: -11px;
   }
   color: ${({ theme: e }) => e.colors.text};
-`, sa = A.span`
+`, la = A.span`
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -4540,7 +4553,7 @@ var Ji = A.div`
     display: block;
     background: #fff;
   }
-`, ca = A.span`
+`, ua = A.span`
   display: flex;
   width: 16px;
   height: 16px;
@@ -4556,10 +4569,10 @@ var Ji = A.div`
   background: ${({ theme: e }) => e.colors.card};
   color: ${({ theme: e }) => e.colors.textSubtle};
   flex-shrink: 0;
-`, la = A.span`
+`, da = A.span`
   position: relative;
   display: inline-flex;
-`, ua = A.div`
+`, fa = A.div`
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
@@ -4572,7 +4585,7 @@ var Ji = A.div`
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.card};
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-`, da = A.button`
+`, pa = A.button`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -4589,7 +4602,7 @@ var Ji = A.div`
   &:hover {
     background: ${({ theme: e }) => e.colors.input};
   }
-`, fa = A.span`
+`, ma = A.span`
   width: 24px;
   height: 24px;
   border-radius: 999px;
@@ -4614,12 +4627,12 @@ A.span`
   font-size: 14px;
   font-weight: 600;
 `;
-var pa = A(g)`
+var ha = A(g)`
   display: flex;
   align-items: center;
   gap: 8px;
   align-self: flex-end;
-`, ma = A.button`
+`, ga = A.button`
   border: 0;
   background: transparent;
   padding: 0;
@@ -4635,14 +4648,14 @@ var pa = A(g)`
   &:hover {
     filter: brightness(1.1);
   }
-`, ha = A.span`
+`, _a = A.span`
   width: 1px;
   height: 16px;
   background: ${({ theme: e }) => e.colors.cardBorder};
-`, ga = A(g)`
+`, va = A(g)`
   justify-content: space-between;
   align-items: center;
-`, _a = A.span`
+`, ya = A.span`
   color: ${({ theme: e }) => e.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -4652,23 +4665,31 @@ var pa = A(g)`
   font-weight: 600;
   line-height: 120%;
   letter-spacing: -0.4px;
-`, va = A.span`
-  display: flex;
+`, ba = {
+	safe: "#129E7D",
+	warn: "#FFB237",
+	danger: "#ED4B9E"
+}, xa = {
+	safe: "#EAFBF7",
+	warn: "#FBF2E7",
+	danger: "#FFF0F9"
+}, Sa = A.span`
+  display: inline-flex;
   padding: 8px 12px;
   align-items: center;
   gap: 4px;
   border-radius: 16px;
-  border-top: 1px solid
-    ${({ $zone: e }) => e === "safe" ? "#BCEFE2" : e === "warn" ? "#F9D9B8" : "#F5BCD7"};
-  border-right: 1px solid
-    ${({ $zone: e }) => e === "safe" ? "#BCEFE2" : e === "warn" ? "#F9D9B8" : "#F5BCD7"};
-  border-bottom: 2px solid
-    ${({ $zone: e }) => e === "safe" ? "#BCEFE2" : e === "warn" ? "#F9D9B8" : "#F5BCD7"};
-  border-left: 1px solid
-    ${({ $zone: e }) => e === "safe" ? "#BCEFE2" : e === "warn" ? "#F9D9B8" : "#F5BCD7"};
-  background: ${({ $zone: e }) => e === "safe" ? "#EAFBF7" : e === "warn" ? "#FBF2E7" : "#FCE7F1"};
+  border-top: 1px solid ${({ $zone: e }) => ba[e]};
+  border-right: 1px solid ${({ $zone: e }) => ba[e]};
+  border-bottom: 2px solid ${({ $zone: e }) => ba[e]};
+  border-left: 1px solid ${({ $zone: e }) => ba[e]};
+  background: ${({ $zone: e }) => xa[e]};
+`, Ca = A.span`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  color: ${({ theme: e }) => e.colors.text};
+  color: #280D5F;
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -4676,16 +4697,54 @@ var pa = A(g)`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-`, ya = A.div`
+`, wa = A.span`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #280D5F;
+  cursor: help;
+`, Ta = A.span`
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  width: 200px;
+  padding: 8px 12px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background: #280D5F;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+  color: #FFF;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease;
+  z-index: 10;
+  ${wa}:hover &,
+  ${wa}:focus-visible & {
+    opacity: 1;
+    visibility: visible;
+  }
+`, Ea = A.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
   gap: 16px;
   margin-top: 16px;
-`, ba = A.div`
+`, Da = A.div`
   position: relative;
   height: 21px;
   align-self: stretch;
@@ -4694,16 +4753,11 @@ var pa = A(g)`
   background: linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%);
   box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.06) inset;
   overflow: visible;
-`, xa = A.span`
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: ${({ $fillPct: e }) => `${e}%`};
-  border-radius: 24px 0 0 24px;
-  background: ${({ theme: e, $zone: t, $degen: n }) => n ? "linear-gradient(90deg, #FAD658 0%, #ED4B9E 100%)" : t === "safe" ? e.colors.success : t === "warn" ? e.colors.warning : e.colors.failure};
-  box-shadow: ${({ $degen: e }) => e ? "0 2px 0 0 rgba(0, 0, 0, 0.06) inset" : "none"};
-`, Sa = A.span`
+
+  html.dark & {
+    background: ${({ theme: e }) => e.colors.backgroundBubblegum};
+  }
+`, Oa = A.span`
   position: absolute;
   top: ${({ $variant: e }) => e === "triple" ? "-15px" : "-10px"};
   left: ${({ $fillPct: e, $variant: t }) => t === "triple" ? `calc(${e}% - 22px)` : t === "double" ? `calc(${e}% - 20.7px)` : `calc(${e}% - 19px)`};
@@ -4717,7 +4771,7 @@ var pa = A(g)`
   touch-action: none;
   cursor: grab;
   &:active { cursor: grabbing; }
-`, Ca = () => /* @__PURE__ */ P("svg", {
+`, ka = () => /* @__PURE__ */ P("svg", {
 	width: "38",
 	height: "39",
 	viewBox: "0 0 38 39",
@@ -4747,7 +4801,7 @@ var pa = A(g)`
 			fill: "#FAD658"
 		})
 	]
-}), wa = () => /* @__PURE__ */ P("svg", {
+}), Aa = () => /* @__PURE__ */ P("svg", {
 	width: "42",
 	height: "43",
 	viewBox: "0 0 42 43",
@@ -4791,7 +4845,7 @@ var pa = A(g)`
 			fill: "#FAD658"
 		})
 	]
-}), Ta = () => /* @__PURE__ */ P("svg", {
+}), ja = () => /* @__PURE__ */ P("svg", {
 	width: "44",
 	height: "48",
 	viewBox: "0 0 44 48",
@@ -4849,7 +4903,7 @@ var pa = A(g)`
 			fill: "#FAD658"
 		})
 	]
-}), Ea = A.input`
+}), Ma = A.input`
   position: absolute;
   inset: -4px 0;
   width: 100%;
@@ -4857,7 +4911,7 @@ var pa = A(g)`
   opacity: 0;
   cursor: pointer;
   margin: 0;
-`, Da = A(g)`
+`, Na = A(g)`
   display: flex;
   align-items: center;
   align-self: stretch;
@@ -4865,7 +4919,7 @@ var pa = A(g)`
   border: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
-`, Oa = A.button`
+`, Pa = A.button`
   display: flex;
   padding: 8px;
   justify-content: center;
@@ -4882,7 +4936,7 @@ var pa = A(g)`
   &:hover {
     color: ${({ $active: e, theme: t }) => e ? t.colors.invertedContrast : t.colors.text};
   }
-`, ka = A.div`
+`, Fa = A.div`
   display: flex;
   padding: 8px;
   align-items: center;
@@ -4897,7 +4951,7 @@ var pa = A(g)`
       0 0 0 1px ${({ theme: e }) => e.colors.secondary},
       0 0 0 4px rgba(118, 69, 217, 0.20);
   }
-`, Aa = A.input`
+`, Ia = A.input`
   flex: 1;
   width: 100%;
   border: 0;
@@ -4913,12 +4967,12 @@ var pa = A(g)`
     -webkit-appearance: none;
     margin: 0;
   }
-`, ja = A.span`
+`, La = A.span`
   font-size: 13px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   padding-left: 4px;
-`, Ma = A(g)`
+`, Ra = A(g)`
   align-items: center;
   justify-content: space-between;
 `;
@@ -4929,48 +4983,50 @@ A.div`
   border-radius: 16px;
   overflow: hidden;
 `;
-var Na = A.div`
+var za = A.div`
   display: flex;
   padding: 8px 16px 16px 16px;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
   align-self: stretch;
-`, Pa = A(g)`
+`, Ba = A(g)`
   align-items: center;
   justify-content: space-between;
   align-self: stretch;
-`, Fa = A.span`
+`, Va = A.span`
   font-size: 12px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.textSubtle};
   text-transform: uppercase;
   letter-spacing: 0.24px;
-`, Ia = A.span`
+`, Ha = A.span`
   font-size: 12px;
   font-weight: 600;
   color: ${({ theme: e, $danger: t }) => t ? e.colors.failure : e.colors.text};
   text-transform: uppercase;
   letter-spacing: 0.24px;
   font-variant-numeric: tabular-nums;
-`, La = A(g)`
-  align-self: stretch;
-  gap: 8px;
-`, Ra = A.button`
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
+`, Ua = A.button`
+  display: flex;
+  padding: 8px;
   justify-content: center;
-  gap: 6px;
-  height: 56px;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  border-bottom-width: 4px;
-  border-radius: 16px;
-  font-family: inherit;
-  font-size: 18px;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
+  border-top: 2px solid rgba(0, 0, 0, 0.2);
+  border-right: 2px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+  border-left: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 24px;
+  font-family: Kanit;
+  font-size: 24px;
+  font-style: normal;
   font-weight: 600;
-  letter-spacing: -0.18px;
-  color: ${({ theme: e }) => e.colors.invertedContrast};
+  line-height: 150%;
+  letter-spacing: -0.24px;
+  font-feature-settings: 'liga' off;
+  color: #FFF;
   cursor: pointer;
   transition: filter 0.12s, transform 0.06s;
   background: ${({ theme: e, $variant: t }) => t === "up" ? e.colors.success : e.colors.failure};
@@ -4985,10 +5041,16 @@ var Na = A.div`
     cursor: not-allowed;
     opacity: 0.6;
   }
-`, za = A(g)`
+`, Wa = A.span`
+  display: flex;
+  padding: 0 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+`, Ga = A(g)`
   align-self: stretch;
   gap: 8px;
-`, Ba = A(y)`
+`, Ka = A(y)`
   display: flex;
   padding: 11px 12px 13px 12px;
   justify-content: center;
@@ -5009,14 +5071,14 @@ var Na = A.div`
   &:hover {
     filter: brightness(1.08);
   }
-`, Va = A.div`
+`, qa = A.div`
   align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 24px;
   border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-`, Ha = A(g)`
+`, Ja = A(g)`
   display: flex;
   padding: 16px;
   justify-content: space-between;
@@ -5028,7 +5090,7 @@ var Na = A.div`
   border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-radius: 24px;
-`, Ua = A.span`
+`, Ya = A.span`
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -5043,7 +5105,7 @@ var Na = A.div`
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
-`, Wa = A.span`
+`, Xa = A.span`
   color: ${({ theme: e }) => e.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -5054,7 +5116,7 @@ var Na = A.div`
   line-height: 120%;
   letter-spacing: -0.32px;
   font-variant-numeric: tabular-nums;
-`, Ga = ({ selected: e, options: t, onSelect: n, onClickFallback: r }) => {
+`, Za = ({ selected: e, options: t, onSelect: n, onClickFallback: r }) => {
 	let [i, a] = k(!1), o = O(null);
 	w(() => {
 		if (!i) return;
@@ -5068,23 +5130,23 @@ var Na = A.div`
 		};
 	}, [i]);
 	let s = !!t && t.length > 1, c = t?.find((t) => t.code === e);
-	return /* @__PURE__ */ P(la, {
+	return /* @__PURE__ */ P(da, {
 		ref: o,
-		children: [/* @__PURE__ */ P(oa, {
+		children: [/* @__PURE__ */ P(ca, {
 			type: "button",
 			onClick: () => {
 				s ? a((e) => !e) : r?.();
 			},
 			"aria-label": "Choose bet denomination",
-			children: [/* @__PURE__ */ N(sa, { children: c?.logoUrl ? /* @__PURE__ */ N("img", {
+			children: [/* @__PURE__ */ N(la, { children: c?.logoUrl ? /* @__PURE__ */ N("img", {
 				src: c.logoUrl,
 				alt: e,
 				loading: "lazy",
 				decoding: "async"
-			}) : e }), /* @__PURE__ */ N(ca, { children: /* @__PURE__ */ N(Bi, {}) })]
-		}), s && i ? /* @__PURE__ */ N(ua, {
+			}) : e }), /* @__PURE__ */ N(ua, { children: /* @__PURE__ */ N(Hi, {}) })]
+		}), s && i ? /* @__PURE__ */ N(fa, {
 			role: "menu",
-			children: t.map((t) => /* @__PURE__ */ P(da, {
+			children: t.map((t) => /* @__PURE__ */ P(pa, {
 				type: "button",
 				role: "menuitemradio",
 				"aria-checked": t.code === e,
@@ -5092,7 +5154,7 @@ var Na = A.div`
 				onClick: () => {
 					n?.(t.code), a(!1);
 				},
-				children: [/* @__PURE__ */ N(fa, {
+				children: [/* @__PURE__ */ N(ma, {
 					$color: t.color,
 					children: t.logoUrl ? /* @__PURE__ */ N("img", {
 						src: t.logoUrl,
@@ -5104,7 +5166,7 @@ var Na = A.div`
 			}, t.code))
 		}) : null]
 	});
-}, Ka = ({ symbol: e, baseAsset: t, pair: n, price: r, pricePnlPct: i, onSymbolClick: a, bet: o, onBetChange: s, betError: l, leverage: u, onLeverageChange: d, maxLeverage: f = ki, presets: p = Oi, quoteAsset: m, onQuoteAssetClick: h, assetOptions: g, onAssetChange: _, fundBalanceText: v, onTopUpFund: y, onPercentClick: x, estimatedEntry: S, liqIfLong: C, marginRequired: w, openingFee: T, canSubmit: E, isSubmittingUp: D = !1, isSubmittingDown: O = !1, onUp: k, onDown: A, onDeposit: j, onWithdraw: M, unrealizedPnl: F }) => {
+}, Qa = ({ symbol: e, baseAsset: t, pair: n, price: r, pricePnlPct: i, onSymbolClick: a, bet: o, onBetChange: s, betError: l, leverage: u, onLeverageChange: d, maxLeverage: f = ki, presets: p = Oi, quoteAsset: m, onQuoteAssetClick: h, assetOptions: g, onAssetChange: _, fundBalanceText: v, onTopUpFund: y, onPercentClick: x, estimatedEntry: S, liqIfLong: C, marginRequired: w, openingFee: T, canSubmit: E, isSubmittingUp: D = !1, isSubmittingDown: O = !1, onUp: k, onDown: A, onDeposit: j, onWithdraw: M, unrealizedPnl: F }) => {
 	let I = Math.min(100, Math.max(0, u / f * 100)), L = Mi(u, f), R = Pi(u, f), z = Fi(u, f), B = D || O, V = !E || B, ee = !E || B, H = b.useRef(null), U = b.useCallback((e) => {
 		e.preventDefault(), e.stopPropagation();
 		let t = e.currentTarget, n = H.current;
@@ -5118,11 +5180,11 @@ var Na = A.div`
 		};
 		t.addEventListener("pointermove", a), t.addEventListener("pointerup", o), t.addEventListener("pointercancel", o);
 	}, [f, d]);
-	return /* @__PURE__ */ P(Ui, {
+	return /* @__PURE__ */ P(Gi, {
 		"aria-label": `Simple bet panel · ${n || e}`,
-		children: [/* @__PURE__ */ N(Wi, { children: /* @__PURE__ */ P(qi, { children: [/* @__PURE__ */ P(Ji, { children: [
-			/* @__PURE__ */ P(Yi, { children: [
-				/* @__PURE__ */ P(Xi, { children: [/* @__PURE__ */ N(Zi, { children: "My Perp Fund" }), /* @__PURE__ */ P(Qi, {
+		children: [/* @__PURE__ */ N(Ki, { children: /* @__PURE__ */ P(Yi, { children: [/* @__PURE__ */ P(Xi, { children: [
+			/* @__PURE__ */ P(Zi, { children: [
+				/* @__PURE__ */ P(Qi, { children: [/* @__PURE__ */ N($i, { children: "My Perp Fund" }), /* @__PURE__ */ P(ea, {
 					type: "button",
 					onClick: y,
 					"aria-label": "Top up fund",
@@ -5132,102 +5194,103 @@ var Na = A.div`
 								display: "inline-flex",
 								color: "var(--pcs-colors-text-subtle, #7A6EAA)"
 							},
-							children: /* @__PURE__ */ N(Hi, {})
+							children: /* @__PURE__ */ N(Wi, {})
 						}),
-						/* @__PURE__ */ N($i, { children: v }),
+						/* @__PURE__ */ N(ta, { children: v }),
 						/* @__PURE__ */ N("span", {
 							style: {
 								display: "inline-flex",
 								color: "var(--pcs-colors-text, #280D5F)"
 							},
-							children: /* @__PURE__ */ N(Vi, {})
+							children: /* @__PURE__ */ N(Ui, {})
 						})
 					]
 				})] }),
-				/* @__PURE__ */ P(ea, { children: [/* @__PURE__ */ P(ta, { children: [/* @__PURE__ */ N(ra, { children: "My Bet" }), /* @__PURE__ */ P(ia, { children: [/* @__PURE__ */ N(aa, {
+				/* @__PURE__ */ P(na, { children: [/* @__PURE__ */ P(ra, { children: [/* @__PURE__ */ N(aa, { children: "My Bet" }), /* @__PURE__ */ P(oa, { children: [/* @__PURE__ */ N(sa, {
 					type: "number",
 					inputMode: "decimal",
 					value: o,
 					onChange: (e) => s(e.target.value),
 					"aria-label": "Bet amount",
 					placeholder: "0"
-				}), /* @__PURE__ */ N(Ga, {
+				}), /* @__PURE__ */ N(Za, {
 					selected: m,
 					options: g,
 					onSelect: _,
 					onClickFallback: h
-				})] })] }), l ? /* @__PURE__ */ N(na, {
+				})] })] }), l ? /* @__PURE__ */ N(ia, {
 					role: "alert",
 					children: l
 				}) : null] }),
-				/* @__PURE__ */ P(pa, { children: [
-					/* @__PURE__ */ N(ma, {
+				/* @__PURE__ */ P(ha, { children: [
+					/* @__PURE__ */ N(ga, {
 						type: "button",
 						onClick: () => x?.(.25),
 						children: "25%"
 					}),
-					/* @__PURE__ */ N(ha, {}),
-					/* @__PURE__ */ N(ma, {
+					/* @__PURE__ */ N(_a, {}),
+					/* @__PURE__ */ N(ga, {
 						type: "button",
 						onClick: () => x?.(.5),
 						children: "50%"
 					}),
-					/* @__PURE__ */ N(ha, {}),
-					/* @__PURE__ */ N(ma, {
+					/* @__PURE__ */ N(_a, {}),
+					/* @__PURE__ */ N(ga, {
 						type: "button",
 						onClick: () => x?.(1),
 						children: "MAX"
 					})
 				] })
 			] }),
-			/* @__PURE__ */ P(Yi, { children: [
-				/* @__PURE__ */ N(Zi, { children: "Leverage" }),
-				/* @__PURE__ */ P(ga, { children: [/* @__PURE__ */ P(_a, { children: [u, "x"] }), /* @__PURE__ */ P(va, {
+			/* @__PURE__ */ P(Zi, { children: [
+				/* @__PURE__ */ N($i, { children: "Leverage" }),
+				/* @__PURE__ */ P(va, { children: [/* @__PURE__ */ P(ya, { children: [u, "x"] }), /* @__PURE__ */ P(Sa, {
 					$zone: L,
-					children: [Ii(L), /* @__PURE__ */ N("span", {
-						style: {
-							display: "inline-flex",
-							color: "var(--pcs-colors-text-subtle, #7A6EAA)"
-						},
-						children: /* @__PURE__ */ N(zi, {})
-					})]
+					children: [
+						Li(L) ? /* @__PURE__ */ N(Ca, {
+							as: "span",
+							"aria-hidden": !0,
+							children: Li(L)
+						}) : null,
+						/* @__PURE__ */ N(Ca, { children: Ii(L) }),
+						/* @__PURE__ */ P(wa, {
+							tabIndex: 0,
+							"aria-label": `${Ii(L)} explanation`,
+							children: [/* @__PURE__ */ N(Vi, {}), Ri(L) ? /* @__PURE__ */ N(Ta, {
+								role: "tooltip",
+								children: Ri(L)
+							}) : null]
+						})
+					]
 				})] }),
-				/* @__PURE__ */ P(ya, { children: [/* @__PURE__ */ P(ba, {
+				/* @__PURE__ */ P(Ea, { children: [/* @__PURE__ */ P(Da, {
 					ref: H,
 					$fillPct: I,
 					$zone: L,
 					"aria-hidden": !0,
-					children: [
-						/* @__PURE__ */ N(xa, {
-							$fillPct: I,
-							$zone: L,
-							$degen: R
-						}),
-						/* @__PURE__ */ N(Ea, {
-							type: "range",
-							min: 1,
-							max: f,
-							value: u,
-							onChange: (e) => d(Number(e.target.value)),
-							"aria-label": "Leverage"
-						}),
-						/* @__PURE__ */ N(Sa, {
-							$fillPct: I,
-							$variant: R ? "triple" : z ? "double" : "single",
-							onPointerDown: U,
-							children: N(R ? Ta : z ? wa : Ca, {})
-						})
-					]
-				}), /* @__PURE__ */ P(Da, {
+					children: [/* @__PURE__ */ N(Ma, {
+						type: "range",
+						min: 1,
+						max: f,
+						value: u,
+						onChange: (e) => d(Number(e.target.value)),
+						"aria-label": "Leverage"
+					}), /* @__PURE__ */ N(Oa, {
+						$fillPct: I,
+						$variant: R ? "triple" : z ? "double" : "single",
+						onPointerDown: U,
+						children: N(R ? ja : z ? Aa : ka, {})
+					})]
+				}), /* @__PURE__ */ P(Na, {
 					role: "tablist",
-					children: [/* @__PURE__ */ P(ka, { children: [/* @__PURE__ */ N(Aa, {
+					children: [/* @__PURE__ */ P(Fa, { children: [/* @__PURE__ */ N(Ia, {
 						type: "number",
 						min: 1,
 						max: f,
 						value: u,
 						onChange: (e) => d(Math.max(1, Math.min(f, Number(e.target.value) || 1))),
 						"aria-label": "Custom leverage"
-					}), /* @__PURE__ */ N(ja, { children: "x" })] }), p.map((e) => /* @__PURE__ */ P(Oa, {
+					}), /* @__PURE__ */ N(La, { children: "%" })] }), p.map((e) => /* @__PURE__ */ P(Pa, {
 						type: "button",
 						role: "tab",
 						"aria-selected": u === e,
@@ -5237,10 +5300,10 @@ var Na = A.div`
 					}, e))]
 				})] })
 			] }),
-			/* @__PURE__ */ P(Ma, { children: [/* @__PURE__ */ N(Zi, { children: "Duration" }), /* @__PURE__ */ P(Qi, {
+			/* @__PURE__ */ P(Ra, { children: [/* @__PURE__ */ N($i, { children: "Duration" }), /* @__PURE__ */ P(ea, {
 				type: "button",
 				disabled: !0,
-				children: [/* @__PURE__ */ N($i, {
+				children: [/* @__PURE__ */ N(ta, {
 					style: { fontSize: 14 },
 					children: "Perpetual"
 				}), /* @__PURE__ */ N("span", {
@@ -5248,58 +5311,44 @@ var Na = A.div`
 					children: "▾"
 				})]
 			})] })
-		] }), o && o !== "0" ? /* @__PURE__ */ P(Gi, { children: [/* @__PURE__ */ P(Na, { children: [
-			/* @__PURE__ */ P(Pa, { children: [/* @__PURE__ */ N(Fa, { children: "Estimated Entry" }), /* @__PURE__ */ N(Ia, { children: S })] }),
-			/* @__PURE__ */ P(Pa, { children: [/* @__PURE__ */ N(Fa, { children: "Liquidation if long" }), /* @__PURE__ */ N(Ia, {
+		] }), /* @__PURE__ */ P(qi, { children: [o && o !== "0" ? /* @__PURE__ */ P(za, { children: [
+			/* @__PURE__ */ P(Ba, { children: [/* @__PURE__ */ N(Va, { children: "Estimated Entry" }), /* @__PURE__ */ N(Ha, { children: S })] }),
+			/* @__PURE__ */ P(Ba, { children: [/* @__PURE__ */ N(Va, { children: "Liquidation if long" }), /* @__PURE__ */ N(Ha, {
 				$danger: !0,
 				children: C
 			})] }),
-			/* @__PURE__ */ P(Pa, { children: [/* @__PURE__ */ N(Fa, { children: "Margin required" }), /* @__PURE__ */ N(Ia, { children: w })] }),
-			/* @__PURE__ */ P(Pa, { children: [/* @__PURE__ */ N(Fa, { children: "Opening fee" }), /* @__PURE__ */ N(Ia, { children: T })] })
-		] }), /* @__PURE__ */ P(Ki, { children: [/* @__PURE__ */ P(Ra, {
+			/* @__PURE__ */ P(Ba, { children: [/* @__PURE__ */ N(Va, { children: "Margin required" }), /* @__PURE__ */ N(Ha, { children: w })] }),
+			/* @__PURE__ */ P(Ba, { children: [/* @__PURE__ */ N(Va, { children: "Opening fee" }), /* @__PURE__ */ N(Ha, { children: T })] })
+		] }) : null, /* @__PURE__ */ P(Ji, { children: [/* @__PURE__ */ N(Ua, {
 			type: "button",
 			$variant: "up",
 			disabled: V,
 			onClick: k,
 			"aria-busy": D,
-			children: [/* @__PURE__ */ N(Li, {}), D ? "..." : "UP"]
-		}), /* @__PURE__ */ P(Ra, {
+			children: /* @__PURE__ */ P(Wa, { children: [/* @__PURE__ */ N(zi, {}), D ? "..." : "UP"] })
+		}), /* @__PURE__ */ N(Ua, {
 			type: "button",
 			$variant: "down",
 			disabled: ee,
 			onClick: A,
 			"aria-busy": O,
-			children: [/* @__PURE__ */ N(Ri, {}), O ? "..." : "DOWN"]
-		})] })] }) : /* @__PURE__ */ P(La, { children: [/* @__PURE__ */ P(Ra, {
-			type: "button",
-			$variant: "up",
-			disabled: V,
-			onClick: k,
-			"aria-busy": D,
-			children: [/* @__PURE__ */ N(Li, {}), D ? "..." : "UP"]
-		}), /* @__PURE__ */ P(Ra, {
-			type: "button",
-			$variant: "down",
-			disabled: ee,
-			onClick: A,
-			"aria-busy": O,
-			children: [/* @__PURE__ */ N(Ri, {}), O ? "..." : "DOWN"]
-		})] })] }) }), /* @__PURE__ */ P(Va, { children: [/* @__PURE__ */ P(za, { children: [/* @__PURE__ */ N(Ba, {
+			children: /* @__PURE__ */ P(Wa, { children: [/* @__PURE__ */ N(Bi, {}), O ? "..." : "DOWN"] })
+		})] })] })] }) }), /* @__PURE__ */ P(qa, { children: [/* @__PURE__ */ P(Ga, { children: [/* @__PURE__ */ N(Ka, {
 			$variant: "primary",
 			onClick: j,
 			type: "button",
 			children: "Deposit"
-		}), /* @__PURE__ */ N(Ba, {
+		}), /* @__PURE__ */ N(Ka, {
 			$variant: "secondary",
 			onClick: M,
 			type: "button",
 			children: "Withdraw"
-		})] }), /* @__PURE__ */ P(Ha, { children: [/* @__PURE__ */ P(Ua, { children: ["Unrealized PnL ", /* @__PURE__ */ N(c, {
+		})] }), /* @__PURE__ */ P(Ja, { children: [/* @__PURE__ */ P(Ya, { children: ["Unrealized PnL ", /* @__PURE__ */ N(c, {
 			color: "textSubtle",
 			width: "14px"
-		})] }), /* @__PURE__ */ N(Wa, { children: F })] })] })]
+		})] }), /* @__PURE__ */ N(Xa, { children: F })] })] })]
 	});
-}, qa = A.div`
+}, $a = A.div`
   display: flex;
   /* Fluid — the consumer's column owns the width. Original 1058px was
      hardcoded for the storybook canvas and made the card overflow / look
@@ -5317,7 +5366,7 @@ var Na = A.div`
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.card};
   font-variant-numeric: tabular-nums;
-`, Ja = A.button`
+`, eo = A.button`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -5329,7 +5378,7 @@ var Na = A.div`
   color: ${({ theme: e }) => e.colors.text};
   text-align: left;
   flex-shrink: 0;
-`, Ya = A.span`
+`, to = A.span`
   width: 64px;
   height: 64px;
   border-radius: 999px;
@@ -5341,7 +5390,7 @@ var Na = A.div`
   font-size: 16px;
   font-weight: 700;
   flex-shrink: 0;
-`, Xa = A.span`
+`, no = A.span`
   display: inline-flex;
   width: 64px;
   height: 64px;
@@ -5363,15 +5412,15 @@ A.span`
   align-items: center;
   color: ${({ theme: e }) => e.colors.textSubtle};
 `;
-var Za = A.div`
+var ro = A.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-`, Qa = A.span`
+`, io = A.span`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`, $a = A.span`
+`, ao = A.span`
   display: flex;
   height: 24px;
   padding: 2px 2px 2px 8px;
@@ -5383,7 +5432,7 @@ var Za = A.div`
   border-bottom: 2px solid ${({ theme: e }) => e.colors.inputSecondary};
   border-left: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
-`, eo = A.span`
+`, oo = A.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -5396,33 +5445,38 @@ var Za = A.div`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-`, to = A.span`
+`, so = A.span`
   display: flex;
   width: 20px;
   align-self: stretch;
   justify-content: center;
   align-items: center;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, no = A.span`
+`, co = A.span`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`, ro = A.span`
+`, lo = A.span`
   font-size: 32px;
   font-weight: 600;
   letter-spacing: -0.32px;
   line-height: 1.2;
   color: ${({ theme: e }) => e.colors.text};
-`, io = A.span`
-  display: inline-flex;
+`, uo = A.span`
+  display: flex;
+  padding: 0 6px;
+  justify-content: center;
   align-items: center;
   gap: 2px;
-  padding: 0 6px;
   border-radius: 999px;
-  background: ${({ theme: e, $positive: t }) => t ? `color-mix(in srgb, ${e.colors.success} 18%, transparent)` : `color-mix(in srgb, ${e.colors.failure} 18%, transparent)`};
+  background: ${({ $positive: e }) => e ? "#EAFBF7" : "#FFF0F9"};
   font-size: 16px;
   color: ${({ theme: e }) => e.colors.text};
-`, ao = A.div`
+`, fo = A.span`
+  display: inline-flex;
+  align-items: center;
+  color: ${({ $positive: e }) => e ? "#129E7D" : "#ED4B9E"};
+`, po = A.div`
   display: flex;
   align-items: center;
   flex: 0 1 auto;
@@ -5430,12 +5484,12 @@ var Za = A.div`
   overflow: hidden;
   position: relative;
   justify-content: flex-start;
-`, oo = A(g)`
+`, mo = A(g)`
   align-items: center;
   gap: 24px;
   height: 56px;
   flex-shrink: 0;
-`, so = A.span`
+`, ho = A.span`
   position: absolute;
   right: 0;
   top: 50%;
@@ -5451,33 +5505,39 @@ var Za = A.div`
   pointer-events: none;
   opacity: ${({ $visible: e }) => e ? 1 : 0};
   transition: opacity 0.15s;
-`, co = A.div`
+`, go = A.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;
-`, lo = A.span`
+`, _o = A.span`
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, uo = A.span`
+`, vo = A.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
-`, fo = () => /* @__PURE__ */ N("svg", {
+`, yo = () => /* @__PURE__ */ N("svg", {
 	width: "12",
 	height: "12",
 	viewBox: "0 0 12 12",
-	fill: "currentColor",
+	fill: "none",
 	"aria-hidden": "true",
-	children: /* @__PURE__ */ N("path", { d: "M6 2l5 8H1z" })
-}), po = () => /* @__PURE__ */ N("svg", {
+	children: /* @__PURE__ */ N("path", {
+		d: "M1.90301 9.83956C1.65374 9.83956 1.47213 9.73331 1.35818 9.52081C1.24423 9.30831 1.25374 9.0988 1.3867 8.89228L5.49051 2.73574C5.61516 2.5553 5.78491 2.46509 5.99977 2.46509C6.21462 2.46509 6.38437 2.5553 6.50901 2.73574L10.6128 8.89228C10.7458 9.0988 10.7553 9.30831 10.6414 9.52081C10.5274 9.73331 10.3458 9.83956 10.0965 9.83956H1.90301Z",
+		fill: "currentColor"
+	})
+}), bo = () => /* @__PURE__ */ N("svg", {
 	width: "12",
 	height: "12",
 	viewBox: "0 0 12 12",
-	fill: "currentColor",
+	fill: "none",
 	"aria-hidden": "true",
-	children: /* @__PURE__ */ N("path", { d: "M6 10L1 2h10z" })
-}), mo = () => /* @__PURE__ */ N("svg", {
+	children: /* @__PURE__ */ N("path", {
+		d: "M1.90301 2.16044C1.65374 2.16044 1.47213 2.26669 1.35818 2.47919C1.24423 2.69169 1.25374 2.9012 1.3867 3.10772L5.49051 9.26426C5.61516 9.4447 5.78491 9.53491 5.99977 9.53491C6.21462 9.53491 6.38437 9.4447 6.50901 9.26426L10.6128 3.10772C10.7458 2.9012 10.7553 2.69169 10.6414 2.47919C10.5274 2.26669 10.3458 2.16044 10.0965 2.16044H1.90301Z",
+		fill: "currentColor"
+	})
+}), xo = () => /* @__PURE__ */ N("svg", {
 	width: "20",
 	height: "20",
 	viewBox: "0 0 20 20",
@@ -5487,7 +5547,7 @@ var Za = A.div`
 		d: "M7.25878 9.75835L9.41712 11.9167C9.74212 12.2417 10.2671 12.2417 10.5921 11.9167L12.7504 9.75835C13.2754 9.23335 12.9004 8.33335 12.1588 8.33335H7.84212C7.10045 8.33335 6.73378 9.23335 7.25878 9.75835Z",
 		fill: "currentColor"
 	})
-}), ho = A.div`
+}), So = A.div`
   position: fixed;
   inset: 0;
   display: flex;
@@ -5495,7 +5555,7 @@ var Za = A.div`
   justify-content: center;
   background: rgba(40, 13, 95, 0.60);
   z-index: 1000;
-`, go = A.div`
+`, Co = A.div`
   display: flex;
   width: 697px;
   flex-direction: column;
@@ -5511,12 +5571,12 @@ var Za = A.div`
     0 4px 8px 0 rgba(0, 0, 0, 0.16);
   padding: 16px;
   gap: 16px;
-`, _o = A.div`
+`, wo = A.div`
   display: flex;
   align-items: center;
   gap: 16px;
   align-self: stretch;
-`, vo = A.button`
+`, To = A.button`
   border: 0;
   background: transparent;
   padding: 4px 0;
@@ -5526,7 +5586,7 @@ var Za = A.div`
   color: ${({ $active: e, theme: t }) => e ? t.colors.secondary : t.colors.textSubtle};
   cursor: pointer;
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, yo = A.label`
+`, Eo = A.label`
   display: flex;
   padding: 7px 8px 9px 16px;
   align-items: flex-start;
@@ -5539,7 +5599,7 @@ var Za = A.div`
   border-left: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, bo = A.input`
+`, Do = A.input`
   flex: 1;
   border: 0;
   background: transparent;
@@ -5548,13 +5608,13 @@ var Za = A.div`
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.text};
   &::placeholder { color: ${({ theme: e }) => e.colors.textSubtle}; }
-`, xo = A.div`
+`, Oo = A.div`
   display: grid;
   grid-template-columns: 24px 1fr 1fr 1fr 1fr;
   align-items: center;
   align-self: stretch;
   row-gap: 4px;
-`, So = A.div`
+`, ko = A.div`
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -5569,30 +5629,30 @@ var Za = A.div`
   &:nth-child(3),
   &:nth-child(4),
   &:nth-child(5) { justify-content: flex-end; }
-`, Co = A.button`
+`, Ao = A.button`
   display: contents;
   border: 0;
   background: transparent;
   cursor: pointer;
   font-family: inherit;
   text-align: left;
-`, wo = A.div`
+`, jo = A.div`
   padding: 12px 12px;
   font-family: Kanit;
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
   font-variant-numeric: tabular-nums;
-  ${Co}:hover & { background: ${({ theme: e }) => e.colors.cardSecondary}; }
-`, To = A(wo)`
+  ${Ao}:hover & { background: ${({ theme: e }) => e.colors.cardSecondary}; }
+`, Mo = A(jo)`
   padding-left: 8px;
   padding-right: 0;
   color: #F0B90B;
-`, Eo = A(wo)`
+`, No = A(jo)`
   display: inline-flex;
   align-items: center;
   gap: 12px;
-`, Do = A.span`
+`, Po = A.span`
   width: 28px;
   height: 28px;
   border-radius: 999px;
@@ -5604,19 +5664,19 @@ var Za = A.div`
   font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
-`, Oo = A(wo)`
+`, Fo = A(jo)`
   text-align: right;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
-`, ko = A.span`
+`, Io = A.span`
   display: inline-flex;
   align-items: center;
   gap: 2px;
   color: ${({ theme: e, $up: t }) => t ? e.colors.success : e.colors.failure};
   font-weight: 600;
-`, Ao = [
+`, Lo = [
 	{
 		symbol: "BTC",
 		lastPrice: "$590.75",
@@ -5641,48 +5701,48 @@ var Za = A.div`
 		color: "#627EEA",
 		starred: !0
 	}
-], jo = ({ isOpen: e, onClose: t }) => e ? /* @__PURE__ */ N(ho, {
+], Ro = ({ isOpen: e, onClose: t }) => e ? /* @__PURE__ */ N(So, {
 	onClick: t,
-	children: /* @__PURE__ */ P(go, {
+	children: /* @__PURE__ */ P(Co, {
 		onClick: (e) => e.stopPropagation(),
 		children: [
-			/* @__PURE__ */ P(_o, { children: [/* @__PURE__ */ N(vo, {
+			/* @__PURE__ */ P(wo, { children: [/* @__PURE__ */ N(To, {
 				type: "button",
 				$active: !0,
 				children: "Favorites"
-			}), /* @__PURE__ */ N(vo, {
+			}), /* @__PURE__ */ N(To, {
 				type: "button",
 				children: "All markets"
 			})] }),
-			/* @__PURE__ */ P(yo, { children: [/* @__PURE__ */ N("svg", {
+			/* @__PURE__ */ P(Eo, { children: [/* @__PURE__ */ N("svg", {
 				width: "20",
 				height: "20",
 				viewBox: "0 0 24 24",
 				fill: "currentColor",
 				"aria-hidden": !0,
 				children: /* @__PURE__ */ N("path", { d: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" })
-			}), /* @__PURE__ */ N(bo, {
+			}), /* @__PURE__ */ N(Do, {
 				type: "text",
 				placeholder: "All tokens"
 			})] }),
-			/* @__PURE__ */ P(xo, {
+			/* @__PURE__ */ P(Oo, {
 				role: "table",
 				children: [
-					/* @__PURE__ */ N(So, { children: "SYMBOLS" }),
-					/* @__PURE__ */ N(So, {}),
-					/* @__PURE__ */ N(So, { children: "LAST PRICE" }),
-					/* @__PURE__ */ N(So, { children: "1D CHANGE" }),
-					/* @__PURE__ */ N(So, { children: "1D VOLUME (USDT)" }),
-					Ao.map((e) => /* @__PURE__ */ P(Co, {
+					/* @__PURE__ */ N(ko, { children: "SYMBOLS" }),
+					/* @__PURE__ */ N(ko, {}),
+					/* @__PURE__ */ N(ko, { children: "LAST PRICE" }),
+					/* @__PURE__ */ N(ko, { children: "1D CHANGE" }),
+					/* @__PURE__ */ N(ko, { children: "1D VOLUME (USDT)" }),
+					Lo.map((e) => /* @__PURE__ */ P(Ao, {
 						type: "button",
 						children: [
-							/* @__PURE__ */ N(To, { children: "★" }),
-							/* @__PURE__ */ P(Eo, { children: [/* @__PURE__ */ N(Do, {
+							/* @__PURE__ */ N(Mo, { children: "★" }),
+							/* @__PURE__ */ P(No, { children: [/* @__PURE__ */ N(Po, {
 								$color: e.color,
 								children: e.symbol.slice(0, 1)
 							}), /* @__PURE__ */ N("span", { children: e.symbol })] }),
-							/* @__PURE__ */ N(Oo, { children: e.lastPrice }),
-							/* @__PURE__ */ N(Oo, { children: /* @__PURE__ */ P(ko, {
+							/* @__PURE__ */ N(Fo, { children: e.lastPrice }),
+							/* @__PURE__ */ N(Fo, { children: /* @__PURE__ */ P(Io, {
 								$up: e.change >= 0,
 								children: [
 									e.change >= 0 ? "▲" : "▼",
@@ -5691,14 +5751,14 @@ var Za = A.div`
 									"%"
 								]
 							}) }),
-							/* @__PURE__ */ N(Oo, { children: e.volume })
+							/* @__PURE__ */ N(Fo, { children: e.volume })
 						]
 					}, e.symbol))
 				]
 			})
 		]
 	})
-}) : null, Mo = ({ baseAsset: e, pair: t, price: n, pricePnlPct: r, volume24h: i, openInterest: a, fundingRate: o, nextFunding: s, onSymbolClick: c, renderTokenIcon: l }) => {
+}) : null, zo = ({ baseAsset: e, pair: t, price: n, pricePnlPct: r, volume24h: i, openInterest: a, fundingRate: o, nextFunding: s, onSymbolClick: c, renderTokenIcon: l }) => {
 	let u = r >= 0, d = l?.(), f = O(null), p = O(null), [m, h] = k(!1), [g, _] = k(!1);
 	return w(() => {
 		let e = f.current, t = p.current;
@@ -5707,36 +5767,39 @@ var Za = A.div`
 		n();
 		let r = new ResizeObserver(n);
 		return r.observe(e), r.observe(t), () => r.disconnect();
-	}, []), /* @__PURE__ */ P(qa, { children: [
-		/* @__PURE__ */ P(Ja, {
+	}, []), /* @__PURE__ */ P($a, { children: [
+		/* @__PURE__ */ P(eo, {
 			type: "button",
 			onClick: () => {
 				c?.(), _(!0);
 			},
 			"aria-label": `Change market · ${t}`,
-			children: [d == null ? /* @__PURE__ */ N(Ya, { children: e }) : /* @__PURE__ */ N(Xa, { children: d }), /* @__PURE__ */ P(Za, { children: [/* @__PURE__ */ N(Qa, { children: /* @__PURE__ */ P($a, { children: [/* @__PURE__ */ N(eo, { children: t }), /* @__PURE__ */ N(to, {
+			children: [d == null ? /* @__PURE__ */ N(to, { children: e }) : /* @__PURE__ */ N(no, { children: d }), /* @__PURE__ */ P(ro, { children: [/* @__PURE__ */ N(io, { children: /* @__PURE__ */ P(ao, { children: [/* @__PURE__ */ N(oo, { children: t }), /* @__PURE__ */ N(so, {
 				"aria-hidden": !0,
-				children: /* @__PURE__ */ N(mo, {})
-			})] }) }), /* @__PURE__ */ P(no, { children: [/* @__PURE__ */ N(ro, { children: n }), /* @__PURE__ */ P(io, {
+				children: /* @__PURE__ */ N(xo, {})
+			})] }) }), /* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: n }), /* @__PURE__ */ P(uo, {
 				$positive: u,
 				children: [
-					N(u ? fo : po, {}),
+					/* @__PURE__ */ N(fo, {
+						$positive: u,
+						children: N(u ? yo : bo, {})
+					}),
 					r.toFixed(2),
 					"%"
 				]
 			})] })] })]
 		}),
-		/* @__PURE__ */ P(ao, {
+		/* @__PURE__ */ P(po, {
 			ref: f,
-			children: [/* @__PURE__ */ P(oo, {
+			children: [/* @__PURE__ */ P(mo, {
 				ref: p,
 				children: [
-					/* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: "24h Volume" }), /* @__PURE__ */ N(uo, { children: i })] }),
-					/* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: "Open Interest" }), /* @__PURE__ */ N(uo, { children: a })] }),
-					/* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: "Funding Rate" }), /* @__PURE__ */ N(uo, { children: o })] }),
-					/* @__PURE__ */ P(co, { children: [/* @__PURE__ */ N(lo, { children: "Next Funding" }), /* @__PURE__ */ N(uo, { children: s })] })
+					/* @__PURE__ */ P(go, { children: [/* @__PURE__ */ N(_o, { children: "24h Volume" }), /* @__PURE__ */ N(vo, { children: i })] }),
+					/* @__PURE__ */ P(go, { children: [/* @__PURE__ */ N(_o, { children: "Open Interest" }), /* @__PURE__ */ N(vo, { children: a })] }),
+					/* @__PURE__ */ P(go, { children: [/* @__PURE__ */ N(_o, { children: "Funding Rate" }), /* @__PURE__ */ N(vo, { children: o })] }),
+					/* @__PURE__ */ P(go, { children: [/* @__PURE__ */ N(_o, { children: "Next Funding" }), /* @__PURE__ */ N(vo, { children: s })] })
 				]
-			}), /* @__PURE__ */ N(so, {
+			}), /* @__PURE__ */ N(ho, {
 				$visible: m,
 				"aria-hidden": !0,
 				children: /* @__PURE__ */ N("svg", {
@@ -5748,12 +5811,12 @@ var Za = A.div`
 				})
 			})]
 		}),
-		/* @__PURE__ */ N(jo, {
+		/* @__PURE__ */ N(Ro, {
 			isOpen: g,
 			onClose: () => _(!1)
 		})
 	] });
-}, No = A(I)`
+}, Bo = A(I)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -5774,11 +5837,11 @@ var Za = A.div`
     flex-direction: column;
     gap: 12px;
   }
-`, Po = A.div`
+`, Vo = A.div`
   display: inline-flex;
   align-items: center;
   gap: 24px;
-`, Fo = A.button`
+`, Ho = A.button`
   border: 0;
   background: transparent;
   font-family: inherit;
@@ -5787,21 +5850,21 @@ var Za = A.div`
   font-weight: ${({ $active: e }) => e ? 700 : 400};
   color: ${({ $active: e, theme: t }) => e ? t.colors.primary : t.colors.textSubtle};
   cursor: pointer;
-`, Io = A.div`
+`, Uo = A.div`
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
-`, Lo = A.div`
+`, Wo = A.div`
   flex: 1;
   position: relative;
   display: grid;
   grid-template-columns: 1fr 40px;
   gap: 8px;
-`, Ro = A.div`
+`, Go = A.div`
   position: relative;
   overflow: visible;
-`, zo = A.div`
+`, Ko = A.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -5810,13 +5873,13 @@ var Za = A.div`
   text-align: left;
   padding-top: 6px;
   padding-bottom: 24px;
-`, Bo = A.div`
+`, qo = A.div`
   display: flex;
   justify-content: space-between;
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   padding-top: 8px;
-`, Vo = A.span`
+`, Jo = A.span`
   position: absolute;
   display: inline-flex;
   align-items: center;
@@ -5828,26 +5891,26 @@ var Za = A.div`
   font-family: 'Kanit', sans-serif;
   font-weight: 600;
   pointer-events: none;
-`, Ho = 1e3, Uo = 360, Wo = 20, Go = 70;
-function Ko(e) {
+`, Yo = 1e3, Xo = 360, Zo = 20, Qo = 70;
+function $o(e) {
 	if (e.length < 2) return null;
-	let t = Math.min(...e.map((e) => e.price)), n = Math.max(...e.map((e) => e.price)) - t || 1, r = e.map((t, n) => n / (e.length - 1) * Ho), i = e.map((e) => Wo + (1 - (e.price - t) / n) * (Uo - Wo - Go)), a = `M ${r[0].toFixed(2)} ${i[0].toFixed(2)}`;
+	let t = Math.min(...e.map((e) => e.price)), n = Math.max(...e.map((e) => e.price)) - t || 1, r = e.map((t, n) => n / (e.length - 1) * Yo), i = e.map((e) => Zo + (1 - (e.price - t) / n) * (Xo - Zo - Qo)), a = `M ${r[0].toFixed(2)} ${i[0].toFixed(2)}`;
 	for (let e = 0; e < r.length - 1; e++) {
 		let t = r[e - 1] ?? r[e], n = i[e - 1] ?? i[e], o = r[e], s = i[e], c = r[e + 1], l = i[e + 1], u = r[e + 2] ?? r[e + 1], d = i[e + 2] ?? i[e + 1], f = o + (c - t) / 6, p = s + (l - n) / 6, m = c - (u - o) / 6, h = l - (d - s) / 6;
 		a += ` C ${f.toFixed(2)} ${p.toFixed(2)}, ${m.toFixed(2)} ${h.toFixed(2)}, ${c.toFixed(2)} ${l.toFixed(2)}`;
 	}
-	let o = `${a} L ${Ho} ${Uo} L 0 ${Uo} Z`, s = i[i.length - 1];
+	let o = `${a} L ${Yo} ${Xo} L 0 ${Xo} Z`, s = i[i.length - 1];
 	return {
 		line: a,
 		area: o,
 		endY: s
 	};
 }
-var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n", Jo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n  L 1000 360\n  L 0 360\n  Z\n", Yo = 200, Xo = ({ timeframe: e, timeframes: t, onTimeframeChange: n, points: r, currentPriceLabel: i, yTicks: a, xTicks: o }) => {
-	let s = j(), c = `simple-chart-fill-${T().replace(/:/g, "")}`, l = s?.colors?.primary ?? "#1FC7D4", u = D(() => Ko(r), [r]), d = u?.line ?? qo, f = u?.area ?? Jo, p = u?.endY ?? Yo;
-	return /* @__PURE__ */ P(No, { children: [/* @__PURE__ */ N(Po, {
+var es = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n", ts = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n  L 1000 360\n  L 0 360\n  Z\n", ns = 200, rs = ({ timeframe: e, timeframes: t, onTimeframeChange: n, points: r, currentPriceLabel: i, yTicks: a, xTicks: o }) => {
+	let s = j(), c = `simple-chart-fill-${T().replace(/:/g, "")}`, l = s?.colors?.primary ?? "#1FC7D4", u = D(() => $o(r), [r]), d = u?.line ?? es, f = u?.area ?? ts, p = u?.endY ?? ns;
+	return /* @__PURE__ */ P(Bo, { children: [/* @__PURE__ */ N(Vo, {
 		role: "tablist",
-		children: t.map((t) => /* @__PURE__ */ N(Fo, {
+		children: t.map((t) => /* @__PURE__ */ N(Ho, {
 			type: "button",
 			role: "tab",
 			"aria-selected": e === t,
@@ -5855,8 +5918,8 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			onClick: () => n(t),
 			children: t
 		}, t))
-	}), /* @__PURE__ */ P(Io, { children: [/* @__PURE__ */ P(Lo, { children: [/* @__PURE__ */ P(Ro, { children: [/* @__PURE__ */ P("svg", {
-		viewBox: `0 0 ${Ho} ${Uo}`,
+	}), /* @__PURE__ */ P(Uo, { children: [/* @__PURE__ */ P(Wo, { children: [/* @__PURE__ */ P(Go, { children: [/* @__PURE__ */ P("svg", {
+		viewBox: `0 0 ${Yo} ${Xo}`,
 		preserveAspectRatio: "none",
 		style: {
 			width: "100%",
@@ -5894,7 +5957,7 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ N("line", {
 				x1: "0",
 				y1: p,
-				x2: Ho - 10,
+				x2: Yo - 10,
 				y2: p,
 				stroke: l,
 				strokeWidth: "1",
@@ -5902,20 +5965,20 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				opacity: "0.7"
 			})
 		]
-	}), /* @__PURE__ */ N(Vo, {
+	}), /* @__PURE__ */ N(Jo, {
 		style: {
 			right: -8,
-			top: `calc(${p}/${Uo} * 100% - 14px)`
+			top: `calc(${p}/${Xo} * 100% - 14px)`
 		},
 		children: i
-	})] }), /* @__PURE__ */ N(zo, {
+	})] }), /* @__PURE__ */ N(Ko, {
 		"aria-hidden": !0,
 		children: a.map((e, t) => /* @__PURE__ */ N("span", { children: e }, `${e}-${t}`))
-	})] }), /* @__PURE__ */ N(Bo, {
+	})] }), /* @__PURE__ */ N(qo, {
 		"aria-hidden": !0,
 		children: o.map((e, t) => /* @__PURE__ */ N("span", { children: e }, `${e}-${t}`))
 	})] })] });
-}, Zo = A(I)`
+}, is = A(I)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -5928,14 +5991,14 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     background: transparent;
     padding: 0;
   }
-`, Qo = A.div`
+`, as = A.div`
   display: flex;
   align-items: center;
   gap: 4px;
   padding: 8px 16px;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   align-self: stretch;
-`, $o = A.button`
+`, os = A.button`
   display: flex;
   padding: ${({ $active: e }) => e ? "12px 12px 12px 16px" : "12px 12px"};
   justify-content: center;
@@ -5952,11 +6015,11 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-weight: ${({ $active: e }) => e ? 600 : 400};
   color: ${({ $active: e, theme: t }) => e ? t.colors.secondary : t.colors.textSubtle};
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, es = A.div`
+`, ss = A.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 56px;
   align-items: center;
-`, ts = A.div`
+`, cs = A.div`
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr 1fr;
   align-items: center;
@@ -5983,7 +6046,7 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   line-height: 150%;
   text-align: right;
   font-variant-numeric: tabular-nums;
-`, ns = A($)`
+`, ls = A($)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -6006,7 +6069,7 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     object-fit: contain;
     display: block;
   }
-`, rs = A.span`
+`, us = A.span`
   display: inline-flex;
   width: 40px;
   height: 40px;
@@ -6017,18 +6080,18 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   color: #fff;
   font-weight: 700;
   font-size: 14px;
-`, is = A.div`
+`, ds = A.div`
   display: flex;
   flex-direction: column;
   line-height: 1.3;
-`, as = A.span`
+`, fs = A.span`
   font-size: 16px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
-`, os = A.span`
+`, ps = A.span`
   font-size: 12px;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, ss = A($)`
+`, ms = A($)`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -6046,7 +6109,7 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
      glyph and label wrap into two lines on narrow grids and the pill
      visually breaks. */
   white-space: nowrap;
-`, cs = A($)`
+`, hs = A($)`
   color: ${({ $sign: e, theme: t }) => e === "positive" ? "var(--pcs-colors-positive60, #129E7D)" : e === "negative" ? t.colors.failure : t.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -6056,37 +6119,42 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
-`, ls = A($)`
+`, gs = A($)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`, us = A.div`
+`, _s = A.div`
   flex: 1;
   height: 6px;
   border-radius: 999px;
   background: ${({ theme: e }) => e.colors.input};
   overflow: hidden;
   max-width: 94px;
-`, ds = A.div`
+`, vs = A.div`
   height: 100%;
   width: ${({ $pct: e }) => `${Math.max(0, Math.min(100, e))}%`};
   background: ${({ $status: e, theme: t }) => e === "safe" ? t.colors.success : e === "warn" ? t.colors.warning : t.colors.failure};
   border-radius: 999px;
-`, fs = A.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+`, ys = A.button`
+  display: flex;
   width: 32px;
   height: 32px;
+  padding: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  aspect-ratio: 1 / 1;
   margin: 16px 10px;
-  padding: 0;
-  border: 0;
   border-radius: 8px;
-  background: ${({ theme: e }) => e.colors.input};
-  color: ${({ theme: e }) => e.colors.failure};
+  border-top: 1px solid #ED4B9E;
+  border-right: 1px solid #ED4B9E;
+  border-bottom: 2px solid #ED4B9E;
+  border-left: 1px solid #ED4B9E;
+  background: #FFF0F9;
+  color: #ED4B9E;
   cursor: pointer;
-  &:hover { filter: brightness(0.95); }
-`, ps = A.div`
+  &:hover { filter: brightness(0.97); }
+`, bs = A.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6094,28 +6162,28 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   padding: 16px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 14px;
-`, ms = A.span`
+`, xs = A.span`
   color: ${({ $side: e, theme: t }) => e === "BUY" ? t.colors.success : t.colors.failure};
   font-weight: 600;
-`, hs = {
+`, Ss = {
 	BNB: "#F0B90B",
 	BTC: "#F7931A",
 	ETH: "#627EEA",
 	USDC: "#2775CA",
 	USDT: "#26A17B",
 	CAKE: "#23CAD5"
-}, gs = (e) => hs[e.toUpperCase()] ?? "#7A6EAA", _s = (e) => e === "up" ? "↑" : "↓", vs = (e) => e === "up" ? "Up/Long" : "Down/Short", ys = () => /* @__PURE__ */ N("svg", {
+}, Cs = (e) => Ss[e.toUpperCase()] ?? "#7A6EAA", ws = (e) => e === "up" ? "↑" : "↓", Ts = (e) => e === "up" ? "Up/Long" : "Down/Short", Es = () => /* @__PURE__ */ N("svg", {
 	width: "18",
 	height: "18",
 	viewBox: "0 0 24 24",
 	fill: "currentColor",
 	"aria-hidden": !0,
 	children: /* @__PURE__ */ N("path", { d: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" })
-}), bs = ({ tab: e, onTabChange: t, positions: n, openOrders: r, historyEmpty: i = !0, onClosePosition: a, renderTokenIcon: o }) => /* @__PURE__ */ P(Zo, { children: [
-	/* @__PURE__ */ P(Qo, {
+}), Ds = ({ tab: e, onTabChange: t, positions: n, openOrders: r, historyEmpty: i = !0, onClosePosition: a, renderTokenIcon: o }) => /* @__PURE__ */ P(is, { children: [
+	/* @__PURE__ */ P(as, {
 		role: "tablist",
 		children: [
-			/* @__PURE__ */ N($o, {
+			/* @__PURE__ */ N(os, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "positions",
@@ -6123,7 +6191,7 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				onClick: () => t("positions"),
 				children: "Positions"
 			}),
-			/* @__PURE__ */ N($o, {
+			/* @__PURE__ */ N(os, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "orders",
@@ -6131,7 +6199,7 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				onClick: () => t("orders"),
 				children: "Open Orders"
 			}),
-			/* @__PURE__ */ N($o, {
+			/* @__PURE__ */ N(os, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "history",
@@ -6141,7 +6209,7 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			})
 		]
 	}),
-	e === "positions" && (n.length === 0 ? /* @__PURE__ */ N(ps, { children: "No open positions" }) : /* @__PURE__ */ P(es, {
+	e === "positions" && (n.length === 0 ? /* @__PURE__ */ N(bs, { children: "No open positions" }) : /* @__PURE__ */ P(ss, {
 		role: "table",
 		children: [
 			/* @__PURE__ */ N(Q, { children: "Token" }),
@@ -6152,38 +6220,38 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ N(Q, { children: "Distance to Liq" }),
 			/* @__PURE__ */ N(Q, {}),
 			n.map((e) => /* @__PURE__ */ P(b.Fragment, { children: [
-				/* @__PURE__ */ P(ns, { children: [o?.(e) ?? /* @__PURE__ */ N(rs, {
-					$color: e.iconColor ?? gs(e.symbol),
+				/* @__PURE__ */ P(ls, { children: [o?.(e) ?? /* @__PURE__ */ N(us, {
+					$color: e.iconColor ?? Cs(e.symbol),
 					children: e.symbol.slice(0, 1)
-				}), /* @__PURE__ */ P(is, { children: [/* @__PURE__ */ N(as, { children: e.symbol }), /* @__PURE__ */ N(os, { children: e.chainLabel })] })] }),
-				/* @__PURE__ */ P(ss, {
+				}), /* @__PURE__ */ P(ds, { children: [/* @__PURE__ */ N(fs, { children: e.symbol }), /* @__PURE__ */ N(ps, { children: e.chainLabel })] })] }),
+				/* @__PURE__ */ P(ms, {
 					$direction: e.direction,
 					children: [
-						_s(e.direction),
+						ws(e.direction),
 						" ",
-						vs(e.direction)
+						Ts(e.direction)
 					]
 				}),
-				/* @__PURE__ */ N(cs, {
+				/* @__PURE__ */ N(hs, {
 					$sign: e.pnlSign,
 					children: e.unrealizedPnl
 				}),
 				/* @__PURE__ */ N($, { children: e.entryPrice }),
 				/* @__PURE__ */ N($, { children: e.liqPrice }),
-				/* @__PURE__ */ P(ls, { children: [/* @__PURE__ */ N(us, { children: /* @__PURE__ */ N(ds, {
+				/* @__PURE__ */ P(gs, { children: [/* @__PURE__ */ N(_s, { children: /* @__PURE__ */ N(vs, {
 					$pct: e.liqDistancePct,
 					$status: e.liqStatus
 				}) }), /* @__PURE__ */ N("span", { children: e.liqStatusLabel })] }),
-				/* @__PURE__ */ N(fs, {
+				/* @__PURE__ */ N(ys, {
 					type: "button",
 					"aria-label": "Close position",
 					onClick: () => a(e.id),
-					children: /* @__PURE__ */ N(ys, {})
+					children: /* @__PURE__ */ N(Es, {})
 				})
 			] }, e.id))
 		]
 	})),
-	e === "orders" && (r.length === 0 ? /* @__PURE__ */ N(ps, { children: "No open orders" }) : /* @__PURE__ */ P(ts, {
+	e === "orders" && (r.length === 0 ? /* @__PURE__ */ N(bs, { children: "No open orders" }) : /* @__PURE__ */ P(cs, {
 		role: "table",
 		children: [
 			/* @__PURE__ */ N(Q, { children: "Symbol" }),
@@ -6195,7 +6263,7 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ N(Q, { children: "Status" }),
 			r.map((e) => /* @__PURE__ */ P(b.Fragment, { children: [
 				/* @__PURE__ */ N($, { children: e.symbol }),
-				/* @__PURE__ */ N($, { children: /* @__PURE__ */ N(ms, {
+				/* @__PURE__ */ N($, { children: /* @__PURE__ */ N(xs, {
 					$side: e.side,
 					children: e.side
 				}) }),
@@ -6207,9 +6275,9 @@ var qo = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			] }, e.id))
 		]
 	})),
-	e === "history" && /* @__PURE__ */ N(ps, { children: "No transaction history" })
+	e === "history" && /* @__PURE__ */ N(bs, { children: "No transaction history" })
 ] });
 //#endregion
-export { ie as AccountPanel, Qn as BookTradesPanel, qn as ChartPanel, Ti as DepositModal, Di as EnableTradingModal, le as LeverageModal, ht as MarketsDropdown, vn as OrderBook, Ke as OrderConfirmModal, ri as OrderForm, Se as PerpsErrorMessage, I as PerpsPanel, In as PositionsPanel, ve as RecentTrades, Ka as SimpleBetPanel, Xo as SimpleChartCard, bs as SimplePositionsCard, Mo as SimpleTickerCard, zt as SymbolHeader, Wn as TpSlModal, z as UnderlineTab, B as UnderlineTabs, Re as WithdrawModal };
+export { ie as AccountPanel, Qn as BookTradesPanel, qn as ChartPanel, Ti as DepositModal, Di as EnableTradingModal, le as LeverageModal, ht as MarketsDropdown, vn as OrderBook, Ke as OrderConfirmModal, ri as OrderForm, Se as PerpsErrorMessage, I as PerpsPanel, In as PositionsPanel, ve as RecentTrades, Qa as SimpleBetPanel, rs as SimpleChartCard, Ds as SimplePositionsCard, zo as SimpleTickerCard, zt as SymbolHeader, Wn as TpSlModal, z as UnderlineTab, B as UnderlineTabs, Re as WithdrawModal };
 
 //# sourceMappingURL=widgets.js.map
