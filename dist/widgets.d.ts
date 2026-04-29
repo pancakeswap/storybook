@@ -557,8 +557,15 @@ export declare interface OrderFormProps {
     hasAddress?: boolean;
     /** Consumer renders its classified error here (e.g. PerpsErrorMessage). */
     errorSlot?: default_2.ReactNode;
-    /** Click submit — consumer routes via canSubmit (place order) or shows the deposit/auth modals. */
-    onSubmit: () => void;
+    /**
+     * Click submit — consumer routes via canSubmit (place order) or shows
+     * the deposit/auth modals. Mobile renders two CTAs (Buy / Sell) that
+     * pass `sideOverride` so the consumer doesn't have to wait for the
+     * `draft.side` state update to flush before placing the order.
+     */
+    onSubmit: (opts?: {
+        sideOverride?: OrderSide_2;
+    }) => void;
     /** Open the leverage adjuster modal. */
     onLeverageClick: () => void;
     /** Toggle margin mode (consumer fires the signed setMarginType call). */
