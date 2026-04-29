@@ -21,8 +21,14 @@ export interface SimplePositionRow {
   chainLabel: string
   iconColor?: string
   direction: SimplePositionDirection
+  /** Pre-formatted leverage label shown next to direction (e.g. "100X"). */
+  leverageText?: string
   unrealizedPnl: string
   pnlSign: 'positive' | 'negative' | 'zero'
+  /** Pre-formatted initial margin (e.g. "0.01692 BNB"). */
+  initialMargin: string
+  /** Pre-formatted USD size (e.g. "208.1"). */
+  sizeUsd: string
   entryPrice: string
   liqPrice: string
   liqDistancePct: number
@@ -82,7 +88,8 @@ const TabsRow = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 16px;
+  height: 48px;
+  padding: 0;
   border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
   align-self: stretch;
 `
@@ -108,7 +115,7 @@ const Tab = styled.button<{ $active?: boolean }>`
 
 const PositionsTable = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 56px;
+  grid-template-columns: 180px 1fr 1fr 1fr 1fr 1fr 1fr 56px;
   align-items: center;
 `
 
@@ -118,8 +125,8 @@ const OrdersTable = styled.div`
   align-items: center;
 `
 
-const Th = styled.div`
-  padding: 16px 10px;
+const Th = styled.div<{ $align?: 'left' | 'right' }>`
+  padding: 8px 16px;
   color: ${({ theme }) => theme.colors.secondary};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -130,10 +137,43 @@ const Th = styled.div`
   letter-spacing: 0.24px;
   text-transform: uppercase;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: ${({ $align }) => ($align === 'right' ? 'flex-end' : 'flex-start')};
+`
+
+const SortGlyph: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path
+      d="M8.76686 12.7917C8.66711 12.7917 8.56945 12.7727 8.47388 12.7347C8.3784 12.6965 8.29324 12.6401 8.21838 12.5653L6.12669 10.4653C5.97706 10.3102 5.90327 10.1287 5.90531 9.92095C5.90745 9.71319 5.98611 9.53449 6.14127 9.38487C6.2909 9.23943 6.47095 9.16568 6.68144 9.16364C6.89193 9.1615 7.07198 9.23524 7.22161 9.38487L7.99394 10.1572V7.17331C7.99394 6.95854 8.06909 6.77606 8.2194 6.62585C8.36961 6.47554 8.55209 6.40039 8.76686 6.40039C8.98162 6.40039 9.16411 6.47554 9.31431 6.62585C9.46462 6.77606 9.53977 6.95854 9.53977 7.17331V10.1572L10.3121 9.38487C10.4575 9.23943 10.6351 9.1667 10.845 9.1667C11.0549 9.1667 11.2374 9.23943 11.3924 9.38487C11.5476 9.53449 11.6252 9.71562 11.6252 9.92824C11.6252 10.1409 11.5504 10.3248 11.4008 10.4799L9.31534 12.5653C9.24047 12.6401 9.15531 12.6965 9.05984 12.7347C8.96427 12.7727 8.86661 12.7917 8.76686 12.7917Z"
+      fill="#BDC2C4"
+    />
+    <path
+      d="M5.23333 7.59979C5.01857 7.59979 4.83608 7.52464 4.68588 7.37433C4.53557 7.22412 4.46042 7.04163 4.46042 6.82687V3.84298L3.68808 4.61531C3.54274 4.76075 3.36511 4.83348 3.15521 4.83348C2.94531 4.83348 2.76282 4.76075 2.60775 4.61531C2.45258 4.46568 2.375 4.28456 2.375 4.07193C2.375 3.85931 2.44981 3.67541 2.59944 3.52025L4.68485 1.43483C4.75972 1.36007 4.84488 1.30363 4.94035 1.26552C5.03592 1.2275 5.13358 1.2085 5.23333 1.2085C5.33308 1.2085 5.43074 1.2275 5.52631 1.26552C5.62178 1.30363 5.70695 1.36007 5.78181 1.43483L7.8735 3.53483C8.02312 3.69 8.09692 3.87146 8.09488 4.07922C8.09274 4.28699 8.01408 4.46568 7.85892 4.61531C7.70929 4.76075 7.52924 4.8345 7.31875 4.83654C7.10826 4.83868 6.92821 4.76493 6.77858 4.61531L6.00625 3.84298V6.82687C6.00625 7.04163 5.9311 7.22412 5.78079 7.37433C5.63058 7.52464 5.4481 7.59979 5.23333 7.59979Z"
+      fill="#BDC2C4"
+    />
+  </svg>
+)
+
+const SortBtn = styled.button`
+  display: flex;
+  padding: 1px 2px 3px 2px;
+  align-items: flex-start;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.20);
+  border-radius: 6px;
+  background: #EFF4F5;
+  cursor: pointer;
+  &:hover { filter: brightness(0.97); }
+
+  html.dark & {
+    background: #353547;
+  }
 `
 
 const Td = styled.div`
-  padding: 16px 10px;
+  padding: 16px;
   color: ${({ theme }) => theme.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -145,22 +185,16 @@ const Td = styled.div`
   font-variant-numeric: tabular-nums;
 `
 
-const TokenCell = styled(Td)`
-  display: inline-flex;
+const TokenCell = styled.div`
+  display: flex;
   align-items: center;
-  gap: 8px;
-  /* Pin the icon slot at 40×40 with flex-shrink 0 so the default
-     TokenIcon chip OR a consumer-supplied image element via
-     renderTokenIcon can't stretch when the cell gets narrow. Without
-     this, a raw image from renderTokenIcon grows with flex 1 1 auto
-     and distorts the artwork. */
+  gap: 12px;
+  padding: 7px 16px;
   & > :first-child {
     flex: 0 0 40px;
     width: 40px;
     height: 40px;
   }
-  /* Constrain raster icons specifically so they keep aspect ratio
-     regardless of source dimensions. */
   & > :first-child img,
   & > :first-child svg {
     width: 100%;
@@ -186,46 +220,48 @@ const TokenIcon = styled.span<{ $color: string }>`
 const TokenMeta = styled.div`
   display: flex;
   flex-direction: column;
-  line-height: 1.3;
+  gap: 2px;
 `
 
 const TokenSymbol = styled.span`
-  font-size: 16px;
-  font-weight: 600;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
   color: ${({ theme }) => theme.colors.text};
-`
-
-const TokenSub = styled.span`
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.textSubtle};
-`
-
-const DirectionPill = styled(Td)<{ $direction: SimplePositionDirection }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid
-    ${({ $direction, theme }) => ($direction === 'up' ? theme.colors.success : theme.colors.failure)};
-  color: ${({ $direction, theme }) => ($direction === 'up' ? theme.colors.success : theme.colors.failure)};
-  font-size: 14px;
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
   font-weight: 600;
-  width: fit-content;
-  margin: 16px 10px;
-  /* "Up/Long" / "Down/Short" must stay on one line — without this the
-     glyph and label wrap into two lines on narrow grids and the pill
-     visually breaks. */
+  line-height: 150%;
+`
+
+const DirectionLabel = styled.span<{ $direction: SimplePositionDirection }>`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  color: ${({ $direction }) => ($direction === 'up' ? '#129E7D' : '#ED4B9E')};
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  text-transform: uppercase;
   white-space: nowrap;
 `
 
 const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
   color: ${({ $sign, theme }) =>
     $sign === 'positive'
-      ? 'var(--pcs-colors-positive60, #129E7D)'
+      ? '#129E7D'
       : $sign === 'negative'
-        ? theme.colors.failure
+        ? '#ED4B9E'
         : theme.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -238,8 +274,9 @@ const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
 `
 
 const LiqDistance = styled(Td)`
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
 `
 
@@ -283,6 +320,10 @@ const CloseBtn = styled.button`
   color: #ED4B9E;
   cursor: pointer;
   &:hover { filter: brightness(0.97); }
+
+  html.dark & {
+    background: #3E1C39;
+  }
 `
 
 const Empty = styled.div`
@@ -315,14 +356,44 @@ const DEFAULT_ICON_COLORS: Record<string, string> = {
 const defaultIconColor = (symbol: string): string =>
   DEFAULT_ICON_COLORS[symbol.toUpperCase()] ?? '#7A6EAA'
 
-const directionGlyph = (d: SimplePositionDirection) => (d === 'up' ? '↑' : '↓')
-const directionLabel = (d: SimplePositionDirection) => (d === 'up' ? 'Up/Long' : 'Down/Short')
+const directionLabel = (d: SimplePositionDirection) => (d === 'up' ? 'Up' : 'Down')
 
 const CloseIcon: React.FC = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
   </svg>
 )
+
+const PlusCircleIcon: React.FC = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path
+      d="M7.368 8.632V10.6c0 .179.06.329.18.45.121.121.27.182.448.182.179 0 .329-.061.452-.182.123-.121.184-.271.184-.45V8.632h1.968c.179 0 .329-.06.45-.18.121-.121.182-.27.182-.448 0-.178-.061-.329-.182-.452-.121-.123-.271-.184-.45-.184H8.632V5.4c0-.179-.06-.329-.18-.45-.121-.121-.27-.182-.448-.182-.178 0-.329.061-.452.182-.123.121-.184.271-.184.45v1.968H5.4c-.179 0-.329.06-.45.18-.121.12-.182.27-.182.448 0 .178.061.329.182.452.121.123.271.184.45.184h1.968ZM8.005 14.535c-.902 0-1.75-.17-2.544-.51a6.553 6.553 0 0 1-2.083-1.402 6.563 6.563 0 0 1-1.398-2.084 6.535 6.535 0 0 1-.51-2.547c0-.905.17-1.751.51-2.539a6.55 6.55 0 0 1 1.398-2.078 6.544 6.544 0 0 1 2.083-1.398 6.535 6.535 0 0 1 2.547-.51c.905 0 1.752.17 2.54.51a6.55 6.55 0 0 1 2.075 1.398 6.582 6.582 0 0 1 1.4 2.082c.34.79.51 1.637.51 2.539 0 .902-.17 1.75-.51 2.543a6.582 6.582 0 0 1-1.4 2.083 6.55 6.55 0 0 1-2.079 1.402 6.535 6.535 0 0 1-2.539.51Zm-.005-1.383c1.434 0 2.651-.5 3.652-1.5 1-1.001 1.5-2.218 1.5-3.652 0-1.434-.5-2.651-1.5-3.652-1.001-1-2.218-1.5-3.652-1.5-1.434 0-2.651.5-3.652 1.5-1 1.001-1.5 2.218-1.5 3.652 0 1.434.5 2.651 1.5 3.652 1.001 1 2.218 1.5 3.652 1.5Z"
+      fill="currentColor"
+    />
+  </svg>
+)
+
+const MarginCell = styled(Td)`
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+`
+
+const MarginAddBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: pointer;
+  border-radius: 6px;
+  &:hover { color: ${({ theme }) => theme.colors.text}; }
+`
 
 // ── Component ───────────────────────────────────────────────────
 
@@ -373,11 +444,30 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
         ) : (
           <PositionsTable role="table">
             <Th>Token</Th>
-            <Th>Direction</Th>
-            <Th>Unrealized PnL</Th>
-            <Th>Entry Price</Th>
-            <Th>Liq. Price</Th>
-            <Th>Distance to Liq</Th>
+            <Th $align="right">
+              Unrealized PnL
+              <SortBtn type="button" aria-label="Sort by unrealized PnL"><SortGlyph /></SortBtn>
+            </Th>
+            <Th $align="right">
+              Initial Margin
+              <SortBtn type="button" aria-label="Sort by initial margin"><SortGlyph /></SortBtn>
+            </Th>
+            <Th $align="right">
+              Size (USD)
+              <SortBtn type="button" aria-label="Sort by size"><SortGlyph /></SortBtn>
+            </Th>
+            <Th $align="right">
+              Entry Price
+              <SortBtn type="button" aria-label="Sort by entry price"><SortGlyph /></SortBtn>
+            </Th>
+            <Th $align="right">
+              Liq. Price
+              <SortBtn type="button" aria-label="Sort by liq. price"><SortGlyph /></SortBtn>
+            </Th>
+            <Th $align="right">
+              Distance to Liq
+              <SortBtn type="button" aria-label="Sort by distance to liq"><SortGlyph /></SortBtn>
+            </Th>
             <Th />
             {positions.map((row) => (
               <React.Fragment key={row.id}>
@@ -394,13 +484,20 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
                   )}
                   <TokenMeta>
                     <TokenSymbol>{row.symbol}</TokenSymbol>
-                    <TokenSub>{row.chainLabel}</TokenSub>
+                    <DirectionLabel $direction={row.direction}>
+                      {directionLabel(row.direction)}
+                      {row.leverageText ? ` | ${row.leverageText}` : ''}
+                    </DirectionLabel>
                   </TokenMeta>
                 </TokenCell>
-                <DirectionPill $direction={row.direction}>
-                  {directionGlyph(row.direction)} {directionLabel(row.direction)}
-                </DirectionPill>
                 <Pnl $sign={row.pnlSign}>{row.unrealizedPnl}</Pnl>
+                <MarginCell>
+                  {row.initialMargin}
+                  <MarginAddBtn type="button" aria-label="Add margin">
+                    <PlusCircleIcon />
+                  </MarginAddBtn>
+                </MarginCell>
+                <Td>{row.sizeUsd}</Td>
                 <Td>{row.entryPrice}</Td>
                 <Td>{row.liqPrice}</Td>
                 <LiqDistance>

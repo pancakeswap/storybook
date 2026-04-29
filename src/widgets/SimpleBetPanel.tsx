@@ -190,7 +190,7 @@ const Root = styled(PerpsPanel)`
   flex-shrink: 0;
   flex-direction: column;
   align-self: stretch;
-  border-radius: 24px;
+  border-radius: 0;
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
@@ -645,6 +645,16 @@ const ZONE_BG: Record<Zone, string> = {
   warn: '#FBF2E7',
   danger: '#FFF0F9',
 }
+const ZONE_BORDER_DARK: Record<Zone, string> = {
+  safe: '#3DDBB5',
+  warn: '#FFB237',
+  danger: '#ED4B9E',
+}
+const ZONE_BG_DARK: Record<Zone, string> = {
+  safe: '#0C3A32',
+  warn: '#452E14',
+  danger: '#3E1C39',
+}
 
 const ZonePill = styled.span<{ $zone: Zone }>`
   display: inline-flex;
@@ -657,6 +667,14 @@ const ZonePill = styled.span<{ $zone: Zone }>`
   border-bottom: 2px solid ${({ $zone }) => ZONE_BORDER[$zone]};
   border-left: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
   background: ${({ $zone }) => ZONE_BG[$zone]};
+
+  html.dark & {
+    border-top-color: ${({ $zone }) => ZONE_BORDER_DARK[$zone]};
+    border-right-color: ${({ $zone }) => ZONE_BORDER_DARK[$zone]};
+    border-bottom-color: ${({ $zone }) => ZONE_BORDER_DARK[$zone]};
+    border-left-color: ${({ $zone }) => ZONE_BORDER_DARK[$zone]};
+    background: ${({ $zone }) => ZONE_BG_DARK[$zone]};
+  }
 `
 
 const ZonePillText = styled.span`
@@ -664,7 +682,7 @@ const ZonePillText = styled.span`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  color: #280D5F;
+  color: ${({ theme }) => theme.colors.text};
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;

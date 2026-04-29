@@ -181,6 +181,10 @@ const Pnl = styled.span<{ $positive: boolean }>`
   background: ${({ $positive }) => ($positive ? '#EAFBF7' : '#FFF0F9')};
   font-size: 16px;
   color: ${({ theme }) => theme.colors.text};
+
+  html.dark & {
+    background: ${({ $positive }) => ($positive ? '#0C3A32' : '#3E1C39')};
+  }
 `
 
 const PnlTriangle = styled.span<{ $positive: boolean }>`
