@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
 import { AddIcon, HelpIcon, WalletFilledIcon } from '../primitives/Icons'
+import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel } from './primitives'
 
 /**
@@ -29,10 +30,41 @@ export interface SimpleBetPanelProps {
   // ── Controlled draft ─────────────────────────────────────
   bet: string
   onBetChange: (next: string) => void
+  /**
+   * Inline validation message rendered under the bet input — typically
+   * the consumer's "Min: 4.25 USDT" hint when the entered bet would
+   * floor to a sub-lot-size qty. Suppresses naturally when omitted /
+   * empty string. Pair with `canSubmit={false}` so UP/DOWN are also
+   * disabled while the message is showing.
+   */
+  betError?: string
   leverage: number
   onLeverageChange: (next: number) => void
+  /**
+   * Per-symbol max leverage. Aster's `/fapi/v1/leverageBracket` defines
+   * tier caps per market, so this must be configurable. Defaults to the
+   * historical 1001 to keep the original story working.
+   */
+  maxLeverage?: number
+  /**
+   * Preset leverage chips below the slider. Default is the original
+   * [50, 250, 500, 1001] for max=1001; consumers passing a smaller max
+   * should also pass scaled presets (e.g. [10, 25, 50, 100] for max=100).
+   */
+  presets?: readonly number[]
   quoteAsset: string
   onQuoteAssetClick?: () => void
+  /**
+   * Optional list of denomination choices for the bet input — when
+   * provided with more than one entry, clicking the chip opens a
+   * dropdown rather than just firing `onQuoteAssetClick`. Use this to
+   * let the user denominate their bet in either the quote asset (USDT)
+   * or the base asset (BTC). The currently-selected `code` should match
+   * `quoteAsset`.
+   */
+  assetOptions?: readonly { code: string; logoUrl?: string; color?: string }[]
+  /** Fired when the user picks a different denomination from the dropdown. */
+  onAssetChange?: (next: string) => void
 
   // ── Fund display + actions ───────────────────────────────
   fundBalanceText: string
@@ -58,26 +90,54 @@ export interface SimpleBetPanelProps {
   unrealizedPnl: string
 }
 
-const PRESETS = [50, 250, 500, 1001] as const
-const MAX_LEVERAGE = 1001
+const DEFAULT_PRESETS = [50, 250, 500, 1001] as const
+const DEFAULT_MAX_LEVERAGE = 1001
 
 type Zone = 'safe' | 'warn' | 'danger'
 
-const zoneFromLeverage = (lev: number): Zone =>
-  lev <= 50 ? 'safe' : lev <= 250 ? 'warn' : 'danger'
+/**
+ * Zones are proportional to max leverage so a symbol capped at 100x still
+ * renders meaningful safe/warn/danger boundaries. Original mapping was
+ * 50 / 250 / 1001 → ~5% / ~25% / 100% — preserved here as ratios.
+ */
+const SAFE_RATIO = 50 / 1001
+const WARN_RATIO = 250 / 1001
+const zoneFromLeverage = (lev: number, max: number): Zone => {
+  if (lev <= max * SAFE_RATIO) return 'safe'
+  if (lev <= max * WARN_RATIO) return 'warn'
+  return 'danger'
+}
+const DEGEN_RATIO = 500 / 1001
+const isDegen = (lev: number, max: number) => lev > max * DEGEN_RATIO
+const isDouble = (lev: number, max: number) => lev > max * WARN_RATIO
 
 const zoneLabel = (z: Zone) =>
-  z === 'safe' ? 'Safe zone' : z === 'warn' ? 'Caution' : 'Danger zone'
+  z === 'safe' ? 'Safe zone' : z === 'warn' ? 'High leverage' : 'Danger zone'
+
+const zoneEmoji = (z: Zone) => (z === 'safe' ? '🌿' : z === 'warn' ? '⚡️' : '🔥')
+
+const zoneTooltip = (z: Zone) =>
+  z === 'safe'
+    ? "A good place to start. You'll feel the market without getting rekt."
+    : z === 'warn'
+      ? 'Liquidation triggers around a 1% move.'
+      : '1% move against you liquidates. Only risk what you can afford to lose.'
 
 // Branded UP/DOWN arrows — kept inline because there's no 1:1 primitive.
 const UpArrow: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 4l-7 7h4v9h6v-9h4z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M10.9629 8.57864L6.79069 12.7509C6.58302 12.9586 6.33844 13.0634 6.05694 13.0654C5.77544 13.0674 5.5251 12.9628 5.30594 12.7516C5.1026 12.5403 5.00194 12.2939 5.00394 12.0124C5.00594 11.7309 5.1111 11.4861 5.31944 11.2781L11.2714 5.33339C11.3736 5.23139 11.4873 5.15456 11.6124 5.10289C11.7376 5.05122 11.8683 5.02539 12.0044 5.02539C12.1406 5.02539 12.2713 5.05122 12.3964 5.10289C12.5216 5.15456 12.6319 5.22797 12.7272 5.32314L18.6829 11.2791C18.8983 11.4945 19.0059 11.7367 19.0059 12.0059C19.0059 12.2751 18.9023 12.5153 18.6949 12.7266C18.4758 12.9378 18.225 13.0434 17.9427 13.0434C17.6604 13.0434 17.4164 12.9378 17.2107 12.7266L13.0379 8.57864V18.3664C13.0379 18.6571 12.9383 18.9025 12.7389 19.1026C12.5394 19.303 12.295 19.4031 12.0057 19.4031C11.7164 19.4031 11.4702 19.303 11.2672 19.1026C11.0644 18.9025 10.9629 18.6571 10.9629 18.3664V8.57864Z"
+      fill="currentColor"
+    />
   </svg>
 )
 const DownArrow: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 20l7-7h-4V4h-6v9H5z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M10.9997 5V16.17L6.11973 11.29C5.72973 10.9 5.08973 10.9 4.69973 11.29C4.30973 11.68 4.30973 12.31 4.69973 12.7L11.2897 19.29C11.6797 19.68 12.3097 19.68 12.6997 19.29L19.2897 12.7C19.6797 12.31 19.6797 11.68 19.2897 11.29C18.8997 10.9 18.2697 10.9 17.8797 11.29L12.9997 16.17V5C12.9997 4.45 12.5497 4 11.9997 4C11.4497 4 10.9997 4.45 10.9997 5Z"
+      fill="currentColor"
+    />
   </svg>
 )
 const TriangleUp: React.FC = () => (
@@ -130,14 +190,20 @@ const Root = styled(PerpsPanel)`
   flex-shrink: 0;
   flex-direction: column;
   align-self: stretch;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
   background: ${({ theme }) => theme.colors.card};
+  overflow: hidden;
   font-variant-numeric: tabular-nums;
   & > div {
     display: flex;
-    padding: 24px;
+    padding: 0;
+    border-radius: 0;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
     flex: 1 0 0;
     align-self: stretch;
     background: ${({ theme }) => theme.colors.card};
@@ -149,6 +215,7 @@ const TopCard = styled.div`
   flex: 1 0 0;
   flex-direction: column;
   align-self: stretch;
+  padding: 24px;
 `
 
 const UpDownCard = styled.div`
@@ -169,7 +236,7 @@ const UpDownCardActions = styled.div`
   display: flex;
   gap: 8px;
   align-self: stretch;
-  padding: 0 16px 16px 16px;
+  padding: 0;
 `
 
 const TopCardInner = styled.div`
@@ -308,7 +375,7 @@ const FundAmt = styled.span`
 `
 
 // Bet input field
-const BetField = styled.div`
+const BetField = styled.label`
   display: flex;
   min-width: 296px;
   padding: 16px;
@@ -320,6 +387,13 @@ const BetField = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  cursor: text;
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
 `
 
 const BetFieldRow = styled.div`
@@ -328,6 +402,15 @@ const BetFieldRow = styled.div`
   justify-content: space-between;
   gap: 8px;
   align-self: stretch;
+`
+
+const BetErrorText = styled.span`
+  align-self: stretch;
+  color: ${({ theme }) => theme.colors.failure};
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  font-feature-settings: 'liga' off;
 `
 
 const BetLabel = styled.span`
@@ -404,6 +487,17 @@ const QuoteIcon = styled.span`
   font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
+  overflow: hidden;
+  /* When the chip wraps a consumer-supplied logo image, fit it inside
+     the circle. Without this the raster either overflows or stretches. */
+  & > img,
+  & > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #fff;
+  }
 `
 
 const QuoteArrowBox = styled.span`
@@ -422,6 +516,68 @@ const QuoteArrowBox = styled.span`
   background: ${({ theme }) => theme.colors.card};
   color: ${({ theme }) => theme.colors.textSubtle};
   flex-shrink: 0;
+`
+
+/* Wrapper that anchors the asset-dropdown menu to the chip button. */
+const AssetDropdownAnchor = styled.span`
+  position: relative;
+  display: inline-flex;
+`
+
+const AssetDropdownMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.card};
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+`
+
+const AssetDropdownItem = styled.button<{ $selected?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: ${({ $selected, theme }) => ($selected ? theme.colors.input : 'transparent')};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  &:hover {
+    background: ${({ theme }) => theme.colors.input};
+  }
+`
+
+const AssetItemChip = styled.span<{ $color?: string }>`
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: ${({ $color }) => $color ?? '#26a17b'};
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex: 0 0 24px;
+  overflow: hidden;
+  & > img,
+  & > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
 `
 
 const QuoteSym = styled.span`
@@ -479,24 +635,36 @@ const LevValue = styled.span`
   letter-spacing: -0.4px;
 `
 
+const ZONE_BORDER: Record<Zone, string> = {
+  safe: '#129E7D',
+  warn: '#FFB237',
+  danger: '#ED4B9E',
+}
+const ZONE_BG: Record<Zone, string> = {
+  safe: '#EAFBF7',
+  warn: '#FBF2E7',
+  danger: '#FFF0F9',
+}
+
 const ZonePill = styled.span<{ $zone: Zone }>`
-  display: flex;
+  display: inline-flex;
   padding: 8px 12px;
   align-items: center;
   gap: 4px;
   border-radius: 16px;
-  border-top: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-right: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-bottom: 2px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-left: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  background: ${({ $zone }) =>
-    $zone === 'safe' ? '#EAFBF7' : $zone === 'warn' ? '#FBF2E7' : '#FCE7F1'};
+  border-top: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  border-right: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  border-bottom: 2px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  border-left: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  background: ${({ $zone }) => ZONE_BG[$zone]};
+`
+
+const ZonePillText = styled.span`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  color: ${({ theme }) => theme.colors.text};
+  color: #280D5F;
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -504,12 +672,17 @@ const ZonePill = styled.span<{ $zone: Zone }>`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+`
+
+const ZoneTipAnchor = styled.span`
+  display: inline-flex;
+  align-items: center;
+  color: #280D5F;
+  cursor: help;
 `
 
 // Hand-rolled leverage slider (the Slider primitive can't do a per-zone
-// gradient fill across the 1..MAX_LEVERAGE range — keeping range input).
+// gradient fill across the 1..maxLeverage range — keeping range input).
 const LevBar = styled.div`
   display: flex;
   flex-direction: column;
@@ -528,25 +701,10 @@ const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   background: linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%);
   box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.06) inset;
   overflow: visible;
-`
 
-const LevFill = styled.span<{ $fillPct: number; $zone: Zone; $degen?: boolean }>`
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: ${({ $fillPct }) => `${$fillPct}%`};
-  border-radius: 24px 0 0 24px;
-  background: ${({ theme, $zone, $degen }) =>
-    $degen
-      ? 'linear-gradient(90deg, #FAD658 0%, #ED4B9E 100%)'
-      : $zone === 'safe'
-        ? theme.colors.success
-        : $zone === 'warn'
-          ? theme.colors.warning
-          : theme.colors.failure};
-  box-shadow: ${({ $degen }) =>
-    $degen ? '0 2px 0 0 rgba(0, 0, 0, 0.06) inset' : 'none'};
+  html.dark & {
+    background: ${({ theme }) => theme.colors.backgroundBubblegum};
+  }
 `
 
 const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' | 'triple' }>`
@@ -562,7 +720,12 @@ const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' |
     $variant === 'triple' ? '44px' : $variant === 'double' ? '41.455px' : '38.004px'};
   height: ${({ $variant }) =>
     $variant === 'triple' ? '48px' : $variant === 'double' ? '42.549px' : '38.186px'};
-  pointer-events: none;
+  /* Sits above LevRangeInput so dragging the thumb is captured by our
+     pointer handler instead of falling through to the native input
+     (which maps click X→value and would snap to 1 at low leverage). */
+  z-index: 2;
+  pointer-events: auto;
+  touch-action: none;
   cursor: grab;
   &:active { cursor: grabbing; }
 `
@@ -681,12 +844,6 @@ const LevCustomSuffix = styled.span`
   padding-left: 4px;
 `
 
-// Duration row (static "Perpetual" placeholder — preserves layout)
-const DurationRow = styled(Flex)`
-  align-items: center;
-  justify-content: space-between;
-`
-
 // Stats summary
 const StatsCard = styled.div`
   margin: 0 20px;
@@ -729,26 +886,26 @@ const StatsValue = styled.span<{ $danger?: boolean }>`
 `
 
 // UP / DOWN buttons
-const DirectionRow = styled(Flex)`
-  align-self: stretch;
-  gap: 8px;
-`
-
 const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  padding: 8px;
   justify-content: center;
-  gap: 6px;
-  height: 56px;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  border-bottom-width: 4px;
-  border-radius: 16px;
-  font-family: inherit;
-  font-size: 18px;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
+  border-top: 2px solid rgba(0, 0, 0, 0.2);
+  border-right: 2px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+  border-left: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 24px;
+  font-family: Kanit;
+  font-size: 24px;
+  font-style: normal;
   font-weight: 600;
-  letter-spacing: -0.18px;
-  color: ${({ theme }) => theme.colors.invertedContrast};
+  line-height: 150%;
+  letter-spacing: -0.24px;
+  font-feature-settings: 'liga' off;
+  color: #FFF;
   cursor: pointer;
   transition: filter 0.12s, transform 0.06s;
   background: ${({ theme, $variant }) => ($variant === 'up' ? theme.colors.success : theme.colors.failure)};
@@ -765,6 +922,14 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
   }
 `
 
+const DirectionButtonContent = styled.span`
+  display: flex;
+  padding: 0 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+`
+
 // Deposit / Withdraw bottom tabs
 const DwRow = styled(Flex)`
   align-self: stretch;
@@ -772,19 +937,23 @@ const DwRow = styled(Flex)`
 `
 
 const DwButton = styled(Button)<{ $variant: 'primary' | 'secondary' }>`
-  flex: 1;
-  height: 40px;
+  display: flex;
+  padding: 11px 12px 13px 12px;
+  justify-content: center;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
   border: 0;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: 16px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: filter 0.12s;
-  background: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.primary : theme.colors.input)};
+  background: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.primary : theme.colors.tertiary)};
   color: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.invertedContrast : theme.colors.primary)};
-  border-bottom-color: ${({ $variant }) => ($variant === 'primary' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)')};
+  border-bottom: 2px solid
+    ${({ $variant }) => ($variant === 'primary' ? 'rgba(0, 0, 0, 0.20)' : 'rgba(0, 0, 0, 0.10)')};
   &:hover {
     filter: brightness(1.08);
   }
@@ -796,36 +965,145 @@ const Bottom = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-top: 16px;
+  padding: 24px;
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
 `
 
 const PnlCard = styled(Flex)`
-  align-self: stretch;
-  align-items: center;
+  display: flex;
+  padding: 16px;
   justify-content: space-between;
-  padding: 12px 14px;
-  background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 16px;
+  align-items: center;
+  align-self: stretch;
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 24px;
 `
 
 const PnlLabel = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 14px;
-  font-weight: 600;
+  overflow: hidden;
   color: ${({ theme }) => theme.colors.textSubtle};
+  text-align: center;
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.2px;
 `
 
 const PnlValue = styled.span`
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.22px;
   color: ${({ theme }) => theme.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 120%;
+  letter-spacing: -0.32px;
   font-variant-numeric: tabular-nums;
 `
+
+// ── Bet asset selector ────────────────────────────────────
+
+interface BetAssetSelectorProps {
+  selected: string
+  options?: readonly { code: string; logoUrl?: string; color?: string }[]
+  onSelect?: (next: string) => void
+  /** Used when no `options` (or only one) — restores the legacy chip-as-button behavior. */
+  onClickFallback?: () => void
+}
+
+const BetAssetSelector: React.FC<BetAssetSelectorProps> = ({
+  selected,
+  options,
+  onSelect,
+  onClickFallback,
+}) => {
+  const [open, setOpen] = useState(false)
+  const anchorRef = useRef<HTMLSpanElement | null>(null)
+
+  // Close on outside click / Escape so the menu doesn't strand if the
+  // user clicks elsewhere in the panel without picking an option.
+  useEffect(() => {
+    if (!open) return undefined
+    const onDown = (e: MouseEvent) => {
+      if (!anchorRef.current) return
+      if (!anchorRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const hasDropdown = !!options && options.length > 1
+  const selectedOption = options?.find((o) => o.code === selected)
+  const handleClick = () => {
+    if (hasDropdown) {
+      setOpen((v) => !v)
+    } else {
+      onClickFallback?.()
+    }
+  }
+
+  return (
+    <AssetDropdownAnchor ref={anchorRef}>
+      <BetTokenButton type="button" onClick={handleClick} aria-label="Choose bet denomination">
+        <QuoteIcon>
+          {selectedOption?.logoUrl ? (
+            <img src={selectedOption.logoUrl} alt={selected} loading="lazy" decoding="async" />
+          ) : (
+            selected
+          )}
+        </QuoteIcon>
+        <QuoteArrowBox>
+          <ArrowDropDownGlyph />
+        </QuoteArrowBox>
+      </BetTokenButton>
+      {hasDropdown && open ? (
+        <AssetDropdownMenu role="menu">
+          {options!.map((opt) => (
+            <AssetDropdownItem
+              key={opt.code}
+              type="button"
+              role="menuitemradio"
+              aria-checked={opt.code === selected}
+              $selected={opt.code === selected}
+              onClick={() => {
+                onSelect?.(opt.code)
+                setOpen(false)
+              }}
+            >
+              <AssetItemChip $color={opt.color}>
+                {opt.logoUrl ? (
+                  <img src={opt.logoUrl} alt={opt.code} loading="lazy" decoding="async" />
+                ) : (
+                  opt.code.slice(0, 1)
+                )}
+              </AssetItemChip>
+              {opt.code}
+            </AssetDropdownItem>
+          ))}
+        </AssetDropdownMenu>
+      ) : null}
+    </AssetDropdownAnchor>
+  )
+}
 
 // ── Component ─────────────────────────────────────────────
 
@@ -838,10 +1116,15 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   onSymbolClick,
   bet,
   onBetChange,
+  betError,
   leverage,
   onLeverageChange,
+  maxLeverage = DEFAULT_MAX_LEVERAGE,
+  presets = DEFAULT_PRESETS,
   quoteAsset,
   onQuoteAssetClick,
+  assetOptions,
+  onAssetChange,
   fundBalanceText,
   onTopUpFund,
   onPercentClick,
@@ -858,11 +1141,54 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   onWithdraw,
   unrealizedPnl,
 }) => {
-  const fillPct = Math.min(100, Math.max(0, (leverage / MAX_LEVERAGE) * 100))
-  const zone = zoneFromLeverage(leverage)
+  const fillPct = Math.min(100, Math.max(0, (leverage / maxLeverage) * 100))
+  const zone = zoneFromLeverage(leverage, maxLeverage)
+  const degen = isDegen(leverage, maxLeverage)
+  const double = isDouble(leverage, maxLeverage)
   const submitting = isSubmittingUp || isSubmittingDown
   const upDisabled = !canSubmit || submitting
   const downDisabled = !canSubmit || submitting
+
+  // Hover tooltip on the leverage-zone info circle. Content text is
+  // zone-dependent — re-running the hook each render is fine, the
+  // returned `tooltip` ReactNode is stable for the same zone string.
+  const zoneTipText = zoneTooltip(zone)
+  const { targetRef: zoneTipTargetRef, tooltip: zoneTipNode } = useTooltip(zoneTipText, { placement: 'top' })
+
+  // Custom thumb-drag handler. The native range input below the thumb
+  // maps the click X coordinate to a value, so when the visual thumb
+  // sits at fillPct≈1% (low leverage), clicking it lands the click at
+  // the track's left edge → value=1. We intercept pointer-down on the
+  // thumb itself, capture the pointer, and translate motion deltas
+  // into leverage values so the gesture starts at the current value
+  // rather than where the thumb happened to be drawn.
+  const trackRef = React.useRef<HTMLDivElement | null>(null)
+  const onThumbPointerDown = React.useCallback(
+    (e: React.PointerEvent<HTMLSpanElement>) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const target = e.currentTarget
+      const track = trackRef.current
+      if (!track) return
+      target.setPointerCapture(e.pointerId)
+      const trackRect = track.getBoundingClientRect()
+      const compute = (clientX: number) => {
+        const pct = Math.max(0, Math.min(1, (clientX - trackRect.left) / trackRect.width))
+        const next = Math.round(1 + pct * (maxLeverage - 1))
+        return Math.max(1, Math.min(maxLeverage, next))
+      }
+      const onMove = (ev: PointerEvent) => onLeverageChange(compute(ev.clientX))
+      const onUp = () => {
+        target.removeEventListener('pointermove', onMove)
+        target.removeEventListener('pointerup', onUp)
+        target.removeEventListener('pointercancel', onUp)
+      }
+      target.addEventListener('pointermove', onMove)
+      target.addEventListener('pointerup', onUp)
+      target.addEventListener('pointercancel', onUp)
+    },
+    [maxLeverage, onLeverageChange],
+  )
 
   return (
     <Root aria-label={`Simple bet panel · ${pair || symbol}`}>
@@ -897,14 +1223,15 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                   aria-label="Bet amount"
                   placeholder="0"
                 />
-                <BetTokenButton type="button" onClick={onQuoteAssetClick} aria-label="Choose quote asset">
-                  <QuoteIcon>{quoteAsset}</QuoteIcon>
-                  <QuoteArrowBox>
-                    <ArrowDropDownGlyph />
-                  </QuoteArrowBox>
-                </BetTokenButton>
+                <BetAssetSelector
+                  selected={quoteAsset}
+                  options={assetOptions}
+                  onSelect={onAssetChange}
+                  onClickFallback={onQuoteAssetClick}
+                />
               </BetInputWrap>
             </BetFieldRow>
+            {betError ? <BetErrorText role="alert">{betError}</BetErrorText> : null}
           </BetField>
 
           <PctRow>
@@ -929,38 +1256,42 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           <LevRow>
             <LevValue>{leverage}x</LevValue>
             <ZonePill $zone={zone}>
-              {zoneLabel(zone)}
-              <span style={{ display: 'inline-flex', color: 'var(--pcs-colors-text-subtle, #7A6EAA)' }}>
+              {zoneEmoji(zone) ? (
+                <ZonePillText as="span" aria-hidden>{zoneEmoji(zone)}</ZonePillText>
+              ) : null}
+              <ZonePillText>{zoneLabel(zone)}</ZonePillText>
+              <ZoneTipAnchor ref={zoneTipTargetRef} aria-label={`${zoneLabel(zone)} explanation`}>
                 <InfoCircleGlyph />
-              </span>
+              </ZoneTipAnchor>
+              {zoneTipNode}
             </ZonePill>
           </LevRow>
 
           <LevBar>
-          <LevTrack $fillPct={fillPct} $zone={zone} aria-hidden>
-            <LevFill $fillPct={fillPct} $zone={zone} $degen={leverage > 500} />
+          <LevTrack ref={trackRef} $fillPct={fillPct} $zone={zone} aria-hidden>
+            {/* Native input below the thumb still handles clicks on the
+                rest of the track + keyboard interaction. */}
+            <LevRangeInput
+              type="range"
+              min={1}
+              max={maxLeverage}
+              value={leverage}
+              onChange={(e) => onLeverageChange(Number(e.target.value))}
+              aria-label="Leverage"
+            />
             <LevThumb
               $fillPct={fillPct}
-              $variant={
-                leverage > 500 ? 'triple' : leverage > 250 ? 'double' : 'single'
-              }
+              $variant={degen ? 'triple' : double ? 'double' : 'single'}
+              onPointerDown={onThumbPointerDown}
             >
-              {leverage > 500 ? (
+              {degen ? (
                 <GrabberDegenGlyph />
-              ) : leverage > 250 ? (
+              ) : double ? (
                 <GrabberDoubleGlyph />
               ) : (
                 <GrabberGlyph />
               )}
             </LevThumb>
-            <LevRangeInput
-              type="range"
-              min={1}
-              max={MAX_LEVERAGE}
-              value={leverage}
-              onChange={(e) => onLeverageChange(Number(e.target.value))}
-              aria-label="Leverage"
-            />
           </LevTrack>
 
           <LevTabs role="tablist">
@@ -968,16 +1299,16 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
               <LevCustomInput
                 type="number"
                 min={1}
-                max={MAX_LEVERAGE}
+                max={maxLeverage}
                 value={leverage}
                 onChange={(e) =>
-                  onLeverageChange(Math.max(1, Math.min(MAX_LEVERAGE, Number(e.target.value) || 1)))
+                  onLeverageChange(Math.max(1, Math.min(maxLeverage, Number(e.target.value) || 1)))
                 }
                 aria-label="Custom leverage"
               />
-              <LevCustomSuffix>x</LevCustomSuffix>
+              <LevCustomSuffix>%</LevCustomSuffix>
             </LevCustom>
-            {PRESETS.map((p) => (
+            {presets.map((p) => (
               <LevTab
                 key={p}
                 type="button"
@@ -993,19 +1324,16 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           </LevBar>
         </Section>
 
-        {/* Duration (display-only placeholder — matches the original prototype) */}
-        <DurationRow>
-          <PreTitle>Duration</PreTitle>
-          <FundChip type="button" disabled>
-            <FundAmt style={{ fontSize: 14 }}>Perpetual</FundAmt>
-            <span aria-hidden>▾</span>
-          </FundChip>
-        </DurationRow>
+        {/* Aster's REST `/fapi/v3/order` perp API has no duration / auto-
+            settle field — only the separate on-chain `predictAndBet`
+            contract on `/trade/1001x/...` does. We submit through the
+            REST API, so the Duration row was dead UI; dropped. If we
+            ever wire the prediction product, restore it here. */}
       </Body>
 
-      {/* UP / DOWN — wrapped in card when bet is filled, otherwise plain */}
-      {bet && bet !== '0' ? (
-        <UpDownCard>
+      {/* UP / DOWN — always wrapped in card; stats only show when bet is filled */}
+      <UpDownCard>
+        {bet && bet !== '0' ? (
           <StatsList>
             <StatsRow>
               <StatsLabel>Estimated Entry</StatsLabel>
@@ -1024,31 +1352,8 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
               <StatsValue>{openingFee}</StatsValue>
             </StatsRow>
           </StatsList>
-          <UpDownCardActions>
-            <DirectionButton
-              type="button"
-              $variant="up"
-              disabled={upDisabled}
-              onClick={onUp}
-              aria-busy={isSubmittingUp}
-            >
-              <UpArrow />
-              {isSubmittingUp ? '...' : 'UP'}
-            </DirectionButton>
-            <DirectionButton
-              type="button"
-              $variant="down"
-              disabled={downDisabled}
-              onClick={onDown}
-              aria-busy={isSubmittingDown}
-            >
-              <DownArrow />
-              {isSubmittingDown ? '...' : 'DOWN'}
-            </DirectionButton>
-          </UpDownCardActions>
-        </UpDownCard>
-      ) : (
-        <DirectionRow>
+        ) : null}
+        <UpDownCardActions>
           <DirectionButton
             type="button"
             $variant="up"
@@ -1056,8 +1361,10 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
             onClick={onUp}
             aria-busy={isSubmittingUp}
           >
-            <UpArrow />
-            {isSubmittingUp ? '...' : 'UP'}
+            <DirectionButtonContent>
+              <UpArrow />
+              {isSubmittingUp ? '...' : 'UP'}
+            </DirectionButtonContent>
           </DirectionButton>
           <DirectionButton
             type="button"
@@ -1066,11 +1373,13 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
             onClick={onDown}
             aria-busy={isSubmittingDown}
           >
-            <DownArrow />
-            {isSubmittingDown ? '...' : 'DOWN'}
+            <DirectionButtonContent>
+              <DownArrow />
+              {isSubmittingDown ? '...' : 'DOWN'}
+            </DirectionButtonContent>
           </DirectionButton>
-        </DirectionRow>
-      )}
+        </UpDownCardActions>
+      </UpDownCard>
       </TopCardInner>
       </TopCard>
 

@@ -49,6 +49,9 @@ export type {
   PositionsPanelTab,
   PositionRow,
   OpenOrderRow,
+  OrderHistoryRow,
+  TradeHistoryRow,
+  TransactionHistoryRow,
 } from './PositionsPanel'
 
 export { TpSlModal } from './TpSlModal'

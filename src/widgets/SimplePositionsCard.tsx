@@ -81,21 +81,28 @@ const Card = styled(PerpsPanel)`
 const TabsRow = styled.div`
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 0 24px;
+  gap: 4px;
+  padding: 8px 16px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  align-self: stretch;
 `
 
 const Tab = styled.button<{ $active?: boolean }>`
+  display: flex;
+  padding: ${({ $active }) => ($active ? '12px 12px 12px 16px' : '12px 12px')};
+  justify-content: center;
+  align-items: center;
   border: 0;
+  border-radius: 16px;
   background: transparent;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: ${({ $active }) => ($active ? 600 : 400)};
-  color: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.textSubtle)};
   cursor: pointer;
-  padding: 16px 0;
-  border-bottom: 2px solid ${({ $active, theme }) => ($active ? theme.colors.text : 'transparent')};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 150%;
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  color: ${({ $active, theme }) => ($active ? theme.colors.secondary : theme.colors.textSubtle)};
   &:hover { color: ${({ theme }) => theme.colors.text}; }
 `
 
@@ -112,18 +119,29 @@ const OrdersTable = styled.div`
 `
 
 const Th = styled.div`
-  padding: 16px;
+  padding: 16px 10px;
+  color: ${({ theme }) => theme.colors.secondary};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
   font-size: 12px;
+  font-style: normal;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.textSubtle};
+  line-height: 150%;
+  letter-spacing: 0.24px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  white-space: nowrap;
 `
 
 const Td = styled.div`
-  padding: 16px;
-  font-size: 14px;
+  padding: 16px 10px;
   color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  text-align: right;
   font-variant-numeric: tabular-nums;
 `
 
@@ -131,6 +149,25 @@ const TokenCell = styled(Td)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* Pin the icon slot at 40×40 with flex-shrink 0 so the default
+     TokenIcon chip OR a consumer-supplied image element via
+     renderTokenIcon can't stretch when the cell gets narrow. Without
+     this, a raw image from renderTokenIcon grows with flex 1 1 auto
+     and distorts the artwork. */
+  & > :first-child {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+  }
+  /* Constrain raster icons specifically so they keep aspect ratio
+     regardless of source dimensions. */
+  & > :first-child img,
+  & > :first-child svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
 `
 
 const TokenIcon = styled.span<{ $color: string }>`
@@ -176,18 +213,28 @@ const DirectionPill = styled(Td)<{ $direction: SimplePositionDirection }>`
   font-size: 14px;
   font-weight: 600;
   width: fit-content;
-  margin: 16px;
+  margin: 16px 10px;
+  /* "Up/Long" / "Down/Short" must stay on one line — without this the
+     glyph and label wrap into two lines on narrow grids and the pill
+     visually breaks. */
+  white-space: nowrap;
 `
 
 const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
   color: ${({ $sign, theme }) =>
     $sign === 'positive'
-      ? theme.colors.success
+      ? 'var(--pcs-colors-positive60, #129E7D)'
       : $sign === 'negative'
         ? theme.colors.failure
         : theme.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 20px;
+  font-style: normal;
   font-weight: 600;
-  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: -0.2px;
 `
 
 const LiqDistance = styled(Td)`
@@ -218,19 +265,24 @@ const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
 `
 
 const CloseBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: flex;
   width: 32px;
   height: 32px;
-  margin: 16px 12px;
-  padding: 0;
-  border: 0;
+  padding: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  aspect-ratio: 1 / 1;
+  margin: 16px 10px;
   border-radius: 8px;
-  background: ${({ theme }) => theme.colors.input};
-  color: ${({ theme }) => theme.colors.failure};
+  border-top: 1px solid #ED4B9E;
+  border-right: 1px solid #ED4B9E;
+  border-bottom: 2px solid #ED4B9E;
+  border-left: 1px solid #ED4B9E;
+  background: #FFF0F9;
+  color: #ED4B9E;
   cursor: pointer;
-  &:hover { filter: brightness(0.95); }
+  &:hover { filter: brightness(0.97); }
 `
 
 const Empty = styled.div`
@@ -330,9 +382,12 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
             {positions.map((row) => (
               <React.Fragment key={row.id}>
                 <TokenCell>
-                  {renderTokenIcon ? (
-                    renderTokenIcon(row)
-                  ) : (
+                  {/* Returning null/undefined from `renderTokenIcon` defers
+                      to the default colored-letter chip — lets consumers
+                      wire in a logo lookup that may not have an entry for
+                      every symbol (e.g. brand-new listings before Aster's
+                      logo CDN updates). */}
+                  {renderTokenIcon?.(row) ?? (
                     <TokenIcon $color={row.iconColor ?? defaultIconColor(row.symbol)}>
                       {row.symbol.slice(0, 1)}
                     </TokenIcon>

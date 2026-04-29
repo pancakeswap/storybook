@@ -93,6 +93,11 @@ export const pcsTheme = {
   alert: {
     background: v('background-alt'),
   },
+  tooltip: {
+    background: v('background-alt'),
+    text:       v('text'),
+    boxShadow:  'var(--pcs-shadows-dropdown)',
+  },
   // styled-system needs breakpoints as an array for responsive props like p={["16px", null, "24px"]}
   breakpoints: ['576px', '852px', '968px', '1080px', '1200px'],
   zIndices: {

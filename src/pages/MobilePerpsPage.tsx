@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './MobilePerpsPage.css'
-import { BunnySlider } from '../widgets/BunnySlider'
 import { DepositModal } from '../widgets/DepositModal'
 import { LeverageModal } from '../widgets/LeverageModal'
 import { MarketsDropdown, type MarketRow } from '../widgets/MarketsDropdown'
+import { OrderForm, type OrderFormDraft, type OrderTypeKey } from '../widgets/OrderForm'
 import { ChartIcon, ChartDisableIcon } from '../primitives/Icons'
 
 export interface MobilePerpsPageProps {
@@ -257,136 +257,10 @@ function OrderBookCol({
   )
 }
 
-interface OrderPanelColProps {
-  size: number
-  onSizeChange: (n: number) => void
-  marginMode: 'cross' | 'isolated'
-  onMarginModeToggle: () => void
-  leverage: number
-  onLeverageClick: () => void
-  orderType: 'Market' | 'Limit' | 'Stop Limit' | 'Stop Market'
-  orderTypeBtnRef: React.RefObject<HTMLDivElement | null>
-  onOrderTypeClick: () => void
-  tpsl: boolean
-  onTpslChange: (v: boolean) => void
-  reduceOnly: boolean
-  onReduceOnlyChange: (v: boolean) => void
-  onTopUp: () => void
-  onBuy: () => void
-  onSell: () => void
-  available?: number     // available USDT
-}
-
-function OrderPanelCol({
-  size,
-  onSizeChange,
-  marginMode,
-  onMarginModeToggle,
-  leverage,
-  onLeverageClick,
-  orderType,
-  orderTypeBtnRef,
-  onOrderTypeClick,
-  tpsl,
-  onTpslChange,
-  reduceOnly,
-  onReduceOnlyChange,
-  onTopUp,
-  onBuy,
-  onSell,
-  available = 11.24,
-}: OrderPanelColProps) {
-  return (
-    <div className="mp-op">
-      <div className="mp-op-row">
-        <button type="button" className="mp-op-pill" onClick={onMarginModeToggle}>
-          {marginMode === 'cross' ? 'Cross' : 'Isolated'}
-        </button>
-        <button type="button" className="mp-op-pill" onClick={onLeverageClick}>
-          {leverage}x
-        </button>
-      </div>
-
-      <div
-        ref={orderTypeBtnRef}
-        className="mp-op-select"
-        role="button"
-        tabIndex={0}
-        onClick={onOrderTypeClick}
-      >
-        <span className="mp-op-select-info"><Info /></span>
-        <span className="mp-op-select-label">{orderType}</span>
-        <span className="mp-op-select-chev"><ChevDown /></span>
-      </div>
-
-      <div className="mp-op-input">
-        <input
-          placeholder="Size"
-          inputMode="decimal"
-          value={Number.isFinite(size) ? size : ''}
-          onChange={(e) => {
-            const v = parseFloat(e.target.value)
-            onSizeChange(Number.isFinite(v) ? v : 0)
-          }}
-        />
-        <span className="mp-op-input-suffix">BTC <ChevDown /></span>
-      </div>
-
-      {/* Use the real BunnySlider so the mobile slider matches the
-       * web view (track + bunny butt + bunny head thumb). */}
-      <BunnySlider
-        min={0}
-        max={1}
-        step={0.001}
-        value={Math.max(0, Math.min(1, size))}
-        onValueChanged={onSizeChange}
-      />
-
-      <div className="mp-op-line">
-        <span>Avbl</span>
-        <strong>{available.toFixed(2)} USDT</strong>
-        <button type="button" aria-label="Top up" onClick={onTopUp}><Plus /></button>
-      </div>
-
-      <label className="mp-op-check">
-        <input type="checkbox" checked={tpsl} onChange={(e) => onTpslChange(e.target.checked)} />
-        <span>TP/SL</span>
-      </label>
-      <label className="mp-op-check">
-        <input type="checkbox" checked={reduceOnly} onChange={(e) => onReduceOnlyChange(e.target.checked)} />
-        <span>Reduce-Only</span>
-      </label>
-
-      <div className="mp-op-stats up">
-        <div className="mp-op-stats-row"><span>Est. liq. price</span><span className="v">-- USDT</span></div>
-        <div className="mp-op-stats-row"><span>Margin</span><span className="v">{(size * 100).toFixed(2)} USDT</span></div>
-        <div className="mp-op-stats-row"><span>Max</span><span className="v">0.013 BTC</span></div>
-      </div>
-
-      <button type="button" className="mp-op-cta mp-op-cta--buy" onClick={onBuy}>Buy/Long</button>
-
-      <div className="mp-op-stats down">
-        <div className="mp-op-stats-row"><span>Est. liq. price</span><span className="v">-- USDT</span></div>
-        <div className="mp-op-stats-row"><span>Margin</span><span className="v">{(size * 100).toFixed(2)} USDT</span></div>
-        <div className="mp-op-stats-row"><span>Max</span><span className="v">0.016 BTC</span></div>
-      </div>
-
-      <button type="button" className="mp-op-cta mp-op-cta--sell" onClick={onSell}>Sell/Short</button>
-    </div>
-  )
-}
-
 /* ── Page ──────────────────────────────────────────────────── */
 
 const TFS = ['1m', '5m', '15m', '1h', '4h', '1d'] as const
 type Tf = typeof TFS[number]
-
-const ORDER_TYPES: Array<'Market' | 'Limit' | 'Stop Limit' | 'Stop Market'> = [
-  'Market',
-  'Limit',
-  'Stop Limit',
-  'Stop Market',
-]
 
 const DEMO_MARKETS: MarketRow[] = [
   { symbol: 'BTCUSDT', lastPrice: '84185.5', priceChangePercent: '-0.52', quoteVolume: '19401160', maxLeverage: 125 },
@@ -407,12 +281,27 @@ export function MobilePerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: Mobil
   const [tf, setTf] = useState<Tf>('15m')
 
   // ── Order panel state ─────────────────────────────────
-  const [size, setSize]                 = useState(0)
-  const [marginMode, setMarginMode]     = useState<'cross' | 'isolated'>('cross')
-  const [leverage, setLeverage]         = useState(100)
-  const [orderType, setOrderType]       = useState<typeof ORDER_TYPES[number]>('Market')
-  const [tpsl, setTpsl]                 = useState(false)
-  const [reduceOnly, setReduceOnly]     = useState(false)
+  // OrderForm is stateless and consumes a controlled `OrderFormDraft` —
+  // we keep one source-of-truth `draft` here. The order-type popover,
+  // BunnySlider, and the Buy/Sell two-CTA layout all live inside the
+  // OrderForm widget when isMobile, so the page no longer owns those.
+  const [draft, setDraft] = useState<OrderFormDraft>({
+    side: 'BUY',
+    leverage: 100,
+    marginMode: 'CROSS',
+    sizeUnit: 'BASE',
+    quantity: '',
+    price: '',
+    reduceOnly: false,
+    tpSlEnabled: false,
+    takeProfitPrice: '',
+    stopLossPrice: '',
+    timeInForce: 'GTC',
+    stopPrice: '',
+    stopPriceSource: 'LAST',
+  })
+  const [typeKey, setTypeKey] = useState<OrderTypeKey>('market')
+  const [sizePercent, setSizePercent] = useState(0)
   const [hideOtherSymbols, setHideOtherSymbols] = useState(false)
   const [activeSymbol, setActiveSymbol] = useState(_initialPair)
   const [favorites, setFavorites]       = useState<string[]>([])
@@ -420,7 +309,6 @@ export function MobilePerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: Mobil
   // ── Modal / popover open state ─────────────────────────
   const [depositOpen,    setDepositOpen]    = useState(false)
   const [leverageOpen,   setLeverageOpen]   = useState(false)
-  const [orderTypeOpen,  setOrderTypeOpen]  = useState(false)
   const [marketsOpen,    setMarketsOpen]    = useState(false)
   const [obViewSheetOpen, setObViewSheetOpen] = useState(false)
   const [obView,         setObView]         = useState<ObView>('both')
@@ -428,17 +316,11 @@ export function MobilePerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: Mobil
   const [historyOpen,    setHistoryOpen]    = useState(false)
   const [historyTab,     setHistoryTab]     = useState<'orders' | 'trades' | 'tx'>('orders')
 
-  // Anchors for portaled popovers (order-type menu + markets dropdown)
-  const orderTypeBtnRef = useRef<HTMLDivElement>(null)
+  // Markets dropdown still anchored from the page (it isn't owned by a
+  // widget yet). Order-type popover moved into OrderForm.
   const symbolBtnRef    = useRef<HTMLDivElement>(null)
-  const [orderTypePos, setOrderTypePos] = useState<{ top: number; left: number; width: number } | null>(null)
   const [marketsPos,   setMarketsPos]   = useState<{ top: number; left: number; width: number } | null>(null)
 
-  useLayoutEffect(() => {
-    if (!orderTypeOpen || !orderTypeBtnRef.current) return
-    const r = orderTypeBtnRef.current.getBoundingClientRect()
-    setOrderTypePos({ top: r.bottom + 4, left: r.left, width: r.width })
-  }, [orderTypeOpen])
   useLayoutEffect(() => {
     if (!marketsOpen || !symbolBtnRef.current) return
     const r = symbolBtnRef.current.getBoundingClientRect()
@@ -449,25 +331,24 @@ export function MobilePerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: Mobil
     setMarketsPos({ top: r.bottom + 4, left, width })
   }, [marketsOpen])
 
-  // Click-outside close for the popovers
+  // Click-outside close for the markets popover
   useEffect(() => {
-    if (!orderTypeOpen && !marketsOpen) return
+    if (!marketsOpen) return
     const onDown = (e: MouseEvent) => {
       const t = e.target as Node
-      if (orderTypeOpen && !orderTypeBtnRef.current?.contains(t) && !document.querySelector('.mp-ot-menu')?.contains(t)) {
-        setOrderTypeOpen(false)
-      }
-      if (marketsOpen && !symbolBtnRef.current?.contains(t) && !document.querySelector('.mp-markets-pop')?.contains(t)) {
+      if (!symbolBtnRef.current?.contains(t) && !document.querySelector('.mp-markets-pop')?.contains(t)) {
         setMarketsOpen(false)
       }
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
-  }, [orderTypeOpen, marketsOpen])
+  }, [marketsOpen])
 
   // ── Action handlers (stubs the consumer would replace) ─
-  const handleBuy  = () => alert(`BUY ${size.toFixed(3)} BTC · ${marginMode} · ${leverage}x · ${orderType}`)
-  const handleSell = () => alert(`SELL ${size.toFixed(3)} BTC · ${marginMode} · ${leverage}x · ${orderType}`)
+  const handleSubmit = (opts?: { sideOverride?: 'BUY' | 'SELL' }) => {
+    const side = opts?.sideOverride ?? draft.side
+    alert(`${side} ${draft.quantity || '0'} BTC · ${draft.marginMode} · ${draft.leverage}x · ${typeKey}`)
+  }
   const baseAsset = activeSymbol.replace('USDT', '')
 
   return (
@@ -588,26 +469,32 @@ export function MobilePerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: Mobil
           tickSize={obTickSize}
           onTickSizeChange={setObTickSize}
         />
-        <OrderPanelCol
-          size={size}
-          onSizeChange={setSize}
-          marginMode={marginMode}
-          onMarginModeToggle={() =>
-            setMarginMode((m) => (m === 'cross' ? 'isolated' : 'cross'))
-          }
-          leverage={leverage}
-          onLeverageClick={() => setLeverageOpen(true)}
-          orderType={orderType}
-          orderTypeBtnRef={orderTypeBtnRef}
-          onOrderTypeClick={() => setOrderTypeOpen((v) => !v)}
-          tpsl={tpsl}
-          onTpslChange={setTpsl}
-          reduceOnly={reduceOnly}
-          onReduceOnlyChange={setReduceOnly}
-          onTopUp={() => setDepositOpen(true)}
-          onBuy={handleBuy}
-          onSell={handleSell}
-        />
+        {/* OrderForm auto-detects the mobile breakpoint and renders the
+            mobile column-style layout (same widget, different viewport). */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <OrderForm
+            symbol={activeSymbol}
+            baseAsset={baseAsset}
+            quoteAsset="USDT"
+            draft={draft}
+            onDraftChange={setDraft}
+            typeKey={typeKey}
+            onTypeKeyChange={setTypeKey}
+            availableBalanceText="11.24"
+            preview={{ cost: '0.00 USDT', liq: '-- USDT' }}
+            feeText="0.02% / 0.05%"
+            sizePercent={sizePercent}
+            onSizePercentChange={setSizePercent}
+            cta="Buy/Long"
+            canSubmit
+            onSubmit={handleSubmit}
+            onLeverageClick={() => setLeverageOpen(true)}
+            onMarginModeToggle={() =>
+              setDraft((d) => ({ ...d, marginMode: d.marginMode === 'CROSS' ? 'ISOLATED' : 'CROSS' }))
+            }
+            onDepositClick={() => setDepositOpen(true)}
+          />
+        </div>
       </div>
 
       {/* Tabs */}
@@ -688,63 +575,14 @@ export function MobilePerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: Mobil
       <LeverageModal
         isOpen={leverageOpen}
         symbol={activeSymbol}
-        currentLeverage={leverage}
+        currentLeverage={draft.leverage}
         availableBalance={11.24}
         onConfirm={(v) => {
-          setLeverage(v)
+          setDraft((d) => ({ ...d, leverage: v }))
           setLeverageOpen(false)
         }}
         onClose={() => setLeverageOpen(false)}
       />
-
-      {/* Order-type popover menu — portaled so it escapes the small column */}
-      {orderTypeOpen && orderTypePos && typeof document !== 'undefined' &&
-        createPortal(
-          <div
-            className="mp-ot-menu"
-            style={{
-              position: 'fixed',
-              top: orderTypePos.top,
-              left: orderTypePos.left,
-              width: orderTypePos.width,
-              background: 'var(--pcs-colors-card)',
-              border: '1px solid var(--pcs-colors-card-border)',
-              borderRadius: 8,
-              boxShadow: 'var(--pcs-shadows-dropdown, 0 12px 32px -16px rgba(0,0,0,0.6))',
-              zIndex: 200,
-              overflow: 'hidden',
-            }}
-            role="listbox"
-          >
-            {ORDER_TYPES.map((ty) => (
-              <button
-                key={ty}
-                type="button"
-                role="option"
-                aria-selected={ty === orderType}
-                onClick={() => {
-                  setOrderType(ty)
-                  setOrderTypeOpen(false)
-                }}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '10px 12px',
-                  background: ty === orderType ? 'var(--pcs-colors-input)' : 'transparent',
-                  border: 0,
-                  color: 'var(--pcs-colors-text)',
-                  fontFamily: 'inherit',
-                  fontSize: 13,
-                  cursor: 'pointer',
-                }}
-              >
-                {ty}
-              </button>
-            ))}
-          </div>,
-          document.body,
-        )}
 
       {/* History sheet — full-page with Order / Trade / Transaction tabs.
        *  Mirrors Aster's mobile history view; styling follows PCS tokens. */}

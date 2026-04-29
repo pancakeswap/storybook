@@ -384,6 +384,244 @@ const TokenValue = styled.span`
   font-variant-numeric: tabular-nums;
 `
 
+/* ── Order Confirmation modal ──────────────────────────────────── */
+
+const ConfirmModalCard = styled.div`
+  display: flex;
+  width: 411px;
+  padding: 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.card};
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+`
+
+const ConfirmModalTitle = styled.h3`
+  margin: 0;
+  align-self: stretch;
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+`
+
+const OrderRowsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: stretch;
+`
+
+const OrderTokenRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 12px;
+`
+
+const OrderTokenLeft = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+`
+
+const OrderTokenSymbol = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 150%;
+`
+
+const SidePill = styled.span<{ $up: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid
+    ${({ theme, $up }) => ($up ? theme.colors.success : theme.colors.failure)};
+  color: ${({ theme, $up }) => ($up ? theme.colors.success : theme.colors.failure)};
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+`
+
+const OrderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 12px;
+`
+
+const OrderLabel = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+`
+
+const OrderValue = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  text-align: right;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`
+
+const DontShowRow = styled.label`
+  display: flex;
+  padding: 8px 16px;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+  justify-content: space-between;
+  border-radius: 16px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  cursor: pointer;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const DontShowCheckbox = styled.input.attrs({ type: 'checkbox' })`
+  appearance: none;
+  display: flex;
+  width: 24px;
+  height: 24px;
+  padding: 1px 2px 3px 2px;
+  align-items: flex-start;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.20);
+  background: ${({ theme }) => theme.colors.success};
+  cursor: pointer;
+  position: relative;
+  &:after {
+    content: '';
+    display: block;
+    width: 14px;
+    height: 14px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.25 9.31 3 7.06l-.94.94L5.25 11.2 12 4.44l-.94-.94z" fill="white"/></svg>') no-repeat center;
+  }
+  &:not(:checked):after {
+    visibility: hidden;
+  }
+  &:not(:checked) {
+    background: ${({ theme }) => theme.colors.input};
+    border-bottom-color: rgba(0, 0, 0, 0.10);
+  }
+  &:focus-visible {
+    outline: 0;
+    box-shadow:
+      0 0 0 1px ${({ theme }) => theme.colors.secondary},
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
+`
+
+const ModalActions = styled.div`
+  display: flex;
+  gap: 8px;
+  align-self: stretch;
+`
+
+const ModalActionBtn = styled.button<{ $variant: 'primary' | 'secondary' }>`
+  display: flex;
+  flex: 1 0 0;
+  padding: 11px 12px 13px;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  border-radius: 16px;
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  background: ${({ theme, $variant }) =>
+    $variant === 'primary' ? theme.colors.primary : theme.colors.tertiary};
+  color: ${({ theme, $variant }) =>
+    $variant === 'primary' ? theme.colors.invertedContrast : theme.colors.primary};
+  border-bottom: 2px solid
+    ${({ $variant }) => ($variant === 'primary' ? 'rgba(0, 0, 0, 0.20)' : 'rgba(0, 0, 0, 0.10)')};
+  &:hover { filter: brightness(1.05); }
+`
+
+const OrderConfirmModal: React.FC<{
+  isOpen: boolean
+  side: 'up' | 'down'
+  pair: string
+  baseAsset: string
+  price: string
+  estLiqPrice: string
+  positionSize: string
+  duration: string
+  onConfirm: () => void
+  onClose: () => void
+}> = ({ isOpen, side, pair, baseAsset, price, estLiqPrice, positionSize, duration, onConfirm, onClose }) => {
+  if (!isOpen) return null
+  const isUp = side === 'up'
+  return (
+    <Overlay onClick={onClose}>
+      <ConfirmModalCard onClick={(e) => e.stopPropagation()}>
+        <ModalHeader>
+          <ConfirmModalTitle>Order Confirmation</ConfirmModalTitle>
+          <ModalCloseBtn type="button" onClick={onClose} aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            </svg>
+          </ModalCloseBtn>
+        </ModalHeader>
+        <OrderTokenRow>
+          <OrderTokenLeft>
+            <TokenIcon $color="#F0B90B">{baseAsset.slice(0, 1)}</TokenIcon>
+            <OrderTokenSymbol>{pair}</OrderTokenSymbol>
+          </OrderTokenLeft>
+          <SidePill $up={isUp}>
+            {isUp ? '↑' : '↓'} {isUp ? 'Up' : 'Down'}
+          </SidePill>
+        </OrderTokenRow>
+        <OrderRowsList>
+          <OrderRow><OrderLabel>Price</OrderLabel><OrderValue>{price}</OrderValue></OrderRow>
+          <OrderRow><OrderLabel>Est. Liquidation price</OrderLabel><OrderValue>{estLiqPrice}</OrderValue></OrderRow>
+          <OrderRow><OrderLabel>Position size</OrderLabel><OrderValue>{positionSize}</OrderValue></OrderRow>
+          <OrderRow><OrderLabel>Time duration</OrderLabel><OrderValue>{duration}</OrderValue></OrderRow>
+        </OrderRowsList>
+        <DontShowRow>
+          Don&apos;t show again
+          <DontShowCheckbox defaultChecked />
+        </DontShowRow>
+        <ModalActions>
+          <ModalActionBtn type="button" $variant="primary" onClick={onConfirm}>Confirm</ModalActionBtn>
+          <ModalActionBtn type="button" $variant="secondary" onClick={onClose}>Cancel</ModalActionBtn>
+        </ModalActions>
+      </ConfirmModalCard>
+    </Overlay>
+  )
+}
+
 interface CollateralAsset {
   symbol: string
   name: string
@@ -487,6 +725,7 @@ const mockBetPanelArgs = (
   setLeverage: (n: number) => void,
   onDeposit: () => void,
   onTopUpFund: () => void,
+  onConfirmOpen: (side: 'up' | 'down') => void,
 ): SimpleBetPanelProps => ({
   symbol: 'BTCUSDT',
   baseAsset: 'BTC',
@@ -505,8 +744,8 @@ const mockBetPanelArgs = (
   marginRequired: '$400 USDT',
   openingFee: '$10.00 (0.05%)',
   canSubmit: true,
-  onUp: () => undefined,
-  onDown: () => undefined,
+  onUp: () => onConfirmOpen('up'),
+  onDown: () => onConfirmOpen('down'),
   onDeposit,
   onWithdraw: () => undefined,
   unrealizedPnl: '$0',
@@ -517,6 +756,7 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
   const [positionsTab, setPositionsTab] = useState<SimplePositionsTab>('positions')
   const [depositOpen, setDepositOpen] = useState(false)
   const [collateralOpen, setCollateralOpen] = useState(false)
+  const [orderConfirm, setOrderConfirm] = useState<'up' | 'down' | null>(null)
   const [bet, setBet] = useState('')
   const [leverage, setLeverage] = useState(10)
 
@@ -567,11 +807,25 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
             setLeverage,
             () => setDepositOpen(true),
             () => setCollateralOpen(true),
+            (side) => setOrderConfirm(side),
           )}
         />
       </Body>
 
       <CollateralModal isOpen={collateralOpen} onClose={() => setCollateralOpen(false)} />
+
+      <OrderConfirmModal
+        isOpen={!!orderConfirm}
+        side={orderConfirm ?? 'up'}
+        pair="BNB/USD"
+        baseAsset="BNB"
+        price="78,053.60 USDT"
+        estLiqPrice="$66,092.23"
+        positionSize="$100"
+        duration="Perpetual"
+        onConfirm={() => setOrderConfirm(null)}
+        onClose={() => setOrderConfirm(null)}
+      />
 
       <DepositModal
         isOpen={depositOpen}
