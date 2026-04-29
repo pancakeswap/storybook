@@ -111,17 +111,32 @@ const isDegen = (lev: number, max: number) => lev > max * DEGEN_RATIO
 const isDouble = (lev: number, max: number) => lev > max * WARN_RATIO
 
 const zoneLabel = (z: Zone) =>
-  z === 'safe' ? 'Safe zone' : z === 'warn' ? 'Caution' : 'Danger zone'
+  z === 'safe' ? 'Safe zone' : z === 'warn' ? 'High leverage' : 'Danger zone'
+
+const zoneEmoji = (z: Zone) => (z === 'safe' ? '🌿' : z === 'warn' ? '⚡️' : '🔥')
+
+const zoneTooltip = (z: Zone) =>
+  z === 'safe'
+    ? "A good place to start. You'll feel the market without getting rekt."
+    : z === 'warn'
+      ? 'Liquidation triggers around a 1% move.'
+      : '1% move against you liquidates. Only risk what you can afford to lose.'
 
 // Branded UP/DOWN arrows — kept inline because there's no 1:1 primitive.
 const UpArrow: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 4l-7 7h4v9h6v-9h4z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M10.9629 8.57864L6.79069 12.7509C6.58302 12.9586 6.33844 13.0634 6.05694 13.0654C5.77544 13.0674 5.5251 12.9628 5.30594 12.7516C5.1026 12.5403 5.00194 12.2939 5.00394 12.0124C5.00594 11.7309 5.1111 11.4861 5.31944 11.2781L11.2714 5.33339C11.3736 5.23139 11.4873 5.15456 11.6124 5.10289C11.7376 5.05122 11.8683 5.02539 12.0044 5.02539C12.1406 5.02539 12.2713 5.05122 12.3964 5.10289C12.5216 5.15456 12.6319 5.22797 12.7272 5.32314L18.6829 11.2791C18.8983 11.4945 19.0059 11.7367 19.0059 12.0059C19.0059 12.2751 18.9023 12.5153 18.6949 12.7266C18.4758 12.9378 18.225 13.0434 17.9427 13.0434C17.6604 13.0434 17.4164 12.9378 17.2107 12.7266L13.0379 8.57864V18.3664C13.0379 18.6571 12.9383 18.9025 12.7389 19.1026C12.5394 19.303 12.295 19.4031 12.0057 19.4031C11.7164 19.4031 11.4702 19.303 11.2672 19.1026C11.0644 18.9025 10.9629 18.6571 10.9629 18.3664V8.57864Z"
+      fill="currentColor"
+    />
   </svg>
 )
 const DownArrow: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 20l7-7h-4V4h-6v9H5z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M10.9997 5V16.17L6.11973 11.29C5.72973 10.9 5.08973 10.9 4.69973 11.29C4.30973 11.68 4.30973 12.31 4.69973 12.7L11.2897 19.29C11.6797 19.68 12.3097 19.68 12.6997 19.29L19.2897 12.7C19.6797 12.31 19.6797 11.68 19.2897 11.29C18.8997 10.9 18.2697 10.9 17.8797 11.29L12.9997 16.17V5C12.9997 4.45 12.5497 4 11.9997 4C11.4497 4 10.9997 4.45 10.9997 5Z"
+      fill="currentColor"
+    />
   </svg>
 )
 const TriangleUp: React.FC = () => (
@@ -220,7 +235,7 @@ const UpDownCardActions = styled.div`
   display: flex;
   gap: 8px;
   align-self: stretch;
-  padding: 0 16px 16px 16px;
+  padding: 0;
 `
 
 const TopCardInner = styled.div`
@@ -359,7 +374,7 @@ const FundAmt = styled.span`
 `
 
 // Bet input field
-const BetField = styled.div`
+const BetField = styled.label`
   display: flex;
   min-width: 296px;
   padding: 16px;
@@ -371,6 +386,13 @@ const BetField = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  cursor: text;
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
 `
 
 const BetFieldRow = styled.div`
@@ -612,24 +634,36 @@ const LevValue = styled.span`
   letter-spacing: -0.4px;
 `
 
+const ZONE_BORDER: Record<Zone, string> = {
+  safe: '#129E7D',
+  warn: '#FFB237',
+  danger: '#ED4B9E',
+}
+const ZONE_BG: Record<Zone, string> = {
+  safe: '#EAFBF7',
+  warn: '#FBF2E7',
+  danger: '#FFF0F9',
+}
+
 const ZonePill = styled.span<{ $zone: Zone }>`
-  display: flex;
+  display: inline-flex;
   padding: 8px 12px;
   align-items: center;
   gap: 4px;
   border-radius: 16px;
-  border-top: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-right: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-bottom: 2px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-left: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  background: ${({ $zone }) =>
-    $zone === 'safe' ? '#EAFBF7' : $zone === 'warn' ? '#FBF2E7' : '#FCE7F1'};
+  border-top: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  border-right: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  border-bottom: 2px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  border-left: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  background: ${({ $zone }) => ZONE_BG[$zone]};
+`
+
+const ZonePillText = styled.span`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  color: ${({ theme }) => theme.colors.text};
+  color: #280D5F;
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -637,8 +671,50 @@ const ZonePill = styled.span<{ $zone: Zone }>`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+`
+
+const ZoneTipAnchor = styled.span`
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #280D5F;
+  cursor: help;
+`
+
+const ZoneTipBubble = styled.span`
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  width: 200px;
+  padding: 8px 12px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background: #280D5F;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+  color: #FFF;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease;
+  z-index: 10;
+  ${ZoneTipAnchor}:hover &,
+  ${ZoneTipAnchor}:focus-visible & {
+    opacity: 1;
+    visibility: visible;
+  }
 `
 
 // Hand-rolled leverage slider (the Slider primitive can't do a per-zone
@@ -661,25 +737,10 @@ const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   background: linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%);
   box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.06) inset;
   overflow: visible;
-`
 
-const LevFill = styled.span<{ $fillPct: number; $zone: Zone; $degen?: boolean }>`
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: ${({ $fillPct }) => `${$fillPct}%`};
-  border-radius: 24px 0 0 24px;
-  background: ${({ theme, $zone, $degen }) =>
-    $degen
-      ? 'linear-gradient(90deg, #FAD658 0%, #ED4B9E 100%)'
-      : $zone === 'safe'
-        ? theme.colors.success
-        : $zone === 'warn'
-          ? theme.colors.warning
-          : theme.colors.failure};
-  box-shadow: ${({ $degen }) =>
-    $degen ? '0 2px 0 0 rgba(0, 0, 0, 0.06) inset' : 'none'};
+  html.dark & {
+    background: ${({ theme }) => theme.colors.backgroundBubblegum};
+  }
 `
 
 const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' | 'triple' }>`
@@ -867,26 +928,26 @@ const StatsValue = styled.span<{ $danger?: boolean }>`
 `
 
 // UP / DOWN buttons
-const DirectionRow = styled(Flex)`
-  align-self: stretch;
-  gap: 8px;
-`
-
 const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  padding: 8px;
   justify-content: center;
-  gap: 6px;
-  height: 56px;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  border-bottom-width: 4px;
-  border-radius: 16px;
-  font-family: inherit;
-  font-size: 18px;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
+  border-top: 2px solid rgba(0, 0, 0, 0.2);
+  border-right: 2px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+  border-left: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 24px;
+  font-family: Kanit;
+  font-size: 24px;
+  font-style: normal;
   font-weight: 600;
-  letter-spacing: -0.18px;
-  color: ${({ theme }) => theme.colors.invertedContrast};
+  line-height: 150%;
+  letter-spacing: -0.24px;
+  font-feature-settings: 'liga' off;
+  color: #FFF;
   cursor: pointer;
   transition: filter 0.12s, transform 0.06s;
   background: ${({ theme, $variant }) => ($variant === 'up' ? theme.colors.success : theme.colors.failure)};
@@ -901,6 +962,14 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
     cursor: not-allowed;
     opacity: 0.6;
   }
+`
+
+const DirectionButtonContent = styled.span`
+  display: flex;
+  padding: 0 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 `
 
 // Deposit / Withdraw bottom tabs
@@ -1223,16 +1292,21 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           <LevRow>
             <LevValue>{leverage}x</LevValue>
             <ZonePill $zone={zone}>
-              {zoneLabel(zone)}
-              <span style={{ display: 'inline-flex', color: 'var(--pcs-colors-text-subtle, #7A6EAA)' }}>
+              {zoneEmoji(zone) ? (
+                <ZonePillText as="span" aria-hidden>{zoneEmoji(zone)}</ZonePillText>
+              ) : null}
+              <ZonePillText>{zoneLabel(zone)}</ZonePillText>
+              <ZoneTipAnchor tabIndex={0} aria-label={`${zoneLabel(zone)} explanation`}>
                 <InfoCircleGlyph />
-              </span>
+                {zoneTooltip(zone) ? (
+                  <ZoneTipBubble role="tooltip">{zoneTooltip(zone)}</ZoneTipBubble>
+                ) : null}
+              </ZoneTipAnchor>
             </ZonePill>
           </LevRow>
 
           <LevBar>
           <LevTrack ref={trackRef} $fillPct={fillPct} $zone={zone} aria-hidden>
-            <LevFill $fillPct={fillPct} $zone={zone} $degen={degen} />
             {/* Native input below the thumb still handles clicks on the
                 rest of the track + keyboard interaction. */}
             <LevRangeInput
@@ -1270,7 +1344,7 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                 }
                 aria-label="Custom leverage"
               />
-              <LevCustomSuffix>x</LevCustomSuffix>
+              <LevCustomSuffix>%</LevCustomSuffix>
             </LevCustom>
             {presets.map((p) => (
               <LevTab
@@ -1298,9 +1372,9 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
         </DurationRow>
       </Body>
 
-      {/* UP / DOWN — wrapped in card when bet is filled, otherwise plain */}
-      {bet && bet !== '0' ? (
-        <UpDownCard>
+      {/* UP / DOWN — always wrapped in card; stats only show when bet is filled */}
+      <UpDownCard>
+        {bet && bet !== '0' ? (
           <StatsList>
             <StatsRow>
               <StatsLabel>Estimated Entry</StatsLabel>
@@ -1319,31 +1393,8 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
               <StatsValue>{openingFee}</StatsValue>
             </StatsRow>
           </StatsList>
-          <UpDownCardActions>
-            <DirectionButton
-              type="button"
-              $variant="up"
-              disabled={upDisabled}
-              onClick={onUp}
-              aria-busy={isSubmittingUp}
-            >
-              <UpArrow />
-              {isSubmittingUp ? '...' : 'UP'}
-            </DirectionButton>
-            <DirectionButton
-              type="button"
-              $variant="down"
-              disabled={downDisabled}
-              onClick={onDown}
-              aria-busy={isSubmittingDown}
-            >
-              <DownArrow />
-              {isSubmittingDown ? '...' : 'DOWN'}
-            </DirectionButton>
-          </UpDownCardActions>
-        </UpDownCard>
-      ) : (
-        <DirectionRow>
+        ) : null}
+        <UpDownCardActions>
           <DirectionButton
             type="button"
             $variant="up"
@@ -1351,8 +1402,10 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
             onClick={onUp}
             aria-busy={isSubmittingUp}
           >
-            <UpArrow />
-            {isSubmittingUp ? '...' : 'UP'}
+            <DirectionButtonContent>
+              <UpArrow />
+              {isSubmittingUp ? '...' : 'UP'}
+            </DirectionButtonContent>
           </DirectionButton>
           <DirectionButton
             type="button"
@@ -1361,11 +1414,13 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
             onClick={onDown}
             aria-busy={isSubmittingDown}
           >
-            <DownArrow />
-            {isSubmittingDown ? '...' : 'DOWN'}
+            <DirectionButtonContent>
+              <DownArrow />
+              {isSubmittingDown ? '...' : 'DOWN'}
+            </DirectionButtonContent>
           </DirectionButton>
-        </DirectionRow>
-      )}
+        </UpDownCardActions>
+      </UpDownCard>
       </TopCardInner>
       </TopCard>
 

@@ -172,17 +172,21 @@ const Price = styled.span`
 `
 
 const Pnl = styled.span<{ $positive: boolean }>`
-  display: inline-flex;
+  display: flex;
+  padding: 0 6px;
+  justify-content: center;
   align-items: center;
   gap: 2px;
-  padding: 0 6px;
   border-radius: 999px;
-  background: ${({ theme, $positive }) =>
-    $positive
-      ? `color-mix(in srgb, ${theme.colors.success} 18%, transparent)`
-      : `color-mix(in srgb, ${theme.colors.failure} 18%, transparent)`};
+  background: ${({ $positive }) => ($positive ? '#EAFBF7' : '#FFF0F9')};
   font-size: 16px;
   color: ${({ theme }) => theme.colors.text};
+`
+
+const PnlTriangle = styled.span<{ $positive: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  color: ${({ $positive }) => ($positive ? '#129E7D' : '#ED4B9E')};
 `
 
 const StatsWrap = styled.div`
@@ -239,13 +243,19 @@ const StatValue = styled.span`
 `
 
 const TriangleUp: React.FC = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-    <path d="M6 2l5 8H1z" />
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <path
+      d="M1.90301 9.83956C1.65374 9.83956 1.47213 9.73331 1.35818 9.52081C1.24423 9.30831 1.25374 9.0988 1.3867 8.89228L5.49051 2.73574C5.61516 2.5553 5.78491 2.46509 5.99977 2.46509C6.21462 2.46509 6.38437 2.5553 6.50901 2.73574L10.6128 8.89228C10.7458 9.0988 10.7553 9.30831 10.6414 9.52081C10.5274 9.73331 10.3458 9.83956 10.0965 9.83956H1.90301Z"
+      fill="currentColor"
+    />
   </svg>
 )
 const TriangleDown: React.FC = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-    <path d="M6 10L1 2h10z" />
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <path
+      d="M1.90301 2.16044C1.65374 2.16044 1.47213 2.26669 1.35818 2.47919C1.24423 2.69169 1.25374 2.9012 1.3867 3.10772L5.49051 9.26426C5.61516 9.4447 5.78491 9.53491 5.99977 9.53491C6.21462 9.53491 6.38437 9.4447 6.50901 9.26426L10.6128 3.10772C10.7458 2.9012 10.7553 2.69169 10.6414 2.47919C10.5274 2.26669 10.3458 2.16044 10.0965 2.16044H1.90301Z"
+      fill="currentColor"
+    />
   </svg>
 )
 const ChevronDownGlyph: React.FC = () => (
@@ -534,7 +544,9 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
           <PriceRow>
             <Price>{price}</Price>
             <Pnl $positive={positive}>
-              {positive ? <TriangleUp /> : <TriangleDown />}
+              <PnlTriangle $positive={positive}>
+                {positive ? <TriangleUp /> : <TriangleDown />}
+              </PnlTriangle>
               {pricePnlPct.toFixed(2)}%
             </Pnl>
           </PriceRow>

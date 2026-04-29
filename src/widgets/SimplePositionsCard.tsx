@@ -265,19 +265,24 @@ const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
 `
 
 const CloseBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: flex;
   width: 32px;
   height: 32px;
+  padding: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  aspect-ratio: 1 / 1;
   margin: 16px 10px;
-  padding: 0;
-  border: 0;
   border-radius: 8px;
-  background: ${({ theme }) => theme.colors.input};
-  color: ${({ theme }) => theme.colors.failure};
+  border-top: 1px solid #ED4B9E;
+  border-right: 1px solid #ED4B9E;
+  border-bottom: 2px solid #ED4B9E;
+  border-left: 1px solid #ED4B9E;
+  background: #FFF0F9;
+  color: #ED4B9E;
   cursor: pointer;
-  &:hover { filter: brightness(0.95); }
+  &:hover { filter: brightness(0.97); }
 `
 
 const Empty = styled.div`
