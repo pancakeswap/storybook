@@ -29,8 +29,28 @@ export interface SimpleBetPanelProps {
   // ── Controlled draft ─────────────────────────────────────
   bet: string
   onBetChange: (next: string) => void
+  /**
+   * Inline validation message rendered under the bet input — typically
+   * the consumer's "Min: 4.25 USDT" hint when the entered bet would
+   * floor to a sub-lot-size qty. Suppresses naturally when omitted /
+   * empty string. Pair with `canSubmit={false}` so UP/DOWN are also
+   * disabled while the message is showing.
+   */
+  betError?: string
   leverage: number
   onLeverageChange: (next: number) => void
+  /**
+   * Per-symbol max leverage. Aster's `/fapi/v1/leverageBracket` defines
+   * tier caps per market, so this must be configurable. Defaults to the
+   * historical 1001 to keep the original story working.
+   */
+  maxLeverage?: number
+  /**
+   * Preset leverage chips below the slider. Default is the original
+   * [50, 250, 500, 1001] for max=1001; consumers passing a smaller max
+   * should also pass scaled presets (e.g. [10, 25, 50, 100] for max=100).
+   */
+  presets?: readonly number[]
   quoteAsset: string
   onQuoteAssetClick?: () => void
 
@@ -58,13 +78,26 @@ export interface SimpleBetPanelProps {
   unrealizedPnl: string
 }
 
-const PRESETS = [50, 250, 500, 1001] as const
-const MAX_LEVERAGE = 1001
+const DEFAULT_PRESETS = [50, 250, 500, 1001] as const
+const DEFAULT_MAX_LEVERAGE = 1001
 
 type Zone = 'safe' | 'warn' | 'danger'
 
-const zoneFromLeverage = (lev: number): Zone =>
-  lev <= 50 ? 'safe' : lev <= 250 ? 'warn' : 'danger'
+/**
+ * Zones are proportional to max leverage so a symbol capped at 100x still
+ * renders meaningful safe/warn/danger boundaries. Original mapping was
+ * 50 / 250 / 1001 → ~5% / ~25% / 100% — preserved here as ratios.
+ */
+const SAFE_RATIO = 50 / 1001
+const WARN_RATIO = 250 / 1001
+const zoneFromLeverage = (lev: number, max: number): Zone => {
+  if (lev <= max * SAFE_RATIO) return 'safe'
+  if (lev <= max * WARN_RATIO) return 'warn'
+  return 'danger'
+}
+const DEGEN_RATIO = 500 / 1001
+const isDegen = (lev: number, max: number) => lev > max * DEGEN_RATIO
+const isDouble = (lev: number, max: number) => lev > max * WARN_RATIO
 
 const zoneLabel = (z: Zone) =>
   z === 'safe' ? 'Safe zone' : z === 'warn' ? 'Caution' : 'Danger zone'
@@ -330,6 +363,15 @@ const BetFieldRow = styled.div`
   align-self: stretch;
 `
 
+const BetErrorText = styled.span`
+  align-self: stretch;
+  color: ${({ theme }) => theme.colors.failure};
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  font-feature-settings: 'liga' off;
+`
+
 const BetLabel = styled.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -509,7 +551,7 @@ const ZonePill = styled.span<{ $zone: Zone }>`
 `
 
 // Hand-rolled leverage slider (the Slider primitive can't do a per-zone
-// gradient fill across the 1..MAX_LEVERAGE range — keeping range input).
+// gradient fill across the 1..maxLeverage range — keeping range input).
 const LevBar = styled.div`
   display: flex;
   flex-direction: column;
@@ -562,7 +604,12 @@ const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' |
     $variant === 'triple' ? '44px' : $variant === 'double' ? '41.455px' : '38.004px'};
   height: ${({ $variant }) =>
     $variant === 'triple' ? '48px' : $variant === 'double' ? '42.549px' : '38.186px'};
-  pointer-events: none;
+  /* Sits above LevRangeInput so dragging the thumb is captured by our
+     pointer handler instead of falling through to the native input
+     (which maps click X→value and would snap to 1 at low leverage). */
+  z-index: 2;
+  pointer-events: auto;
+  touch-action: none;
   cursor: grab;
   &:active { cursor: grabbing; }
 `
@@ -838,8 +885,11 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   onSymbolClick,
   bet,
   onBetChange,
+  betError,
   leverage,
   onLeverageChange,
+  maxLeverage = DEFAULT_MAX_LEVERAGE,
+  presets = DEFAULT_PRESETS,
   quoteAsset,
   onQuoteAssetClick,
   fundBalanceText,
@@ -858,11 +908,48 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   onWithdraw,
   unrealizedPnl,
 }) => {
-  const fillPct = Math.min(100, Math.max(0, (leverage / MAX_LEVERAGE) * 100))
-  const zone = zoneFromLeverage(leverage)
+  const fillPct = Math.min(100, Math.max(0, (leverage / maxLeverage) * 100))
+  const zone = zoneFromLeverage(leverage, maxLeverage)
+  const degen = isDegen(leverage, maxLeverage)
+  const double = isDouble(leverage, maxLeverage)
   const submitting = isSubmittingUp || isSubmittingDown
   const upDisabled = !canSubmit || submitting
   const downDisabled = !canSubmit || submitting
+
+  // Custom thumb-drag handler. The native range input below the thumb
+  // maps the click X coordinate to a value, so when the visual thumb
+  // sits at fillPct≈1% (low leverage), clicking it lands the click at
+  // the track's left edge → value=1. We intercept pointer-down on the
+  // thumb itself, capture the pointer, and translate motion deltas
+  // into leverage values so the gesture starts at the current value
+  // rather than where the thumb happened to be drawn.
+  const trackRef = React.useRef<HTMLDivElement | null>(null)
+  const onThumbPointerDown = React.useCallback(
+    (e: React.PointerEvent<HTMLSpanElement>) => {
+      e.preventDefault()
+      e.stopPropagation()
+      const target = e.currentTarget
+      const track = trackRef.current
+      if (!track) return
+      target.setPointerCapture(e.pointerId)
+      const trackRect = track.getBoundingClientRect()
+      const compute = (clientX: number) => {
+        const pct = Math.max(0, Math.min(1, (clientX - trackRect.left) / trackRect.width))
+        const next = Math.round(1 + pct * (maxLeverage - 1))
+        return Math.max(1, Math.min(maxLeverage, next))
+      }
+      const onMove = (ev: PointerEvent) => onLeverageChange(compute(ev.clientX))
+      const onUp = () => {
+        target.removeEventListener('pointermove', onMove)
+        target.removeEventListener('pointerup', onUp)
+        target.removeEventListener('pointercancel', onUp)
+      }
+      target.addEventListener('pointermove', onMove)
+      target.addEventListener('pointerup', onUp)
+      target.addEventListener('pointercancel', onUp)
+    },
+    [maxLeverage, onLeverageChange],
+  )
 
   return (
     <Root aria-label={`Simple bet panel · ${pair || symbol}`}>
@@ -905,6 +992,7 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                 </BetTokenButton>
               </BetInputWrap>
             </BetFieldRow>
+            {betError ? <BetErrorText role="alert">{betError}</BetErrorText> : null}
           </BetField>
 
           <PctRow>
@@ -937,30 +1025,31 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           </LevRow>
 
           <LevBar>
-          <LevTrack $fillPct={fillPct} $zone={zone} aria-hidden>
-            <LevFill $fillPct={fillPct} $zone={zone} $degen={leverage > 500} />
+          <LevTrack ref={trackRef} $fillPct={fillPct} $zone={zone} aria-hidden>
+            <LevFill $fillPct={fillPct} $zone={zone} $degen={degen} />
+            {/* Native input below the thumb still handles clicks on the
+                rest of the track + keyboard interaction. */}
+            <LevRangeInput
+              type="range"
+              min={1}
+              max={maxLeverage}
+              value={leverage}
+              onChange={(e) => onLeverageChange(Number(e.target.value))}
+              aria-label="Leverage"
+            />
             <LevThumb
               $fillPct={fillPct}
-              $variant={
-                leverage > 500 ? 'triple' : leverage > 250 ? 'double' : 'single'
-              }
+              $variant={degen ? 'triple' : double ? 'double' : 'single'}
+              onPointerDown={onThumbPointerDown}
             >
-              {leverage > 500 ? (
+              {degen ? (
                 <GrabberDegenGlyph />
-              ) : leverage > 250 ? (
+              ) : double ? (
                 <GrabberDoubleGlyph />
               ) : (
                 <GrabberGlyph />
               )}
             </LevThumb>
-            <LevRangeInput
-              type="range"
-              min={1}
-              max={MAX_LEVERAGE}
-              value={leverage}
-              onChange={(e) => onLeverageChange(Number(e.target.value))}
-              aria-label="Leverage"
-            />
           </LevTrack>
 
           <LevTabs role="tablist">
@@ -968,16 +1057,16 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
               <LevCustomInput
                 type="number"
                 min={1}
-                max={MAX_LEVERAGE}
+                max={maxLeverage}
                 value={leverage}
                 onChange={(e) =>
-                  onLeverageChange(Math.max(1, Math.min(MAX_LEVERAGE, Number(e.target.value) || 1)))
+                  onLeverageChange(Math.max(1, Math.min(maxLeverage, Number(e.target.value) || 1)))
                 }
                 aria-label="Custom leverage"
               />
               <LevCustomSuffix>x</LevCustomSuffix>
             </LevCustom>
-            {PRESETS.map((p) => (
+            {presets.map((p) => (
               <LevTab
                 key={p}
                 type="button"
