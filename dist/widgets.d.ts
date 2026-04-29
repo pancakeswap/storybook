@@ -569,6 +569,27 @@ export declare interface OrderFormProps {
     t?: (key: string, options?: Record<string, string | number | undefined>) => string;
 }
 
+export declare interface OrderHistoryRow {
+    /** Stable React key — typically the orderId. */
+    id: string | number;
+    /** Local date string, e.g. '2025-04-17'. */
+    date: string;
+    /** Local time string, e.g. '01:37:26'. */
+    time: string;
+    symbol: string;
+    side: 'BUY' | 'SELL';
+    /** Humanized order type, e.g. 'Limit', 'Stop Market (Reduce)'. */
+    type: string;
+    /** Pre-formatted price (or 'Market' / 'Market / Trig <price>'). */
+    price: string;
+    /** Pre-formatted original quantity. */
+    origQty: string;
+    /** Pre-formatted executed quantity. */
+    executedQty: string;
+    /** Wire status — 'FILLED' / 'CANCELED' / 'EXPIRED' / 'REJECTED' etc. */
+    status: string;
+}
+
 export declare type OrderSide = 'BUY' | 'SELL';
 
 declare type OrderSide_2 = 'BUY' | 'SELL';
@@ -993,6 +1014,8 @@ export declare interface PositionsPanelProps {
     onTabChange: (tab: PositionsPanelTab) => void;
     positions: PositionRow[];
     openOrders: OpenOrderRow[];
+    /** Past orders (filled / canceled / expired). */
+    orderHistory?: OrderHistoryRow[];
     /** Fills the user has executed (settled trades). */
     tradeHistory?: TradeHistoryRow[];
     /** Account ledger entries — funding, realized PnL, deposits, etc. */
