@@ -201,6 +201,22 @@ const TpSlCell = styled.div`
   gap: 0;
 `
 
+/** Small leverage chip rendered next to a position's symbol — purple
+ *  text on the tertiary surface (mirrors SymbolHeader's old LevPill). */
+const LevBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+  flex-shrink: 0;
+`
+
 const TpSlValue = styled.span<{ $kind: 'tp' | 'sl' }>`
   color: ${({ $kind, theme }) => ($kind === 'tp' ? theme.colors.success : theme.colors.failure)};
 `
@@ -321,7 +337,12 @@ const PositionTableRow: React.FC<{
 
   return (
     <>
-      <Td bold>{p.symbol}</Td>
+      <Td as="div" bold>
+        <Flex alignItems="center" style={{ gap: 6 }}>
+          <span>{p.symbol}</span>
+          <LevBadge>{p.leverage}x</LevBadge>
+        </Flex>
+      </Td>
       <Td style={{ color: side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
         {p.positionAmt}
       </Td>
