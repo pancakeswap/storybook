@@ -49,6 +49,7 @@ export type {
   PositionsPanelTab,
   PositionRow,
   OpenOrderRow,
+  OrderHistoryRow,
 } from './PositionsPanel'
 
 export { TpSlModal } from './TpSlModal'
