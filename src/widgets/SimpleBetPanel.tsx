@@ -4,6 +4,7 @@ import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
 import { AddIcon, HelpIcon, WalletFilledIcon } from '../primitives/Icons'
+import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel } from './primitives'
 
 /**
@@ -674,47 +675,10 @@ const ZonePillText = styled.span`
 `
 
 const ZoneTipAnchor = styled.span`
-  position: relative;
   display: inline-flex;
   align-items: center;
   color: #280D5F;
   cursor: help;
-`
-
-const ZoneTipBubble = styled.span`
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  width: 200px;
-  padding: 8px 12px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 12px;
-  background: #280D5F;
-  box-shadow:
-    0 1px 2px 0 rgba(0, 0, 0, 0.08),
-    0 4px 8px 0 rgba(0, 0, 0, 0.16);
-  color: #FFF;
-  font-feature-settings: 'liga' off;
-  font-family: Kanit;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 150%;
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.12s ease;
-  z-index: 10;
-  ${ZoneTipAnchor}:hover &,
-  ${ZoneTipAnchor}:focus-visible & {
-    opacity: 1;
-    visibility: visible;
-  }
 `
 
 // Hand-rolled leverage slider (the Slider primitive can't do a per-zone
@@ -1185,6 +1149,12 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   const upDisabled = !canSubmit || submitting
   const downDisabled = !canSubmit || submitting
 
+  // Hover tooltip on the leverage-zone info circle. Content text is
+  // zone-dependent — re-running the hook each render is fine, the
+  // returned `tooltip` ReactNode is stable for the same zone string.
+  const zoneTipText = zoneTooltip(zone)
+  const { targetRef: zoneTipTargetRef, tooltip: zoneTipNode } = useTooltip(zoneTipText, { placement: 'top' })
+
   // Custom thumb-drag handler. The native range input below the thumb
   // maps the click X coordinate to a value, so when the visual thumb
   // sits at fillPct≈1% (low leverage), clicking it lands the click at
@@ -1290,12 +1260,10 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                 <ZonePillText as="span" aria-hidden>{zoneEmoji(zone)}</ZonePillText>
               ) : null}
               <ZonePillText>{zoneLabel(zone)}</ZonePillText>
-              <ZoneTipAnchor tabIndex={0} aria-label={`${zoneLabel(zone)} explanation`}>
+              <ZoneTipAnchor ref={zoneTipTargetRef} aria-label={`${zoneLabel(zone)} explanation`}>
                 <InfoCircleGlyph />
-                {zoneTooltip(zone) ? (
-                  <ZoneTipBubble role="tooltip">{zoneTooltip(zone)}</ZoneTipBubble>
-                ) : null}
               </ZoneTipAnchor>
+              {zoneTipNode}
             </ZonePill>
           </LevRow>
 

@@ -166,6 +166,36 @@ The `src/widgets/*` components are presentation-only. The consumer (pancake-fron
 - Icon-only buttons must have `aria-label`.
 - Color-only state communication must have a text/icon fallback (e.g. a green/red dot is not enough — pair it with an explicit "Long" / "Short" label).
 
+### Tooltips — always use `useTooltip` from `src/hooks/useTooltip`
+
+Hover/click hint popovers go through the shared `useTooltip` hook (Radix-Popover-backed, themed via `theme.tooltip`). Do NOT write ad-hoc CSS-hover bubbles, custom `position: absolute` popups, or one-off Radix wiring per widget. The hook's API mirrors `@pancakeswap/uikit`'s `useTooltip` so call-site code is portable across this repo and pancake-frontend.
+
+**Canonical pattern:**
+
+```tsx
+import { useTooltip } from '../hooks/useTooltip'
+
+const { targetRef, tooltip } = useTooltip('Liquidation triggers around a 1% move.', {
+  placement: 'top', // 'top' | 'bottom' | 'left' | 'right' | 'top-start' | … | 'auto'
+})
+
+return (
+  <>
+    <InfoTrigger ref={targetRef} aria-label="High leverage explanation">
+      <InfoCircleGlyph />
+    </InfoTrigger>
+    {tooltip}
+  </>
+)
+```
+
+- Render `{tooltip}` once anywhere in the same parent. It self-portals to `#portal-root` (or `document.body`) — placement is anchored to the element captured by `targetRef`, not to where `{tooltip}` sits in the JSX.
+- `targetRef` is a callback ref (`(el: HTMLElement | null) => void`). It works on `styled.span` / `styled.button` etc. via the regular `ref` prop — styled-components 6 forwards refs by default. For non-DOM components that don't forward refs, wrap in a real element first.
+- **Default trigger** is `hover` on desktop, `click` on touch devices (auto-detected via `isTouchDevice()`). Override with `{ trigger: 'click' | 'focus' }` only when needed.
+- **Themed colors** — tooltip body and arrow read from `theme.tooltip.{background,text,boxShadow}`. To customize per-site (e.g. a dark-purple zone bubble that diverges from the default surface), pass styled JSX as `content` rather than rebuilding the popover machinery.
+
+**Gotcha for anyone editing the hook itself:** `Popover.Anchor` and `Popover.Content` MUST be siblings under `<Popover.Root>`. Radix's `Popover.Anchor` returns `null` when given a `virtualRef` and discards any children — so wrapping Content inside Anchor compiles, attaches listeners, flips `visible` on hover, and renders nothing. If a tooltip stops appearing on hover, check this first.
+
 ---
 
 ## PancakeSwap Design Language
