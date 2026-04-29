@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import './WalletPanel.css'
-import { Checkbox } from '../ui/components/Checkbox'
+import './WalletPanelCompact.css'
+import { Checkbox } from '../primitives/Checkbox'
 
 /* ── Types ─────────────────────────────────────────────────── */
 
@@ -45,7 +45,7 @@ export interface WalletData {
   }
 }
 
-export interface WalletPanelProps {
+export interface WalletPanelCompactProps {
   data?: WalletData
   initialTab?: TabKey
   initialTimeframe?: Timeframe
@@ -172,7 +172,7 @@ const BnbDiamond = ({ size = 16 }: { size?: number }) => (
 function PnLPill({ value, lg }: { value: number; lg?: boolean }) {
   const up = value >= 0
   return (
-    <span className={`wp-pnl ${up ? 'wp-pnl--up' : 'wp-pnl--down'}${lg ? ' wp-pnl--lg' : ''}`}>
+    <span className={`wpc-pnl ${up ? 'wpc-pnl--up' : 'wpc-pnl--down'}${lg ? ' wpc-pnl--lg' : ''}`}>
       {up ? <TriangleUp size={12} /> : <TriangleDown size={12} />}
       <span>{Math.abs(value).toFixed(2)}%</span>
     </span>
@@ -189,14 +189,14 @@ function TfToggle({
   options: { value: Timeframe; label: string }[]
 }) {
   return (
-    <div className="wp-tf" role="tablist">
+    <div className="wpc-tf" role="tablist">
       {options.map((o) => (
         <button
           key={o.value}
           type="button"
           role="tab"
           aria-selected={value === o.value}
-          className={`wp-tf-btn${value === o.value ? ' wp-tf-btn--active' : ''}`}
+          className={`wpc-tf-btn${value === o.value ? ' wpc-tf-btn--active' : ''}`}
           onClick={() => onChange(o.value)}
         >
           {o.label}
@@ -208,7 +208,7 @@ function TfToggle({
 
 function TokenCircle({ symbol, color }: { symbol: string; color: string }) {
   return (
-    <span className="wp-token-circle" style={{ background: color }}>
+    <span className="wpc-token-circle" style={{ background: color }}>
       {symbol.slice(0, 1)}
     </span>
   )
@@ -217,24 +217,24 @@ function TokenCircle({ symbol, color }: { symbol: string; color: string }) {
 function PositionRow({ p }: { p: PerpPosition }) {
   const up = p.pnlPct >= 0
   return (
-    <div className="wp-tk-row">
-      <span className="wp-tk-icon">
+    <div className="wpc-tk-row">
+      <span className="wpc-tk-icon">
         <TokenCircle symbol={p.symbol} color={p.color} />
       </span>
-      <div className="wp-tk-meta">
-        <div className="wp-tk-symbol">{p.symbol}</div>
-        <div className="wp-pos-detail">
-          <span className={`wp-pos-side wp-pos-side--${p.side.toLowerCase()}`}>{p.side}</span>
-          <span className="wp-pos-sep">•</span>
-          <span className="wp-pos-lev">{p.leverage}</span>
+      <div className="wpc-tk-meta">
+        <div className="wpc-tk-symbol">{p.symbol}</div>
+        <div className="wpc-pos-detail">
+          <span className={`wpc-pos-side wpc-pos-side--${p.side.toLowerCase()}`}>{p.side}</span>
+          <span className="wpc-pos-sep">•</span>
+          <span className="wpc-pos-lev">{p.leverage}</span>
         </div>
       </div>
-      <div className="wp-tk-right">
-        <span className="wp-pos-pnl">
+      <div className="wpc-tk-right">
+        <span className="wpc-pos-pnl">
           {p.pnlUsd >= 0 ? '+' : '-'}
           {fmtUsd(Math.abs(p.pnlUsd))}
         </span>
-        <span className={`wp-pnl wp-pnl--md ${up ? 'wp-pnl--up' : 'wp-pnl--down'}`}>
+        <span className={`wpc-pnl wpc-pnl--md ${up ? 'wpc-pnl--up' : 'wpc-pnl--down'}`}>
           {up ? <TriangleUp size={12} /> : <TriangleDown size={12} />}
           <span>{Math.abs(p.pnlPct).toFixed(1)}%</span>
         </span>
@@ -246,23 +246,23 @@ function PositionRow({ p }: { p: PerpPosition }) {
 function TokenRow({ tk }: { tk: SpotToken }) {
   const up = tk.pnl >= 0
   return (
-    <div className="wp-tk-row">
-      <span className="wp-tk-icon">
+    <div className="wpc-tk-row">
+      <span className="wpc-tk-icon">
         <TokenCircle symbol={tk.symbol} color={tk.color} />
-        <span className="wp-tk-network">
+        <span className="wpc-tk-network">
           <BnbDiamond size={11} />
         </span>
       </span>
-      <div className="wp-tk-meta">
-        <div className="wp-tk-line">
-          <span className="wp-tk-symbol">{tk.symbol}</span>
-          <span className="wp-tk-name">{tk.name}</span>
+      <div className="wpc-tk-meta">
+        <div className="wpc-tk-line">
+          <span className="wpc-tk-symbol">{tk.symbol}</span>
+          <span className="wpc-tk-name">{tk.name}</span>
         </div>
-        <div className="wp-tk-amount">{tk.amount}</div>
+        <div className="wpc-tk-amount">{tk.amount}</div>
       </div>
-      <div className="wp-tk-right">
-        <span className="wp-tk-value">{fmtUsdRound(tk.value)}</span>
-        <span className={`wp-pnl wp-pnl--md ${up ? 'wp-pnl--up' : 'wp-pnl--down'}`}>
+      <div className="wpc-tk-right">
+        <span className="wpc-tk-value">{fmtUsdRound(tk.value)}</span>
+        <span className={`wpc-pnl wpc-pnl--md ${up ? 'wpc-pnl--up' : 'wpc-pnl--down'}`}>
           {up ? <TriangleUp size={12} /> : <TriangleDown size={12} />}
           <span>{Math.abs(tk.pnl).toFixed(1)}%</span>
         </span>
@@ -291,8 +291,8 @@ function BucketCard({
   onToggle?: () => void
   hideSmall?: boolean
   setHideSmall?: (v: boolean) => void
-  onSpotAction?: WalletPanelProps['onSpotAction']
-  onPerpAction?: WalletPanelProps['onPerpAction']
+  onSpotAction?: WalletPanelCompactProps['onSpotAction']
+  onPerpAction?: WalletPanelCompactProps['onPerpAction']
 }) {
   const pnl = bucket.pnl[timeframe]
   const tokens =
@@ -303,55 +303,55 @@ function BucketCard({
       : bucket.positions
 
   return (
-    <div className={`wp-bucket${expanded ? ' wp-bucket--expanded' : ''}`}>
-      <div className="wp-bucket-row">
-        <div className="wp-bucket-left">
-          <div className="wp-bucket-icon" aria-hidden />
-          <div className="wp-bucket-meta">
-            <div className="wp-bucket-label">{bucket.label}</div>
-            <div className="wp-bucket-sub">{bucket.sublabel}</div>
+    <div className={`wpc-bucket${expanded ? ' wpc-bucket--expanded' : ''}`}>
+      <div className="wpc-bucket-row">
+        <div className="wpc-bucket-left">
+          <div className="wpc-bucket-icon" aria-hidden />
+          <div className="wpc-bucket-meta">
+            <div className="wpc-bucket-label">{bucket.label}</div>
+            <div className="wpc-bucket-sub">{bucket.sublabel}</div>
           </div>
         </div>
-        <div className="wp-bucket-right">
-          <div className="wp-bucket-amount-row">
-            <span className="wp-bucket-amount">{fmtUsd(bucket.amount)}</span>
-            <span className={`wp-pnl-flat ${pnl >= 0 ? 'wp-pnl-flat--up' : 'wp-pnl-flat--down'}`}>
+        <div className="wpc-bucket-right">
+          <div className="wpc-bucket-amount-row">
+            <span className="wpc-bucket-amount">{fmtUsd(bucket.amount)}</span>
+            <span className={`wpc-pnl-flat ${pnl >= 0 ? 'wpc-pnl-flat--up' : 'wpc-pnl-flat--down'}`}>
               {pnl >= 0 ? <TriangleUp size={12} /> : <TriangleDown size={12} />}
               <span>{Math.abs(pnl).toFixed(2)}%</span>
             </span>
           </div>
           <button
             type="button"
-            className={`wp-bucket-caret${expanded ? ' wp-bucket-caret--up' : ''}`}
+            className={`wpc-bucket-caret${expanded ? ' wpc-bucket-caret--up' : ''}`}
             aria-label={expanded ? 'Collapse' : 'Expand'}
             aria-expanded={expanded}
             disabled={!expandable}
             onClick={onToggle}
           >
-            <span className="wp-bucket-caret-icon">
+            <span className="wpc-bucket-caret-icon">
               <ArrowDropDown />
             </span>
           </button>
         </div>
       </div>
-      <div className="wp-track-row">
-        <div className="wp-track">
+      <div className="wpc-track-row">
+        <div className="wpc-track">
           <div
-            className={`wp-track-fill wp-track-fill--${bucket.key}`}
+            className={`wpc-track-fill wpc-track-fill--${bucket.key}`}
             style={{ width: `${pct}%` }}
           />
         </div>
-        <span className="wp-track-pct">{pct.toFixed(0)}%</span>
+        <span className="wpc-track-pct">{pct.toFixed(0)}%</span>
       </div>
 
       {expanded && (bucket.tokens || bucket.positions) && (
         <>
-          <div className="wp-divider" />
-          {bucket.description && <p className="wp-bucket-desc">{bucket.description}</p>}
-          <label className="wp-hide-small">
-            <div className="wp-hide-small-inner">
-              <span className="wp-hide-small-label">Hide small balances</span>
-              <span className="wp-hide-small-info" aria-hidden>
+          <div className="wpc-divider" />
+          {bucket.description && <p className="wpc-bucket-desc">{bucket.description}</p>}
+          <label className="wpc-hide-small">
+            <div className="wpc-hide-small-inner">
+              <span className="wpc-hide-small-label">Hide small balances</span>
+              <span className="wpc-hide-small-info" aria-hidden>
                 <InfoCircle size={16} />
               </span>
               <Checkbox
@@ -361,7 +361,7 @@ function BucketCard({
               />
             </div>
           </label>
-          <div className="wp-tk-list">
+          <div className="wpc-tk-list">
             {bucket.key === 'spot' && tokens?.map((tk, i) => (
               <TokenRow key={tk.symbol + i} tk={tk} />
             ))}
@@ -370,16 +370,16 @@ function BucketCard({
             ))}
           </div>
           {bucket.key === 'spot' && (
-            <div className="wp-actions">
-              <button type="button" className="wp-action-btn" onClick={() => onSpotAction?.('send')}>
+            <div className="wpc-actions">
+              <button type="button" className="wpc-action-btn" onClick={() => onSpotAction?.('send')}>
                 Send
               </button>
-              <button type="button" className="wp-action-btn" onClick={() => onSpotAction?.('receive')}>
+              <button type="button" className="wpc-action-btn" onClick={() => onSpotAction?.('receive')}>
                 Receive
               </button>
               <button
                 type="button"
-                className="wp-action-btn wp-action-btn--primary"
+                className="wpc-action-btn wpc-action-btn--primary"
                 onClick={() => onSpotAction?.('swap')}
               >
                 Swap
@@ -387,16 +387,16 @@ function BucketCard({
             </div>
           )}
           {bucket.key === 'perp' && (
-            <div className="wp-actions">
-              <button type="button" className="wp-action-btn" onClick={() => onPerpAction?.('deposit')}>
+            <div className="wpc-actions">
+              <button type="button" className="wpc-action-btn" onClick={() => onPerpAction?.('deposit')}>
                 Deposit
               </button>
-              <button type="button" className="wp-action-btn" onClick={() => onPerpAction?.('withdraw')}>
+              <button type="button" className="wpc-action-btn" onClick={() => onPerpAction?.('withdraw')}>
                 Withdraw
               </button>
               <button
                 type="button"
-                className="wp-action-btn wp-action-btn--primary"
+                className="wpc-action-btn wpc-action-btn--primary"
                 onClick={() => onPerpAction?.('manage')}
               >
                 Manage
@@ -411,7 +411,7 @@ function BucketCard({
 
 /* ── Main component ────────────────────────────────────────── */
 
-export function WalletPanel({
+export function WalletPanelCompact({
   data = DEFAULT_DATA,
   initialTab = 'assets',
   initialTimeframe = '24h',
@@ -419,7 +419,7 @@ export function WalletPanel({
   onBridge,
   onSpotAction,
   onPerpAction,
-}: WalletPanelProps) {
+}: WalletPanelCompactProps) {
   const [tab, setTab] = useState<TabKey>(initialTab)
   const [timeframe, setTimeframe] = useState<Timeframe>(initialTimeframe)
   const [expanded, setExpanded] = useState<'spot' | 'perp' | null>(initialExpanded)
@@ -454,27 +454,27 @@ export function WalletPanel({
   ]
 
   return (
-    <section className="wp-root" aria-label="Wallet">
+    <section className="wpc-root" aria-label="Wallet">
       {/* Header chips */}
-      <div className="wp-header">
-        <button type="button" className="wp-chip" aria-label="Wallet — all chains">
-          <span className="wp-chip-stack">
-            <span className="wp-chip-badge wp-chip-badge--light">
-              <span className="wp-chip-grid">
+      <div className="wpc-header">
+        <button type="button" className="wpc-chip" aria-label="Wallet — all chains">
+          <span className="wpc-chip-stack">
+            <span className="wpc-chip-badge wpc-chip-badge--light">
+              <span className="wpc-chip-grid">
                 <span style={{ background: '#F0B90B' }} />
                 <span style={{ background: '#627EEA' }} />
                 <span style={{ background: '#46557A' }} />
                 <span style={{ background: '#0052FF' }} />
               </span>
             </span>
-            <span className="wp-chip-badge wp-chip-badge--dark">
+            <span className="wpc-chip-badge wpc-chip-badge--dark">
               <BnbDiamond />
             </span>
           </span>
           <ChevronDown size={20} />
         </button>
-        <button type="button" className="wp-chip" aria-label="Select chain">
-          <span className="wp-chip-badge wp-chip-badge--dark">
+        <button type="button" className="wpc-chip" aria-label="Select chain">
+          <span className="wpc-chip-badge wpc-chip-badge--dark">
             <BnbDiamond />
           </span>
           <ChevronDown size={20} />
@@ -482,14 +482,14 @@ export function WalletPanel({
       </div>
 
       {/* Tabs */}
-      <div className="wp-tabs" role="tablist">
+      <div className="wpc-tabs" role="tablist">
         {tabs.map((tt) => (
           <button
             key={tt.value}
             type="button"
             role="tab"
             aria-selected={tab === tt.value}
-            className={`wp-tab${tab === tt.value ? ' wp-tab--active' : ''}`}
+            className={`wpc-tab${tab === tt.value ? ' wpc-tab--active' : ''}`}
             onClick={() => setTab(tt.value)}
           >
             {tt.label}
@@ -498,73 +498,74 @@ export function WalletPanel({
       </div>
 
       {/* Hero */}
-      <div className="wp-hero">
-        <div className="wp-hero-top">
-          <span className="wp-hero-title">My Wallet</span>
+      <div className="wpc-hero">
+        <div className="wpc-hero-top">
+          <span className="wpc-hero-title">My Wallet</span>
           <TfToggle value={timeframe} onChange={setTimeframe} options={tfOptions} />
         </div>
-        <div className="wp-hero-amount-row">
-          <span className="wp-hero-amount">
-            <span className="wp-hero-amount-int">{total.whole}</span>
-            <span className="wp-hero-amount-dec">{total.dec}</span>
+        <div className="wpc-hero-amount-row">
+          <span className="wpc-hero-amount">
+            <span className="wpc-hero-amount-int">{total.whole}</span>
+            <span className="wpc-hero-amount-dec">{total.dec}</span>
           </span>
           <PnLPill value={pnl} lg />
         </div>
-        <div className="wp-hero-sub">
-          <span className={pnl >= 0 ? 'wp-hero-sub-up' : 'wp-hero-sub-down'}>
+        <div className="wpc-hero-sub">
+          <span className={pnl >= 0 ? 'wpc-hero-sub-up' : 'wpc-hero-sub-down'}>
             {pnl >= 0 ? '+' : '-'}
             {fmtUsd(Math.abs(pnlDelta)).replace('-', '')}
           </span>
-          <span className="wp-hero-sub-rest">{` over the past ${tfLabel}`}</span>
+          <span className="wpc-hero-sub-rest">{` over the past ${tfLabel}`}</span>
         </div>
       </div>
 
-      {/* Composition */}
-      <div className="wp-comp">
-        <div className="wp-comp-bar">
-          <span className="wp-comp-seg wp-comp-seg--spot" />
-          <span className="wp-comp-seg wp-comp-seg--perp" />
+      {/* Overview wrapper: composition + buckets in a single bordered card */}
+      <div className="wpc-overview">
+        <div className="wpc-overview-section wpc-comp">
+          <div className="wpc-overview-title">Overview</div>
+          <div className="wpc-comp-bar">
+            <span className="wpc-comp-seg wpc-comp-seg--spot" />
+            <span className="wpc-comp-seg wpc-comp-seg--perp" />
+          </div>
+          <div className="wpc-comp-legend">
+            <span className="wpc-comp-leg-item">
+              <span className="wpc-comp-leg-dot wpc-comp-leg-dot--spot" />
+              <span className="wpc-comp-leg-label">Spot</span>
+              <span className="wpc-comp-leg-pct">{totals.spotPct.toFixed(0)}%</span>
+            </span>
+            <span className="wpc-comp-leg-item">
+              <span className="wpc-comp-leg-dot wpc-comp-leg-dot--perp" />
+              <span className="wpc-comp-leg-label">Perp</span>
+              <span className="wpc-comp-leg-pct">{totals.perpPct.toFixed(0)}%</span>
+            </span>
+          </div>
         </div>
-        <div className="wp-comp-legend">
-          <span className="wp-comp-leg-item">
-            <span className="wp-comp-leg-dot wp-comp-leg-dot--spot" />
-            <span className="wp-comp-leg-label">Spot</span>
-            <span className="wp-comp-leg-pct">{totals.spotPct.toFixed(0)}%</span>
-          </span>
-          <span className="wp-comp-leg-item">
-            <span className="wp-comp-leg-dot wp-comp-leg-dot--perp" />
-            <span className="wp-comp-leg-label">Perp</span>
-            <span className="wp-comp-leg-pct">{totals.perpPct.toFixed(0)}%</span>
-          </span>
-        </div>
+        <BucketCard
+          bucket={data.buckets.spot}
+          pct={totals.spotPct}
+          timeframe={timeframe}
+          expandable
+          expanded={expanded === 'spot'}
+          onToggle={() => setExpanded((e) => (e === 'spot' ? null : 'spot'))}
+          hideSmall={hideSmall}
+          setHideSmall={setHideSmall}
+          onSpotAction={onSpotAction}
+        />
+        <BucketCard
+          bucket={data.buckets.perp}
+          pct={totals.perpPct}
+          timeframe={timeframe}
+          expandable
+          expanded={expanded === 'perp'}
+          onToggle={() => setExpanded((e) => (e === 'perp' ? null : 'perp'))}
+          hideSmall={hideSmall}
+          setHideSmall={setHideSmall}
+          onPerpAction={onPerpAction}
+        />
       </div>
-
-      {/* Buckets */}
-      <BucketCard
-        bucket={data.buckets.spot}
-        pct={totals.spotPct}
-        timeframe={timeframe}
-        expandable
-        expanded={expanded === 'spot'}
-        onToggle={() => setExpanded((e) => (e === 'spot' ? null : 'spot'))}
-        hideSmall={hideSmall}
-        setHideSmall={setHideSmall}
-        onSpotAction={onSpotAction}
-      />
-      <BucketCard
-        bucket={data.buckets.perp}
-        pct={totals.perpPct}
-        timeframe={timeframe}
-        expandable
-        expanded={expanded === 'perp'}
-        onToggle={() => setExpanded((e) => (e === 'perp' ? null : 'perp'))}
-        hideSmall={hideSmall}
-        setHideSmall={setHideSmall}
-        onPerpAction={onPerpAction}
-      />
 
       {/* Bridge */}
-      <button type="button" className="wp-bridge" onClick={onBridge}>
+      <button type="button" className="wpc-bridge" onClick={onBridge}>
         Bridge Crypto
         <ArrowRight size={24} />
       </button>

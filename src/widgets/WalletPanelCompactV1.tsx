@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import './WalletPanelCompactV1.css'
-import { Checkbox } from '../ui/components/Checkbox'
+import { Checkbox } from '../primitives/Checkbox'
 import walletIcon from '../assets/wallet.png'
 import perpsChartIcon from '../assets/perps-chart.png'
 
