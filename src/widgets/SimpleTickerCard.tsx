@@ -46,6 +46,11 @@ const Card = styled.div`
   border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
   background: ${({ theme }) => theme.colors.card};
   font-variant-numeric: tabular-nums;
+
+  @media (max-width: 575.98px) {
+    padding: 16px;
+    gap: 8px;
+  }
 `
 
 const Left = styled.button`
@@ -60,6 +65,10 @@ const Left = styled.button`
   color: ${({ theme }) => theme.colors.text};
   text-align: left;
   flex-shrink: 0;
+
+  @media (max-width: 575.98px) {
+    flex: 1;
+  }
 `
 
 const TokenChip = styled.span`
@@ -74,6 +83,12 @@ const TokenChip = styled.span`
   font-size: 16px;
   font-weight: 700;
   flex-shrink: 0;
+
+  @media (max-width: 575.98px) {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
 `
 
 /* Fixed-size slot for a consumer-supplied icon (e.g. an img from
@@ -96,6 +111,12 @@ const TokenIconSlot = styled.span`
     object-fit: contain;
     display: block;
   }
+
+  @media (max-width: 575.98px) {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+  }
 `
 
 /* Chevron paired with the pair name to advertise the symbol-picker
@@ -111,6 +132,16 @@ const Meta = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
+
+  @media (max-width: 575.98px) {
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    & > :first-child {
+      flex: 1;
+    }
+  }
 `
 
 const NameRow = styled.span`
@@ -131,6 +162,13 @@ const PairDropdown = styled.span`
   border-bottom: 2px solid ${({ theme }) => theme.colors.inputSecondary};
   border-left: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
+
+  @media (max-width: 575.98px) {
+    height: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
 `
 
 const Name = styled.span`
@@ -146,6 +184,11 @@ const Name = styled.span`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
+
+  @media (max-width: 575.98px) {
+    font-size: 20px;
+    letter-spacing: -0.2px;
+  }
 `
 
 const PairArrowBox = styled.span`
@@ -155,6 +198,31 @@ const PairArrowBox = styled.span`
   justify-content: center;
   align-items: center;
   color: ${({ theme }) => theme.colors.textSubtle};
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
+`
+
+/* Standalone chevron button rendered to the right of the price at mobile.
+   Replaces the inline chevron inside PairDropdown — see Figma 378:8075. */
+const MobilePairChevron = styled.span`
+  display: none;
+
+  @media (max-width: 575.98px) {
+    display: inline-flex;
+    padding: 2px;
+    align-items: center;
+    gap: 4px;
+    border-radius: 8px;
+    border-top: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+    border-right: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+    border-bottom: 2px solid ${({ theme }) => theme.colors.inputSecondary};
+    border-left: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+    background: ${({ theme }) => theme.colors.input};
+    color: ${({ theme }) => theme.colors.textSubtle};
+    flex-shrink: 0;
+  }
 `
 
 const PriceRow = styled.span`
@@ -169,6 +237,16 @@ const Price = styled.span`
   letter-spacing: -0.32px;
   line-height: 1.2;
   color: ${({ theme }) => theme.colors.text};
+
+  @media (max-width: 575.98px) {
+    font-family: Kanit;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+    color: ${({ theme }) => theme.colors.text};
+  }
 `
 
 const Pnl = styled.span<{ $positive: boolean }>`
@@ -184,6 +262,10 @@ const Pnl = styled.span<{ $positive: boolean }>`
 
   html.dark & {
     background: ${({ $positive }) => ($positive ? '#0C3A32' : '#3E1C39')};
+  }
+
+  @media (max-width: 575.98px) {
+    display: none;
   }
 `
 
@@ -228,22 +310,55 @@ const StatsChevron = styled.span<{ $visible: boolean }>`
   transition: opacity 0.15s;
 `
 
-const Stat = styled.div`
+const Stat = styled.div<{ $hideOnLaptop?: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    display: ${({ $hideOnLaptop }) => ($hideOnLaptop ? 'none' : 'flex')};
+  }
+
+  @media (min-width: 576px) and (max-width: 967.98px) {
+    display: ${({ $hideOnLaptop }) => ($hideOnLaptop ? 'none' : 'flex')};
+  }
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
 `
 
 const StatLabel = styled.span`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.textSubtle};
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    color: ${({ theme }) => theme.colors.textSubtle};
+    font-feature-settings: 'liga' off;
+    font-family: Kanit;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%;
+  }
 `
 
 const StatValue = styled.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text};
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    color: ${({ theme }) => theme.colors.text};
+    font-feature-settings: 'liga' off;
+    font-family: Kanit;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 150%;
+    letter-spacing: -0.2px;
+  }
 `
 
 const TriangleUp: React.FC = () => (
@@ -554,6 +669,9 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
               {pricePnlPct.toFixed(2)}%
             </Pnl>
           </PriceRow>
+          <MobilePairChevron aria-hidden>
+            <PairArrowGlyph />
+          </MobilePairChevron>
         </Meta>
       </Left>
 
@@ -563,15 +681,15 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
             <StatLabel>24h Volume</StatLabel>
             <StatValue>{volume24h}</StatValue>
           </Stat>
-          <Stat>
+          <Stat $hideOnLaptop>
             <StatLabel>Open Interest</StatLabel>
             <StatValue>{openInterest}</StatValue>
           </Stat>
-          <Stat>
+          <Stat $hideOnLaptop>
             <StatLabel>Funding Rate</StatLabel>
             <StatValue>{fundingRate}</StatValue>
           </Stat>
-          <Stat>
+          <Stat $hideOnLaptop>
             <StatLabel>Next Funding</StatLabel>
             <StatValue>{nextFunding}</StatValue>
           </Stat>

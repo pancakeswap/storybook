@@ -117,6 +117,206 @@ const PositionsTable = styled.div`
   display: grid;
   grid-template-columns: 180px 1fr 1fr 1fr 1fr 1fr 1fr 56px;
   align-items: center;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    grid-template-columns: 180px 1fr 1fr 1fr 56px;
+  }
+
+  @media (max-width: 967.98px) {
+    display: none;
+  }
+`
+
+/* Tablet-only stacked card per position. Shows the same data as the
+   desktop grid but as a vertical card with header (icon + name + PnL),
+   divider, stat rows (Entry/Liq/Distance), and a full-width Close button.
+   Hidden on desktop and laptop. */
+const TabletPositionsList = styled.div`
+  display: none;
+
+  @media (max-width: 967.98px) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+`
+
+const TabletPositionCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  padding: 16px;
+  border-radius: 16px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  gap: 16px;
+`
+
+const TabletPositionHeader = styled.div`
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+`
+
+const TabletPositionTokenIcon = styled.span<{ $color: string }>`
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: ${({ $color }) => $color};
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-right: 12px;
+`
+
+const TabletPositionMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+`
+
+const TabletPositionSymbol = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+`
+
+const TabletPositionDirection = styled.span<{ $direction: SimplePositionDirection }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: ${({ $direction }) => ($direction === 'up' ? '#129E7D' : '#ED4B9E')};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  text-transform: uppercase;
+`
+
+const TabletPositionPnl = styled.span<{ $sign: 'positive' | 'negative' | 'zero' }>`
+  color: ${({ $sign, theme }) =>
+    $sign === 'positive' ? '#129E7D' : $sign === 'negative' ? '#ED4B9E' : theme.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`
+
+const TabletPositionDivider = styled.span`
+  display: block;
+  height: 1px;
+  align-self: stretch;
+  background: ${({ theme }) => theme.colors.cardBorder};
+`
+
+const TabletPositionStats = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: stretch;
+`
+
+const TabletPositionStatRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+`
+
+const TabletPositionStatLabel = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+`
+
+const TabletPositionStatValue = styled.span<{ $danger?: boolean; $safe?: boolean }>`
+  color: ${({ $danger, $safe, theme }) =>
+    $safe ? '#129E7D' : $danger ? '#ED4B9E' : theme.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`
+
+const TabletPositionLiqBar = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: stretch;
+`
+
+const TabletPositionLiqTrack = styled.div`
+  height: 12px;
+  align-self: stretch;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.input};
+  overflow: hidden;
+`
+
+const TabletPositionLiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
+  height: 100%;
+  width: ${({ $pct }) => `${Math.max(0, Math.min(100, $pct))}%`};
+  background: ${({ $status, theme }) =>
+    $status === 'safe'
+      ? theme.colors.success
+      : $status === 'warn'
+        ? theme.colors.warning
+        : theme.colors.failure};
+`
+
+const TabletPositionCloseBtn = styled.button`
+  display: flex;
+  height: 48px;
+  padding: 12px;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  border-radius: 16px;
+  border-top: 1px solid #ED4B9E;
+  border-right: 1px solid #ED4B9E;
+  border-bottom: 2px solid #ED4B9E;
+  border-left: 1px solid #ED4B9E;
+  background: transparent;
+  color: #ED4B9E;
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover { background: #FFF0F9; }
+`
+
+const HideOnLaptop = styled.div`
+  display: contents;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    display: none;
+  }
 `
 
 const OrdersTable = styled.div`
@@ -438,6 +638,55 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
         </Tab>
       </TabsRow>
 
+      {tab === 'positions' && positions.length > 0 && (
+        <TabletPositionsList>
+          {positions.map((row) => (
+            <TabletPositionCard key={`tablet-${row.id}`}>
+              <TabletPositionHeader>
+                {renderTokenIcon?.(row) ?? (
+                  <TabletPositionTokenIcon $color={row.iconColor ?? defaultIconColor(row.symbol)}>
+                    {row.symbol.slice(0, 1)}
+                  </TabletPositionTokenIcon>
+                )}
+                <TabletPositionMeta>
+                  <TabletPositionSymbol>{row.symbol}</TabletPositionSymbol>
+                  <TabletPositionDirection $direction={row.direction}>
+                    {directionLabel(row.direction)}
+                    {row.leverageText ? ` · ${row.leverageText}` : ''}
+                  </TabletPositionDirection>
+                </TabletPositionMeta>
+                <TabletPositionPnl $sign={row.pnlSign}>{row.unrealizedPnl}</TabletPositionPnl>
+              </TabletPositionHeader>
+              <TabletPositionDivider />
+              <TabletPositionStats>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Entry Price</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{row.entryPrice}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Liq Price</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{row.liqPrice}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionLiqBar>
+                  <TabletPositionStatRow>
+                    <TabletPositionStatLabel>Distance to Liq</TabletPositionStatLabel>
+                    <TabletPositionStatValue $safe={row.liqStatus === 'safe'} $danger={row.liqStatus === 'danger'}>
+                      {row.liqStatusLabel}
+                    </TabletPositionStatValue>
+                  </TabletPositionStatRow>
+                  <TabletPositionLiqTrack>
+                    <TabletPositionLiqFill $pct={row.liqDistancePct} $status={row.liqStatus} />
+                  </TabletPositionLiqTrack>
+                </TabletPositionLiqBar>
+              </TabletPositionStats>
+              <TabletPositionCloseBtn type="button" onClick={() => onClosePosition(row.id)}>
+                Close
+              </TabletPositionCloseBtn>
+            </TabletPositionCard>
+          ))}
+        </TabletPositionsList>
+      )}
+
       {tab === 'positions' &&
         (positions.length === 0 ? (
           <Empty>No open positions</Empty>
@@ -448,14 +697,16 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
               Unrealized PnL
               <SortBtn type="button" aria-label="Sort by unrealized PnL"><SortGlyph /></SortBtn>
             </Th>
-            <Th $align="right">
-              Initial Margin
-              <SortBtn type="button" aria-label="Sort by initial margin"><SortGlyph /></SortBtn>
-            </Th>
-            <Th $align="right">
-              Size (USD)
-              <SortBtn type="button" aria-label="Sort by size"><SortGlyph /></SortBtn>
-            </Th>
+            <HideOnLaptop>
+              <Th $align="right">
+                Initial Margin
+                <SortBtn type="button" aria-label="Sort by initial margin"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Size (USD)
+                <SortBtn type="button" aria-label="Sort by size"><SortGlyph /></SortBtn>
+              </Th>
+            </HideOnLaptop>
             <Th $align="right">
               Entry Price
               <SortBtn type="button" aria-label="Sort by entry price"><SortGlyph /></SortBtn>
@@ -464,10 +715,12 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
               Liq. Price
               <SortBtn type="button" aria-label="Sort by liq. price"><SortGlyph /></SortBtn>
             </Th>
-            <Th $align="right">
-              Distance to Liq
-              <SortBtn type="button" aria-label="Sort by distance to liq"><SortGlyph /></SortBtn>
-            </Th>
+            <HideOnLaptop>
+              <Th $align="right">
+                Distance to Liq
+                <SortBtn type="button" aria-label="Sort by distance to liq"><SortGlyph /></SortBtn>
+              </Th>
+            </HideOnLaptop>
             <Th />
             {positions.map((row) => (
               <React.Fragment key={row.id}>
@@ -491,21 +744,25 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
                   </TokenMeta>
                 </TokenCell>
                 <Pnl $sign={row.pnlSign}>{row.unrealizedPnl}</Pnl>
-                <MarginCell>
-                  {row.initialMargin}
-                  <MarginAddBtn type="button" aria-label="Add margin">
-                    <PlusCircleIcon />
-                  </MarginAddBtn>
-                </MarginCell>
-                <Td>{row.sizeUsd}</Td>
+                <HideOnLaptop>
+                  <MarginCell>
+                    {row.initialMargin}
+                    <MarginAddBtn type="button" aria-label="Add margin">
+                      <PlusCircleIcon />
+                    </MarginAddBtn>
+                  </MarginCell>
+                  <Td>{row.sizeUsd}</Td>
+                </HideOnLaptop>
                 <Td>{row.entryPrice}</Td>
                 <Td>{row.liqPrice}</Td>
-                <LiqDistance>
-                  <LiqTrack>
-                    <LiqFill $pct={row.liqDistancePct} $status={row.liqStatus} />
-                  </LiqTrack>
-                  <span>{row.liqStatusLabel}</span>
-                </LiqDistance>
+                <HideOnLaptop>
+                  <LiqDistance>
+                    <LiqTrack>
+                      <LiqFill $pct={row.liqDistancePct} $status={row.liqStatus} />
+                    </LiqTrack>
+                    <span>{row.liqStatusLabel}</span>
+                  </LiqDistance>
+                </HideOnLaptop>
                 <CloseBtn
                   type="button"
                   aria-label="Close position"

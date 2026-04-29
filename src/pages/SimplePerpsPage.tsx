@@ -83,6 +83,14 @@ const Logo = styled.div`
   margin-right: 32px;
 `
 
+/* Hide the "PancakeSwap" wordmark on tablet — only the bunny chip
+   remains, per Figma 375:7569. */
+const LogoText = styled.span`
+  @media (max-width: 967.98px) {
+    display: none;
+  }
+`
+
 const LogoBunny = styled.span`
   display: inline-flex;
   width: 24px;
@@ -148,6 +156,10 @@ const DepositPill = styled.button`
   font-weight: 600;
   cursor: pointer;
   &:hover { filter: brightness(1.05); }
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
 `
 
 const SettingsBtn = styled.button`
@@ -162,6 +174,10 @@ const SettingsBtn = styled.button`
   color: ${({ theme }) => theme.colors.textSubtle};
   cursor: pointer;
   &:hover { background: ${({ theme }) => theme.colors.input}; }
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
 `
 
 const WalletChip = styled.button`
@@ -192,11 +208,24 @@ const WalletAvatar = styled.span`
   font-size: 14px;
 `
 
+const WalletBalance = styled.span`
+  @media (max-width: 575.98px) {
+    display: none;
+  }
+`
+
 const Body = styled.div`
   display: flex;
   align-items: stretch;
   min-height: 0;
   flex: 1;
+
+  @media (max-width: 967.98px) {
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+    background: ${({ theme }) => theme.colors.background};
+  }
 `
 
 const LeftCol = styled.div`
@@ -211,6 +240,28 @@ const LeftCol = styled.div`
     ${({ theme }) => theme.colors.card} 0%,
     ${({ theme }) => theme.colors.input} 100%
   );
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    padding: 24px;
+  }
+
+  @media (max-width: 967.98px) {
+    display: contents;
+  }
+`
+
+/* On tablet, LeftCol uses display:contents so its children become direct
+   flex items of Body. Bet panel + positions are then siblings, and we
+   nudge positions to last via order so the order matches Figma:
+   ticker → chart → bet panel → positions. */
+const TabletPositionsWrapper = styled.div`
+  display: contents;
+
+  @media (max-width: 967.98px) {
+    display: block;
+    align-self: stretch;
+    order: 1;
+  }
 `
 
 /* ── Collateral picker modal (opens when + is clicked on My Perp Fund) ── */
@@ -689,7 +740,7 @@ const ModeBar: React.FC<{ onDeposit?: () => void }> = ({ onDeposit }) => (
   <ModeBarRoot>
     <Logo>
       <LogoBunny aria-hidden>🐰</LogoBunny>
-      PancakeSwap
+      <LogoText>PancakeSwap</LogoText>
     </Logo>
     <ModeToggle role="tablist" aria-label="Trading mode">
       <ModeTab type="button" role="tab" aria-selected $active>
@@ -711,7 +762,7 @@ const ModeBar: React.FC<{ onDeposit?: () => void }> = ({ onDeposit }) => (
       </SettingsBtn>
       <WalletChip type="button">
         <WalletAvatar aria-hidden>🦊</WalletAvatar>
-        $6,488.98
+        <WalletBalance>$6,488.98</WalletBalance>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
         </svg>
@@ -791,14 +842,16 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
             xTicks={X_TICKS}
           />
 
-          <SimplePositionsCard
-            tab={positionsTab}
-            onTabChange={setPositionsTab}
-            positions={SAMPLE_POSITIONS}
-            openOrders={[]}
-            historyEmpty
-            onClosePosition={() => undefined}
-          />
+          <TabletPositionsWrapper>
+            <SimplePositionsCard
+              tab={positionsTab}
+              onTabChange={setPositionsTab}
+              positions={SAMPLE_POSITIONS}
+              openOrders={[]}
+              historyEmpty
+              onClosePosition={() => undefined}
+            />
+          </TabletPositionsWrapper>
         </LeftCol>
 
         {/* Right column: UP/DOWN bet panel */}

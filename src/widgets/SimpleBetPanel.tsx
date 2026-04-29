@@ -198,6 +198,7 @@ const Root = styled(PerpsPanel)`
   background: ${({ theme }) => theme.colors.card};
   overflow: hidden;
   font-variant-numeric: tabular-nums;
+
   & > div {
     display: flex;
     padding: 0;
@@ -208,6 +209,19 @@ const Root = styled(PerpsPanel)`
     align-self: stretch;
     background: ${({ theme }) => theme.colors.card};
   }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    width: 357px;
+  }
+
+  @media (max-width: 967.98px) {
+    width: auto;
+    align-self: stretch;
+    border-radius: 24px;
+    & > div {
+      flex: 0 0 auto;
+    }
+  }
 `
 
 const TopCard = styled.div`
@@ -216,6 +230,14 @@ const TopCard = styled.div`
   flex-direction: column;
   align-self: stretch;
   padding: 24px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 575.98px) {
+    padding: 16px;
+  }
 `
 
 const UpDownCard = styled.div`
@@ -230,6 +252,22 @@ const UpDownCard = styled.div`
   border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
   border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
   background: ${({ theme }) => theme.colors.cardSecondary};
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    width: auto;
+    align-self: stretch;
+    border-radius: 16px;
+    border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+    border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+    border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+    border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+    background: ${({ theme }) => theme.colors.cardSecondary};
+  }
+
+  @media (max-width: 967.98px) {
+    width: auto;
+    align-self: stretch;
+  }
 `
 
 const UpDownCardActions = styled.div`
@@ -237,6 +275,11 @@ const UpDownCardActions = styled.div`
   gap: 8px;
   align-self: stretch;
   padding: 0;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    height: 56px;
+    align-items: center;
+  }
 `
 
 const TopCardInner = styled.div`
@@ -459,6 +502,12 @@ const BetInput = styled.input`
     -webkit-appearance: none;
     margin: 0;
   }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    color: ${({ theme }) => theme.colors.textSubtle};
+    font-size: 32px;
+    letter-spacing: -0.32px;
+  }
 `
 
 const BetTokenButton = styled.button`
@@ -633,6 +682,11 @@ const LevValue = styled.span`
   font-weight: 600;
   line-height: 120%;
   letter-spacing: -0.4px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    font-size: 32px;
+    letter-spacing: -0.32px;
+  }
 `
 
 const ZONE_BORDER: Record<Zone, string> = {
@@ -713,6 +767,7 @@ const LevBar = styled.div`
 const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   position: relative;
   height: 21px;
+  flex-shrink: 0;
   align-self: stretch;
   border-radius: 24px;
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
@@ -722,6 +777,10 @@ const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
 
   html.dark & {
     background: ${({ theme }) => theme.colors.backgroundBubblegum};
+  }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    height: 16px;
   }
 `
 
@@ -916,6 +975,10 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
   border-bottom: 4px solid rgba(0, 0, 0, 0.2);
   border-left: 2px solid rgba(0, 0, 0, 0.2);
   border-radius: 24px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    border-radius: 16px;
+  }
   font-family: Kanit;
   font-size: 24px;
   font-style: normal;
@@ -985,6 +1048,14 @@ const Bottom = styled.div`
   gap: 16px;
   padding: 24px;
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 575.98px) {
+    padding: 16px;
+  }
 `
 
 const PnlCard = styled(Flex)`
@@ -1029,6 +1100,12 @@ const PnlValue = styled.span`
   line-height: 120%;
   letter-spacing: -0.32px;
   font-variant-numeric: tabular-nums;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    font-size: 24px;
+    line-height: 150%;
+    letter-spacing: -0.24px;
+  }
 `
 
 // ── Bet asset selector ────────────────────────────────────
