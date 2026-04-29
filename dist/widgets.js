@@ -1176,13 +1176,20 @@ var Tt = A.div`
 	strokeWidth: "2",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ P("path", { d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z" })
-}), zt = (e) => e, Bt = ({ symbol: e, pairLabel: t, logoUrl: r, leverage: i, lastPrice: a, markPrice: o, indexPrice: s, fundingRate: c, nextFundingTime: l, change24h: u, volume24h: d, favorited: f = !1, onToggleFavorite: p, renderMarketsDropdown: m, t: h = zt }) => {
-	let g = M(), [_, v] = k(!1), [y, b] = k(null), x = O(null), S = O(null);
+}), zt = (e) => e, Bt = ({ symbol: e, pairLabel: t, logoUrl: r, leverage: i, lastPrice: a, markPrice: o, indexPrice: s, fundingRate: c, nextFundingTime: l, change24h: u, volume24h: d, favorited: f = !1, onToggleFavorite: p, renderMarketsDropdown: m, marketsOpen: h, onMarketsOpenChange: g, t: _ = zt }) => {
+	let v = M(), y = h !== void 0, [b, x] = k(!1), S = y ? h : b, T = C((e) => {
+		let t = typeof e == "function" ? e(S) : e;
+		y || x(t), g?.(t);
+	}, [
+		y,
+		S,
+		g
+	]), [D, A] = k(null), j = O(null), N = O(null);
 	E(() => {
-		if (!_ || !x.current) return;
+		if (!S || !j.current) return;
 		let e = () => {
-			let e = x.current.getBoundingClientRect();
-			b({
+			let e = j.current.getBoundingClientRect();
+			A({
 				top: e.bottom + 8,
 				left: e.left
 			});
@@ -1190,19 +1197,19 @@ var Tt = A.div`
 		return e(), window.addEventListener("resize", e), window.addEventListener("scroll", e, !0), () => {
 			window.removeEventListener("resize", e), window.removeEventListener("scroll", e, !0);
 		};
-	}, [_]), w(() => {
-		if (!_) return;
+	}, [S]), w(() => {
+		if (!S) return;
 		let e = (e) => {
 			let t = e.target;
-			x.current?.contains(t) || S.current?.contains(t) || v(!1);
+			j.current?.contains(t) || N.current?.contains(t) || T(!1);
 		}, t = (e) => {
-			e.key === "Escape" && v(!1);
+			e.key === "Escape" && T(!1);
 		};
 		return window.addEventListener("mousedown", e), window.addEventListener("keydown", t), () => {
 			window.removeEventListener("mousedown", e), window.removeEventListener("keydown", t);
 		};
-	}, [_]);
-	let T = C(() => v(!1), []), D = Number(c) < 0, A = Number(u) < 0;
+	}, [S]);
+	let I = C(() => T(!1), []), L = Number(c) < 0, R = Number(u) < 0;
 	return /* @__PURE__ */ F(_t, {
 		"aria-label": `${e} ticker`,
 		children: [
@@ -1210,15 +1217,15 @@ var Tt = A.div`
 				onClick: (e) => {
 					e.stopPropagation(), p();
 				},
-				"aria-label": h(f ? "Unfavorite" : "Favorite"),
+				"aria-label": _(f ? "Unfavorite" : "Favorite"),
 				"aria-pressed": f,
 				children: /* @__PURE__ */ P(Rt, {})
 			}), /* @__PURE__ */ F(yt, {
-				ref: x,
+				ref: j,
 				"aria-haspopup": "listbox",
-				"aria-expanded": _,
+				"aria-expanded": S,
 				disabled: !m,
-				onClick: () => m && v((e) => !e),
+				onClick: () => m && T((e) => !e),
 				children: [
 					/* @__PURE__ */ P(St, {
 						$bg: r ? "transparent" : "linear-gradient(180deg, #F7931A, #E8850C)",
@@ -1234,13 +1241,13 @@ var Tt = A.div`
 					})
 				]
 			})] }),
-			_ && y && typeof document < "u" && m ? ee(/* @__PURE__ */ P(bt, {
-				ref: S,
+			S && D && typeof document < "u" && m ? ee(/* @__PURE__ */ P(bt, {
+				ref: N,
 				style: {
-					top: y.top,
-					left: y.left
+					top: D.top,
+					left: D.left
 				},
-				children: m(T)
+				children: m(I)
 			}), document.body) : null,
 			/* @__PURE__ */ P(Tt, {
 				"aria-label": `Last price: ${a ?? ""}`,
@@ -1253,24 +1260,24 @@ var Tt = A.div`
 						role: "listitem",
 						children: [/* @__PURE__ */ P(Ot, {
 							$dashed: !0,
-							children: h("Mark")
+							children: _("Mark")
 						}), /* @__PURE__ */ P(kt, { children: o ?? "—" })]
 					}),
 					/* @__PURE__ */ F(Dt, {
 						role: "listitem",
 						children: [/* @__PURE__ */ P(Ot, {
 							$dashed: !0,
-							children: h("Index")
+							children: _("Index")
 						}), /* @__PURE__ */ P(kt, { children: s ?? "—" })]
 					}),
 					/* @__PURE__ */ F(Dt, {
 						role: "listitem",
 						children: [/* @__PURE__ */ P(Ot, {
 							$dashed: !0,
-							children: h("Funding / Countdown")
+							children: _("Funding / Countdown")
 						}), /* @__PURE__ */ F(At, { children: [
 							/* @__PURE__ */ P(jt, {
-								$negative: D,
+								$negative: L,
 								children: Nt(c)
 							}),
 							/* @__PURE__ */ P(Mt, { children: "/" }),
@@ -1282,14 +1289,14 @@ var Tt = A.div`
 					}),
 					/* @__PURE__ */ F(Dt, {
 						role: "listitem",
-						children: [/* @__PURE__ */ P(Ot, { children: h("24h Change") }), /* @__PURE__ */ P(kt, {
-							style: { color: u ? A ? g.colors.failure : g.colors.success : void 0 },
+						children: [/* @__PURE__ */ P(Ot, { children: _("24h Change") }), /* @__PURE__ */ P(kt, {
+							style: { color: u ? R ? v.colors.failure : v.colors.success : void 0 },
 							children: Pt(u)
 						})]
 					}),
 					/* @__PURE__ */ F(Dt, {
 						role: "listitem",
-						children: [/* @__PURE__ */ P(Ot, { children: h("24h Volume (USDT)") }), /* @__PURE__ */ P(kt, { children: It(d) })]
+						children: [/* @__PURE__ */ P(Ot, { children: _("24h Volume (USDT)") }), /* @__PURE__ */ P(kt, { children: It(d) })]
 					})
 				]
 			})

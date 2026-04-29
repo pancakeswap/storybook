@@ -1197,6 +1197,17 @@ export declare interface SymbolHeaderProps {
      * Omit to make the pair pill non-interactive (no dropdown).
      */
     renderMarketsDropdown?: (close: () => void) => default_2.ReactNode;
+    /**
+     * Controlled open state. Pass alongside `onMarketsOpenChange` to lift
+     * the dropdown's open/close lifecycle out of the widget — useful when
+     * the consumer needs a single source of truth (e.g. another markets
+     * trigger lives elsewhere on the page and would otherwise pop a
+     * second dropdown). When `marketsOpen` is omitted the widget falls
+     * back to its own `useState` for backward compatibility.
+     */
+    marketsOpen?: boolean;
+    /** Fired on every internal request to open / close the dropdown. */
+    onMarketsOpenChange?: (open: boolean) => void;
     /** Translator. */
     t?: (key: string) => string;
 }
