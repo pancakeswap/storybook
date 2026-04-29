@@ -1,5 +1,5 @@
 import React from 'react'
-import styled, { useTheme } from 'styled-components'
+import styled, { css, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
@@ -69,6 +69,27 @@ export interface TransactionHistoryRow {
   symbol: string
 }
 
+export interface OrderHistoryRow {
+  /** Stable React key — typically the orderId. */
+  id: string | number
+  /** Local date string, e.g. '2025-04-17'. */
+  date: string
+  /** Local time string, e.g. '01:37:26'. */
+  time: string
+  symbol: string
+  side: 'BUY' | 'SELL'
+  /** Humanized order type, e.g. 'Limit', 'Stop Market (Reduce)'. */
+  type: string
+  /** Pre-formatted price (or 'Market' / 'Market / Trig <price>'). */
+  price: string
+  /** Pre-formatted original quantity. */
+  origQty: string
+  /** Pre-formatted executed quantity. */
+  executedQty: string
+  /** Wire status — 'FILLED' / 'CANCELED' / 'EXPIRED' / 'REJECTED' etc. */
+  status: string
+}
+
 export type PositionsPanelTab =
   | 'positions'
   | 'orders'
@@ -82,6 +103,8 @@ export interface PositionsPanelProps {
   onTabChange: (tab: PositionsPanelTab) => void
   positions: PositionRow[]
   openOrders: OpenOrderRow[]
+  /** Past orders (filled / canceled / expired). */
+  orderHistory?: OrderHistoryRow[]
   /** Fills the user has executed (settled trades). */
   tradeHistory?: TradeHistoryRow[]
   /** Account ledger entries — funding, realized PnL, deposits, etc. */
@@ -201,6 +224,22 @@ const TpSlCell = styled.div`
   gap: 0;
 `
 
+/** Small leverage chip rendered next to a position's symbol — purple
+ *  text on the tertiary surface (mirrors SymbolHeader's old LevPill). */
+const LevBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.secondary};
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0;
+  flex-shrink: 0;
+`
+
 const TpSlValue = styled.span<{ $kind: 'tp' | 'sl' }>`
   color: ${({ $kind, theme }) => ($kind === 'tp' ? theme.colors.success : theme.colors.failure)};
 `
@@ -218,6 +257,17 @@ const OrdersTable = styled.div`
   }
 `
 
+/* Shared scroll mixin for the history tabs. Without this each history
+ * table grew to fit every row — a 100-entry history pushed the whole
+ * page-bottom panel below the fold. The grid stays intact (rather than
+ * splitting headers + body into separate scroll containers, which
+ * would desync column widths) and `Th` cells use `position: sticky`
+ * so the header row anchors to the top while rows scroll under it. */
+const historyTableScroll = css`
+  max-height: 360px;
+  overflow-y: auto;
+`
+
 const TradesTable = styled.div`
   display: grid;
   grid-template-columns: 148px 156px 1fr 1fr 1fr 1fr;
@@ -227,6 +277,7 @@ const TradesTable = styled.div`
   & > * {
     padding: 16px 12px;
   }
+  ${historyTableScroll}
 `
 
 const TxTable = styled.div`
@@ -238,6 +289,19 @@ const TxTable = styled.div`
   & > * {
     padding: 16px 12px;
   }
+  ${historyTableScroll}
+`
+
+const OrderHistoryTable = styled.div`
+  display: grid;
+  grid-template-columns: 148px 156px minmax(min-content, 0.6fr) repeat(5, minmax(min-content, 1fr));
+  column-gap: 0;
+  row-gap: 6px;
+  font-variant-numeric: tabular-nums;
+  & > * {
+    padding: 16px 12px;
+  }
+  ${historyTableScroll}
 `
 
 /** Stacked date / time cell — the figma renders these on two lines. */
@@ -277,6 +341,14 @@ const ShareBtn = styled.button`
 const Th = styled(Text).attrs({ fontSize: '10px', color: 'textSubtle' })`
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  /* Anchor the header row when the history tables overflow + scroll.
+     position: sticky is a no-op when the parent doesn't scroll, so
+     this is also safe on the Positions / Open Orders tables (which
+     don't use the scroll mixin today). */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: ${({ theme }) => theme.colors.card};
 `
 
 const Td = styled(Text).attrs({ fontSize: '14px' })`
@@ -321,7 +393,12 @@ const PositionTableRow: React.FC<{
 
   return (
     <>
-      <Td bold>{p.symbol}</Td>
+      <Td as="div" bold>
+        <Flex alignItems="center" style={{ gap: 6 }}>
+          <span>{p.symbol}</span>
+          <LevBadge>{p.leverage}x</LevBadge>
+        </Flex>
+      </Td>
       <Td style={{ color: side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
         {p.positionAmt}
       </Td>
@@ -377,6 +454,7 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
   onTabChange,
   positions,
   openOrders,
+  orderHistory = [],
   tradeHistory = [],
   transactionHistory = [],
   onShareTrade,
@@ -402,7 +480,9 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
         <UnderlineTab>
           {t('Open Orders')} ({openOrders.length})
         </UnderlineTab>
-        <UnderlineTab>{t('Order History')}</UnderlineTab>
+        <UnderlineTab>
+          {t('Order History')} ({orderHistory.length})
+        </UnderlineTab>
         <UnderlineTab>
           {t('Trade History')} ({tradeHistory.length})
         </UnderlineTab>
@@ -493,13 +573,44 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
             </OrdersTable>
           ))}
 
-        {tab === 'history' && (
-          <Empty>
-            <Text fontSize="12px" color="textSubtle">
-              {t('Order history coming soon')}
-            </Text>
-          </Empty>
-        )}
+        {tab === 'history' &&
+          (orderHistory.length === 0 ? (
+            <Empty>
+              <Text fontSize="12px" color="textSubtle">
+                {t('No order history')}
+              </Text>
+            </Empty>
+          ) : (
+            <OrderHistoryTable>
+              <Th>{t('Time')}</Th>
+              <Th>{t('Symbol')}</Th>
+              <Th>{t('Side')}</Th>
+              <Th>{t('Type')}</Th>
+              <Th>{t('Price')}</Th>
+              <Th>{t('Size')}</Th>
+              <Th>{t('Filled')}</Th>
+              <Th>{t('Status')}</Th>
+              {orderHistory.map((o) => (
+                <RowGroup key={o.id}>
+                  <Td as="div">
+                    <StackedTime>
+                      <span>{o.date}</span>
+                      <span>{o.time}</span>
+                    </StackedTime>
+                  </Td>
+                  <Td bold>{o.symbol}</Td>
+                  <Td style={{ color: o.side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
+                    {o.side}
+                  </Td>
+                  <Td>{o.type}</Td>
+                  <Td>{o.price}</Td>
+                  <Td>{o.origQty}</Td>
+                  <Td>{o.executedQty}</Td>
+                  <Td>{o.status}</Td>
+                </RowGroup>
+              ))}
+            </OrderHistoryTable>
+          ))}
 
         {tab === 'trades' &&
           (tradeHistory.length === 0 ? (

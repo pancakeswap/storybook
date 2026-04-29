@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
-import { BunnySlider } from './BunnySlider'
+import { Slider } from '../primitives/Slider'
 import { Text } from '../primitives/Text'
 import Modal from '../primitives/Modal/Modal'
 import { ModalV2 } from '../primitives/Modal/ModalV2'
@@ -134,9 +134,15 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
             </StepButton>
           </Stepper>
 
-          <BunnySlider
+          <Slider
+            variant="dotted"
             name="perp-leverage"
-            min={minLeverage}
+            // min={0} (not minLeverage) so the default 4 stops land on
+            // round values: max=200 → 1/50/100/150/200, max=100 →
+            // 1/25/50/75/100. The leftmost stop sends 0 to
+            // onValueChanged; `clamp` lifts that to `minLeverage` so the
+            // user-facing minimum is still 1.
+            min={0}
             max={maxLeverage}
             value={value}
             onValueChanged={(v) => setValue(clamp(v))}

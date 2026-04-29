@@ -82,3 +82,6 @@ export * from './primitives/Icons'
 
 // ── Contexts / hooks ──────────────────────────────────────────
 export { useMatchBreakpoints, MatchBreakpointsProvider } from './contexts'
+
+export { useTooltip, StyledTooltipContent, StyledTooltipArrow } from './hooks/useTooltip'
+export type { Placement, TooltipOptions, TooltipRefs, TriggerType } from './hooks/useTooltip'

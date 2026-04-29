@@ -49,6 +49,18 @@ export interface SymbolHeaderProps {
    */
   renderMarketsDropdown?: (close: () => void) => React.ReactNode
 
+  /**
+   * Controlled open state. Pass alongside `onMarketsOpenChange` to lift
+   * the dropdown's open/close lifecycle out of the widget — useful when
+   * the consumer needs a single source of truth (e.g. another markets
+   * trigger lives elsewhere on the page and would otherwise pop a
+   * second dropdown). When `marketsOpen` is omitted the widget falls
+   * back to its own `useState` for backward compatibility.
+   */
+  marketsOpen?: boolean
+  /** Fired on every internal request to open / close the dropdown. */
+  onMarketsOpenChange?: (open: boolean) => void
+
   /** Translator. */
   t?: (key: string) => string
 }
@@ -290,10 +302,26 @@ export const SymbolHeader: React.FC<SymbolHeaderProps> = ({
   favorited = false,
   onToggleFavorite,
   renderMarketsDropdown,
+  marketsOpen,
+  onMarketsOpenChange,
   t = identity,
 }) => {
   const theme = useTheme()
-  const [open, setOpen] = useState(false)
+  // Controlled when the consumer provides `marketsOpen`; otherwise fall
+  // back to local state so existing call sites (no controlled prop) keep
+  // working. `setOpen` writes to whichever side is active so the rest of
+  // the component reads `open` uniformly.
+  const isControlled = marketsOpen !== undefined
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = isControlled ? marketsOpen : internalOpen
+  const setOpen = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)) => {
+      const nextOpen = typeof next === 'function' ? next(open) : next
+      if (!isControlled) setInternalOpen(nextOpen)
+      onMarketsOpenChange?.(nextOpen)
+    },
+    [isControlled, open, onMarketsOpenChange],
+  )
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
