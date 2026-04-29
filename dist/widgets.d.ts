@@ -557,8 +557,15 @@ export declare interface OrderFormProps {
     hasAddress?: boolean;
     /** Consumer renders its classified error here (e.g. PerpsErrorMessage). */
     errorSlot?: default_2.ReactNode;
-    /** Click submit — consumer routes via canSubmit (place order) or shows the deposit/auth modals. */
-    onSubmit: () => void;
+    /**
+     * Click submit — consumer routes via canSubmit (place order) or shows
+     * the deposit/auth modals. Mobile renders two CTAs (Buy / Sell) that
+     * pass `sideOverride` so the consumer doesn't have to wait for the
+     * `draft.side` state update to flush before placing the order.
+     */
+    onSubmit: (opts?: {
+        sideOverride?: OrderSide_2;
+    }) => void;
     /** Open the leverage adjuster modal. */
     onLeverageClick: () => void;
     /** Toggle margin mode (consumer fires the signed setMarginType call). */
@@ -567,6 +574,27 @@ export declare interface OrderFormProps {
     onDepositClick: () => void;
     /** Translator. */
     t?: (key: string, options?: Record<string, string | number | undefined>) => string;
+}
+
+export declare interface OrderHistoryRow {
+    /** Stable React key — typically the orderId. */
+    id: string | number;
+    /** Local date string, e.g. '2025-04-17'. */
+    date: string;
+    /** Local time string, e.g. '01:37:26'. */
+    time: string;
+    symbol: string;
+    side: 'BUY' | 'SELL';
+    /** Humanized order type, e.g. 'Limit', 'Stop Market (Reduce)'. */
+    type: string;
+    /** Pre-formatted price (or 'Market' / 'Market / Trig <price>'). */
+    price: string;
+    /** Pre-formatted original quantity. */
+    origQty: string;
+    /** Pre-formatted executed quantity. */
+    executedQty: string;
+    /** Wire status — 'FILLED' / 'CANCELED' / 'EXPIRED' / 'REJECTED' etc. */
+    status: string;
 }
 
 export declare type OrderSide = 'BUY' | 'SELL';
@@ -993,6 +1021,8 @@ export declare interface PositionsPanelProps {
     onTabChange: (tab: PositionsPanelTab) => void;
     positions: PositionRow[];
     openOrders: OpenOrderRow[];
+    /** Past orders (filled / canceled / expired). */
+    orderHistory?: OrderHistoryRow[];
     /** Fills the user has executed (settled trades). */
     tradeHistory?: TradeHistoryRow[];
     /** Account ledger entries — funding, realized PnL, deposits, etc. */
@@ -1167,6 +1197,17 @@ export declare interface SymbolHeaderProps {
      * Omit to make the pair pill non-interactive (no dropdown).
      */
     renderMarketsDropdown?: (close: () => void) => default_2.ReactNode;
+    /**
+     * Controlled open state. Pass alongside `onMarketsOpenChange` to lift
+     * the dropdown's open/close lifecycle out of the widget — useful when
+     * the consumer needs a single source of truth (e.g. another markets
+     * trigger lives elsewhere on the page and would otherwise pop a
+     * second dropdown). When `marketsOpen` is omitted the widget falls
+     * back to its own `useState` for backward compatibility.
+     */
+    marketsOpen?: boolean;
+    /** Fired on every internal request to open / close the dropdown. */
+    onMarketsOpenChange?: (open: boolean) => void;
     /** Translator. */
     t?: (key: string) => string;
 }
@@ -1217,7 +1258,7 @@ export declare interface TpSlModalProps {
     t?: (key: string) => string;
 }
 
-declare interface TradeHistoryRow {
+export declare interface TradeHistoryRow {
     /** Stable React key — typically the tradeId. */
     id: string | number;
     /** Local date string, e.g. '2025-04-17'. */
@@ -1236,7 +1277,7 @@ declare interface TradeHistoryRow {
     realizedProfit: string;
 }
 
-declare interface TransactionHistoryRow {
+export declare interface TransactionHistoryRow {
     /** Stable React key — typically the txId. */
     id: string | number;
     date: string;
