@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
@@ -53,6 +53,17 @@ export interface SimpleBetPanelProps {
   presets?: readonly number[]
   quoteAsset: string
   onQuoteAssetClick?: () => void
+  /**
+   * Optional list of denomination choices for the bet input — when
+   * provided with more than one entry, clicking the chip opens a
+   * dropdown rather than just firing `onQuoteAssetClick`. Use this to
+   * let the user denominate their bet in either the quote asset (USDT)
+   * or the base asset (BTC). The currently-selected `code` should match
+   * `quoteAsset`.
+   */
+  assetOptions?: readonly { code: string; logoUrl?: string; color?: string }[]
+  /** Fired when the user picks a different denomination from the dropdown. */
+  onAssetChange?: (next: string) => void
 
   // ── Fund display + actions ───────────────────────────────
   fundBalanceText: string
@@ -446,6 +457,17 @@ const QuoteIcon = styled.span`
   font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
+  overflow: hidden;
+  /* When the chip wraps a consumer-supplied logo image, fit it inside
+     the circle. Without this the raster either overflows or stretches. */
+  & > img,
+  & > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #fff;
+  }
 `
 
 const QuoteArrowBox = styled.span`
@@ -464,6 +486,68 @@ const QuoteArrowBox = styled.span`
   background: ${({ theme }) => theme.colors.card};
   color: ${({ theme }) => theme.colors.textSubtle};
   flex-shrink: 0;
+`
+
+/* Wrapper that anchors the asset-dropdown menu to the chip button. */
+const AssetDropdownAnchor = styled.span`
+  position: relative;
+  display: inline-flex;
+`
+
+const AssetDropdownMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.card};
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+`
+
+const AssetDropdownItem = styled.button<{ $selected?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: ${({ $selected, theme }) => ($selected ? theme.colors.input : 'transparent')};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  &:hover {
+    background: ${({ theme }) => theme.colors.input};
+  }
+`
+
+const AssetItemChip = styled.span<{ $color?: string }>`
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: ${({ $color }) => $color ?? '#26a17b'};
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex: 0 0 24px;
+  overflow: hidden;
+  & > img,
+  & > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
 `
 
 const QuoteSym = styled.span`
@@ -874,6 +958,98 @@ const PnlValue = styled.span`
   font-variant-numeric: tabular-nums;
 `
 
+// ── Bet asset selector ────────────────────────────────────
+
+interface BetAssetSelectorProps {
+  selected: string
+  options?: readonly { code: string; logoUrl?: string; color?: string }[]
+  onSelect?: (next: string) => void
+  /** Used when no `options` (or only one) — restores the legacy chip-as-button behavior. */
+  onClickFallback?: () => void
+}
+
+const BetAssetSelector: React.FC<BetAssetSelectorProps> = ({
+  selected,
+  options,
+  onSelect,
+  onClickFallback,
+}) => {
+  const [open, setOpen] = useState(false)
+  const anchorRef = useRef<HTMLSpanElement | null>(null)
+
+  // Close on outside click / Escape so the menu doesn't strand if the
+  // user clicks elsewhere in the panel without picking an option.
+  useEffect(() => {
+    if (!open) return undefined
+    const onDown = (e: MouseEvent) => {
+      if (!anchorRef.current) return
+      if (!anchorRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const hasDropdown = !!options && options.length > 1
+  const selectedOption = options?.find((o) => o.code === selected)
+  const handleClick = () => {
+    if (hasDropdown) {
+      setOpen((v) => !v)
+    } else {
+      onClickFallback?.()
+    }
+  }
+
+  return (
+    <AssetDropdownAnchor ref={anchorRef}>
+      <BetTokenButton type="button" onClick={handleClick} aria-label="Choose bet denomination">
+        <QuoteIcon>
+          {selectedOption?.logoUrl ? (
+            <img src={selectedOption.logoUrl} alt={selected} loading="lazy" decoding="async" />
+          ) : (
+            selected
+          )}
+        </QuoteIcon>
+        <QuoteArrowBox>
+          <ArrowDropDownGlyph />
+        </QuoteArrowBox>
+      </BetTokenButton>
+      {hasDropdown && open ? (
+        <AssetDropdownMenu role="menu">
+          {options!.map((opt) => (
+            <AssetDropdownItem
+              key={opt.code}
+              type="button"
+              role="menuitemradio"
+              aria-checked={opt.code === selected}
+              $selected={opt.code === selected}
+              onClick={() => {
+                onSelect?.(opt.code)
+                setOpen(false)
+              }}
+            >
+              <AssetItemChip $color={opt.color}>
+                {opt.logoUrl ? (
+                  <img src={opt.logoUrl} alt={opt.code} loading="lazy" decoding="async" />
+                ) : (
+                  opt.code.slice(0, 1)
+                )}
+              </AssetItemChip>
+              {opt.code}
+            </AssetDropdownItem>
+          ))}
+        </AssetDropdownMenu>
+      ) : null}
+    </AssetDropdownAnchor>
+  )
+}
+
 // ── Component ─────────────────────────────────────────────
 
 export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
@@ -892,6 +1068,8 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   presets = DEFAULT_PRESETS,
   quoteAsset,
   onQuoteAssetClick,
+  assetOptions,
+  onAssetChange,
   fundBalanceText,
   onTopUpFund,
   onPercentClick,
@@ -984,12 +1162,12 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                   aria-label="Bet amount"
                   placeholder="0"
                 />
-                <BetTokenButton type="button" onClick={onQuoteAssetClick} aria-label="Choose quote asset">
-                  <QuoteIcon>{quoteAsset}</QuoteIcon>
-                  <QuoteArrowBox>
-                    <ArrowDropDownGlyph />
-                  </QuoteArrowBox>
-                </BetTokenButton>
+                <BetAssetSelector
+                  selected={quoteAsset}
+                  options={assetOptions}
+                  onSelect={onAssetChange}
+                  onClickFallback={onQuoteAssetClick}
+                />
               </BetInputWrap>
             </BetFieldRow>
             {betError ? <BetErrorText role="alert">{betError}</BetErrorText> : null}

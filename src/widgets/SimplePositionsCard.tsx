@@ -112,16 +112,20 @@ const OrdersTable = styled.div`
 `
 
 const Th = styled.div`
-  padding: 16px;
+  padding: 16px 10px;
   font-size: 12px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.textSubtle};
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  /* "Distance to Liq" / "Unrealized PnL" wrap on narrow viewports without
+     this — keep header copy on one line and let the table reclaim space
+     via the trimmed horizontal padding above. */
+  white-space: nowrap;
 `
 
 const Td = styled.div`
-  padding: 16px;
+  padding: 16px 10px;
   font-size: 14px;
   color: ${({ theme }) => theme.colors.text};
   font-variant-numeric: tabular-nums;
@@ -131,6 +135,25 @@ const TokenCell = styled(Td)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  /* Pin the icon slot at 40×40 with flex-shrink 0 so the default
+     TokenIcon chip OR a consumer-supplied image element via
+     renderTokenIcon can't stretch when the cell gets narrow. Without
+     this, a raw image from renderTokenIcon grows with flex 1 1 auto
+     and distorts the artwork. */
+  & > :first-child {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+  }
+  /* Constrain raster icons specifically so they keep aspect ratio
+     regardless of source dimensions. */
+  & > :first-child img,
+  & > :first-child svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
 `
 
 const TokenIcon = styled.span<{ $color: string }>`
@@ -176,7 +199,11 @@ const DirectionPill = styled(Td)<{ $direction: SimplePositionDirection }>`
   font-size: 14px;
   font-weight: 600;
   width: fit-content;
-  margin: 16px;
+  margin: 16px 10px;
+  /* "Up/Long" / "Down/Short" must stay on one line — without this the
+     glyph and label wrap into two lines on narrow grids and the pill
+     visually breaks. */
+  white-space: nowrap;
 `
 
 const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
@@ -223,7 +250,7 @@ const CloseBtn = styled.button`
   justify-content: center;
   width: 32px;
   height: 32px;
-  margin: 16px 12px;
+  margin: 16px 10px;
   padding: 0;
   border: 0;
   border-radius: 8px;
@@ -330,9 +357,12 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
             {positions.map((row) => (
               <React.Fragment key={row.id}>
                 <TokenCell>
-                  {renderTokenIcon ? (
-                    renderTokenIcon(row)
-                  ) : (
+                  {/* Returning null/undefined from `renderTokenIcon` defers
+                      to the default colored-letter chip — lets consumers
+                      wire in a logo lookup that may not have an entry for
+                      every symbol (e.g. brand-new listings before Aster's
+                      logo CDN updates). */}
+                  {renderTokenIcon?.(row) ?? (
                     <TokenIcon $color={row.iconColor ?? defaultIconColor(row.symbol)}>
                       {row.symbol.slice(0, 1)}
                     </TokenIcon>

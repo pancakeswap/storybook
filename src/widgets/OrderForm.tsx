@@ -7,7 +7,9 @@ import { Checkbox } from '../primitives/Checkbox'
 import { Input } from '../primitives/Input'
 import Slider from '../primitives/Slider/Slider'
 import { Text } from '../primitives/Text'
-import { AddIcon } from '../primitives/Icons'
+import { AddIcon, ChevronDownIcon, InfoIcon } from '../primitives/Icons'
+import { useMatchBreakpoints } from '../contexts'
+import { BunnySlider } from './BunnySlider'
 import { PerpsPanel } from './primitives'
 
 export type OrderSide = 'BUY' | 'SELL'
@@ -91,8 +93,13 @@ export interface OrderFormProps {
   errorSlot?: React.ReactNode
 
   // ── Actions ───────────────────────────────────────────────
-  /** Click submit — consumer routes via canSubmit (place order) or shows the deposit/auth modals. */
-  onSubmit: () => void
+  /**
+   * Click submit — consumer routes via canSubmit (place order) or shows
+   * the deposit/auth modals. Mobile renders two CTAs (Buy / Sell) that
+   * pass `sideOverride` so the consumer doesn't have to wait for the
+   * `draft.side` state update to flush before placing the order.
+   */
+  onSubmit: (opts?: { sideOverride?: OrderSide }) => void
   /** Open the leverage adjuster modal. */
   onLeverageClick: () => void
   /** Toggle margin mode (consumer fires the signed setMarginType call). */
@@ -428,6 +435,477 @@ const defaultT = (
   return Object.entries(options).reduce((acc, [k, v]) => acc.split(`%${k}%`).join(String(v)), key)
 }
 
+// ── Mobile-specific styled bits ─────────────────────────────
+//
+// Mobile layout follows the prototype in `src/pages/MobilePerpsPage.tsx`
+// (`OrderPanelCol`) but rebuilt with styled-components so the widget
+// stays self-contained. Visual targets in `MobilePerpsPage.css#mp-op-*`.
+
+const MBody = styled(Flex)`
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+`
+
+const MPillRow = styled(Flex)`
+  gap: 6px;
+`
+
+const MPill = styled.button`
+  flex: 1;
+  background: ${({ theme }) => theme.colors.input};
+  border: 0;
+  border-radius: 10px;
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  height: 38px;
+  cursor: pointer;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`
+
+const MTypeSelect = styled.button`
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  background: ${({ theme }) => theme.colors.input};
+  border: 0;
+  border-radius: 10px;
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+`
+
+const MTypeSelectLabel = styled.span`
+  text-align: center;
+`
+
+const MInputRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  background: ${({ theme }) => theme.colors.input};
+  border: 0;
+  border-radius: 10px;
+`
+
+const MInput = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text};
+  font-variant-numeric: tabular-nums;
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.textSubtle};
+  }
+`
+
+const MInputSuffix = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+`
+
+const MAvblRow = styled(Flex)`
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  & > strong {
+    flex: 1;
+    color: ${({ theme }) => theme.colors.text};
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+`
+
+const MCheckRow = styled(Flex)`
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const MStats = styled.div<{ $tone: 'up' | 'down' }>`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 0;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  & .v {
+    color: ${({ theme, $tone }) => ($tone === 'up' ? theme.colors.success : theme.colors.failure)};
+    font-variant-numeric: tabular-nums;
+  }
+`
+
+const MStatRow = styled(Flex)`
+  justify-content: space-between;
+  align-items: center;
+`
+
+const MCta = styled.button<{ $side: OrderSide }>`
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: ${({ $side, theme }) => ($side === 'BUY' ? theme.colors.success : theme.colors.failure)};
+  color: ${({ theme }) => theme.colors.invertedContrast};
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s;
+  &:hover:not(:disabled) {
+    filter: brightness(1.07);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`
+
+const MTypeMenu = styled.div`
+  position: fixed;
+  z-index: 200;
+  background: ${({ theme }) => theme.colors.card};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 8px;
+  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+`
+
+const MTypeMenuItem = styled.button<{ $active: boolean }>`
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: 0;
+  background: ${({ $active, theme }) => ($active ? theme.colors.input : 'transparent')};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  &:hover {
+    background: ${({ theme }) => theme.colors.input};
+  }
+`
+
+const MOBILE_TYPES: ReadonlyArray<{ key: OrderTypeKey; label: string }> = [
+  { key: 'market', label: 'Market' },
+  { key: 'limit', label: 'Limit' },
+  { key: 'stop-limit', label: 'Stop Limit' },
+  { key: 'stop-market', label: 'Stop Market' },
+]
+
+/**
+ * Mobile-only render path. Mounted from `OrderForm` when
+ * `useMatchBreakpoints().isMobile` is true. Internal hooks (type-menu
+ * popover) live here so the desktop branch never spends them.
+ */
+const MobileOrderForm: React.FC<OrderFormProps> = ({
+  baseAsset,
+  quoteAsset,
+  draft,
+  onDraftChange,
+  typeKey,
+  onTypeKeyChange,
+  availableBalanceText,
+  preview,
+  feeText,
+  sizePercent,
+  onSizePercentChange,
+  cta: _cta,
+  canSubmit,
+  isSubmitting = false,
+  marginSubmitting = false,
+  authReady: _authReady = true,
+  hasAddress: _hasAddress = true,
+  errorSlot,
+  onSubmit,
+  onLeverageClick,
+  onMarginModeToggle,
+  onDepositClick,
+  t = defaultT,
+}) => {
+  const sizeUnitLabel = draft.sizeUnit === 'QUOTE' ? quoteAsset : baseAsset
+  const isStopOrder = typeKey === 'stop-limit' || typeKey === 'stop-market'
+  const needsLimitPrice = typeKey === 'limit' || typeKey === 'stop-limit'
+  const needsStopPrice = isStopOrder
+
+  const toggleSizeUnit = () =>
+    onDraftChange({ ...draft, sizeUnit: draft.sizeUnit === 'BASE' ? 'QUOTE' : 'BASE', quantity: '' })
+
+  const typeBtnRef = useRef<HTMLButtonElement>(null)
+  const typeMenuRef = useRef<HTMLDivElement>(null)
+  const [typeMenuOpen, setTypeMenuOpen] = useState(false)
+  const [typeMenuPos, setTypeMenuPos] = useState<{ top: number; left: number; width: number } | null>(null)
+
+  useEffect(() => {
+    if (!typeMenuOpen || !typeBtnRef.current) return
+    const r = typeBtnRef.current.getBoundingClientRect()
+    setTypeMenuPos({ top: r.bottom + 4, left: r.left, width: r.width })
+  }, [typeMenuOpen])
+
+  useEffect(() => {
+    if (!typeMenuOpen) return
+    const onDown = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (
+        typeBtnRef.current &&
+        !typeBtnRef.current.contains(target) &&
+        typeMenuRef.current &&
+        !typeMenuRef.current.contains(target)
+      ) {
+        setTypeMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [typeMenuOpen])
+
+  const currentTypeLabel =
+    MOBILE_TYPES.find((x) => x.key === typeKey)?.label ?? 'Market'
+
+  // The desktop summary computes `Cost / Liq / Fees`. Mobile shows
+  // `Est. liq. price / Margin / Max` per the prototype. We don't have
+  // a `max` value in the props yet — use the cost preview as a stand-in
+  // and leave a TODO so the consumer can wire a real `maxSizeText`
+  // later without another widget API churn.
+  const liqText = preview.liq
+  const marginText = preview.cost
+  const maxText = '—' // TODO: thread max-size from consumer when available
+
+  return (
+    <MBody>
+      <MPillRow>
+        <MPill disabled={marginSubmitting} onClick={onMarginModeToggle}>
+          {draft.marginMode === 'CROSS' ? t('Cross') : t('Isolated')}
+        </MPill>
+        <MPill onClick={onLeverageClick}>{`${draft.leverage}x`}</MPill>
+      </MPillRow>
+
+      <MTypeSelect
+        ref={typeBtnRef}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={typeMenuOpen}
+        onClick={() => setTypeMenuOpen((v) => !v)}
+      >
+        <InfoIcon width="14px" color="textSubtle" />
+        <MTypeSelectLabel>{t(currentTypeLabel)}</MTypeSelectLabel>
+        <ChevronDownIcon width="14px" color="textSubtle" />
+      </MTypeSelect>
+
+      {typeMenuOpen &&
+        typeMenuPos &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <MTypeMenu
+            ref={typeMenuRef}
+            role="listbox"
+            style={{ top: typeMenuPos.top, left: typeMenuPos.left, width: typeMenuPos.width }}
+          >
+            {MOBILE_TYPES.map((opt) => (
+              <MTypeMenuItem
+                key={opt.key}
+                role="option"
+                aria-selected={opt.key === typeKey}
+                $active={opt.key === typeKey}
+                onClick={() => {
+                  onTypeKeyChange(opt.key)
+                  setTypeMenuOpen(false)
+                }}
+              >
+                {t(opt.label)}
+              </MTypeMenuItem>
+            ))}
+          </MTypeMenu>,
+          document.body,
+        )}
+
+      {needsStopPrice && (
+        <MInputRow>
+          <Text fontSize="13px" color="textSubtle">
+            {t('Stop')}
+          </Text>
+          <MInput
+            value={draft.stopPrice}
+            onChange={(e) => onDraftChange({ ...draft, stopPrice: e.target.value })}
+            placeholder="0"
+            inputMode="decimal"
+            aria-label={t('Stop price')}
+            style={{ textAlign: 'right' }}
+          />
+          <MInputSuffix
+            type="button"
+            onClick={() =>
+              onDraftChange({
+                ...draft,
+                stopPriceSource: draft.stopPriceSource === 'MARK' ? 'LAST' : 'MARK',
+              })
+            }
+          >
+            {draft.stopPriceSource === 'MARK' ? t('Mark') : t('Last')}
+            <ChevronDownIcon width="12px" />
+          </MInputSuffix>
+        </MInputRow>
+      )}
+
+      {needsLimitPrice && (
+        <MInputRow>
+          <Text fontSize="13px" color="textSubtle">
+            {t('Price')}
+          </Text>
+          <MInput
+            value={draft.price}
+            onChange={(e) => onDraftChange({ ...draft, price: e.target.value })}
+            placeholder="0"
+            inputMode="decimal"
+            aria-label={t('Limit price')}
+            style={{ textAlign: 'right' }}
+          />
+          <Text fontSize="13px" color="textSubtle">
+            {quoteAsset}
+          </Text>
+        </MInputRow>
+      )}
+
+      <MInputRow>
+        <MInput
+          value={draft.quantity}
+          onChange={(e) => onDraftChange({ ...draft, quantity: e.target.value })}
+          placeholder={t('Size')}
+          inputMode="decimal"
+        />
+        <MInputSuffix type="button" onClick={toggleSizeUnit}>
+          {sizeUnitLabel}
+          <ChevronDownIcon width="12px" />
+        </MInputSuffix>
+      </MInputRow>
+
+      <Box>
+        <BunnySlider
+          min={0}
+          max={100}
+          step={1}
+          value={sizePercent}
+          onValueChanged={onSizePercentChange}
+        />
+      </Box>
+
+      <MAvblRow>
+        <span>{t('Avbl')}</span>
+        <strong>{`${availableBalanceText} ${quoteAsset}`}</strong>
+        <IconButton
+          variant="text"
+          scale="xs"
+          onClick={onDepositClick}
+          aria-label={t('Deposit')}
+          style={{ width: 18, height: 18, minWidth: 18, borderRadius: 999 }}
+        >
+          <AddIcon color="primary" width="10px" />
+        </IconButton>
+      </MAvblRow>
+
+      <MCheckRow>
+        <Checkbox
+          scale="sm"
+          checked={draft.tpSlEnabled}
+          onChange={(e) => onDraftChange({ ...draft, tpSlEnabled: e.target.checked })}
+        />
+        <span>{t('TP/SL')}</span>
+      </MCheckRow>
+
+      <MCheckRow>
+        <Checkbox
+          scale="sm"
+          checked={draft.reduceOnly}
+          onChange={(e) => onDraftChange({ ...draft, reduceOnly: e.target.checked })}
+        />
+        <span>{t('Reduce-Only')}</span>
+      </MCheckRow>
+
+      {errorSlot}
+
+      <MStats $tone="up">
+        <MStatRow>
+          <span>{t('Est. liq. price')}</span>
+          <span className="v">{liqText}</span>
+        </MStatRow>
+        <MStatRow>
+          <span>{t('Margin')}</span>
+          <span className="v">{marginText}</span>
+        </MStatRow>
+        <MStatRow>
+          <span>{t('Max')}</span>
+          <span className="v">{maxText}</span>
+        </MStatRow>
+      </MStats>
+
+      <MCta
+        type="button"
+        $side="BUY"
+        disabled={!canSubmit || isSubmitting}
+        onClick={() => onSubmit({ sideOverride: 'BUY' })}
+      >
+        {t('Buy/Long')}
+      </MCta>
+
+      <MStats $tone="down">
+        <MStatRow>
+          <span>{t('Est. liq. price')}</span>
+          <span className="v">{liqText}</span>
+        </MStatRow>
+        <MStatRow>
+          <span>{t('Margin')}</span>
+          <span className="v">{marginText}</span>
+        </MStatRow>
+        <MStatRow>
+          <span>{t('Max')}</span>
+          <span className="v">{maxText}</span>
+        </MStatRow>
+      </MStats>
+
+      <MCta
+        type="button"
+        $side="SELL"
+        disabled={!canSubmit || isSubmitting}
+        onClick={() => onSubmit({ sideOverride: 'SELL' })}
+      >
+        {t('Sell/Short')}
+      </MCta>
+
+      <Text fontSize="11px" color="textSubtle" textAlign="right">
+        {t('Fees')}: {feeText}
+      </Text>
+    </MBody>
+  )
+}
+
 /**
  * Trading order entry form. Stateless — the consumer owns the full
  * `OrderFormDraft` (typically persisted to localStorage via jotai),
@@ -443,31 +921,38 @@ const defaultT = (
  * EnableTradingModal) are rendered by the consumer alongside this
  * form — keeps the widget free of any imperative-modal coupling.
  */
-export const OrderForm: React.FC<OrderFormProps> = ({
-  baseAsset,
-  quoteAsset,
-  draft,
-  onDraftChange,
-  typeKey,
-  onTypeKeyChange,
-  availableBalanceText,
-  preview,
-  feeText,
-  sizePercent,
-  onSizePercentChange,
-  cta,
-  canSubmit,
-  isSubmitting = false,
-  marginSubmitting = false,
-  authReady = true,
-  hasAddress = true,
-  errorSlot,
-  onSubmit,
-  onLeverageClick,
-  onMarginModeToggle,
-  onDepositClick,
-  t = defaultT,
-}) => {
+export const OrderForm: React.FC<OrderFormProps> = (props) => {
+  // Auto-responsive: switch to mobile layout when the viewport drops
+  // into the mobile breakpoint. Same pattern as Modal / MotionModal —
+  // consumer doesn't pass any flag.
+  const { isMobile } = useMatchBreakpoints()
+  if (isMobile) return <MobileOrderForm {...props} />
+
+  const {
+    baseAsset,
+    quoteAsset,
+    draft,
+    onDraftChange,
+    typeKey,
+    onTypeKeyChange,
+    availableBalanceText,
+    preview,
+    feeText,
+    sizePercent,
+    onSizePercentChange,
+    cta,
+    canSubmit,
+    isSubmitting = false,
+    marginSubmitting = false,
+    authReady = true,
+    hasAddress = true,
+    errorSlot,
+    onSubmit,
+    onLeverageClick,
+    onMarginModeToggle,
+    onDepositClick,
+    t = defaultT,
+  } = props
   const sizeUnitLabel = draft.sizeUnit === 'QUOTE' ? quoteAsset : baseAsset
 
   const setSide = (side: OrderSide) => onDraftChange({ ...draft, side })
@@ -789,7 +1274,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 
       {authReady ? (
         <SubmitButton
-          onClick={onSubmit}
+          onClick={() => onSubmit()}
           disabled={!canSubmit}
           isLoading={isSubmitting}
           scale="md"
@@ -798,7 +1283,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
           {cta}
         </SubmitButton>
       ) : (
-        <SubmitButton $side={draft.side} onClick={onSubmit} scale="md" disabled={!hasAddress}>
+        <SubmitButton $side={draft.side} onClick={() => onSubmit()} scale="md" disabled={!hasAddress}>
           {cta}
         </SubmitButton>
       )}

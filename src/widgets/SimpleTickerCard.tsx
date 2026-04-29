@@ -17,16 +17,28 @@ export interface SimpleTickerCardProps {
   fundingRate: string
   nextFunding: string
   onSymbolClick?: () => void
+  /**
+   * Optional token-icon renderer. When provided, replaces the default
+   * letter chip with the consumer's element (typically the venue's CDN
+   * logo). Returning null/undefined defers to the default chip so an
+   * unlisted symbol still has a visual.
+   */
+  renderTokenIcon?: () => React.ReactNode
 }
 
 // ── Styled ────────────────────────────────────────────────
 
 const Card = styled.div`
   display: flex;
-  width: 1058px;
+  /* Fluid — the consumer's column owns the width. Original 1058px was
+     hardcoded for the storybook canvas and made the card overflow / look
+     stranded inside narrower production layouts. */
+  width: 100%;
+  box-sizing: border-box;
   padding: 24px;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   border-radius: 24px;
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
@@ -61,6 +73,37 @@ const TokenChip = styled.span`
   font-size: 16px;
   font-weight: 700;
   flex-shrink: 0;
+`
+
+/* Fixed-size slot for a consumer-supplied icon (e.g. an img from
+   renderTokenIcon). Keeps the artwork from stretching when the card
+   gets narrow and forces aspect-ratio preservation regardless of the
+   source image dimensions. */
+const TokenIconSlot = styled.span`
+  display: inline-flex;
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  overflow: hidden;
+  & > img,
+  & > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+`
+
+/* Chevron paired with the pair name to advertise the symbol-picker
+   action. Without this, users don't realise the entire card is the
+   click target for "switch market". */
+const Chevron = styled.span`
+  display: inline-flex;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.textSubtle};
 `
 
 const Meta = styled.div`
@@ -152,6 +195,11 @@ const TriangleDown: React.FC = () => (
     <path d="M6 10L1 2h10z" />
   </svg>
 )
+const ChevronDownGlyph: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
 
 export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
   baseAsset,
@@ -163,8 +211,10 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
   fundingRate,
   nextFunding,
   onSymbolClick,
+  renderTokenIcon,
 }) => {
   const positive = pricePnlPct >= 0
+  const consumerIcon = renderTokenIcon?.()
   return (
     <Card>
       <Left
@@ -173,11 +223,16 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
         disabled={!onSymbolClick}
         aria-label={`Change market · ${pair}`}
       >
-        <TokenChip>{baseAsset}</TokenChip>
+        {consumerIcon != null ? <TokenIconSlot>{consumerIcon}</TokenIconSlot> : <TokenChip>{baseAsset}</TokenChip>}
         <Meta>
           <NameRow>
             <Name>{pair}</Name>
             <Tag>Perp</Tag>
+            {onSymbolClick ? (
+              <Chevron>
+                <ChevronDownGlyph />
+              </Chevron>
+            ) : null}
           </NameRow>
           <PriceRow>
             <Price>{price}</Price>
