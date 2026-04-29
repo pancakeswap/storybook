@@ -880,12 +880,6 @@ const LevCustomSuffix = styled.span`
   padding-left: 4px;
 `
 
-// Duration row (static "Perpetual" placeholder — preserves layout)
-const DurationRow = styled(Flex)`
-  align-items: center;
-  justify-content: space-between;
-`
-
 // Stats summary
 const StatsCard = styled.div`
   margin: 0 20px;
@@ -1362,14 +1356,11 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           </LevBar>
         </Section>
 
-        {/* Duration (display-only placeholder — matches the original prototype) */}
-        <DurationRow>
-          <PreTitle>Duration</PreTitle>
-          <FundChip type="button" disabled>
-            <FundAmt style={{ fontSize: 14 }}>Perpetual</FundAmt>
-            <span aria-hidden>▾</span>
-          </FundChip>
-        </DurationRow>
+        {/* Aster's REST `/fapi/v3/order` perp API has no duration / auto-
+            settle field — only the separate on-chain `predictAndBet`
+            contract on `/trade/1001x/...` does. We submit through the
+            REST API, so the Duration row was dead UI; dropped. If we
+            ever wire the prediction product, restore it here. */}
       </Body>
 
       {/* UP / DOWN — always wrapped in card; stats only show when bet is filled */}
