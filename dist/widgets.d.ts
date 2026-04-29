@@ -1247,7 +1247,7 @@ export declare interface TpSlModalProps {
     t?: (key: string) => string;
 }
 
-declare interface TradeHistoryRow {
+export declare interface TradeHistoryRow {
     /** Stable React key — typically the tradeId. */
     id: string | number;
     /** Local date string, e.g. '2025-04-17'. */
@@ -1266,7 +1266,7 @@ declare interface TradeHistoryRow {
     realizedProfit: string;
 }
 
-declare interface TransactionHistoryRow {
+export declare interface TransactionHistoryRow {
     /** Stable React key — typically the txId. */
     id: string | number;
     date: string;
