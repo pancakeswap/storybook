@@ -903,19 +903,23 @@ const DwRow = styled(Flex)`
 `
 
 const DwButton = styled(Button)<{ $variant: 'primary' | 'secondary' }>`
-  flex: 1;
-  height: 40px;
+  display: flex;
+  padding: 11px 12px 13px 12px;
+  justify-content: center;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
   border: 0;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: 16px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: filter 0.12s;
-  background: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.primary : theme.colors.input)};
+  background: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.primary : theme.colors.tertiary)};
   color: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.invertedContrast : theme.colors.primary)};
-  border-bottom-color: ${({ $variant }) => ($variant === 'primary' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)')};
+  border-bottom: 2px solid
+    ${({ $variant }) => ($variant === 'primary' ? 'rgba(0, 0, 0, 0.20)' : 'rgba(0, 0, 0, 0.10)')};
   &:hover {
     filter: brightness(1.08);
   }
@@ -932,29 +936,46 @@ const Bottom = styled.div`
 `
 
 const PnlCard = styled(Flex)`
-  align-self: stretch;
-  align-items: center;
+  display: flex;
+  padding: 16px;
   justify-content: space-between;
-  padding: 12px 14px;
-  background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 16px;
+  align-items: center;
+  align-self: stretch;
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 24px;
 `
 
 const PnlLabel = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 14px;
-  font-weight: 600;
+  overflow: hidden;
   color: ${({ theme }) => theme.colors.textSubtle};
+  text-align: center;
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.2px;
 `
 
 const PnlValue = styled.span`
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.22px;
   color: ${({ theme }) => theme.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 120%;
+  letter-spacing: -0.32px;
   font-variant-numeric: tabular-nums;
 `
 
