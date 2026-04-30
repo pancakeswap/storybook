@@ -1640,6 +1640,22 @@ export declare function StarFillIcon(p: IconProps): JSX_2.Element;
 
 export declare function StarLineIcon(p: IconProps): JSX_2.Element;
 
+/**
+ * Provider-free `useMatchBreakpoints`.
+ *
+ * Returns the same shape as the uikit hook
+ * (`{ isMobile, isTablet, isDesktop, isXs, isSm, isMd, isLg, isXl, isXxl }`)
+ * but each call subscribes directly to `window.matchMedia`. We don't
+ * read from `MatchBreakpointsContext` because hosts that consume our
+ * widget bundle (e.g. pancake-frontend) wrap their app in their own
+ * uikit Provider — never ours — so a context-backed hook would always
+ * fall back to its default `{ isMobile:false, ... }` and dispatch the
+ * desktop variant on mobile viewports.
+ *
+ * `MatchBreakpointsProvider` is still exported (and used by the
+ * storybook canvas decorator) for backward compat, but its state is
+ * no longer read here.
+ */
 declare type State = {
     [key: string]: boolean;
 };
