@@ -186,6 +186,9 @@ export declare interface DepositModalProps {
     evmAddress?: string;
     /** Pre-truncated Solana address. */
     solanaAddress?: string;
+    /** Pre-formatted current Perp balance shown in the summary card
+     *  (e.g. "$0"). Defaults to "$0" when omitted. */
+    perpBalanceText?: string;
     isLoadingAssets?: boolean;
     assets: DepositTokenRow[];
     selectedAssetId?: string;
@@ -239,6 +242,8 @@ export declare interface DepositTokenRow {
     displayName?: string;
     /** Pre-formatted balance string (e.g. "1234.56"). */
     balanceText: string;
+    /** Pre-formatted USD value, e.g. "$999,999.99". Optional. */
+    usdValueText?: string;
     /** Whether the wallet has any non-zero balance for this asset. */
     hasBalance: boolean;
     /** Optional logo URL — consumer's responsibility to resolve. */
