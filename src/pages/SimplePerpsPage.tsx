@@ -8,7 +8,6 @@ import {
   type SimplePositionRow,
   type SimplePositionsTab,
 } from '../widgets/SimplePositionsCard'
-import { DepositModal } from '../widgets/DepositModal'
 
 export interface SimplePerpsPageProps {
   initialPair?: string
@@ -676,6 +675,406 @@ const OrderConfirmModal: React.FC<{
   )
 }
 
+/* ── Fund Your Perp Account modal ──────────────────────── */
+
+const FundModalCard = styled.div`
+  display: flex;
+  width: 456px;
+  padding: 24px;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.card};
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+`
+
+const FundModalTitle = styled.h3`
+  margin: 0;
+  flex: 1;
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+`
+
+const PerpBalanceCard = styled.div`
+  display: flex;
+  align-self: stretch;
+  padding: 16px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  border-radius: 16px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.cardSecondary};
+`
+
+const PerpBalanceRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+`
+
+const PerpBalanceMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const PerpBalanceLabel = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  text-transform: uppercase;
+`
+
+const PerpBalanceSub = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.12px;
+`
+
+const PerpBalanceAmount = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
+`
+
+const TopUpLabel = styled.span`
+  align-self: stretch;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.12px;
+`
+
+const FundTokenList = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+`
+
+const FundTokenRow = styled.button`
+  display: flex;
+  padding: 12px;
+  align-items: center;
+  align-self: stretch;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 12px;
+  text-align: left;
+  font-family: inherit;
+  &:hover { background: ${({ theme }) => theme.colors.cardSecondary}; }
+`
+
+const FundTokenLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+`
+
+const FundTokenMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+`
+
+const FundTokenName = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 150%;
+`
+
+const FundTokenAmountLine = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.12px;
+  font-variant-numeric: tabular-nums;
+`
+
+const FundTokenUsd = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`
+
+interface FundAsset {
+  symbol: string
+  chainLabel: string
+  amount: string
+  valueUsd: string
+  color: string
+}
+
+const FUND_ASSETS: FundAsset[] = [
+  { symbol: 'BNB',  chainLabel: 'BNB Chain',     amount: '999,999.99', valueUsd: '$999,999.99', color: '#F0B90B' },
+  { symbol: 'ETH',  chainLabel: 'Ethereum',      amount: '999,999.99', valueUsd: '$999,999.99', color: '#627EEA' },
+  { symbol: 'ETH',  chainLabel: 'Arbitrum One',  amount: '999,999.99', valueUsd: '$999,999.99', color: '#627EEA' },
+  { symbol: 'USDC', chainLabel: 'Ethereum',      amount: '999,999.99', valueUsd: '$999,999.99', color: '#2775CA' },
+]
+
+/* Amount-entry step (shown after a token is picked from the list). */
+
+const FundField = styled.label`
+  display: flex;
+  height: 80px;
+  min-width: 296px;
+  padding: 0 16px;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  align-self: stretch;
+  border-radius: 24px;
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  background: ${({ theme }) => theme.colors.input};
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  cursor: text;
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
+`
+
+const FundFieldLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`
+
+const FundFieldMeta = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const FundFieldTicker = styled.span`
+  overflow: hidden;
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+`
+
+const FundFieldChain = styled.span`
+  overflow: hidden;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: 0.12px;
+`
+
+const FundFieldRight = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`
+
+const FundFieldAmountInput = styled.input`
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: right;
+  outline: none;
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.24px;
+  font-variant-numeric: tabular-nums;
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.textSubtle};
+    opacity: 1;
+  }
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`
+
+const FundFieldUsd = styled.span`
+  overflow: hidden;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+`
+
+const FundContinueBtn = styled.button`
+  display: flex;
+  height: 48px;
+  align-self: stretch;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  border-radius: 16px;
+  background: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.textDisabled};
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: not-allowed;
+  &:not(:disabled) {
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.invertedContrast};
+    cursor: pointer;
+  }
+`
+
+const FundAccountModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
+  isOpen,
+  onClose,
+}) => {
+  const [selected, setSelected] = useState<FundAsset | null>(null)
+  const [amount, setAmount] = useState('')
+  const handleClose = () => {
+    setSelected(null)
+    setAmount('')
+    onClose()
+  }
+  if (!isOpen) return null
+  const showAmount = selected !== null
+  const canContinue = !!amount && Number(amount) > 0
+  return (
+    <Overlay onClick={handleClose}>
+      <FundModalCard onClick={(e) => e.stopPropagation()}>
+        <ModalHeader>
+          <FundModalTitle>Fund Your Perp Account</FundModalTitle>
+          <ModalCloseBtn type="button" onClick={handleClose} aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            </svg>
+          </ModalCloseBtn>
+        </ModalHeader>
+        {showAmount ? (
+          <>
+            <FundField>
+              <FundFieldLeft>
+                <TokenIcon $color={selected.color}>{selected.symbol.slice(0, 1)}</TokenIcon>
+                <FundFieldMeta>
+                  <FundFieldTicker>{selected.symbol}</FundFieldTicker>
+                  <FundFieldChain>{selected.chainLabel}</FundFieldChain>
+                </FundFieldMeta>
+              </FundFieldLeft>
+              <FundFieldRight>
+                <FundFieldAmountInput
+                  type="number"
+                  inputMode="decimal"
+                  placeholder="0.0"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  aria-label="Deposit amount"
+                />
+                <FundFieldUsd>~{amount || '0.0'} USD</FundFieldUsd>
+              </FundFieldRight>
+            </FundField>
+            <FundContinueBtn type="button" disabled={!canContinue}>
+              Continue
+            </FundContinueBtn>
+          </>
+        ) : (
+          <>
+            <PerpBalanceCard>
+              <PerpBalanceRow>
+                <PerpBalanceMeta>
+                  <PerpBalanceLabel>Perp Balance</PerpBalanceLabel>
+                  <PerpBalanceSub>In Aster Contract</PerpBalanceSub>
+                </PerpBalanceMeta>
+                <PerpBalanceAmount>$0</PerpBalanceAmount>
+              </PerpBalanceRow>
+            </PerpBalanceCard>
+            <TopUpLabel>Top up from your connected EOA wallet (0x…8989)</TopUpLabel>
+            <FundTokenList>
+              {FUND_ASSETS.map((a, i) => (
+                <FundTokenRow
+                  key={`${a.symbol}-${i}`}
+                  type="button"
+                  onClick={() => setSelected(a)}
+                >
+                  <FundTokenLeft>
+                    <TokenIcon $color={a.color}>{a.symbol.slice(0, 1)}</TokenIcon>
+                    <FundTokenMeta>
+                      <FundTokenName>{a.symbol}</FundTokenName>
+                      <FundTokenAmountLine>
+                        {a.amount} {a.symbol}
+                      </FundTokenAmountLine>
+                    </FundTokenMeta>
+                  </FundTokenLeft>
+                  <FundTokenUsd>{a.valueUsd}</FundTokenUsd>
+                </FundTokenRow>
+              ))}
+            </FundTokenList>
+          </>
+        )}
+      </FundModalCard>
+    </Overlay>
+  )
+}
+
 interface CollateralAsset {
   symbol: string
   name: string
@@ -777,8 +1176,8 @@ const mockBetPanelArgs = (
   setBet: (s: string) => void,
   leverage: number,
   setLeverage: (n: number) => void,
-  onDeposit: () => void,
-  onTopUpFund: () => void,
+  onFundOpen: () => void,
+  onCollateralOpen: () => void,
   onConfirmOpen: (side: 'up' | 'down') => void,
 ): SimpleBetPanelProps => ({
   symbol: 'BTCUSDT',
@@ -791,8 +1190,12 @@ const mockBetPanelArgs = (
   leverage,
   onLeverageChange: setLeverage,
   quoteAsset: 'USDT',
+  /* Collateral picker opens via the dropdown arrow under the bet input's
+     token icon. The (+) on the My Perp Fund chip and the Deposit button
+     both open the Fund Your Perp Account modal instead. */
+  onQuoteAssetClick: onCollateralOpen,
   fundBalanceText: '20.00 USDT',
-  onTopUpFund,
+  onTopUpFund: onFundOpen,
   estimatedEntry: '$78,053.60',
   liqIfLong: '$66,092.23 (-2.0%)',
   marginRequired: '$400 USDT',
@@ -800,7 +1203,7 @@ const mockBetPanelArgs = (
   canSubmit: true,
   onUp: () => onConfirmOpen('up'),
   onDown: () => onConfirmOpen('down'),
-  onDeposit,
+  onDeposit: onFundOpen,
   onWithdraw: () => undefined,
   unrealizedPnl: '$0',
 })
@@ -808,7 +1211,7 @@ const mockBetPanelArgs = (
 export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProps = {}) {
   const [tf, setTf] = useState<Tf>('1d')
   const [positionsTab, setPositionsTab] = useState<SimplePositionsTab>('positions')
-  const [depositOpen, setDepositOpen] = useState(false)
+  const [fundOpen, setFundOpen] = useState(false)
   const [collateralOpen, setCollateralOpen] = useState(false)
   const [orderConfirm, setOrderConfirm] = useState<'up' | 'down' | null>(null)
   const [bet, setBet] = useState('')
@@ -816,7 +1219,7 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
 
   return (
     <Root aria-label={`Perpetuals · Simple mode · ${initialPair}`}>
-      <ModeBar onDeposit={() => setDepositOpen(true)} />
+      <ModeBar onDeposit={() => setFundOpen(true)} />
 
       <Body>
         {/* Left column: ticker + chart + positions */}
@@ -861,12 +1264,14 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
             setBet,
             leverage,
             setLeverage,
-            () => setDepositOpen(true),
+            () => setFundOpen(true),
             () => setCollateralOpen(true),
             (side) => setOrderConfirm(side),
           )}
         />
       </Body>
+
+      <FundAccountModal isOpen={fundOpen} onClose={() => setFundOpen(false)} />
 
       <CollateralModal isOpen={collateralOpen} onClose={() => setCollateralOpen(false)} />
 
@@ -883,21 +1288,6 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
         onClose={() => setOrderConfirm(null)}
       />
 
-      <DepositModal
-        isOpen={depositOpen}
-        onClose={() => setDepositOpen(false)}
-        step="select"
-        evmAddress="0x1234…abcd"
-        assets={[]}
-        onSelectAsset={() => undefined}
-        amount=""
-        onAmountChange={() => undefined}
-        onPercentClick={() => undefined}
-        submitState="idle"
-        canContinue={false}
-        onContinue={() => undefined}
-        onBack={() => setDepositOpen(false)}
-      />
     </Root>
   )
 }
