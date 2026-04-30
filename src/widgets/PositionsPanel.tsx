@@ -868,6 +868,72 @@ const MobileEmpty = styled.div`
   font-size: 14px;
 `
 
+/* ── Mobile position / open-order cards ─────────────────────── */
+const MobileList = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const MobileCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  font-variant-numeric: tabular-nums;
+`
+
+const MobileCardHead = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+const MobileCardSymbol = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const MobileCardSide = styled.span<{ $side: 'BUY' | 'SELL' }>`
+  font-size: 12px;
+  font-weight: 500;
+  color: ${({ $side, theme }) => ($side === 'BUY' ? theme.colors.success : theme.colors.failure)};
+`
+
+const MobileCardSpacer = styled.span`
+  flex: 1;
+`
+
+const MobileCardPnl = styled.span<{ $up: boolean }>`
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ $up, theme }) => ($up ? theme.colors.success : theme.colors.failure)};
+`
+
+const MobileCardGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  font-size: 12px;
+`
+
+const MobileCardCell = styled.div`
+  display: flex;
+  justify-content: space-between;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  & > strong {
+    color: ${({ theme }) => theme.colors.text};
+    font-weight: 500;
+  }
+`
+
+const MobileCardActions = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+`
+
 /** Wrapper that strips the desktop card chrome — the mobile page already
  *  separates this section visually with the tab strip's borders. */
 const MobileRoot = styled.div`
@@ -1164,6 +1230,143 @@ const MobileHistorySheet: React.FC<{
   )
 }
 
+/**
+ * Single position card — split out so `useMarkPriceForSymbol` can be
+ * called at a stable hook index per render (same reason as
+ * `PositionTableRow` for the desktop table).
+ */
+const MobilePositionCard: React.FC<{
+  p: PositionRow
+  useMarkPriceForSymbol?: PositionsPanelProps['useMarkPriceForSymbol']
+  computeLiqPrice?: PositionsPanelProps['computeLiqPrice']
+  onClose: (p: PositionRow) => void
+  onEditTpSl: (p: PositionRow, markPrice: number) => void
+  closingSymbol?: string | null
+  t: (key: string) => string
+}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, closingSymbol, t }) => {
+  const markPrice = useMarkPriceForSymbol?.(p.symbol)
+  const side: 'BUY' | 'SELL' = p.positionAmt >= 0 ? 'BUY' : 'SELL'
+
+  const livePnl =
+    Number.isFinite(markPrice) && Number.isFinite(p.entryPrice)
+      ? (markPrice! - p.entryPrice) * p.positionAmt
+      : Number(p.unrealizedProfit)
+
+  const liq =
+    Number.isFinite(p.entryPrice) && Number.isFinite(p.leverage)
+      ? computeLiqPrice?.({ side, entryPrice: p.entryPrice, leverage: p.leverage })
+      : undefined
+
+  const isClosing = closingSymbol === p.symbol
+  const sizeAbs = Math.abs(p.positionAmt)
+
+  return (
+    <MobileCard>
+      <MobileCardHead>
+        <MobileCardSymbol>{p.symbol}</MobileCardSymbol>
+        <MobileCardSide $side={side}>
+          {side === 'BUY' ? t('Long') : t('Short')} · {p.leverage}x
+        </MobileCardSide>
+        <MobileCardSpacer />
+        <MobileCardPnl $up={livePnl >= 0}>
+          {Number.isFinite(livePnl) ? `${livePnl >= 0 ? '+' : ''}${livePnl.toFixed(4)}` : '—'}
+        </MobileCardPnl>
+      </MobileCardHead>
+      <MobileCardGrid>
+        <MobileCardCell>
+          <span>{t('Size')}</span>
+          <strong>{sizeAbs}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('Entry')}</span>
+          <strong>{Number.isFinite(p.entryPrice) ? p.entryPrice.toFixed(2) : '—'}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('Mark')}</span>
+          <strong>
+            {markPrice !== undefined && Number.isFinite(markPrice) ? markPrice.toFixed(2) : '—'}
+          </strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('Liq')}</span>
+          <strong>{liq ? liq.toFixed(2) : '—'}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('TP')}</span>
+          <strong>{p.tpStopPrice ? Number(p.tpStopPrice).toFixed(2) : '—'}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('SL')}</span>
+          <strong>{p.slStopPrice ? Number(p.slStopPrice).toFixed(2) : '—'}</strong>
+        </MobileCardCell>
+      </MobileCardGrid>
+      <MobileCardActions>
+        <Button
+          scale="xs"
+          variant="tertiary"
+          onClick={() => onEditTpSl(p, markPrice ?? NaN)}
+          disabled={!Number.isFinite(p.positionAmt) || p.positionAmt === 0}
+        >
+          {t('TP/SL')}
+        </Button>
+        <Button
+          scale="xs"
+          variant="secondary"
+          onClick={() => onClose(p)}
+          disabled={isClosing || !Number.isFinite(p.positionAmt) || p.positionAmt === 0}
+          isLoading={isClosing}
+        >
+          {t('Close')}
+        </Button>
+      </MobileCardActions>
+    </MobileCard>
+  )
+}
+
+const MobileOrderCard: React.FC<{
+  o: OpenOrderRow
+  onCancel: (o: OpenOrderRow) => void
+  cancellingOrderId?: OpenOrderRow['id'] | null
+  t: (key: string) => string
+}> = ({ o, onCancel, cancellingOrderId, t }) => {
+  const isCancelling = cancellingOrderId === o.id
+  return (
+    <MobileCard>
+      <MobileCardHead>
+        <MobileCardSymbol>{o.symbol}</MobileCardSymbol>
+        <MobileCardSide $side={o.side}>
+          {o.side === 'BUY' ? t('Buy') : t('Sell')} · {o.type}
+        </MobileCardSide>
+        <MobileCardSpacer />
+        <span style={{ fontSize: 12, color: 'inherit' }}>{o.status}</span>
+      </MobileCardHead>
+      <MobileCardGrid>
+        <MobileCardCell>
+          <span>{t('Price')}</span>
+          <strong>{o.price}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('Filled')}</span>
+          <strong>
+            {o.executedQty}/{o.origQty}
+          </strong>
+        </MobileCardCell>
+      </MobileCardGrid>
+      <MobileCardActions>
+        <Button
+          scale="xs"
+          variant="secondary"
+          disabled={isCancelling}
+          isLoading={isCancelling}
+          onClick={() => onCancel(o)}
+        >
+          {t('Cancel')}
+        </Button>
+      </MobileCardActions>
+    </MobileCard>
+  )
+}
+
 const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
   tab,
   onTabChange,
@@ -1172,6 +1375,13 @@ const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
   orderHistory = [],
   tradeHistory = [],
   transactionHistory = [],
+  onClosePosition,
+  onEditTpSl,
+  onCancelOrder,
+  useMarkPriceForSymbol,
+  computeLiqPrice,
+  closingSymbol,
+  cancellingOrderId,
   positionsCount,
   hideOtherSymbols = false,
   onHideOtherSymbolsChange,
@@ -1250,11 +1460,40 @@ const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
         </MobileCheckLabel>
       </MobileFiltersRow>
 
-      {/* Empty state — the mobile mocks always render an empty state for
-       *  this list area; row rendering for assets / twap is consumer-owned
-       *  and not yet defined. Open Orders / Positions still fall through
-       *  to the tab's `emptyText`. */}
-      <MobileEmpty>{active.emptyText}</MobileEmpty>
+      {/* Body: render rows when data exists for the active tab; fall
+       *  back to the tab's empty-state text otherwise. Assets / TWAP
+       *  data isn't surfaced through this widget yet — they always
+       *  render the empty state. */}
+      {tab === 'positions' && positions.length > 0 ? (
+        <MobileList>
+          {positions.map((p) => (
+            <MobilePositionCard
+              key={p.id}
+              p={p}
+              useMarkPriceForSymbol={useMarkPriceForSymbol}
+              computeLiqPrice={computeLiqPrice}
+              onClose={onClosePosition}
+              onEditTpSl={onEditTpSl}
+              closingSymbol={closingSymbol}
+              t={t}
+            />
+          ))}
+        </MobileList>
+      ) : tab === 'orders' && openOrders.length > 0 ? (
+        <MobileList>
+          {openOrders.map((o) => (
+            <MobileOrderCard
+              key={o.id}
+              o={o}
+              onCancel={onCancelOrder}
+              cancellingOrderId={cancellingOrderId}
+              t={t}
+            />
+          ))}
+        </MobileList>
+      ) : (
+        <MobileEmpty>{active.emptyText}</MobileEmpty>
+      )}
 
       <MobileHistorySheet
         open={historyOpen}
