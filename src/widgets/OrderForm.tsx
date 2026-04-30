@@ -1085,9 +1085,9 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
             onClick={onDepositClick}
             title={t('Deposit')}
             aria-label={t('Deposit')}
-            style={{ width: 18, height: 18, minWidth: 18, borderRadius: 999 }}
+            style={{ width: 22, height: 22, minWidth: 22, borderRadius: 999 }}
           >
-            <AddIcon color="primary" width="10px" />
+            <AddIcon color="primary" width="14px" />
           </IconButton>
         </AvblValue>
       </AvblRow>

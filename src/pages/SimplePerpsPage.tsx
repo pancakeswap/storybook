@@ -8,6 +8,11 @@ import {
   type SimplePositionRow,
   type SimplePositionsTab,
 } from '../widgets/SimplePositionsCard'
+import {
+  DepositModal,
+  type DepositStep,
+  type DepositTokenRow,
+} from '../widgets/DepositModal'
 
 export interface SimplePerpsPageProps {
   initialPair?: string
@@ -985,93 +990,68 @@ const FundContinueBtn = styled.button`
   }
 `
 
+/* Maps the page's FUND_ASSETS to the DepositModal's row schema. */
+const FUND_DEPOSIT_ROWS: DepositTokenRow[] = FUND_ASSETS.map((a, i) => ({
+  id: `${a.symbol}-${i}`,
+  symbol: a.symbol,
+  displayName: a.symbol,
+  balanceText: a.amount,
+  usdValueText: a.valueUsd,
+  hasBalance: true,
+}))
+
+/**
+ * SimplePerpsPage's deposit-button entry-point now uses the real
+ * DepositModal widget — same controlled flow as the Interactive
+ * story (select asset → enter amount → checking → success).
+ */
 const FundAccountModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   isOpen,
   onClose,
 }) => {
-  const [selected, setSelected] = useState<FundAsset | null>(null)
+  const [step, setStep] = useState<DepositStep>('select')
+  const [selected, setSelected] = useState<DepositTokenRow | undefined>()
   const [amount, setAmount] = useState('')
+
   const handleClose = () => {
-    setSelected(null)
+    setStep('select')
+    setSelected(undefined)
     setAmount('')
     onClose()
   }
-  if (!isOpen) return null
-  const showAmount = selected !== null
-  const canContinue = !!amount && Number(amount) > 0
+
   return (
-    <Overlay onClick={handleClose}>
-      <FundModalCard onClick={(e) => e.stopPropagation()}>
-        <ModalHeader>
-          <FundModalTitle>Fund Your Perp Account</FundModalTitle>
-          <ModalCloseBtn type="button" onClick={handleClose} aria-label="Close">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-            </svg>
-          </ModalCloseBtn>
-        </ModalHeader>
-        {showAmount ? (
-          <>
-            <FundField>
-              <FundFieldLeft>
-                <TokenIcon $color={selected.color}>{selected.symbol.slice(0, 1)}</TokenIcon>
-                <FundFieldMeta>
-                  <FundFieldTicker>{selected.symbol}</FundFieldTicker>
-                  <FundFieldChain>{selected.chainLabel}</FundFieldChain>
-                </FundFieldMeta>
-              </FundFieldLeft>
-              <FundFieldRight>
-                <FundFieldAmountInput
-                  type="number"
-                  inputMode="decimal"
-                  placeholder="0.0"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  aria-label="Deposit amount"
-                />
-                <FundFieldUsd>~{amount || '0.0'} USD</FundFieldUsd>
-              </FundFieldRight>
-            </FundField>
-            <FundContinueBtn type="button" disabled={!canContinue}>
-              Continue
-            </FundContinueBtn>
-          </>
-        ) : (
-          <>
-            <PerpBalanceCard>
-              <PerpBalanceRow>
-                <PerpBalanceMeta>
-                  <PerpBalanceLabel>Perp Balance</PerpBalanceLabel>
-                  <PerpBalanceSub>In Aster Contract</PerpBalanceSub>
-                </PerpBalanceMeta>
-                <PerpBalanceAmount>$0</PerpBalanceAmount>
-              </PerpBalanceRow>
-            </PerpBalanceCard>
-            <TopUpLabel>Top up from your connected EOA wallet (0x…8989)</TopUpLabel>
-            <FundTokenList>
-              {FUND_ASSETS.map((a, i) => (
-                <FundTokenRow
-                  key={`${a.symbol}-${i}`}
-                  type="button"
-                  onClick={() => setSelected(a)}
-                >
-                  <FundTokenLeft>
-                    <TokenIcon $color={a.color}>{a.symbol.slice(0, 1)}</TokenIcon>
-                    <FundTokenMeta>
-                      <FundTokenName>{a.symbol}</FundTokenName>
-                      <FundTokenAmountLine>
-                        {a.amount} {a.symbol}
-                      </FundTokenAmountLine>
-                    </FundTokenMeta>
-                  </FundTokenLeft>
-                  <FundTokenUsd>{a.valueUsd}</FundTokenUsd>
-                </FundTokenRow>
-              ))}
-            </FundTokenList>
-          </>
-        )}
-      </FundModalCard>
-    </Overlay>
+    <DepositModal
+      isOpen={isOpen}
+      step={step}
+      assets={FUND_DEPOSIT_ROWS}
+      selectedAssetId={selected?.id}
+      selectedAsset={selected}
+      evmAddress="0x…8989"
+      perpBalanceText="$0"
+      amount={amount}
+      onAmountChange={setAmount}
+      onSelectAsset={(id) => {
+        const a = FUND_DEPOSIT_ROWS.find((x) => x.id === id)
+        if (!a) return
+        setSelected(a)
+        setStep('amount')
+      }}
+      onPercentClick={(pct) => {
+        if (!selected) return
+        const max = parseFloat(selected.balanceText.replace(/,/g, ''))
+        if (!Number.isFinite(max)) return
+        setAmount(((max * pct) / 100).toFixed(4))
+      }}
+      onBack={() => setStep('select')}
+      submitState="idle"
+      canContinue={!!amount && Number(amount) > 0}
+      onContinue={() => {
+        setStep('checking')
+        setTimeout(() => setStep('success'), 1200)
+      }}
+      onClose={handleClose}
+    />
   )
 }
 
