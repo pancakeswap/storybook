@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Button } from '../primitives/Button'
 import { Flex } from '../primitives/Box'
 import { Message, MessageText } from '../primitives/Message'

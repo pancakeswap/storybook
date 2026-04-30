@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import bunnyButtUrl from '../primitives/Slider/svg/bunnybutt.svg'
 import bunnyHeadMainUrl from '../primitives/Slider/svg/bunnyhead-main.svg'
 import bunnyHeadMaxUrl from '../primitives/Slider/svg/bunnyhead-max.svg'

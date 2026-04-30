@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Slider } from '../primitives/Slider'

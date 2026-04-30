@@ -1,6 +1,6 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
-import styled, { css, useTheme } from 'styled-components'
+import { css, styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'

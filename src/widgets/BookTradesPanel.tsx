@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { PerpsPanel, UnderlineTab, UnderlineTabs } from './primitives'
 
 export type BookTradesTab = 'book' | 'trades'

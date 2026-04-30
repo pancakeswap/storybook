@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Text } from '../primitives/Text'
 import { SearchIcon } from '../primitives/Icons'

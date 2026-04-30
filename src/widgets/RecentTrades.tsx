@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { PerpsPanel } from './primitives'
 
 export interface RecentTradeRow {

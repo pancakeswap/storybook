@@ -103,3 +103,13 @@ export type {
   SimplePositionDirection,
   SimplePositionLiqStatus,
 } from './SimplePositionsCard'
+
+export { WalletPanelCompactV1 } from './WalletPanelCompactV1'
+export type {
+  WalletPanelCompactV1Props,
+  WalletPanelLabels,
+  Bucket,
+  WalletData,
+  ActionItem,
+  PerpStatsData,
+} from './WalletPanelCompactV1'

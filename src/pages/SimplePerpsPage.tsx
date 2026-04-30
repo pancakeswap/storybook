@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { SimpleBetPanel, type SimpleBetPanelProps } from '../widgets/SimpleBetPanel'
 import { SimpleTickerCard } from '../widgets/SimpleTickerCard'
 import { SimpleChartCard } from '../widgets/SimpleChartCard'

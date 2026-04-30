@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import styled, { useTheme } from 'styled-components'
+import { styled, useTheme } from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Input } from '../primitives/Input'

@@ -1,5 +1,5 @@
 import React, { useId, useMemo } from 'react'
-import styled, { useTheme } from 'styled-components'
+import { styled, useTheme } from 'styled-components'
 import { PerpsPanel } from './primitives'
 
 /**

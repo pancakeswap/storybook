@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import styled, { useTheme } from 'styled-components'
+import { styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { ChevronDownIcon } from '../primitives/Icons'
 import { useMatchBreakpoints } from '../contexts'

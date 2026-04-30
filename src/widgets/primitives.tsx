@@ -1,6 +1,6 @@
 import React, { Children, cloneElement } from 'react'
 import type { ReactElement } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Card } from '../primitives/Card'
 
 /**
