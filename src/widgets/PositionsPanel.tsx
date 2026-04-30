@@ -5,7 +5,7 @@ import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
 import { ChevronDownIcon, CloseIcon, HistoryIcon } from '../primitives/Icons'
-import { useIsMobile } from '../hooks/useIsMobile'
+import { useMatchBreakpoints } from '../contexts'
 import { PerpsPanel, UnderlineTab, UnderlineTabs } from './primitives'
 
 export interface PositionRow {
@@ -165,7 +165,7 @@ export interface PositionsPanelProps {
 
   // ── Mobile-only props ────────────────────────────────────────
   /**
-   * Force the mobile layout. Defaults to `useIsMobile()`
+   * Force the mobile layout. Defaults to `useMatchBreakpoints().isMobile`
    * — same auto-detection pattern as `OrderForm`.
    */
   isMobile?: boolean
@@ -495,7 +495,7 @@ const PositionTableRow: React.FC<{
  * | TWAP`) and owns a full-page History sheet portal.
  */
 export const PositionsPanel: React.FC<PositionsPanelProps> = (props) => {
-  const isMobileBp = useIsMobile()
+  const { isMobile: isMobileBp } = useMatchBreakpoints()
   const isMobile = props.isMobile ?? isMobileBp
   if (isMobile) return <MobilePositionsPanel {...props} />
   return <DesktopPositionsPanel {...props} />
