@@ -166,7 +166,16 @@
 .wpc1-tf-btn--active {
   background: var(--pcs-colors-text-subtle);
   color: #fff;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
   font-weight: 600;
+  line-height: 150%;
+}
+
+html.dark .wpc1-tf-btn--active {
+  color: #000;
 }
 
 .wpc1-hero-amount-row {
@@ -860,20 +869,20 @@
 /* ── Action buttons row ───────────────────────────────────────── */
 .wpc1-actions {
   display: flex;
-  width: 336px;
+  align-self: stretch;
   align-items: center;
   gap: 8px;
 }
 
 .wpc1-action-btn {
   display: flex;
-  padding: 3px 4px 5px 4px;
+  padding: 11px 12px 13px 12px;
   justify-content: center;
   align-items: center;
   flex: 1 0 0;
   border: 0;
   border-bottom: 2px solid rgba(0, 0, 0, 0.10);
-  border-radius: 12px;
+  border-radius: 16px;
   background: var(--pcs-colors-input);
   color: var(--pcs-colors-text-subtle);
   font-feature-settings: 'liga' off;
@@ -888,7 +897,7 @@
 .wpc1-action-btn:active { transform: translateY(1px); border-bottom-width: 0; padding-bottom: 7px; }
 
 .wpc1-action-btn--primary {
-  border-radius: 12px;
+  border-radius: 16px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.20);
   background: var(--pcs-colors-primary);
   color: var(--pcs-colors-inverted-contrast);

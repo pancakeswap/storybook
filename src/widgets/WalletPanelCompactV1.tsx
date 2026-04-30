@@ -53,7 +53,6 @@ export interface WalletPanelCompactV1Props {
   initialTab?: TabKey
   initialTimeframe?: Timeframe
   initialExpanded?: 'spot' | 'perp' | null
-  onBridge?: () => void
   onSpotAction?: (action: 'send' | 'receive' | 'swap') => void
   onPerpAction?: (action: 'deposit' | 'withdraw' | 'manage' | 'transfer') => void
 }
@@ -82,17 +81,16 @@ const DEFAULT_DATA: WalletData = {
       label: 'Perps Balance',
       sublabel: 'Aster contract',
       amount: 973.35,
-      pnl: { '24h': -0.22, '7d': 8.12, 'all': 23.18 },
-      description: 'Total value of your assets and active positions, including unrealized PnL. Updates in real time.',
+      pnl: { '24h': 1.72, '7d': 8.12, 'all': 23.18 },
+      description: 'Total value of your perps trading balance. Updates in real time.',
       positions: [
         { symbol: 'ETH', side: 'Long',  leverage: '500X', pnlUsd: 209.87, pnlPct: 0.5, color: '#627EEA' },
         { symbol: 'BTC', side: 'Short', leverage: '250X', pnlUsd: 425.26, pnlPct: 0.5, color: '#F7931A' },
         { symbol: 'BNB', side: 'Long',  leverage: '500X', pnlUsd: 338.11, pnlPct: 0.5, color: '#F0B90B' },
       ],
       balanceTokens: [
-        { symbol: 'USDC', name: 'Circle USD', amount: '256.29 USDC', value: 257.35, pnl: 0.01, network: 'BNB', color: '#2775CA' },
-        { symbol: 'ETH',  name: 'Ethereum',   amount: '0.11 ETH',   value: 254.09, pnl: 0.5,  network: 'BNB', color: '#627EEA' },
-        { symbol: 'BNB',  name: 'Binance',    amount: '0.09 BNB',   value: 56.44,  pnl: 0.5,  network: 'BNB', color: '#F0B90B' },
+        { symbol: 'USDC', name: 'Circle USD', amount: '610 USDC',    value: 610.09, pnl: 0.5, network: 'BNB', color: '#2775CA' },
+        { symbol: 'USDT', name: 'Tether',     amount: '363.34 USDT', value: 363.12, pnl: 0.5, network: 'BNB', color: '#26A17B' },
       ],
     },
   },
@@ -159,12 +157,6 @@ const PerpsChartGlyph = () => (
 const TriangleDown = ({ size = 12 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
     <path d="M6 9L1.5 3h9z" />
-  </svg>
-)
-
-const ArrowRight = ({ size = 24 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M4 11h12.17l-5.59-5.59L12 4l8 8-8 8-1.42-1.41L16.17 13H4v-2z" />
   </svg>
 )
 
@@ -352,7 +344,6 @@ function BucketDetail({
   setHideSmall,
   onSpotAction,
   onPerpAction,
-  onBridge,
 }: {
   bucket: Bucket
   pct: number
@@ -364,9 +355,7 @@ function BucketDetail({
   setHideSmall: (v: boolean) => void
   onSpotAction?: WalletPanelCompactV1Props['onSpotAction']
   onPerpAction?: WalletPanelCompactV1Props['onPerpAction']
-  onBridge?: () => void
 }) {
-  const [expandedStat, setExpandedStat] = useState<'balance' | 'pnl' | null>(null)
   const pnl = bucket.pnl[timeframe]
   const pnlDelta = bucket.amount * (pnl / 100)
   const tfLabel = timeframe === '24h' ? '24 hours' : timeframe === '7d' ? '7 days' : 'lifetime'
@@ -453,110 +442,45 @@ function BucketDetail({
         </>
       ) : (
         <>
-          <div className="wpc1-perp-stats">
-            <div className="wpc1-perp-stats-row">
-              <span className="wpc1-perp-stats-label">Balance</span>
-              <div className="wpc1-perp-stats-right">
-                <span className="wpc1-perp-stats-value">{fmtUsd(567.79)}</span>
-                <span className="wpc1-pnl-flat wpc1-pnl-flat--up">
-                  <TriangleUp size={12} />
-                  <span>1.72%</span>
-                </span>
-                <button
-                  type="button"
-                  className={`wpc1-bucket-caret${expandedStat === 'balance' ? ' wpc1-bucket-caret--up' : ''}`}
-                  aria-label={expandedStat === 'balance' ? 'Collapse Balance' : 'Expand Balance'}
-                  aria-expanded={expandedStat === 'balance'}
-                  onClick={() => setExpandedStat((e) => (e === 'balance' ? null : 'balance'))}
-                >
-                  <span className="wpc1-bucket-caret-icon">
-                    <ArrowDropDown />
-                  </span>
-                </button>
-              </div>
+          <label className="wpc1-hide-small">
+            <div className="wpc1-hide-small-inner">
+              <span className="wpc1-hide-small-label">Hide small balances</span>
+              <span className="wpc1-hide-small-info" aria-hidden>
+                <InfoCircle size={16} />
+              </span>
+              <Checkbox
+                scale="sm"
+                checked={hideSmall}
+                onChange={(e) => setHideSmall(e.target.checked)}
+              />
             </div>
-            {expandedStat === 'balance' && (
-              <div className="wpc1-perp-stats-expand">
-                <div className="wpc1-perp-stats-divider" />
-                <label className="wpc1-hide-small">
-                  <div className="wpc1-hide-small-inner">
-                    <span className="wpc1-hide-small-label">Hide small balances</span>
-                    <span className="wpc1-hide-small-info" aria-hidden>
-                      <InfoCircle size={16} />
-                    </span>
-                    <Checkbox
-                      scale="sm"
-                      checked={hideSmall}
-                      onChange={(e) => setHideSmall(e.target.checked)}
-                    />
-                  </div>
-                </label>
-                <div className="wpc1-tk-list">
-                  {(bucket.balanceTokens || []).map((tk, i) => (
-                    <TokenRow key={tk.symbol + i} tk={tk} />
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="wpc1-perp-stats-divider" />
-            <div className="wpc1-perp-stats-row">
-              <span className="wpc1-perp-stats-label">Unrealized PnL</span>
-              <div className="wpc1-perp-stats-right">
-                <span className="wpc1-perp-stats-value">405.56</span>
-                <span className="wpc1-pnl-flat wpc1-pnl-flat--down">
-                  <TriangleDown size={12} />
-                  <span>0.22%</span>
-                </span>
-                <button
-                  type="button"
-                  className={`wpc1-bucket-caret${expandedStat === 'pnl' ? ' wpc1-bucket-caret--up' : ''}`}
-                  aria-label={expandedStat === 'pnl' ? 'Collapse Unrealized PnL' : 'Expand Unrealized PnL'}
-                  aria-expanded={expandedStat === 'pnl'}
-                  onClick={() => setExpandedStat((e) => (e === 'pnl' ? null : 'pnl'))}
-                >
-                  <span className="wpc1-bucket-caret-icon">
-                    <ArrowDropDown />
-                  </span>
-                </button>
-              </div>
-            </div>
-            {expandedStat === 'pnl' && (
-              <div className="wpc1-perp-stats-expand">
-                <div className="wpc1-perp-stats-divider" />
-                <label className="wpc1-hide-small">
-                  <div className="wpc1-hide-small-inner">
-                    <span className="wpc1-hide-small-label">Hide small balances</span>
-                    <span className="wpc1-hide-small-info" aria-hidden>
-                      <InfoCircle size={16} />
-                    </span>
-                    <Checkbox
-                      scale="sm"
-                      checked={hideSmall}
-                      onChange={(e) => setHideSmall(e.target.checked)}
-                    />
-                  </div>
-                </label>
-                <div className="wpc1-tk-list">
-                  {(bucket.positions || []).map((p, i) => (
-                    <PositionRow key={p.symbol + i} p={p} />
-                  ))}
-                </div>
-              </div>
-            )}
+          </label>
+          <div className="wpc1-tk-list">
+            {(bucket.balanceTokens && hideSmall
+              ? bucket.balanceTokens.filter((t) => t.value >= 100)
+              : bucket.balanceTokens
+            )?.map((tk, i) => (
+              <TokenRow key={tk.symbol + i} tk={tk} />
+            ))}
           </div>
           <div className="wpc1-actions">
-            <button type="button" className="wpc1-action-btn" onClick={() => onPerpAction?.('transfer')}>Transfer</button>
-            <button type="button" className="wpc1-action-btn" onClick={() => onPerpAction?.('withdraw')}>Withdraw</button>
-            <button type="button" className="wpc1-action-btn wpc1-action-btn--primary" onClick={() => onPerpAction?.('deposit')}>Deposit</button>
+            <button
+              type="button"
+              className="wpc1-action-btn"
+              onClick={() => onPerpAction?.('withdraw')}
+            >
+              Withdraw
+            </button>
+            <button
+              type="button"
+              className="wpc1-action-btn wpc1-action-btn--primary"
+              onClick={() => onPerpAction?.('deposit')}
+            >
+              Deposit
+            </button>
           </div>
         </>
       )}
-
-      {/* Bridge */}
-      <button type="button" className="wpc1-bridge" onClick={onBridge}>
-        Bridge Crypto
-        <ArrowRight size={24} />
-      </button>
     </>
   )
 }
@@ -704,7 +628,6 @@ export function WalletPanelCompactV1({
   initialTab = 'assets',
   initialTimeframe = '24h',
   initialExpanded = null,
-  onBridge,
   onSpotAction,
   onPerpAction,
 }: WalletPanelCompactV1Props) {
@@ -759,7 +682,6 @@ export function WalletPanelCompactV1({
           setHideSmall={setHideSmall}
           onSpotAction={onSpotAction}
           onPerpAction={onPerpAction}
-          onBridge={onBridge}
         />
       </section>
     )
@@ -863,12 +785,6 @@ export function WalletPanelCompactV1({
           onOpen={() => setView('perp')}
         />
       </div>
-
-      {/* Bridge */}
-      <button type="button" className="wpc1-bridge" onClick={onBridge}>
-        Bridge Crypto
-        <ArrowRight size={24} />
-      </button>
     </section>
   )
 }
