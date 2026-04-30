@@ -109,7 +109,7 @@ declare type BoxProps = React.HTMLAttributes<HTMLDivElement>;
  * whatever else upstream wants).
  *
  * Auto-responsive: drops to `MobileChartPanel` when
- * `useMatchBreakpoints().isMobile` is true. Mobile adds an inline
+ * `useIsMobile()` is true. Mobile adds an inline
  * timeframe tab row + an optional floating price pill — desktop keeps
  * the original `children` + `minHeight` API untouched.
  */
@@ -1126,7 +1126,7 @@ export declare interface PositionsPanelProps {
     /** Translator. */
     t?: (key: string) => string;
     /**
-     * Force the mobile layout. Defaults to `useMatchBreakpoints().isMobile`
+     * Force the mobile layout. Defaults to `useIsMobile()`
      * — same auto-detection pattern as `OrderForm`.
      */
     isMobile?: boolean;
