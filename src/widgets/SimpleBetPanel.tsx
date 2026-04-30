@@ -149,7 +149,7 @@ const TriangleUp: React.FC = () => (
 const InfoCircleGlyph: React.FC = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ aspectRatio: '1 / 1' }}>
     <path
-      d="M7.99636 11.2598C8.18224 11.2598 8.3393 11.1966 8.46752 11.0702C8.59563 10.9436 8.65969 10.7869 8.65969 10.6V7.85984C8.65969 7.67284 8.5968 7.51612 8.47102 7.38967C8.34524 7.26323 8.18936 7.20001 8.00336 7.20001C7.81747 7.20001 7.66041 7.26323 7.53219 7.38967C7.40408 7.51612 7.34002 7.67284 7.34002 7.85984V10.6C7.34002 10.7869 7.40291 10.9436 7.52869 11.0702C7.65447 11.1966 7.81036 11.2598 7.99636 11.2598ZM7.99636 6.07968C8.18791 6.07968 8.34969 6.0149 8.48169 5.88534C8.61358 5.75567 8.67952 5.59506 8.67952 5.40351C8.67952 5.21195 8.61474 5.05018 8.48519 4.91818C8.35552 4.78629 8.19491 4.72034 8.00336 4.72034C7.8118 4.72034 7.65002 4.78512 7.51802 4.91467C7.38613 5.04434 7.32019 5.20495 7.32019 5.39651C7.32019 5.58806 7.38497 5.74984 7.51452 5.88184C7.64419 6.01373 7.8048 6.07968 7.99636 6.07968ZM8.00452 14.5355C7.10241 14.5355 6.25452 14.3654 5.46086 14.0252C4.66708 13.685 3.97263 13.2173 3.37752 12.6223C2.78252 12.0272 2.31491 11.3331 1.97469 10.5398C1.63447 9.74662 1.46436 8.89745 1.46436 7.99234C1.46436 7.08734 1.63447 6.24079 1.97469 5.45267C2.31491 4.66445 2.78252 3.97279 3.37752 3.37767C3.97263 2.78267 4.6668 2.31506 5.46002 1.97484C6.25324 1.63462 7.10241 1.46451 8.00752 1.46451C8.91252 1.46451 9.75908 1.63462 10.5472 1.97484C11.3354 2.31506 12.0271 2.78267 12.6222 3.37767C13.2172 3.97279 13.6848 4.66567 14.025 5.45634C14.3652 6.24701 14.5354 7.09334 14.5354 7.99534C14.5354 8.89745 14.3652 9.74534 14.025 10.539C13.6848 11.3328 13.2172 12.0272 12.6222 12.6223C12.0271 13.2173 11.3342 13.685 10.5435 14.0252C9.75286 14.3654 8.90652 14.5355 8.00452 14.5355ZM7.99986 13.1522C9.43363 13.1522 10.6508 12.652 11.6514 11.6515C12.6518 10.651 13.152 9.43379 13.152 8.00001C13.152 6.56623 12.6518 5.34906 11.6514 4.34851C10.6508 3.34806 9.43363 2.84784 7.99986 2.84784C6.56608 2.84784 5.34891 3.34806 4.34836 4.34851C3.34791 5.34906 2.84769 6.56623 2.84769 8.00001C2.84769 9.43379 3.34791 10.651 4.34836 11.6515C5.34891 12.652 6.56608 13.1522 7.99986 13.1522Z"
+      d="M7.99636 11.2602C8.18224 11.2602 8.3393 11.197 8.46752 11.0705C8.59563 10.944 8.65969 10.7872 8.65969 10.6003V7.86018C8.65969 7.67318 8.5968 7.51645 8.47102 7.39001C8.34524 7.26357 8.18936 7.20034 8.00336 7.20034C7.81747 7.20034 7.66041 7.26357 7.53219 7.39001C7.40408 7.51645 7.34002 7.67318 7.34002 7.86018V10.6003C7.34002 10.7872 7.40291 10.944 7.52869 11.0705C7.65447 11.197 7.81036 11.2602 7.99636 11.2602ZM7.99636 6.08001C8.18791 6.08001 8.34969 6.01523 8.48169 5.88568C8.61358 5.75601 8.67952 5.5954 8.67952 5.40384C8.67952 5.21229 8.61474 5.05051 8.48519 4.91851C8.35552 4.78662 8.19491 4.72068 8.00336 4.72068C7.8118 4.72068 7.65002 4.78546 7.51802 4.91501C7.38613 5.04468 7.32019 5.20529 7.32019 5.39684C7.32019 5.5884 7.38497 5.75018 7.51452 5.88218C7.64419 6.01407 7.8048 6.08001 7.99636 6.08001ZM8.00452 14.5358C7.10241 14.5358 6.25452 14.3657 5.46086 14.0255C4.66708 13.6853 3.97263 13.2177 3.37752 12.6227C2.78252 12.0276 2.31491 11.3334 1.97469 10.5402C1.63447 9.74696 1.46436 8.89779 1.46436 7.99268C1.46436 7.08768 1.63447 6.24112 1.97469 5.45301C2.31491 4.66479 2.78252 3.97312 3.37752 3.37801C3.97263 2.78301 4.6668 2.3154 5.46002 1.97518C6.25324 1.63495 7.10241 1.46484 8.00752 1.46484C8.91252 1.46484 9.75908 1.63495 10.5472 1.97518C11.3354 2.3154 12.0271 2.78301 12.6222 3.37801C13.2172 3.97312 13.6848 4.66601 14.025 5.45668C14.3652 6.24734 14.5354 7.09368 14.5354 7.99568C14.5354 8.89779 14.3652 9.74568 14.025 10.5393C13.6848 11.3331 13.2172 12.0276 12.6222 12.6227C12.0271 13.2177 11.3342 13.6853 10.5435 14.0255C9.75286 14.3657 8.90652 14.5358 8.00452 14.5358ZM7.99986 13.1525C9.43363 13.1525 10.6508 12.6523 11.6514 11.6518C12.6518 10.6513 13.152 9.43412 13.152 8.00034C13.152 6.56657 12.6518 5.3494 11.6514 4.34884C10.6508 3.3484 9.43363 2.84818 7.99986 2.84818C6.56608 2.84818 5.34891 3.3484 4.34836 4.34884C3.34791 5.3494 2.84769 6.56657 2.84769 8.00034C2.84769 9.43412 3.34791 10.6513 4.34836 11.6518C5.34891 12.6523 6.56608 13.1525 7.99986 13.1525Z"
       fill="currentColor"
     />
   </svg>
@@ -241,44 +241,32 @@ const TopCard = styled.div`
 `
 
 const UpDownCard = styled.div`
-  display: flex;
-  width: 458px;
+  display: inline-flex;
   flex-direction: column;
-  align-items: flex-start;
   align-self: stretch;
-  border-radius: 24px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  background: ${({ theme }) => theme.colors.cardSecondary};
-
-  @media (min-width: 968px) and (max-width: 1199.98px) {
-    width: auto;
-    align-self: stretch;
-    border-radius: 16px;
-    border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-    border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-    border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
-    border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-    background: ${({ theme }) => theme.colors.cardSecondary};
-  }
-
-  @media (max-width: 967.98px) {
-    width: auto;
-    align-self: stretch;
-  }
+  align-items: flex-start;
+  gap: 16px;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
 `
 
 const UpDownCardActions = styled.div`
   display: flex;
+  width: 458px;
+  height: 77px;
+  align-items: center;
   gap: 8px;
   align-self: stretch;
   padding: 0;
 
   @media (min-width: 968px) and (max-width: 1199.98px) {
+    width: auto;
     height: 56px;
-    align-items: center;
+  }
+
+  @media (max-width: 967.98px) {
+    width: auto;
   }
 `
 
@@ -383,18 +371,14 @@ const PreTitle = styled(Text).attrs({ fontSize: '12px' })`
 // Wallet / fund chip
 const FundChip = styled.button`
   display: flex;
-  padding: 8px;
   align-items: center;
   gap: 4px;
-  border-radius: 12px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  background: ${({ theme }) => theme.colors.cardSecondary};
+  padding: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
   font-family: inherit;
-  color: ${({ theme }) => theme.colors.text};
+  color: #B8ADD2;
   transition: filter 0.12s;
   &:hover {
     filter: brightness(0.98);
@@ -403,7 +387,7 @@ const FundChip = styled.button`
 
 const FundAmt = styled.span`
   overflow: hidden;
-  color: ${({ theme }) => theme.colors.text};
+  color: #B8ADD2;
   text-align: right;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -689,46 +673,20 @@ const LevValue = styled.span`
   }
 `
 
-const ZONE_BORDER: Record<Zone, string> = {
-  safe: '#129E7D',
-  warn: '#FFB237',
-  danger: '#ED4B9E',
-}
 const ZONE_BG: Record<Zone, string> = {
-  safe: '#EAFBF7',
-  warn: '#FBF2E7',
-  danger: '#FFF0F9',
-}
-const ZONE_BORDER_DARK: Record<Zone, string> = {
-  safe: '#3DDBB5',
+  safe: '#31D0AA',
   warn: '#FFB237',
   danger: '#ED4B9E',
-}
-const ZONE_BG_DARK: Record<Zone, string> = {
-  safe: '#0C3A32',
-  warn: '#452E14',
-  danger: '#3E1C39',
 }
 
 const ZonePill = styled.span<{ $zone: Zone }>`
-  display: inline-flex;
-  padding: 8px 12px;
+  display: flex;
+  padding: 2px 5px;
+  justify-content: center;
   align-items: center;
   gap: 4px;
-  border-radius: 16px;
-  border-top: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
-  border-right: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
-  border-bottom: 2px solid ${({ $zone }) => ZONE_BORDER[$zone]};
-  border-left: 1px solid ${({ $zone }) => ZONE_BORDER[$zone]};
+  border-radius: 999px;
   background: ${({ $zone }) => ZONE_BG[$zone]};
-
-  html.dark & {
-    border-top-color: ${({ $zone }) => ZONE_BORDER_DARK[$zone]};
-    border-right-color: ${({ $zone }) => ZONE_BORDER_DARK[$zone]};
-    border-bottom-color: ${({ $zone }) => ZONE_BORDER_DARK[$zone]};
-    border-left-color: ${({ $zone }) => ZONE_BORDER_DARK[$zone]};
-    background: ${({ $zone }) => ZONE_BG_DARK[$zone]};
-  }
 `
 
 const ZonePillText = styled.span`
@@ -736,21 +694,29 @@ const ZonePillText = styled.span`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  color: ${({ theme }) => theme.colors.text};
+  color: #FFF;
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
   font-size: 14px;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 150%;
+
+  html.dark & {
+    color: #000;
+  }
 `
 
 const ZoneTipAnchor = styled.span`
   display: inline-flex;
   align-items: center;
-  color: #280D5F;
+  color: #FFF;
   cursor: help;
+
+  html.dark & {
+    color: #000;
+  }
 `
 
 // Hand-rolled leverage slider (the Slider primitive can't do a per-zone
@@ -932,11 +898,22 @@ const StatsCard = styled.div`
 
 const StatsList = styled.div`
   display: flex;
-  padding: 8px 16px 16px 16px;
+  width: 458px;
+  padding: 16px;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
   align-self: stretch;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.cardSecondary};
+
+  @media (max-width: 1199.98px) {
+    width: auto;
+  }
 `
 
 const StatsRow = styled(Flex)`
@@ -990,6 +967,10 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
   cursor: pointer;
   transition: filter 0.12s, transform 0.06s;
   background: ${({ theme, $variant }) => ($variant === 'up' ? theme.colors.success : theme.colors.failure)};
+
+  html.dark & {
+    color: #000;
+  }
   &:hover:not(:disabled) {
     filter: brightness(1.08);
   }
@@ -1296,11 +1277,11 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           <SectionHead>
             <PreTitle>My Perp Fund</PreTitle>
             <FundChip type="button" onClick={onTopUpFund} aria-label="Top up fund">
-              <span style={{ display: 'inline-flex', color: 'var(--pcs-colors-text-subtle, #7A6EAA)' }}>
+              <span style={{ display: 'inline-flex' }}>
                 <WalletGlyph />
               </span>
               <FundAmt>{fundBalanceText}</FundAmt>
-              <span style={{ display: 'inline-flex', color: 'var(--pcs-colors-text, #280D5F)' }}>
+              <span style={{ display: 'inline-flex' }}>
                 <AddCircleGlyph />
               </span>
             </FundChip>
@@ -1401,7 +1382,7 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                 }
                 aria-label="Custom leverage"
               />
-              <LevCustomSuffix>%</LevCustomSuffix>
+              <LevCustomSuffix>x</LevCustomSuffix>
             </LevCustom>
             {presets.map((p) => (
               <LevTab

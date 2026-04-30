@@ -205,6 +205,10 @@ const TabletPositionDirection = styled.span<{ $direction: SimplePositionDirectio
   line-height: 150%;
   letter-spacing: 0.24px;
   text-transform: uppercase;
+
+  html.dark & {
+    color: ${({ $direction }) => ($direction === 'up' ? '#3DDBB5' : '#ED4B9E')};
+  }
 `
 
 const TabletPositionPnl = styled.span<{ $sign: 'positive' | 'negative' | 'zero' }>`
@@ -218,6 +222,11 @@ const TabletPositionPnl = styled.span<{ $sign: 'positive' | 'negative' | 'zero' 
   font-weight: 600;
   line-height: 150%;
   font-variant-numeric: tabular-nums;
+
+  html.dark & {
+    color: ${({ $sign, theme }) =>
+      $sign === 'positive' ? '#3DDBB5' : $sign === 'negative' ? '#ED4B9E' : theme.colors.text};
+  }
 `
 
 const TabletPositionDivider = styled.span`
@@ -454,6 +463,10 @@ const DirectionLabel = styled.span<{ $direction: SimplePositionDirection }>`
   letter-spacing: 0.24px;
   text-transform: uppercase;
   white-space: nowrap;
+
+  html.dark & {
+    color: ${({ $direction }) => ($direction === 'up' ? '#3DDBB5' : '#ED4B9E')};
+  }
 `
 
 const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
@@ -471,6 +484,15 @@ const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
+
+  html.dark & {
+    color: ${({ $sign, theme }) =>
+      $sign === 'positive'
+        ? '#3DDBB5'
+        : $sign === 'negative'
+          ? '#ED4B9E'
+          : theme.colors.text};
+  }
 `
 
 const LiqDistance = styled(Td)`

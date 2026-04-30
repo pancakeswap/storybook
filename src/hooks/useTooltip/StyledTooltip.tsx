@@ -8,6 +8,12 @@ import { styled } from 'styled-components'
  * popper's `data-popper-placement^=`, which we no longer need because
  * Radix gives us the exact side as a discrete attribute.
  */
+/**
+ * High-contrast tooltip — dark surface in light mode, light surface in
+ * dark mode (per Figma 391:39212-style direction). Color swap is keyed
+ * on the `html.dark` class set by Storybook's theme toolbar / consumer
+ * theme switcher.
+ */
 export const StyledTooltipContent = styled(Popover.Content)`
   padding: 16px;
   font-size: 16px;
@@ -15,14 +21,21 @@ export const StyledTooltipContent = styled(Popover.Content)`
   border-radius: 16px;
   max-width: 320px;
   z-index: 101;
-  background: ${({ theme }) => theme.tooltip.background};
-  color: ${({ theme }) => theme.tooltip.text};
+  background: #08060B;
+  color: #FFFFFF;
   box-shadow: ${({ theme }) => theme.tooltip.boxShadow};
   word-wrap: break-word;
-  /* Radix sets visibility to 'hidden' until positioned to avoid the
-     "render at 0,0 then jump" flash. Nothing to do here. */
+
+  html.dark & {
+    background: #FFFFFF;
+    color: #08060B;
+  }
 `
 
 export const StyledTooltipArrow = styled(Popover.Arrow)`
-  fill: ${({ theme }) => theme.tooltip.background};
+  fill: #08060B;
+
+  html.dark & {
+    fill: #FFFFFF;
+  }
 `
