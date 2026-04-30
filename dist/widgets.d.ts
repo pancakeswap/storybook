@@ -1,5 +1,8 @@
+import { ActionItem } from './WalletPanelCompactV1';
+import { Bucket } from './WalletPanelCompactV1';
 import { default as default_2 } from 'react';
 import { IStyledComponent } from 'styled-components';
+import { PerpStatsData } from './WalletPanelCompactV1';
 import { ResponsiveValue } from 'styled-system';
 import { SimpleBetPanel } from './SimpleBetPanel';
 import { SimpleBetPanelProps } from './SimpleBetPanel';
@@ -16,6 +19,10 @@ import { SimpleTickerCard } from './SimpleTickerCard';
 import { SimpleTickerCardProps } from './SimpleTickerCard';
 import { Theme } from 'styled-system';
 import { TLengthStyledSystem } from 'styled-system';
+import { WalletData } from './WalletPanelCompactV1';
+import { WalletPanelCompactV1 } from './WalletPanelCompactV1';
+import { WalletPanelCompactV1Props } from './WalletPanelCompactV1';
+import { WalletPanelLabels } from './WalletPanelCompactV1';
 
 export declare const AccountPanel: default_2.FC<AccountPanelProps>;
 
@@ -73,6 +80,8 @@ export declare type AccountPanelState = {
     marginMode?: string;
 };
 
+export { ActionItem }
+
 /**
  * Tabbed container for Order Book + Recent Trades — one panel, one
  * header. The two child slots are always mounted (hidden via
@@ -100,6 +109,8 @@ export declare interface BookTradesPanelProps {
 export declare type BookTradesTab = 'book' | 'trades';
 
 declare type BoxProps = React.HTMLAttributes<HTMLDivElement>;
+
+export { Bucket }
 
 /**
  * Stylesheet shell for the perps chart. Owns the panel framing
@@ -1030,6 +1041,8 @@ onTransitionEndCapture?: default_2.TransitionEventHandler<HTMLDivElement> | unde
 'data-pr-showondisabled'?: boolean | undefined | undefined;
 }>;
 
+export { PerpStatsData }
+
 export declare interface PositionRow {
     /** Stable React key — consumer typically uses `${symbol}-${positionSide}`. */
     id: string;
@@ -1411,6 +1424,14 @@ export declare interface UnderlineTabsProps {
      */
     fullWidth?: boolean;
 }
+
+export { WalletData }
+
+export { WalletPanelCompactV1 }
+
+export { WalletPanelCompactV1Props }
+
+export { WalletPanelLabels }
 
 /**
  * Withdraw flow modal — multi-step (select asset → enter amount). The
