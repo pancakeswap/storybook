@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import styled, { useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { ChevronDownIcon } from '../primitives/Icons'
-import { useMatchBreakpoints } from '../contexts'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { PerpsPanel } from './primitives'
 
 export type OrderBookView = 'both' | 'bids' | 'asks'
@@ -768,7 +768,7 @@ const MobileOrderBook: React.FC<OrderBookProps> = ({
  * the finest available option and emits a change.
  */
 export const OrderBook: React.FC<OrderBookProps> = (props) => {
-  const { isMobile } = useMatchBreakpoints()
+  const isMobile = useIsMobile()
   if (isMobile) return <MobileOrderBook {...props} />
   return <DesktopOrderBook {...props} />
 }

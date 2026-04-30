@@ -1,6 +1,6 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { useMatchBreakpoints } from '../contexts'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { PerpsPanel } from './primitives'
 
 export const DEFAULT_TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1d'] as const
@@ -119,7 +119,7 @@ const PricePill = styled.span`
 
 /**
  * Mobile-only render path. Mounted from `ChartPanel` when
- * `useMatchBreakpoints().isMobile` is true. Owns the timeframe tab
+ * `useIsMobile()` is true. Owns the timeframe tab
  * row + the canvas slot; consumer fills `children` with the real chart
  * (TradingView iframe etc.). When `children` is empty, the storybook
  * gradient/line fixture is shown.
@@ -168,12 +168,12 @@ const MobileChartPanel: React.FC<ChartPanelProps> = ({
  * whatever else upstream wants).
  *
  * Auto-responsive: drops to `MobileChartPanel` when
- * `useMatchBreakpoints().isMobile` is true. Mobile adds an inline
+ * `useIsMobile()` is true. Mobile adds an inline
  * timeframe tab row + an optional floating price pill — desktop keeps
  * the original `children` + `minHeight` API untouched.
  */
 export const ChartPanel: React.FC<ChartPanelProps> = (props) => {
-  const { isMobile } = useMatchBreakpoints()
+  const isMobile = useIsMobile()
   if (isMobile) return <MobileChartPanel {...props} />
   const { children, minHeight = '420px' } = props
   return <Panel $minHeight={toCss(minHeight)}>{children}</Panel>

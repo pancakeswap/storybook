@@ -8,7 +8,7 @@ import { Input } from '../primitives/Input'
 import Slider from '../primitives/Slider/Slider'
 import { Text } from '../primitives/Text'
 import { AddIcon, ChevronDownIcon, InfoIcon } from '../primitives/Icons'
-import { useMatchBreakpoints } from '../contexts'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { BunnySlider } from './BunnySlider'
 import { PerpsPanel } from './primitives'
 
@@ -623,7 +623,7 @@ const MOBILE_TYPES: ReadonlyArray<{ key: OrderTypeKey; label: string }> = [
 
 /**
  * Mobile-only render path. Mounted from `OrderForm` when
- * `useMatchBreakpoints().isMobile` is true. Internal hooks (type-menu
+ * `useIsMobile()` is true. Internal hooks (type-menu
  * popover) live here so the desktop branch never spends them.
  */
 const MobileOrderForm: React.FC<OrderFormProps> = ({
@@ -925,7 +925,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
   // Auto-responsive: switch to mobile layout when the viewport drops
   // into the mobile breakpoint. Same pattern as Modal / MotionModal —
   // consumer doesn't pass any flag.
-  const { isMobile } = useMatchBreakpoints()
+  const isMobile = useIsMobile()
   if (isMobile) return <MobileOrderForm {...props} />
 
   const {

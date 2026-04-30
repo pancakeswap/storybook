@@ -4,7 +4,7 @@ import { Button } from '../primitives/Button'
 import { Flex } from '../primitives/Box'
 import { Message, MessageText } from '../primitives/Message'
 import { Text } from '../primitives/Text'
-import { useMatchBreakpoints } from '../contexts'
+import { useIsMobile } from '../hooks/useIsMobile'
 import { PerpsPanel } from './primitives'
 
 /**
@@ -206,7 +206,7 @@ export const AccountPanel: React.FC<AccountPanelProps> = (props) => {
   // Auto-responsive: switch to slim row layout when the viewport drops
   // into the mobile breakpoint. Same pattern as OrderForm — consumer
   // doesn't pass any flag.
-  const { isMobile } = useMatchBreakpoints()
+  const isMobile = useIsMobile()
   if (isMobile) return <MobileAccountPanel {...props} />
 
   const {

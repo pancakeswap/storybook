@@ -4,7 +4,7 @@ import styled, { useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Text } from '../primitives/Text'
 import { ChartDisableIcon, ChartIcon, ChevronDownIcon, StarFillIcon, StarLineIcon } from '../primitives/Icons'
-import { useMatchBreakpoints } from '../contexts'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 export interface SymbolHeaderProps {
   /** Full venue symbol — used as React key + aria labels. */
@@ -301,7 +301,7 @@ export const SymbolHeader: React.FC<SymbolHeaderProps> = (props) => {
   // Auto-responsive: switch to mobile layout when the viewport drops
   // into the mobile breakpoint. Same pattern as OrderForm — desktop
   // call sites don't need to pass any flag.
-  const { isMobile } = useMatchBreakpoints()
+  const isMobile = useIsMobile()
   if (isMobile) return <MobileSymbolHeader {...props} />
   return <DesktopSymbolHeader {...props} />
 }
