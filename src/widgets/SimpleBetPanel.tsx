@@ -3,7 +3,7 @@ import { styled } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
-import { AddIcon, HelpIcon, WalletFilledIcon } from '../primitives/Icons'
+import { AddIcon, WalletFilledIcon } from '../primitives/Icons'
 import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel } from './primitives'
 
@@ -378,7 +378,7 @@ const FundChip = styled.button`
   background: transparent;
   cursor: pointer;
   font-family: inherit;
-  color: #B8ADD2;
+  color: ${({ theme }) => theme.colors.textSubtle};
   transition: filter 0.12s;
   &:hover {
     filter: brightness(0.98);
@@ -387,7 +387,7 @@ const FundChip = styled.button`
 
 const FundAmt = styled.span`
   overflow: hidden;
-  color: #B8ADD2;
+  color: ${({ theme }) => theme.colors.textSubtle};
   text-align: right;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -1473,9 +1473,7 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
 
       {/* Unrealized PnL */}
       <PnlCard>
-        <PnlLabel>
-          Unrealized PnL <HelpIcon color="textSubtle" width="14px" />
-        </PnlLabel>
+        <PnlLabel>Unrealized PnL</PnlLabel>
         <PnlValue>{unrealizedPnl}</PnlValue>
       </PnlCard>
       </Bottom>

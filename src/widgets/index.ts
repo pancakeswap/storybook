@@ -104,12 +104,12 @@ export type {
   SimplePositionLiqStatus,
 } from './SimplePositionsCard'
 
-export { WalletPanelCompactV1 } from './WalletPanelCompactV1'
+export { WalletPanel } from './WalletPanel'
 export type {
-  WalletPanelCompactV1Props,
+  WalletPanelProps,
   WalletPanelLabels,
   Bucket,
   WalletData,
   ActionItem,
   PerpStatsData,
-} from './WalletPanelCompactV1'
+} from './WalletPanel'
