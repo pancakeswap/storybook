@@ -1,8 +1,8 @@
-import { ActionItem } from './WalletPanelCompactV1';
-import { Bucket } from './WalletPanelCompactV1';
+import { ActionItem } from './WalletPanel';
+import { Bucket } from './WalletPanel';
 import { default as default_2 } from 'react';
 import { IStyledComponent } from 'styled-components';
-import { PerpStatsData } from './WalletPanelCompactV1';
+import { PerpStatsData } from './WalletPanel';
 import { ResponsiveValue } from 'styled-system';
 import { SimpleBetPanel } from './SimpleBetPanel';
 import { SimpleBetPanelProps } from './SimpleBetPanel';
@@ -19,10 +19,10 @@ import { SimpleTickerCard } from './SimpleTickerCard';
 import { SimpleTickerCardProps } from './SimpleTickerCard';
 import { Theme } from 'styled-system';
 import { TLengthStyledSystem } from 'styled-system';
-import { WalletData } from './WalletPanelCompactV1';
-import { WalletPanelCompactV1 } from './WalletPanelCompactV1';
-import { WalletPanelCompactV1Props } from './WalletPanelCompactV1';
-import { WalletPanelLabels } from './WalletPanelCompactV1';
+import { WalletData } from './WalletPanel';
+import { WalletPanel } from './WalletPanel';
+import { WalletPanelLabels } from './WalletPanel';
+import { WalletPanelProps } from './WalletPanel';
 
 export declare const AccountPanel: default_2.FC<AccountPanelProps>;
 
@@ -1432,11 +1432,11 @@ export declare interface UnderlineTabsProps {
 
 export { WalletData }
 
-export { WalletPanelCompactV1 }
-
-export { WalletPanelCompactV1Props }
+export { WalletPanel }
 
 export { WalletPanelLabels }
+
+export { WalletPanelProps }
 
 /**
  * Withdraw flow modal — multi-step (select asset → enter amount). The
