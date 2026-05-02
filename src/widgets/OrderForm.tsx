@@ -122,6 +122,14 @@ export interface OrderFormProps {
   /** Open the deposit modal (Avbl row + connector for not-yet-deposited users). */
   onDepositClick: () => void
 
+  /**
+   * Optional extra controls rendered on the right of the Cross/Isolated +
+   * Leverage pills row. Used by consumers to drop in additional
+   * account-level mode toggles (e.g. AssetModeButton) without coupling
+   * the OrderForm widget to those concepts.
+   */
+  extraControls?: React.ReactNode
+
   /** Translator. */
   t?: (key: string, options?: Record<string, string | number | undefined>) => string
 }
@@ -664,6 +672,7 @@ const MobileOrderForm: React.FC<OrderFormProps> = ({
   onLeverageClick,
   onMarginModeToggle,
   onDepositClick,
+  extraControls,
   t = defaultT,
 }) => {
   const sizeUnitLabel = draft.sizeUnit === 'QUOTE' ? quoteAsset : baseAsset
@@ -721,6 +730,7 @@ const MobileOrderForm: React.FC<OrderFormProps> = ({
           {draft.marginMode === 'CROSS' ? t('Cross') : t('Isolated')}
         </MPill>
         <MPill onClick={onLeverageClick}>{`${draft.leverage}x`}</MPill>
+        {extraControls}
       </MPillRow>
 
       <MTypeSelect
@@ -966,6 +976,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
     onLeverageClick,
     onMarginModeToggle,
     onDepositClick,
+    extraControls,
     markPrice,
     priceDecimals = 2,
     t = defaultT,
@@ -1147,6 +1158,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
         <ModeButton onClick={onLeverageClick} title={t('Leverage')}>
           {draft.leverage}x
         </ModeButton>
+        {extraControls}
       </Flex>
 
       <AvblRow>

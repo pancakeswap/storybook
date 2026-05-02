@@ -22,6 +22,12 @@ export type { AccountPanelProps, AccountPanelState } from './AccountPanel'
 export { LeverageModal } from './LeverageModal'
 export type { LeverageModalProps } from './LeverageModal'
 
+export { AssetModeModal } from './AssetModeModal'
+export type { AssetMode, AssetModeModalProps } from './AssetModeModal'
+
+export { AssetModeButton } from './AssetModeButton'
+export type { AssetModeButtonProps } from './AssetModeButton'
+
 export { RecentTrades } from './RecentTrades'
 export type { RecentTradeRow, RecentTradesProps } from './RecentTrades'
 
