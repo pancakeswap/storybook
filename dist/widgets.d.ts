@@ -1,4 +1,9 @@
 import { ActionItem } from './WalletPanel';
+import { AssetMode } from './AssetModeModal';
+import { AssetModeButton } from './AssetModeButton';
+import { AssetModeButtonProps } from './AssetModeButton';
+import { AssetModeModal } from './AssetModeModal';
+import { AssetModeModalProps } from './AssetModeModal';
 import { Bucket } from './WalletPanel';
 import { default as default_2 } from 'react';
 import { IStyledComponent } from 'styled-components';
@@ -81,6 +86,16 @@ export declare type AccountPanelState = {
 };
 
 export { ActionItem }
+
+export { AssetMode }
+
+export { AssetModeButton }
+
+export { AssetModeButtonProps }
+
+export { AssetModeModal }
+
+export { AssetModeModalProps }
 
 /**
  * Tabbed container for Order Book + Recent Trades — one panel, one
@@ -647,6 +662,13 @@ export declare interface OrderFormProps {
     onMarginModeToggle: () => void;
     /** Open the deposit modal (Avbl row + connector for not-yet-deposited users). */
     onDepositClick: () => void;
+    /**
+     * Optional extra controls rendered on the right of the Cross/Isolated +
+     * Leverage pills row. Used by consumers to drop in additional
+     * account-level mode toggles (e.g. AssetModeButton) without coupling
+     * the OrderForm widget to those concepts.
+     */
+    extraControls?: default_2.ReactNode;
     /** Translator. */
     t?: (key: string, options?: Record<string, string | number | undefined>) => string;
 }
