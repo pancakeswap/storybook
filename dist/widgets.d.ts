@@ -621,6 +621,18 @@ export declare interface OrderFormProps {
     /** Consumer renders its classified error here (e.g. PerpsErrorMessage). */
     errorSlot?: default_2.ReactNode;
     /**
+     * Current mark price for the symbol. Used as the entry-price fallback
+     * for TP/SL PnL calculations when no limit price is set. Optional —
+     * if omitted, TP/SL inputs still accept manual values but the
+     * trigger ↔ PnL bidirectional sync is disabled.
+     */
+    markPrice?: number;
+    /**
+     * Decimal places used to format computed trigger prices (defaults to
+     * 2). Pass `meta.pricePrecision` for tick-aligned output.
+     */
+    priceDecimals?: number;
+    /**
      * Click submit — consumer routes via canSubmit (place order) or shows
      * the deposit/auth modals. Mobile renders two CTAs (Buy / Sell) that
      * pass `sideOverride` so the consumer doesn't have to wait for the
