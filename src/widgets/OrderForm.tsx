@@ -11,6 +11,7 @@ import { AddIcon, ChevronDownIcon, InfoIcon } from '../primitives/Icons'
 import { useMatchBreakpoints } from '../contexts'
 import { BunnySlider } from './BunnySlider'
 import { PerpsPanel } from './primitives'
+import { ensureNegative, ensurePositive, useSeparatedNumberInput } from './separatedNumberInput'
 
 export type OrderSide = 'BUY' | 'SELL'
 export type OrderTypeKey = 'market' | 'limit' | 'stop-limit' | 'stop-market'
@@ -91,6 +92,20 @@ export interface OrderFormProps {
   // ── Optional inline error / validation messages ───────────
   /** Consumer renders its classified error here (e.g. PerpsErrorMessage). */
   errorSlot?: React.ReactNode
+
+  // ── TP/SL sync inputs (consumer supplies; widget does the math) ─
+  /**
+   * Current mark price for the symbol. Used as the entry-price fallback
+   * for TP/SL PnL calculations when no limit price is set. Optional —
+   * if omitted, TP/SL inputs still accept manual values but the
+   * trigger ↔ PnL bidirectional sync is disabled.
+   */
+  markPrice?: number
+  /**
+   * Decimal places used to format computed trigger prices (defaults to
+   * 2). Pass `meta.pricePrecision` for tick-aligned output.
+   */
+  priceDecimals?: number
 
   // ── Actions ───────────────────────────────────────────────
   /**
@@ -951,6 +966,8 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
     onLeverageClick,
     onMarginModeToggle,
     onDepositClick,
+    markPrice,
+    priceDecimals = 2,
     t = defaultT,
   } = props
   const sizeUnitLabel = draft.sizeUnit === 'QUOTE' ? quoteAsset : baseAsset
@@ -961,6 +978,65 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
     onDraftChange({ ...draft, sizeUnit: draft.sizeUnit === 'BASE' ? 'QUOTE' : 'BASE', quantity: '' })
 
   const toggleTpSl = () => onDraftChange({ ...draft, tpSlEnabled: !draft.tpSlEnabled })
+
+  // ── TP/SL trigger ↔ PnL bidirectional sync ──────────────────────
+  // Entry price = limit price if set, else markPrice. Base qty derived
+  // from draft.quantity, accounting for sizeUnit (QUOTE → divide by
+  // entry to convert to base). Both legs use the same formula:
+  //   PnL  = (trigger − entry) × baseQty × (side === 'BUY' ? 1 : -1)
+  //   trigger = entry + (PnL × dir) / baseQty
+  // The sign of (trigger − entry) gives gain (TP) vs loss (SL), so SL
+  // PnL naturally comes out negative and the math is identical for
+  // both legs.
+  const entryPriceNum = Number(draft.price) || (typeof markPrice === 'number' ? markPrice : 0)
+  const baseQtyNum = (() => {
+    const raw = Number(draft.quantity)
+    if (!Number.isFinite(raw) || raw <= 0) return 0
+    if (draft.sizeUnit === 'BASE') return raw
+    return entryPriceNum > 0 ? raw / entryPriceNum : 0
+  })()
+  const sideDir = draft.side === 'BUY' ? 1 : -1
+  const tpSlSyncReady = entryPriceNum > 0 && baseQtyNum > 0
+
+  const formatPnl = (n: number) => (Number.isFinite(n) ? n.toFixed(2) : '')
+  const formatTriggerPrice = (n: number) => (Number.isFinite(n) ? n.toFixed(priceDecimals) : '')
+  // Strip thousands-separator commas before parsing — paste-from-clipboard,
+  // OS autofill, and some mobile keyboards can insert them. `.` is always the
+  // decimal separator (we follow the JS Number convention).
+  const stripSeparators = (s: string) => s.replace(/,/g, '')
+  const triggerToPnl = (triggerStr: string): string => {
+    const trigger = Number(stripSeparators(triggerStr))
+    if (!Number.isFinite(trigger) || !tpSlSyncReady) return ''
+    return formatPnl((trigger - entryPriceNum) * baseQtyNum * sideDir)
+  }
+  const pnlToTrigger = (pnlStr: string): string => {
+    const pnl = Number(stripSeparators(pnlStr))
+    if (!Number.isFinite(pnl) || !tpSlSyncReady) return ''
+    return formatTriggerPrice(entryPriceNum + (pnl * sideDir) / baseQtyNum)
+  }
+  const handleTpPriceChange = (raw: string) => {
+    const val = stripSeparators(raw)
+    if (val === '') return onDraftChange({ ...draft, takeProfitPrice: '', takeProfitPnl: '' })
+    onDraftChange({ ...draft, takeProfitPrice: val, takeProfitPnl: triggerToPnl(val) })
+  }
+  const handleTpPnlChange = (raw: string) => {
+    // TP gain is always positive — flip a leading '-' into the absolute value.
+    const val = ensurePositive(stripSeparators(raw))
+    if (val === '' || val === '-') return onDraftChange({ ...draft, takeProfitPnl: '', takeProfitPrice: '' })
+    onDraftChange({ ...draft, takeProfitPnl: val, takeProfitPrice: pnlToTrigger(val) })
+  }
+  const handleSlPriceChange = (raw: string) => {
+    const val = stripSeparators(raw)
+    if (val === '') return onDraftChange({ ...draft, stopLossPrice: '', stopLossPnl: '' })
+    onDraftChange({ ...draft, stopLossPrice: val, stopLossPnl: triggerToPnl(val) })
+  }
+  const handleSlPnlChange = (raw: string) => {
+    // SL is always a loss — force a leading '-' so users see the sign even if
+    // they typed a bare positive.
+    const val = ensureNegative(stripSeparators(raw))
+    if (val === '' || val === '-') return onDraftChange({ ...draft, stopLossPnl: '', stopLossPrice: '' })
+    onDraftChange({ ...draft, stopLossPnl: val, stopLossPrice: pnlToTrigger(val) })
+  }
 
   const isStopOrder = typeKey === 'stop-limit' || typeKey === 'stop-market'
   const needsLimitPrice = typeKey === 'limit' || typeKey === 'stop-limit'
@@ -1211,8 +1287,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
                   {t('Trigger Price')}
                 </Text>
                 <InputTight
-                  value={draft.takeProfitPrice}
-                  onChange={(e) => onDraftChange({ ...draft, takeProfitPrice: e.target.value })}
+                  {...useSeparatedNumberInput(draft.takeProfitPrice, handleTpPriceChange)}
                   placeholder="0.00"
                   inputMode="decimal"
                 />
@@ -1222,8 +1297,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
                   {t('PnL (USDT)')}
                 </Text>
                 <InputTight
-                  value={draft.takeProfitPnl ?? ''}
-                  onChange={(e) => onDraftChange({ ...draft, takeProfitPnl: e.target.value })}
+                  {...useSeparatedNumberInput(draft.takeProfitPnl ?? '', handleTpPnlChange)}
                   placeholder="0.00"
                   inputMode="decimal"
                 />
@@ -1248,8 +1322,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
                   {t('Trigger Price')}
                 </Text>
                 <InputTight
-                  value={draft.stopLossPrice}
-                  onChange={(e) => onDraftChange({ ...draft, stopLossPrice: e.target.value })}
+                  {...useSeparatedNumberInput(draft.stopLossPrice, handleSlPriceChange)}
                   placeholder="0.00"
                   inputMode="decimal"
                 />
@@ -1259,8 +1332,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
                   {t('PnL (USDT)')}
                 </Text>
                 <InputTight
-                  value={draft.stopLossPnl ?? ''}
-                  onChange={(e) => onDraftChange({ ...draft, stopLossPnl: e.target.value })}
+                  {...useSeparatedNumberInput(draft.stopLossPnl ?? '', handleSlPnlChange)}
                   placeholder="0.00"
                   inputMode="decimal"
                 />

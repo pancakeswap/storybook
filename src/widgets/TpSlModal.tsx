@@ -6,6 +6,7 @@ import { Input } from '../primitives/Input'
 import { Text } from '../primitives/Text'
 import Modal from '../primitives/Modal/Modal'
 import { ModalV2 } from '../primitives/Modal/ModalV2'
+import { ensureNegative, ensurePositive, formatWithThousandSeparator, useSeparatedNumberInput } from './separatedNumberInput'
 
 export type PositionSide = 'LONG' | 'SHORT'
 
@@ -137,32 +138,38 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
   const priceFromPnl = (pnl: number) => (qty > 0 ? entryPrice + (dir * pnl) / qty : NaN)
   const pnlFromPrice = (price: number) => (qty > 0 ? dir * (price - entryPrice) * qty : NaN)
 
-  const fmt = (n: number, digits = 2) =>
-    Number.isFinite(n) ? n.toLocaleString(undefined, { maximumFractionDigits: digits }) : ''
-
+  // Sibling-update helper. Raw input values flow in via the SeparatedNumberInput
+  // hook (already comma-stripped), so Number() parsing is safe and the sibling
+  // gets a raw decimal string back — display layer adds the commas.
+  const formatRaw = (n: number, digits: number) => (Number.isFinite(n) ? n.toFixed(digits) : '')
   const onChangeTpPrice = (v: string) => {
     setTpPrice(v)
+    if (v === '') return setTpPnl('')
     const n = Number(v)
-    if (Number.isFinite(n) && v !== '') setTpPnl(fmt(pnlFromPrice(n), 4))
-    else setTpPnl('')
+    setTpPnl(Number.isFinite(n) ? formatRaw(pnlFromPrice(n), 4) : '')
   }
   const onChangeTpPnl = (v: string) => {
-    setTpPnl(v)
-    const n = Number(v)
-    if (Number.isFinite(n) && v !== '') setTpPrice(fmt(priceFromPnl(n), 2))
-    else setTpPrice('')
+    // TP gain is always positive — flip a leading '-' into the absolute value.
+    const norm = ensurePositive(v)
+    setTpPnl(norm)
+    if (norm === '' || norm === '-') return setTpPrice('')
+    const n = Number(norm)
+    setTpPrice(Number.isFinite(n) ? formatRaw(priceFromPnl(n), 2) : '')
   }
   const onChangeSlPrice = (v: string) => {
     setSlPrice(v)
+    if (v === '') return setSlPnl('')
     const n = Number(v)
-    if (Number.isFinite(n) && v !== '') setSlPnl(fmt(pnlFromPrice(n), 4))
-    else setSlPnl('')
+    setSlPnl(Number.isFinite(n) ? formatRaw(pnlFromPrice(n), 4) : '')
   }
   const onChangeSlPnl = (v: string) => {
-    setSlPnl(v)
-    const n = Number(v)
-    if (Number.isFinite(n) && v !== '') setSlPrice(fmt(priceFromPnl(n), 2))
-    else setSlPnl('')
+    // SL is always a loss — force a leading '-' so users see the sign even if
+    // they typed a bare positive.
+    const norm = ensureNegative(v)
+    setSlPnl(norm)
+    if (norm === '' || norm === '-') return setSlPrice('')
+    const n = Number(norm)
+    setSlPrice(Number.isFinite(n) ? formatRaw(priceFromPnl(n), 2) : '')
   }
 
   const warning = useMemo(() => {
@@ -226,7 +233,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
               {t('Entry')}
             </Text>
             <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {Number.isFinite(entryPrice) ? entryPrice.toFixed(2) : '—'}
+              {Number.isFinite(entryPrice) ? formatWithThousandSeparator(entryPrice.toFixed(2)) : '—'}
             </Text>
           </SummaryRow>
           <SummaryRow>
@@ -234,7 +241,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
               {t('Mark')}
             </Text>
             <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {Number.isFinite(markPrice) ? markPrice.toFixed(2) : '—'}
+              {Number.isFinite(markPrice) ? formatWithThousandSeparator(markPrice.toFixed(2)) : '—'}
             </Text>
           </SummaryRow>
 
@@ -248,8 +255,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
               <Box style={{ flex: 1 }}>
                 <FieldLabel>{t('Trigger Price')}</FieldLabel>
                 <InputTight
-                  value={tpPrice}
-                  onChange={(e) => onChangeTpPrice(e.target.value)}
+                  {...useSeparatedNumberInput(tpPrice, onChangeTpPrice)}
                   placeholder="0.00"
                   inputMode="decimal"
                 />
@@ -257,8 +263,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
               <Box style={{ flex: 1 }}>
                 <FieldLabel>{t('PnL (USDT)')}</FieldLabel>
                 <InputTight
-                  value={tpPnl}
-                  onChange={(e) => onChangeTpPnl(e.target.value)}
+                  {...useSeparatedNumberInput(tpPnl, onChangeTpPnl)}
                   placeholder="0.00"
                   inputMode="decimal"
                 />
@@ -274,8 +279,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
               <Box style={{ flex: 1 }}>
                 <FieldLabel>{t('Trigger Price')}</FieldLabel>
                 <InputTight
-                  value={slPrice}
-                  onChange={(e) => onChangeSlPrice(e.target.value)}
+                  {...useSeparatedNumberInput(slPrice, onChangeSlPrice)}
                   placeholder="0.00"
                   inputMode="decimal"
                 />
@@ -283,8 +287,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
               <Box style={{ flex: 1 }}>
                 <FieldLabel>{t('PnL (USDT)')}</FieldLabel>
                 <InputTight
-                  value={slPnl}
-                  onChange={(e) => onChangeSlPnl(e.target.value)}
+                  {...useSeparatedNumberInput(slPnl, onChangeSlPnl)}
                   placeholder="0.00"
                   inputMode="decimal"
                 />

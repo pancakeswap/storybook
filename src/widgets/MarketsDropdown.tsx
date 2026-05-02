@@ -256,7 +256,8 @@ const fmtVol = (v?: string) => {
 }
 
 const baseAsset = (symbol: string) =>
-  symbol.toUpperCase().replace(/USDT$/, '').replace(/USDC$/, '').replace(/USD$/, '') || symbol.toUpperCase()
+  symbol.toUpperCase().replace(/USD1$/, '').replace(/USDT$/, '').replace(/USDC$/, '').replace(/USD$/, '') ||
+  symbol.toUpperCase()
 
 const glyph = (symbol: string) => baseAsset(symbol).slice(0, 1) || symbol.slice(0, 1)
 
