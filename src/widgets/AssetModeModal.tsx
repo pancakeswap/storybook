@@ -182,7 +182,15 @@ export const AssetModeModal: React.FC<AssetModeModalProps> = ({
 
           <Text fontSize="13px" color="textSubtle">
             {t('Read about ')}
-            <Text as="span" fontSize="13px" bold style={{ color: theme.colors.secondary }}>
+            <Text
+              as="a"
+              href="https://docs.asterdex.com/trading/perpetuals/single-asset-mode-and-multi-asset-mode"
+              target="_blank"
+              rel="noopener noreferrer"
+              fontSize="13px"
+              bold
+              style={{ color: theme.colors.secondary, textDecoration: 'none' }}
+            >
               {t('Multi-Asset Mode')}
             </Text>
             {t(' to better manage risk.')}
