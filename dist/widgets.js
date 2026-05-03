@@ -445,10 +445,16 @@ var G = B(e)`
 						children: [
 							u("Read about "),
 							/* @__PURE__ */ U(r, {
-								as: "span",
+								as: "a",
+								href: "https://docs.asterdex.com/trading/perpetuals/single-asset-mode-and-multi-asset-mode",
+								target: "_blank",
+								rel: "noopener noreferrer",
 								fontSize: "13px",
 								bold: !0,
-								style: { color: d.colors.secondary },
+								style: {
+									color: d.colors.secondary,
+									textDecoration: "none"
+								},
 								children: u("Multi-Asset Mode")
 							}),
 							u(" to better manage risk.")
