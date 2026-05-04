@@ -127,12 +127,14 @@ const BackLink = styled.button`
   &:hover { filter: brightness(1.1); }
 `
 
-/** Perp Balance summary card — Figma 47:866. */
+/** Perps Balance summary card — Figma 47:866. */
 const PerpBalanceCard = styled(Flex)`
   align-items: center;
   justify-content: space-between;
+  align-self: stretch;
   padding: 16px;
-  background: ${({ theme }) => theme.colors.backgroundAlt};
+  gap: 10px;
+  background: ${({ theme }) => theme.colors.cardSecondary};
   border: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-bottom-width: 2px;
   border-radius: 16px;
@@ -387,7 +389,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
       ? t('Processing Deposit')
       : step === 'failed'
       ? t('Deposit Failed')
-      : t('Fund Your Perp Account')
+      : t('Fund Your Perps Account')
 
   const submitLabel = (() => {
     switch (submitState) {
@@ -459,7 +461,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
               {/* Perp balance summary card — Figma 47:866. */}
               <PerpBalanceCard>
                 <Flex flexDirection="column" style={{ gap: 2 }}>
-                  <Pretitle>{t('Perp Balance')}</Pretitle>
+                  <Pretitle>{t('Perps Balance')}</Pretitle>
                   <Text fontSize="12px" color="textSubtle">
                     {t('In Aster Contract')}
                   </Text>

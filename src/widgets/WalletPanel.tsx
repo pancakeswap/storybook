@@ -312,6 +312,11 @@ const BucketIconChip = styled.span<{ $variant: 'spot' | 'perp' }>`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
+
+  html.dark & {
+    border-color: ${({ $variant }) => ($variant === 'spot' ? '#55496E' : '#575775')};
+    background: ${({ $variant }) => ($variant === 'spot' ? '#27252B' : '#223537')};
+  }
 `
 
 const SpotWalletGlyph = () => (

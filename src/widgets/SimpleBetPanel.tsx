@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { styled } from 'styled-components'
+import { keyframes, styled } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
@@ -226,7 +226,7 @@ const Root = styled(PerpsPanel)`
 
 const TopCard = styled.div`
   display: flex;
-  flex: 1 0 0;
+  flex: 0 0 auto;
   flex-direction: column;
   align-self: stretch;
   padding: 24px;
@@ -274,9 +274,8 @@ const TopCardInner = styled.div`
   display: flex;
   flex-direction: column;
   align-self: stretch;
-  flex: 1 0 0;
-  justify-content: space-between;
-  gap: 16px;
+  flex: 0 0 auto;
+  gap: 64px;
 `
 
 // Symbol header strip
@@ -463,7 +462,14 @@ const BetInputWrap = styled.span`
 `
 
 const BetInput = styled.input`
-  width: 90px;
+  /* field-sizing: content lets the input auto-grow to fit the typed
+     value (Chrome/Edge 123+, Safari 17.4+). Without it, the previous
+     fixed 90px width clipped after ~4 digits at 40px. min-width keeps
+     room for the placeholder "0" before any input; max-width clamps
+     it from overflowing the bet field on extreme inputs. */
+  field-sizing: content;
+  min-width: 22px;
+  max-width: 240px;
   border: 0;
   background: transparent;
   color: ${({ theme }) => theme.colors.text};
@@ -727,7 +733,7 @@ const LevBar = styled.div`
   align-items: flex-start;
   align-self: stretch;
   gap: 16px;
-  margin-top: 16px;
+  margin-top: 8px;
 `
 
 const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
@@ -818,6 +824,8 @@ const LevTabs = styled(Flex)`
   display: flex;
   align-items: center;
   align-self: stretch;
+  gap: 4px;
+  padding: 0;
   border-radius: 16px;
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
@@ -896,6 +904,23 @@ const StatsCard = styled.div`
   overflow: hidden;
 `
 
+/**
+ * Trade-info card mounts whenever the user has a non-empty bet. Animate
+ * it in instead of popping in — fades from 0 → 1 + slides up 8px so the
+ * arrival reads as a response to typing rather than an abrupt swap.
+ * 240ms / ease-out feels responsive without being slow.
+ */
+const statsListEnter = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`
+
 const StatsList = styled.div`
   display: flex;
   width: 458px;
@@ -910,6 +935,7 @@ const StatsList = styled.div`
   border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
   border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
   background: ${({ theme }) => theme.colors.cardSecondary};
+  animation: ${statsListEnter} 0.24s ease-out;
 
   @media (max-width: 1199.98px) {
     width: auto;
@@ -1070,8 +1096,8 @@ const PnlLabel = styled.span`
   letter-spacing: -0.2px;
 `
 
-const PnlValue = styled.span`
-  color: ${({ theme }) => theme.colors.text};
+const PnlValue = styled.span<{ $zero?: boolean }>`
+  color: ${({ $zero, theme }) => ($zero ? theme.colors.textSubtle : theme.colors.text)};
   text-align: right;
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -1471,10 +1497,14 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
         </DwButton>
       </DwRow>
 
-      {/* Unrealized PnL */}
+      {/* Unrealized PnL — muted color when value is zero (no open
+          position to score). Strips currency symbols / commas / signs
+          before checking so e.g. "$0", "+$0.00", "0.00 USDT" all match. */}
       <PnlCard>
         <PnlLabel>Unrealized PnL</PnlLabel>
-        <PnlValue>{unrealizedPnl}</PnlValue>
+        <PnlValue $zero={Number(String(unrealizedPnl).replace(/[^\d.-]/g, '')) === 0}>
+          {unrealizedPnl}
+        </PnlValue>
       </PnlCard>
       </Bottom>
     </Root>
