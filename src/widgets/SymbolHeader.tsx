@@ -5,6 +5,7 @@ import { Flex } from '../primitives/Box'
 import { Text } from '../primitives/Text'
 import { ChartDisableIcon, ChartIcon, ChevronDownIcon, StarFillIcon, StarLineIcon } from '../primitives/Icons'
 import { useMatchBreakpoints } from '../contexts'
+import { useTooltip } from '../hooks/useTooltip'
 
 export interface SymbolHeaderProps {
   /** Full venue symbol — used as React key + aria labels. */
@@ -236,6 +237,68 @@ const FundingSep = styled.span`
   padding: 0 2px;
 `
 
+/* Funding/Countdown tooltip — light surface (white bg, dark text)
+   regardless of theme, per Figma spec. Anchored to its Stat (which is
+   position: relative). */
+
+const FundingTipAnchor = styled.span`
+  position: relative;
+  display: inline-flex;
+`
+
+const FundingTipBubble = styled.div`
+  position: fixed;
+  transform: translateX(-50%);
+  display: flex;
+  width: 254px;
+  padding: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  border-radius: 16px;
+  background: #08060B;
+  color: #FFF;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+  z-index: 100;
+  white-space: normal;
+
+  html.dark & {
+    background: #FFF;
+    color: #000;
+    box-shadow:
+      0 1px 2px 0 rgba(0, 0, 0, 0.16),
+      0 4px 8px 0 rgba(0, 0, 0, 0.32);
+  }
+`
+
+const FundingTipRow = styled.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 8px;
+`
+
+const FundingTipDirSpan = styled.span<{ $color: 'long' | 'short' | 'plain' }>`
+  color: ${({ $color }) =>
+    $color === 'long' ? '#31D0AA' : $color === 'short' ? '#ED4B9E' : 'inherit'};
+`
+
+const FundingTipDesc = styled.p`
+  margin: 0;
+  align-self: stretch;
+`
+
 const formatPct = (v?: string, digits = 4) => {
   if (!v) return '—'
   const n = Number(v) * 100
@@ -388,6 +451,31 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   const fundingNegative = Number(fundingRate) < 0
   const change24hNegative = Number(change24h) < 0
 
+  const { targetRef: markTipRef, tooltip: markTipNode } = useTooltip(
+    t(
+      'The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes.',
+    ),
+    { placement: 'bottom' },
+  )
+
+  const [fundingTipOpen, setFundingTipOpen] = useState(false)
+  const [fundingTipPos, setFundingTipPos] = useState<{ top: number; left: number } | null>(null)
+  const fundingAnchorRef = useRef<HTMLSpanElement>(null)
+  const fundingPctNumeric = (() => {
+    const n = Number(fundingRate)
+    return Number.isFinite(n) ? n * 100 : null
+  })()
+  const fundingAnnualized =
+    fundingPctNumeric != null ? `${(fundingPctNumeric * 3 * 365).toFixed(4)}%` : '—'
+
+  const openFundingTip = () => {
+    const a = fundingAnchorRef.current
+    if (!a) return
+    const r = a.getBoundingClientRect()
+    setFundingTipPos({ top: r.bottom + 8, left: r.left + r.width / 2 })
+    setFundingTipOpen(true)
+  }
+
   return (
     <Root aria-label={`${symbol} ticker`}>
       <PairPill>
@@ -431,17 +519,59 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
 
       <Stats role="list">
         <Stat role="listitem">
-          <StatLabel $dashed>{t('Mark')}</StatLabel>
+          <StatLabel ref={markTipRef} $dashed>{t('Mark')}</StatLabel>
           <StatValue>{markPrice ?? '—'}</StatValue>
+          {markTipNode}
         </Stat>
 
         <Stat role="listitem">
-          <StatLabel $dashed>{t('Index')}</StatLabel>
+          <StatLabel>{t('Index')}</StatLabel>
           <StatValue>{indexPrice ?? '—'}</StatValue>
         </Stat>
 
         <Stat role="listitem">
-          <StatLabel $dashed>{t('Funding / Countdown')}</StatLabel>
+          <FundingTipAnchor
+            ref={fundingAnchorRef}
+            onMouseEnter={openFundingTip}
+            onMouseLeave={() => setFundingTipOpen(false)}
+          >
+            <StatLabel $dashed>{t('Funding / Countdown')}</StatLabel>
+          </FundingTipAnchor>
+          {fundingTipOpen && fundingTipPos && typeof document !== 'undefined'
+            ? createPortal(
+                <FundingTipBubble
+                  role="tooltip"
+                  style={{ top: fundingTipPos.top, left: fundingTipPos.left }}
+                >
+                  <FundingTipRow>
+                    <span>{t('Interval')}</span>
+                    <span>8h</span>
+                  </FundingTipRow>
+                  <FundingTipRow>
+                    <span>{t('Direction')}</span>
+                    <span>
+                      <FundingTipDirSpan $color="long">{t('Long')}</FundingTipDirSpan>{' '}
+                      <FundingTipDirSpan $color="plain">{t('Pays')}</FundingTipDirSpan>{' '}
+                      <FundingTipDirSpan $color="short">{t('Short')}</FundingTipDirSpan>
+                    </span>
+                  </FundingTipRow>
+                  <FundingTipRow>
+                    <span>{t('Funding rate')}</span>
+                    <span>{formatPct(fundingRate)}</span>
+                  </FundingTipRow>
+                  <FundingTipRow>
+                    <span>{t('Annualized')}</span>
+                    <span>{fundingAnnualized}</span>
+                  </FundingTipRow>
+                  <FundingTipDesc>
+                    {t(
+                      'Funding rate for the next period. If positive, longs pay shorts. If negative, shorts pay longs.',
+                    )}
+                  </FundingTipDesc>
+                </FundingTipBubble>,
+                document.body,
+              )
+            : null}
           <FundingValue>
             <FundingRate $negative={fundingNegative}>{formatPct(fundingRate)}</FundingRate>
             <FundingSep>/</FundingSep>

@@ -15,20 +15,34 @@ import { styled } from 'styled-components'
  * theme switcher.
  */
 export const StyledTooltipContent = styled(Popover.Content)`
+  display: flex;
+  width: 200px;
   padding: 16px;
-  font-size: 16px;
-  line-height: 130%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   border-radius: 16px;
-  max-width: 320px;
   z-index: 101;
   background: #08060B;
   color: #FFFFFF;
-  box-shadow: ${({ theme }) => theme.tooltip.boxShadow};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
   word-wrap: break-word;
 
   html.dark & {
     background: #FFFFFF;
     color: #08060B;
+  }
+
+  & > * {
+    align-self: stretch;
   }
 `
 

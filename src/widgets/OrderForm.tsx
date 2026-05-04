@@ -168,45 +168,117 @@ const TypeTab = styled.button<{ $active: boolean }>`
 `
 
 const SideToggle = styled(Flex)`
-  background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
   border-radius: 12px;
-  padding: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.input};
+  padding: 0;
   gap: 0;
+  overflow: hidden;
+`
+
+/**
+ * Sliding colored indicator that animates between Buy (left) and Sell
+ * (right). cubic-bezier(0.34, 1.56, 0.64, 1) is the standard "back ease
+ * out" curve — overshoots its target by ~5% then settles, giving the
+ * bouncy snap. Background color transitions on a separate (gentler)
+ * timing so the slide and the recolor don't cross-blend muddily.
+ */
+const SideIndicator = styled.span<{ $side: OrderSide }>`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  border-radius: 12px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.10);
+  background: ${({ $side }) => ($side === 'BUY' ? '#31D0AA' : '#ED4B9E')};
+  transform: translateX(${({ $side }) => ($side === 'BUY' ? '0%' : '100%')});
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.25s ease;
+  pointer-events: none;
+  z-index: 0;
+`
+
+/* Active-press effect for Buy/Sell — drop the SideIndicator's bottom
+   stroke while either toggle button is pressed so it reads as a tap. */
+const SideToggleWrap = styled(SideToggle)`
+  &:has(button:active) ${SideIndicator} {
+    border-bottom-width: 0;
+    bottom: -2px;
+  }
 `
 
 const SideButton = styled.button<{ $active: boolean; $side: OrderSide }>`
-  flex: 1;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1 0 0;
+  align-self: stretch;
+  padding: 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
   border: 0;
-  background: ${({ $active, $side, theme }) =>
-    $active ? ($side === 'BUY' ? theme.colors.success : theme.colors.failure) : 'transparent'};
-  color: ${({ $active, theme }) => ($active ? theme.colors.invertedContrast : theme.colors.textSubtle)};
-  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  border-radius: 12px;
+  background: transparent;
+  color: ${({ $active, theme }) => ($active ? '#FFF' : theme.colors.textSubtle)};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
   font-size: 16px;
-  padding: 6px 8px;
-  border-radius: 10px;
+  font-style: normal;
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  line-height: 150%;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: color 0.25s ease;
+
+  html.dark & {
+    color: ${({ $active, theme }) => ($active ? '#000' : theme.colors.textSubtle)};
+  }
 `
 
 const ModeButton = styled.button`
-  flex: 1;
-  background: ${({ theme }) => theme.colors.input};
-  border: 0;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  color: ${({ theme }) => theme.colors.primary};
-  font-size: 16px;
-  font-weight: 600;
-  padding: 4px 8px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  flex: 1 0 0;
+  padding: 3px 4px 5px 4px;
   justify-content: center;
+  align-items: center;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.10);
+  border-radius: 12px;
+  background: #EFF4F5;
+  color: #02919D;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  cursor: pointer;
   transition: filter 0.12s;
   &:hover {
-    filter: brightness(1.08);
+    filter: brightness(0.97);
   }
+  &:active:not(:disabled) {
+    border-bottom-width: 0;
+    padding-bottom: 7px;
+  }
+
+  html.dark & {
+    background: #353547;
+  }
+`
+
+const ModeButtonLabel = styled.span`
+  display: flex;
+  padding: 0 4px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 `
 
 const AvblRow = styled(Flex)`
@@ -226,19 +298,45 @@ const AvblValue = styled(Flex)`
 const SizeField = styled.div`
   position: relative;
   display: flex;
-  align-items: center;
   height: 48px;
   padding: 0 16px;
-  background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
   border-radius: 16px;
-  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+  border: 1px solid #D7CAEC;
+  background: #EEEAF4;
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
   gap: 8px;
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
+
+  html.dark & {
+    border-color: #55496E;
+    background: #372F47;
+    box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+    &:focus-within {
+      box-shadow:
+        0 0 0 1px #7645D9,
+        0 0 0 4px rgba(118, 69, 217, 0.20);
+    }
+  }
 `
 
-const SizeLabel = styled(Text).attrs({ fontSize: '14px', color: 'textSubtle' })`
+const SizeLabel = styled.span`
   pointer-events: none;
   flex-shrink: 0;
+  color: #7A6EAA;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
 `
 
 const SizeInput = styled.input`
@@ -248,34 +346,150 @@ const SizeInput = styled.input`
   outline: 0;
   background: transparent;
   text-align: right;
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  color: #7A6EAA;
   font-variant-numeric: tabular-nums;
   &::placeholder {
-    color: ${({ theme }) => theme.colors.textSubtle};
+    color: #7A6EAA;
   }
 `
 
 const UnitPicker = styled(Button).attrs({ variant: 'text', scale: 'xs' })`
   padding: 0;
-  font-weight: 600;
-  font-size: 14px;
   color: ${({ theme }) => theme.colors.text};
-  gap: 2px;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  gap: 4px;
   height: auto;
 `
+
+const DashedLabelWrap = styled.span`
+  position: relative;
+  display: inline-flex;
+`
+
+const DashedLabel = styled.span`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px dashed #5B4776;
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.text};
+  cursor: help;
+`
+
+/**
+ * Reduce-Only tooltip — light surface (white bg, dark text) in light
+ * mode, inverted to dark surface (#08060B bg, light text) in dark mode.
+ * Shadow strengthens from light to dark to keep readable elevation
+ * against the darker page bg.
+ */
+const ReduceOnlyTooltip = styled.div`
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  width: 200px;
+  padding: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  border-radius: 16px;
+  background: #08060B;
+  color: #FFF;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.16),
+    0 4px 8px 0 rgba(0, 0, 0, 0.32);
+  pointer-events: none;
+  z-index: 100;
+  white-space: normal;
+  text-align: center;
+
+  /* Down-pointing notch — bottom edge of the bubble. Inherits the
+     bubble's bg via currentColor so the color flip cascades. */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid currentColor;
+    color: #08060B;
+  }
+
+  html.dark & {
+    background: #FFF;
+    color: #000;
+    box-shadow:
+      0 1px 2px 0 rgba(0, 0, 0, 0.08),
+      0 4px 8px 0 rgba(0, 0, 0, 0.16);
+    &::after {
+      color: #FFF;
+    }
+  }
+`
+
+const UnitPickerChevron = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden style={{ flexShrink: 0, aspectRatio: '1 / 1' }}>
+    <path
+      d="M2.72261 3.10042C2.52319 3.10042 2.3779 3.18542 2.28674 3.35542C2.19558 3.52542 2.20318 3.69303 2.30956 3.85825L5.59261 8.78348C5.69232 8.92783 5.82812 9 6.00001 9C6.17189 9 6.30769 8.92783 6.40741 8.78348L9.69046 3.85825C9.79683 3.69303 9.80444 3.52542 9.71328 3.35542C9.62212 3.18542 9.47683 3.10042 9.27741 3.10042H2.72261Z"
+      fill="#B8ADD2"
+    />
+  </svg>
+)
 
 const PriceInputRow = styled.div`
   position: relative;
   display: flex;
-  align-items: center;
   height: 48px;
   padding: 0 16px;
-  background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
   border-radius: 16px;
-  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+  border: 1px solid #D7CAEC;
+  background: #EEEAF4;
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
   gap: 8px;
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
+
+  html.dark & {
+    border-color: #55496E;
+    background: #372F47;
+    box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+    &:focus-within {
+      box-shadow:
+        0 0 0 1px #7645D9,
+        0 0 0 4px rgba(118, 69, 217, 0.20);
+    }
+  }
 `
 
 const PriceInput = styled.input`
@@ -285,11 +499,16 @@ const PriceInput = styled.input`
   outline: 0;
   background: transparent;
   text-align: right;
-  font-size: 14px;
-  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  color: #7A6EAA;
   font-variant-numeric: tabular-nums;
   &::placeholder {
-    color: ${({ theme }) => theme.colors.textSubtle};
+    color: #7A6EAA;
   }
 `
 
@@ -444,7 +663,13 @@ const SummaryGrid = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
 `
 
-const SK = styled(Text).attrs({ fontSize: '14px', color: 'textSubtle' })``
+const SK = styled(Text).attrs({ fontSize: '14px', color: 'textSubtle' })`
+  display: inline-flex;
+  width: fit-content;
+  justify-self: start;
+  border-bottom: 1px dashed #5B4776;
+  cursor: help;
+`
 const SV = styled(Text).attrs({ fontSize: '14px' })`
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -1059,6 +1284,9 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
   const stopPanelRef = useRef<HTMLDivElement>(null)
   const [stopMenuOpen, setStopMenuOpen] = useState(false)
   const [stopMenuPos, setStopMenuPos] = useState({ top: 0, left: 0 })
+  const [reduceOnlyTipOpen, setReduceOnlyTipOpen] = useState(false)
+  const [tpSlTipOpen, setTpSlTipOpen] = useState(false)
+  const [summaryTip, setSummaryTip] = useState<'cost' | 'liq' | 'fees' | null>(null)
 
   useEffect(() => {
     if (!stopMenuOpen || !stopTabRef.current || !stopPanelRef.current) return
@@ -1142,21 +1370,24 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
           )}
       </TypeTabs>
 
-      <SideToggle>
+      <SideToggleWrap>
+        <SideIndicator $side={draft.side} aria-hidden />
         <SideButton $active={draft.side === 'BUY'} $side="BUY" onClick={() => setSide('BUY')}>
-          {t('Buy')}
+          {t('Buy / Long')}
         </SideButton>
         <SideButton $active={draft.side === 'SELL'} $side="SELL" onClick={() => setSide('SELL')}>
-          {t('Sell')}
+          {t('Sell / Short')}
         </SideButton>
-      </SideToggle>
+      </SideToggleWrap>
 
       <Flex style={{ gap: 8 }}>
         <ModeButton disabled={marginSubmitting} onClick={onMarginModeToggle} title={t('Margin mode')}>
-          {draft.marginMode === 'CROSS' ? t('Cross') : t('Isolated')}
+          <ModeButtonLabel>
+            {draft.marginMode === 'CROSS' ? t('Cross') : t('Isolated')}
+          </ModeButtonLabel>
         </ModeButton>
         <ModeButton onClick={onLeverageClick} title={t('Leverage')}>
-          {draft.leverage}x
+          <ModeButtonLabel>{draft.leverage}x</ModeButtonLabel>
         </ModeButton>
         {extraControls}
       </Flex>
@@ -1251,7 +1482,8 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
           inputMode="decimal"
         />
         <UnitPicker onClick={toggleSizeUnit} title={t('Toggle unit')}>
-          {sizeUnitLabel} ▾
+          {sizeUnitLabel}
+          <UnitPickerChevron />
         </UnitPicker>
       </SizeField>
 
@@ -1272,12 +1504,34 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
           checked={draft.reduceOnly}
           onChange={(e) => onDraftChange({ ...draft, reduceOnly: e.target.checked })}
         />
-        <Text fontSize="14px">{t('Reduce Only')}</Text>
+        <DashedLabelWrap
+          onMouseEnter={() => setReduceOnlyTipOpen(true)}
+          onMouseLeave={() => setReduceOnlyTipOpen(false)}
+        >
+          <DashedLabel>{t('Reduce Only')}</DashedLabel>
+          {reduceOnlyTipOpen && (
+            <ReduceOnlyTooltip role="tooltip">
+              {t('Reduce-Only order will only reduce your position, not increase it.')}
+            </ReduceOnlyTooltip>
+          )}
+        </DashedLabelWrap>
       </Flex>
 
       <Flex alignItems="center" style={{ gap: 8 }}>
         <Checkbox scale="sm" checked={draft.tpSlEnabled} onChange={toggleTpSl} />
-        <Text fontSize="14px">{t('Take Profit / Stop Loss')}</Text>
+        <DashedLabelWrap
+          onMouseEnter={() => setTpSlTipOpen(true)}
+          onMouseLeave={() => setTpSlTipOpen(false)}
+        >
+          <DashedLabel>{t('Take Profit / Stop Loss')}</DashedLabel>
+          {tpSlTipOpen && (
+            <ReduceOnlyTooltip role="tooltip">
+              {t(
+                'Set Take Profit or Stop Loss before opening. It activates after entry. Choose Last or Mark price as the trigger.',
+              )}
+            </ReduceOnlyTooltip>
+          )}
+        </DashedLabelWrap>
       </Flex>
 
       {draft.tpSlEnabled && (
@@ -1373,15 +1627,45 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
       )}
 
       <SummaryGrid>
-        <SK>{t('Cost')}</SK>
+        <DashedLabelWrap
+          onMouseEnter={() => setSummaryTip('cost')}
+          onMouseLeave={() => setSummaryTip(null)}
+        >
+          <SK>{t('Cost')}</SK>
+          {summaryTip === 'cost' && (
+            <ReduceOnlyTooltip role="tooltip">
+              {t('Total margin required to open this position.')}
+            </ReduceOnlyTooltip>
+          )}
+        </DashedLabelWrap>
         <SV>{preview.cost}</SV>
         {!isStopOrder && (
           <>
-            <SK>{t('Est. Liq. Price')}</SK>
+            <DashedLabelWrap
+              onMouseEnter={() => setSummaryTip('liq')}
+              onMouseLeave={() => setSummaryTip(null)}
+            >
+              <SK>{t('Est. Liq. Price')}</SK>
+              {summaryTip === 'liq' && (
+                <ReduceOnlyTooltip role="tooltip">
+                  {t('Total margin required to open this position.')}
+                </ReduceOnlyTooltip>
+              )}
+            </DashedLabelWrap>
             <SV>{preview.liq}</SV>
           </>
         )}
-        <SK>{t('Fees')}</SK>
+        <DashedLabelWrap
+          onMouseEnter={() => setSummaryTip('fees')}
+          onMouseLeave={() => setSummaryTip(null)}
+        >
+          <SK>{t('Fees')}</SK>
+          {summaryTip === 'fees' && (
+            <ReduceOnlyTooltip role="tooltip">
+              {t('Trading and funding fees applied to this position.')}
+            </ReduceOnlyTooltip>
+          )}
+        </DashedLabelWrap>
         <SV>{feeText}</SV>
       </SummaryGrid>
     </Card>
