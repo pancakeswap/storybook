@@ -1,10 +1,10 @@
-import { B as e, D as t, E as n, F as r, H as i, Ht as a, Jn as o, Jt as s, Ki as c, M as l, Q as u, S as d, T as f, V as p, Vt as m, b as h, i as g, it as _, j as v, lt as y, nn as b, nr as x, o as S, ot as C, qi as w, t as T, w as E, wi as D } from "./chunks/useTooltip-C1nAa6Ub.js";
+import { B as e, D as t, E as n, F as r, H as i, Ht as a, Jn as o, Jt as s, Ki as c, M as l, Q as u, S as d, T as f, V as p, Vt as m, b as h, i as g, it as _, j as v, lt as y, nn as b, nr as x, o as S, ot as C, qi as w, t as T, w as E, wi as D } from "./chunks/useTooltip-CEhVD15R.js";
 import O, { Children as k, cloneElement as A, useCallback as j, useEffect as M, useId as N, useLayoutEffect as P, useMemo as F, useRef as I, useState as L } from "react";
 import { css as R, keyframes as z, styled as B, useTheme as V } from "styled-components";
 import { Fragment as H, jsx as U, jsxs as W } from "react/jsx-runtime";
-import { createPortal as ee } from "react-dom";
+import { createPortal as G } from "react-dom";
 //#region src/widgets/primitives.tsx
-var G = B(e)`
+var K = B(e)`
   border-radius: 0;
   padding: 0;
   display: flex;
@@ -20,13 +20,13 @@ var G = B(e)`
     min-height: 0;
     background: ${({ theme: e }) => e.colors.backgroundAlt};
   }
-`, K = B.div`
+`, q = B.div`
   display: flex;
   gap: ${({ $fullWidth: e }) => e ? "0" : "16px"};
   padding: ${({ $fullWidth: e }) => e ? "0" : "0 12px"};
   border-bottom: ${({ $fullWidth: e }) => e ? "0" : "1px solid"};
   border-bottom-color: ${({ theme: e }) => e.colors.cardBorder};
-`, te = B.button`
+`, ee = B.button`
   background: transparent;
   border: 0;
   flex: ${({ $fullWidth: e }) => e ? "1" : "0 0 auto"};
@@ -44,32 +44,32 @@ var G = B(e)`
   &:hover:not(:disabled) {
     color: ${({ theme: e }) => e.colors.text};
   }
-`, q = ({ children: e, isActive: t = !1, onClick: n, fullWidth: r = !1 }) => /* @__PURE__ */ U(te, {
+`, J = ({ children: e, isActive: t = !1, onClick: n, fullWidth: r = !1 }) => /* @__PURE__ */ U(ee, {
 	$active: t,
 	$fullWidth: r,
 	onClick: n,
 	type: "button",
 	children: e
-}), ne = ({ activeIndex: e, onItemClick: t, children: n, fullWidth: r = !1 }) => /* @__PURE__ */ U(K, {
+}), te = ({ activeIndex: e, onItemClick: t, children: n, fullWidth: r = !1 }) => /* @__PURE__ */ U(q, {
 	$fullWidth: r,
 	children: k.map(n, (n, i) => !n || typeof n != "object" ? n : A(n, {
 		isActive: i === e,
 		onClick: () => t(i),
 		fullWidth: r
 	}))
-}), re = B(G)`
+}), ne = B(K)`
   flex: 1;
   & > div {
     padding: 12px;
     gap: 12px;
   }
-`, ie = B(r).attrs({ fontSize: "16px" })`
+`, re = B(r).attrs({ fontSize: "16px" })`
   line-height: 1.3;
   color: ${({ theme: e }) => e.colors.text};
-`, J = B(E)`
+`, Y = B(E)`
   justify-content: space-between;
   align-items: center;
-`, Y = B(r).attrs({
+`, ie = B(r).attrs({
 	fontSize: "14px",
 	color: "textSubtle"
 })``, ae = B(r).attrs({ fontSize: "14px" })`
@@ -157,7 +157,7 @@ var G = B(e)`
 	let { isMobile: a } = h();
 	if (a) return /* @__PURE__ */ U(me, { ...e });
 	let { walletDisplay: o, state: s, canDeposit: c = !0, canWithdraw: l = !0, onDeposit: u, onWithdraw: d, onEnableTrading: f, t: p = le } = e;
-	return /* @__PURE__ */ W(re, { children: [
+	return /* @__PURE__ */ W(ne, { children: [
 		/* @__PURE__ */ W(E, {
 			style: { gap: 8 },
 			children: [/* @__PURE__ */ U(oe, {
@@ -208,15 +208,15 @@ var G = B(e)`
 			children: p("Enable Trading")
 		})] }),
 		s.kind === "ready" && /* @__PURE__ */ W(se, { children: [
-			/* @__PURE__ */ U(ie, { children: p("Account Equity") }),
-			/* @__PURE__ */ W(J, { children: [/* @__PURE__ */ U(Y, { children: p("Wallet") }), /* @__PURE__ */ U(ae, { children: o ?? "—" })] }),
-			/* @__PURE__ */ W(J, { children: [/* @__PURE__ */ U(Y, { children: p("Equity") }), /* @__PURE__ */ U(ae, { children: s.equity || "—" })] }),
-			/* @__PURE__ */ W(J, { children: [/* @__PURE__ */ U(Y, { children: p("Available") }), /* @__PURE__ */ U(ae, { children: s.available || "—" })] }),
-			/* @__PURE__ */ W(J, { children: [/* @__PURE__ */ U(Y, { children: p("Unrealized PnL") }), /* @__PURE__ */ U(ce, {
+			/* @__PURE__ */ U(re, { children: p("Account Equity") }),
+			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(ie, { children: p("Wallet") }), /* @__PURE__ */ U(ae, { children: o ?? "—" })] }),
+			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(ie, { children: p("Equity") }), /* @__PURE__ */ U(ae, { children: s.equity || "—" })] }),
+			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(ie, { children: p("Available") }), /* @__PURE__ */ U(ae, { children: s.available || "—" })] }),
+			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(ie, { children: p("Unrealized PnL") }), /* @__PURE__ */ U(ce, {
 				$sign: s.pnlSign,
 				children: s.unrealizedPnl || "—"
 			})] }),
-			/* @__PURE__ */ W(J, { children: [/* @__PURE__ */ U(Y, { children: p("Margin mode") }), /* @__PURE__ */ U(ae, { children: s.marginMode ?? p("Cross") })] })
+			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(ie, { children: p("Margin mode") }), /* @__PURE__ */ U(ae, { children: s.marginMode ?? p("Cross") })] })
 		] })
 	] });
 }, ge = B(E)`
@@ -557,7 +557,7 @@ var G = B(e)`
 	return i ? /* @__PURE__ */ U("div", {
 		style: r ? { display: "none" } : { display: "contents" },
 		children: l
-	}) : /* @__PURE__ */ U(G, {
+	}) : /* @__PURE__ */ U(K, {
 		style: r ? { display: "none" } : void 0,
 		children: l
 	});
@@ -1431,23 +1431,70 @@ var Zt = B.div`
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   padding: 0 2px;
-`, on = (e, t = 4) => {
+`, on = B.span`
+  position: relative;
+  display: inline-flex;
+`, sn = B.div`
+  position: fixed;
+  transform: translateX(-50%);
+  display: flex;
+  width: 254px;
+  padding: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  border-radius: 16px;
+  background: #08060B;
+  color: #FFF;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+  z-index: 100;
+  white-space: normal;
+
+  html.dark & {
+    background: #FFF;
+    color: #000;
+    box-shadow:
+      0 1px 2px 0 rgba(0, 0, 0, 0.16),
+      0 4px 8px 0 rgba(0, 0, 0, 0.32);
+  }
+`, cn = B.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 8px;
+`, ln = B.span`
+  color: ${({ $color: e }) => e === "long" ? "#31D0AA" : e === "short" ? "#ED4B9E" : "inherit"};
+`, un = B.p`
+  margin: 0;
+  align-self: stretch;
+`, dn = (e, t = 4) => {
 	if (!e) return "—";
 	let n = Number(e) * 100;
 	return Number.isFinite(n) ? `${n >= 0 ? "+" : ""}${n.toFixed(t)}%` : "—";
-}, sn = (e, t = 2) => {
+}, fn = (e, t = 2) => {
 	if (!e) return "—";
 	let n = Number(e);
 	return Number.isFinite(n) ? `${n >= 0 ? "+" : ""}${n.toFixed(t)}%` : "—";
-}, cn = (e) => {
+}, pn = (e) => {
 	if (!e) return "—";
 	let t = Math.max(0, e - Date.now()), n = Math.floor(t / 36e5), r = Math.floor(t % 36e5 / 6e4), i = Math.floor(t % 6e4 / 1e3);
 	return `${String(n).padStart(2, "0")}:${String(r).padStart(2, "0")}:${String(i).padStart(2, "0")}`;
-}, ln = (e) => {
+}, mn = (e) => {
 	if (!e) return "—";
 	let t = Number(e);
 	return Number.isFinite(t) ? `$${t.toLocaleString("en-US", { maximumFractionDigits: 2 })}` : "—";
-}, un = (e) => (e.split(/[- ]/)[0] ?? e).slice(0, 1) || "?", dn = () => /* @__PURE__ */ U("svg", {
+}, hn = (e) => (e.split(/[- ]/)[0] ?? e).slice(0, 1) || "?", gn = () => /* @__PURE__ */ U("svg", {
 	width: "14",
 	height: "14",
 	viewBox: "0 0 24 24",
@@ -1456,10 +1503,10 @@ var Zt = B.div`
 	strokeWidth: "2",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ U("path", { d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z" })
-}), fn = (e) => e, pn = (e) => {
+}), _n = (e) => e, vn = (e) => {
 	let { isMobile: t } = h();
-	return U(t ? Tn : mn, { ...e });
-}, mn = ({ symbol: e, pairLabel: t, logoUrl: n, leverage: r, lastPrice: i, markPrice: a, indexPrice: o, fundingRate: c, nextFundingTime: l, change24h: u, volume24h: d, favorited: f = !1, onToggleFavorite: p, renderMarketsDropdown: m, marketsOpen: h, onMarketsOpenChange: g, t: _ = fn }) => {
+	return U(t ? An : yn, { ...e });
+}, yn = ({ symbol: e, pairLabel: t, logoUrl: n, leverage: r, lastPrice: i, markPrice: a, indexPrice: o, fundingRate: c, nextFundingTime: l, change24h: u, volume24h: d, favorited: f = !1, onToggleFavorite: p, renderMarketsDropdown: m, marketsOpen: h, onMarketsOpenChange: g, t: _ = _n }) => {
 	let v = V(), y = h !== void 0, [b, x] = L(!1), S = y ? h : b, C = j((e) => {
 		let t = typeof e == "function" ? e(S) : e;
 		y || x(t), g?.(t);
@@ -1467,12 +1514,12 @@ var Zt = B.div`
 		y,
 		S,
 		g
-	]), [w, T] = L(null), E = I(null), D = I(null);
+	]), [w, E] = L(null), D = I(null), O = I(null);
 	P(() => {
-		if (!S || !E.current) return;
+		if (!S || !D.current) return;
 		let e = () => {
-			let e = E.current.getBoundingClientRect();
-			T({
+			let e = D.current.getBoundingClientRect();
+			E({
 				top: e.bottom + 8,
 				left: e.left
 			});
@@ -1484,7 +1531,7 @@ var Zt = B.div`
 		if (!S) return;
 		let e = (e) => {
 			let t = e.target;
-			E.current?.contains(t) || D.current?.contains(t) || C(!1);
+			D.current?.contains(t) || O.current?.contains(t) || C(!1);
 		}, t = (e) => {
 			e.key === "Escape" && C(!1);
 		};
@@ -1492,7 +1539,18 @@ var Zt = B.div`
 			window.removeEventListener("mousedown", e), window.removeEventListener("keydown", t);
 		};
 	}, [S]);
-	let O = j(() => C(!1), []), k = Number(c) < 0, A = Number(u) < 0;
+	let k = j(() => C(!1), []), A = Number(c) < 0, N = Number(u) < 0, { targetRef: F, tooltip: R } = T(_("The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes."), { placement: "bottom" }), [z, B] = L(!1), [H, K] = L(null), q = I(null), ee = (() => {
+		let e = Number(c);
+		return Number.isFinite(e) ? e * 100 : null;
+	})(), J = ee == null ? "—" : `${(ee * 3 * 365).toFixed(4)}%`, te = () => {
+		let e = q.current;
+		if (!e) return;
+		let t = e.getBoundingClientRect();
+		K({
+			top: t.bottom + 8,
+			left: t.left + t.width / 2
+		}), B(!0);
+	};
 	return /* @__PURE__ */ W(Ut, {
 		"aria-label": `${e} ticker`,
 		children: [
@@ -1502,9 +1560,9 @@ var Zt = B.div`
 				},
 				"aria-label": _(f ? "Unfavorite" : "Favorite"),
 				"aria-pressed": f,
-				children: /* @__PURE__ */ U(dn, {})
+				children: /* @__PURE__ */ U(gn, {})
 			}), /* @__PURE__ */ W(Gt, {
-				ref: E,
+				ref: D,
 				"aria-haspopup": "listbox",
 				"aria-expanded": S,
 				disabled: !m,
@@ -1515,7 +1573,7 @@ var Zt = B.div`
 						children: n ? /* @__PURE__ */ U(Yt, {
 							src: n,
 							alt: t
-						}) : un(t)
+						}) : hn(t)
 					}),
 					/* @__PURE__ */ U(Xt, { children: t }),
 					/* @__PURE__ */ U(s, {
@@ -1524,13 +1582,13 @@ var Zt = B.div`
 					})
 				]
 			})] }),
-			S && w && typeof document < "u" && m ? ee(/* @__PURE__ */ U(Kt, {
-				ref: D,
+			S && w && typeof document < "u" && m ? G(/* @__PURE__ */ U(Kt, {
+				ref: O,
 				style: {
 					top: w.top,
 					left: w.left
 				},
-				children: m(O)
+				children: m(k)
 			}), document.body) : null,
 			/* @__PURE__ */ U(Zt, {
 				"aria-label": `Last price: ${i ?? ""}`,
@@ -1541,58 +1599,97 @@ var Zt = B.div`
 				children: [
 					/* @__PURE__ */ W($t, {
 						role: "listitem",
-						children: [/* @__PURE__ */ U(en, {
-							$dashed: !0,
-							children: _("Mark")
-						}), /* @__PURE__ */ U(tn, { children: a ?? "—" })]
-					}),
-					/* @__PURE__ */ W($t, {
-						role: "listitem",
-						children: [/* @__PURE__ */ U(en, {
-							$dashed: !0,
-							children: _("Index")
-						}), /* @__PURE__ */ U(tn, { children: o ?? "—" })]
-					}),
-					/* @__PURE__ */ W($t, {
-						role: "listitem",
-						children: [/* @__PURE__ */ U(en, {
-							$dashed: !0,
-							children: _("Funding / Countdown")
-						}), /* @__PURE__ */ W(nn, { children: [
-							/* @__PURE__ */ U(rn, {
-								$negative: k,
-								children: on(c)
+						children: [
+							/* @__PURE__ */ U(en, {
+								ref: F,
+								$dashed: !0,
+								children: _("Mark")
 							}),
-							/* @__PURE__ */ U(an, { children: "/" }),
-							/* @__PURE__ */ U(tn, {
-								as: "span",
-								children: cn(l)
-							})
-						] })]
+							/* @__PURE__ */ U(tn, { children: a ?? "—" }),
+							R
+						]
+					}),
+					/* @__PURE__ */ W($t, {
+						role: "listitem",
+						children: [/* @__PURE__ */ U(en, { children: _("Index") }), /* @__PURE__ */ U(tn, { children: o ?? "—" })]
+					}),
+					/* @__PURE__ */ W($t, {
+						role: "listitem",
+						children: [
+							/* @__PURE__ */ U(on, {
+								ref: q,
+								onMouseEnter: te,
+								onMouseLeave: () => B(!1),
+								children: /* @__PURE__ */ U(en, {
+									$dashed: !0,
+									children: _("Funding / Countdown")
+								})
+							}),
+							z && H && typeof document < "u" ? G(/* @__PURE__ */ W(sn, {
+								role: "tooltip",
+								style: {
+									top: H.top,
+									left: H.left
+								},
+								children: [
+									/* @__PURE__ */ W(cn, { children: [/* @__PURE__ */ U("span", { children: _("Interval") }), /* @__PURE__ */ U("span", { children: "8h" })] }),
+									/* @__PURE__ */ W(cn, { children: [/* @__PURE__ */ U("span", { children: _("Direction") }), /* @__PURE__ */ W("span", { children: [
+										/* @__PURE__ */ U(ln, {
+											$color: "long",
+											children: _("Long")
+										}),
+										" ",
+										/* @__PURE__ */ U(ln, {
+											$color: "plain",
+											children: _("Pays")
+										}),
+										" ",
+										/* @__PURE__ */ U(ln, {
+											$color: "short",
+											children: _("Short")
+										})
+									] })] }),
+									/* @__PURE__ */ W(cn, { children: [/* @__PURE__ */ U("span", { children: _("Funding rate") }), /* @__PURE__ */ U("span", { children: dn(c) })] }),
+									/* @__PURE__ */ W(cn, { children: [/* @__PURE__ */ U("span", { children: _("Annualized") }), /* @__PURE__ */ U("span", { children: J })] }),
+									/* @__PURE__ */ U(un, { children: _("Funding rate for the next period. If positive, longs pay shorts. If negative, shorts pay longs.") })
+								]
+							}), document.body) : null,
+							/* @__PURE__ */ W(nn, { children: [
+								/* @__PURE__ */ U(rn, {
+									$negative: A,
+									children: dn(c)
+								}),
+								/* @__PURE__ */ U(an, { children: "/" }),
+								/* @__PURE__ */ U(tn, {
+									as: "span",
+									children: pn(l)
+								})
+							] })
+						]
 					}),
 					/* @__PURE__ */ W($t, {
 						role: "listitem",
 						children: [/* @__PURE__ */ U(en, { children: _("24h Change") }), /* @__PURE__ */ U(tn, {
-							style: { color: u ? A ? v.colors.failure : v.colors.success : void 0 },
-							children: sn(u)
+							style: { color: u ? N ? v.colors.failure : v.colors.success : void 0 },
+							children: fn(u)
 						})]
 					}),
 					/* @__PURE__ */ W($t, {
 						role: "listitem",
-						children: [/* @__PURE__ */ U(en, { children: _("24h Volume (USDT)") }), /* @__PURE__ */ U(tn, { children: ln(d) })]
+						children: [/* @__PURE__ */ U(en, { children: _("24h Volume (USDT)") }), /* @__PURE__ */ U(tn, { children: mn(d) })]
 					})
 				]
 			})
 		]
 	});
-}, hn = B(E)`
+}, bn = B(E)`
   align-items: center;
   gap: 8px;
   padding: 12px;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.backgroundAlt};
   font-variant-numeric: tabular-nums;
-`, gn = B.div`
+`, xn = B.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1601,7 +1698,7 @@ var Zt = B.div`
   &[aria-disabled='true'] {
     cursor: default;
   }
-`, _n = B.span`
+`, Sn = B.span`
   width: 28px;
   height: 28px;
   border-radius: 999px;
@@ -1614,11 +1711,11 @@ var Zt = B.div`
   flex-shrink: 0;
   background: ${({ $bg: e }) => e ?? "#F7931A"};
   overflow: hidden;
-`, vn = B.span`
+`, Cn = B.span`
   font-size: 18px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
-`, yn = B.span`
+`, wn = B.span`
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
@@ -1626,17 +1723,17 @@ var Zt = B.div`
   background: ${({ theme: e }) => e.colors.input};
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 11px;
-`, bn = B.span`
+`, Tn = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
   display: inline-flex;
   align-items: center;
-`, xn = B.span`
+`, En = B.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ $negative: e, theme: t }) => e ? t.colors.failure : t.colors.success};
-`, Sn = B.span`
+`, Dn = B.span`
   flex: 1;
-`, Cn = B.button`
+`, On = B.button`
   width: 32px;
   height: 32px;
   display: inline-flex;
@@ -1649,10 +1746,10 @@ var Zt = B.div`
   &:hover {
     color: ${({ $starred: e, $active: t, theme: n }) => e ? n.colors.warning : t ? n.colors.primary : n.colors.text};
   }
-`, wn = B.div`
+`, kn = B.div`
   position: fixed;
   z-index: 1000;
-`, Tn = ({ symbol: e, pairLabel: t, logoUrl: n, change24h: r, favorited: i = !1, onToggleFavorite: o, chartOpen: l = !1, onChartToggle: u, renderMarketsDropdown: d, marketsOpen: f, onMarketsOpenChange: p, t: h = fn }) => {
+`, An = ({ symbol: e, pairLabel: t, logoUrl: n, change24h: r, favorited: i = !1, onToggleFavorite: o, chartOpen: l = !1, onChartToggle: u, renderMarketsDropdown: d, marketsOpen: f, onMarketsOpenChange: p, t: h = _n }) => {
 	let g = f !== void 0, [_, v] = L(!1), y = g ? f : _, b = j((e) => {
 		let t = typeof e == "function" ? e(y) : e;
 		g || v(t), p?.(t);
@@ -1687,10 +1784,10 @@ var Zt = B.div`
 		};
 	}, [y]);
 	let E = j(() => b(!1), [b]), D = Number(r) < 0, O = t.split(/[- ]/)[0] ?? t, k = !!d;
-	return /* @__PURE__ */ W(hn, {
+	return /* @__PURE__ */ W(bn, {
 		"aria-label": `${e} ticker`,
 		children: [
-			/* @__PURE__ */ W(gn, {
+			/* @__PURE__ */ W(xn, {
 				ref: x,
 				role: "button",
 				"aria-haspopup": "listbox",
@@ -1702,27 +1799,27 @@ var Zt = B.div`
 					k && (e.key === "Enter" || e.key === " ") && (e.preventDefault(), b((e) => !e));
 				},
 				children: [
-					/* @__PURE__ */ U(_n, {
+					/* @__PURE__ */ U(Sn, {
 						$bg: n ? "transparent" : void 0,
 						children: n ? /* @__PURE__ */ U(Yt, {
 							src: n,
 							alt: t
 						}) : O
 					}),
-					/* @__PURE__ */ U(vn, { children: e }),
-					/* @__PURE__ */ U(yn, { children: h("Perp") }),
-					/* @__PURE__ */ U(bn, { children: /* @__PURE__ */ U(s, {
+					/* @__PURE__ */ U(Cn, { children: e }),
+					/* @__PURE__ */ U(wn, { children: h("Perp") }),
+					/* @__PURE__ */ U(Tn, { children: /* @__PURE__ */ U(s, {
 						width: "16px",
 						color: "textSubtle"
 					}) })
 				]
 			}),
-			r !== void 0 && /* @__PURE__ */ U(xn, {
+			r !== void 0 && /* @__PURE__ */ U(En, {
 				$negative: D,
-				children: sn(r)
+				children: fn(r)
 			}),
-			/* @__PURE__ */ U(Sn, {}),
-			o && /* @__PURE__ */ U(Cn, {
+			/* @__PURE__ */ U(Dn, {}),
+			o && /* @__PURE__ */ U(On, {
 				type: "button",
 				$starred: i,
 				"aria-label": h(i ? "Unfavorite" : "Favorite"),
@@ -1733,7 +1830,7 @@ var Zt = B.div`
 					"aria-hidden": "true"
 				})
 			}),
-			u && /* @__PURE__ */ U(Cn, {
+			u && /* @__PURE__ */ U(On, {
 				type: "button",
 				$active: l,
 				"aria-label": h(l ? "Hide chart" : "Show chart"),
@@ -1741,7 +1838,7 @@ var Zt = B.div`
 				onClick: u,
 				children: U(l ? m : a, { width: "20px" })
 			}),
-			y && C && typeof document < "u" && d ? ee(/* @__PURE__ */ U(wn, {
+			y && C && typeof document < "u" && d ? G(/* @__PURE__ */ U(kn, {
 				ref: S,
 				style: {
 					top: C.top,
@@ -1752,15 +1849,15 @@ var Zt = B.div`
 			}), document.body) : null
 		]
 	});
-}, En = 10, Dn = 27, On = B(E)`
+}, jn = 10, Mn = 27, Nn = B(E)`
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
   gap: 8px;
   flex-shrink: 0;
-`, kn = B(E)`
+`, Pn = B(E)`
   gap: 5px;
-`, An = B.button`
+`, Fn = B.button`
   width: 26px;
   height: 24px;
   background: ${({ $active: e, theme: t }) => e ? t.colors.input : "transparent"};
@@ -1776,9 +1873,9 @@ var Zt = B.div`
   &:hover {
     opacity: ${({ $active: e }) => e ? 1 : .8};
   }
-`, jn = B.div`
+`, In = B.div`
   position: relative;
-`, Mn = B.button`
+`, Ln = B.button`
   background: transparent;
   border: 0;
   color: ${({ theme: e }) => e.colors.text};
@@ -1794,7 +1891,7 @@ var Zt = B.div`
   &:hover {
     opacity: 0.75;
   }
-`, Nn = B.div`
+`, Rn = B.div`
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
@@ -1808,7 +1905,7 @@ var Zt = B.div`
   overflow: hidden;
   z-index: 200;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
-`, Pn = B.button`
+`, zn = B.button`
   background: transparent;
   border: 0;
   color: ${({ $active: e, theme: t }) => e ? t.colors.primary : t.colors.text};
@@ -1822,10 +1919,10 @@ var Zt = B.div`
   &:hover {
     background: ${({ theme: e }) => e.colors.input};
   }
-`, Fn = B(E)`
+`, Bn = B(E)`
   align-items: center;
   gap: 2px;
-`, In = B.div`
+`, Vn = B.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   padding: 8px 16px;
@@ -1835,22 +1932,22 @@ var Zt = B.div`
   letter-spacing: 0.12px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   flex-shrink: 0;
-`, Ln = B.div`
+`, Hn = B.div`
   display: flex;
   flex-direction: column;
   min-height: 0;
-`, Rn = B.div`
-  height: ${({ $size: e }) => e === "full" ? En * 2 * Dn : En * Dn}px;
+`, Un = B.div`
+  height: ${({ $size: e }) => e === "full" ? jn * 2 * Mn : jn * Mn}px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-`, zn = B.div`
+`, Wn = B.div`
   position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   padding: 3px 16px;
   gap: 4px;
-  height: ${Dn}px;
+  height: ${Mn}px;
   align-items: center;
   font-size: 14px;
   font-weight: 400;
@@ -1861,15 +1958,15 @@ var Zt = B.div`
   &:hover {
     filter: brightness(1.06);
   }
-`, Bn = B.span`
+`, Gn = B.span`
   position: relative;
   z-index: 1;
   color: ${({ $side: e, theme: t }) => e === "bid" ? "#129E7D" : t.colors.failure};
-`, Vn = B.span`
+`, Kn = B.span`
   position: relative;
   z-index: 1;
   text-align: ${({ $align: e }) => e ?? "right"};
-`, Hn = B.div`
+`, qn = B.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   padding: 4px 16px;
@@ -1880,14 +1977,14 @@ var Zt = B.div`
   font-variant-numeric: tabular-nums;
   color: ${({ theme: e }) => e.colors.text};
   flex-shrink: 0;
-`, Un = B.span`
+`, Jn = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Wn = B.span`
+`, Yn = B.span`
   text-align: center;
-`, Gn = B.span`
+`, Xn = B.span`
   text-align: right;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Kn = (e, t, n, r, i) => {
+`, Zn = (e, t, n, r, i) => {
 	if (r <= 1) return e;
 	let a = n * r, o = /* @__PURE__ */ new Map();
 	for (let [n, r] of e) {
@@ -1897,36 +1994,36 @@ var Zt = B.div`
 		o.set(c, (o.get(c) ?? 0) + s);
 	}
 	return [...o.entries()].sort((e, n) => t === "bid" ? Number(n[0]) - Number(e[0]) : Number(e[0]) - Number(n[0])).map(([e, t]) => [e, t.toString()]);
-}, qn = [
+}, Qn = [
 	100,
 	50,
 	10,
 	1
-], Jn = (e) => e === 0 ? "1" : `0.${"0".repeat(e - 1)}1`, Yn = (e) => !e || e <= 0 ? 0 : Math.round(-Math.log10(e)), Xn = (e, t) => {
+], $n = (e) => e === 0 ? "1" : `0.${"0".repeat(e - 1)}1`, er = (e) => !e || e <= 0 ? 0 : Math.round(-Math.log10(e)), tr = (e, t) => {
 	let n = [];
-	for (let e of qn) t > e * 10 && n.push(String(e));
-	let r = Yn(e);
-	for (let e = 1; e <= r; e++) n.push(Jn(e));
+	for (let e of Qn) t > e * 10 && n.push(String(e));
+	let r = er(e);
+	for (let e = 1; e <= r; e++) n.push($n(e));
 	return n;
-}, Zn = (e, t) => {
+}, nr = (e, t) => {
 	M(() => {
 		let n = (n) => {
 			e.current && !e.current.contains(n.target) && t();
 		};
 		return window.addEventListener("mousedown", n), () => window.removeEventListener("mousedown", n);
 	}, [e, t]);
-}, Qn = ({ label: e, items: t, activeValue: n, onSelect: r }) => {
+}, rr = ({ label: e, items: t, activeValue: n, onSelect: r }) => {
 	let [i, a] = L(!1), o = I(null);
-	return Zn(o, () => a(!1)), /* @__PURE__ */ W(jn, {
+	return nr(o, () => a(!1)), /* @__PURE__ */ W(In, {
 		ref: o,
-		children: [/* @__PURE__ */ W(Mn, {
+		children: [/* @__PURE__ */ W(Ln, {
 			onClick: () => a((e) => !e),
 			children: [
 				e,
 				" ",
 				i ? "▴" : "▾"
 			]
-		}), i && /* @__PURE__ */ U(Nn, { children: t.map((e) => /* @__PURE__ */ U(Pn, {
+		}), i && /* @__PURE__ */ U(Rn, { children: t.map((e) => /* @__PURE__ */ U(zn, {
 			$active: e.value === n,
 			onClick: () => {
 				r(e.value), a(!1);
@@ -1934,7 +2031,7 @@ var Zt = B.div`
 			children: e.label
 		}, e.value)) })]
 	});
-}, $n = ({ bidColor: e, askColor: t, listColor: n }) => /* @__PURE__ */ W("svg", {
+}, ir = ({ bidColor: e, askColor: t, listColor: n }) => /* @__PURE__ */ W("svg", {
 	width: "16",
 	height: "15",
 	viewBox: "0 0 16 15",
@@ -1984,7 +2081,7 @@ var Zt = B.div`
 			fill: n
 		})
 	]
-}), er = ({ bidColor: e, listColor: t }) => /* @__PURE__ */ W("svg", {
+}), ar = ({ bidColor: e, listColor: t }) => /* @__PURE__ */ W("svg", {
 	width: "16",
 	height: "15",
 	viewBox: "0 0 16 15",
@@ -2027,7 +2124,7 @@ var Zt = B.div`
 			fill: t
 		})
 	]
-}), tr = ({ askColor: e, listColor: t }) => /* @__PURE__ */ W("svg", {
+}), or = ({ askColor: e, listColor: t }) => /* @__PURE__ */ W("svg", {
 	width: "16",
 	height: "15",
 	viewBox: "0 0 16 15",
@@ -2070,7 +2167,7 @@ var Zt = B.div`
 			fill: t
 		})
 	]
-}), nr = (e) => e, rr = [
+}), sr = (e) => e, cr = [
 	"0.1",
 	"0.5",
 	"1",
@@ -2078,7 +2175,7 @@ var Zt = B.div`
 	"10",
 	"50",
 	"100"
-], ir = B.div`
+], lr = B.div`
   display: flex;
   flex-direction: column;
   padding: 8px 8px 0;
@@ -2086,7 +2183,7 @@ var Zt = B.div`
   height: 100%;
   width: 100%;
   background: ${({ theme: e }) => e.colors.card};
-`, ar = B.div`
+`, ur = B.div`
   color: ${({ theme: e }) => e.colors.textSubtle};
   display: flex;
   flex-direction: column;
@@ -2097,18 +2194,18 @@ var Zt = B.div`
     color: ${({ theme: e }) => e.colors.text};
     font-weight: 400;
   }
-`, or = B.div`
+`, dr = B.div`
   display: flex;
   justify-content: space-between;
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 11px;
   padding-bottom: 4px;
   margin-bottom: 4px;
-`, sr = B.span`
+`, fr = B.span`
   display: inline-flex;
   align-items: center;
   gap: 2px;
-`, cr = B.div`
+`, pr = B.div`
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -2118,22 +2215,22 @@ var Zt = B.div`
   z-index: 1;
   font-variant-numeric: tabular-nums;
   color: ${({ $side: e, theme: t }) => e === "bid" ? "#129E7D" : t.colors.failure};
-`, lr = B.span`
+`, mr = B.span`
   position: absolute;
   inset: 0 0 0 auto;
   z-index: -1;
   pointer-events: none;
-`, ur = B.div`
+`, hr = B.div`
   text-align: center;
   padding: 8px 0;
-`, dr = B.div`
+`, gr = B.div`
   font-size: 18px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
-`, fr = B.div`
+`, _r = B.div`
   font-size: 12px;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, pr = B.div`
+`, vr = B.div`
   display: flex;
   justify-content: space-between;
   padding: 6px 4px;
@@ -2142,7 +2239,7 @@ var Zt = B.div`
      adjacent OrderForm column is taller than the order book the grid row
      stretches MWrap and the footer ends up below the iPhone viewport. */
   border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-`, mr = B.button`
+`, yr = B.button`
   width: 24px;
   height: 24px;
   background: transparent;
@@ -2153,7 +2250,7 @@ var Zt = B.div`
   color: ${({ theme: e }) => e.colors.textSubtle};
   cursor: pointer;
   padding: 0;
-`, hr = B.button`
+`, br = B.button`
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -2165,7 +2262,7 @@ var Zt = B.div`
   cursor: pointer;
   padding: 0;
   font-variant-numeric: tabular-nums;
-`, gr = B.div`
+`, xr = B.div`
   position: absolute;
   bottom: calc(100% + 4px);
   right: 0;
@@ -2176,7 +2273,7 @@ var Zt = B.div`
   box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   z-index: 50;
-`, _r = B.button`
+`, Sr = B.button`
   display: block;
   width: 100%;
   text-align: right;
@@ -2188,12 +2285,12 @@ var Zt = B.div`
   font-size: 13px;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
-`, vr = B.div`
+`, Cr = B.div`
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 250;
-`, yr = B.div`
+`, wr = B.div`
   position: fixed;
   left: 0;
   right: 0;
@@ -2204,14 +2301,14 @@ var Zt = B.div`
   border-top-right-radius: 16px;
   padding: 8px 0 16px;
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
-`, br = B.div`
+`, Tr = B.div`
   width: 36px;
   height: 4px;
   border-radius: 999px;
   background: ${({ theme: e }) => e.colors.textSubtle};
   opacity: 0.4;
   margin: 4px auto 12px;
-`, xr = B.button`
+`, Er = B.button`
   display: flex;
   width: 100%;
   align-items: center;
@@ -2224,17 +2321,17 @@ var Zt = B.div`
   font-size: 15px;
   cursor: pointer;
   text-align: left;
-`, Sr = B.span`
+`, Dr = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-size: 16px;
-`, Cr = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, view: o, onViewChange: c, priceStep: l, onPriceStepChange: u, hidden: d, t: f = nr, fundingRateText: p, fundingCountdownText: m, midPriceText: h, midSubText: g, priceStepOptions: _ = rr }) => {
+`, Or = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, view: o, onViewChange: c, priceStep: l, onPriceStepChange: u, hidden: d, t: f = sr, fundingRateText: p, fundingCountdownText: m, midPriceText: h, midSubText: g, priceStepOptions: _ = cr }) => {
 	let v = V(), [y, b] = L(!1), [x, S] = L(!1), C = I(null);
-	Zn(C, () => b(!1));
+	nr(C, () => b(!1));
 	let w = F(() => {
-		let n = Math.max(i, Number(l) || i), r = Math.max(1, Math.round(n / i)), o = Kn(e, "ask", i, r, a), s = Kn(t, "bid", i, r, a), c = [...o].sort(([e], [t]) => Number(e) - Number(t)), u = [...s].sort(([e], [t]) => Number(t) - Number(e));
+		let n = Math.max(i, Number(l) || i), r = Math.max(1, Math.round(n / i)), o = Zn(e, "ask", i, r, a), s = Zn(t, "bid", i, r, a), c = [...o].sort(([e], [t]) => Number(e) - Number(t)), u = [...s].sort(([e], [t]) => Number(t) - Number(e));
 		return {
-			asks: c.slice(0, En).reverse(),
-			bids: u.slice(0, En)
+			asks: c.slice(0, jn).reverse(),
+			bids: u.slice(0, jn)
 		};
 	}, [
 		e,
@@ -2247,10 +2344,10 @@ var Zt = B.div`
 		for (let [, t] of w.asks) e = Math.max(e, Number(t) || 0);
 		for (let [, t] of w.bids) e = Math.max(e, Number(t) || 0);
 		return e || 1;
-	}, [w]), E = `color-mix(in srgb, ${v.colors.failure} 18%, transparent)`, D = (e, t, n) => /* @__PURE__ */ W(cr, {
+	}, [w]), E = `color-mix(in srgb, ${v.colors.failure} 18%, transparent)`, D = (e, t, n) => /* @__PURE__ */ W(pr, {
 		$side: n,
 		children: [
-			/* @__PURE__ */ U(lr, { style: {
+			/* @__PURE__ */ U(mr, { style: {
 				width: `${Math.max(6, Math.min(100, Number(t) / T * 100))}%`,
 				background: n === "ask" ? E : "color-mix(in srgb, #129E7D 18%, transparent)"
 			} }),
@@ -2271,21 +2368,21 @@ var Zt = B.div`
 			label: f("Bids only")
 		}
 	], k = v.colors.failure, A = "#129E7D", j = v.colors.textSubtle;
-	return /* @__PURE__ */ W(ir, {
+	return /* @__PURE__ */ W(lr, {
 		style: d ? { display: "none" } : void 0,
 		children: [
-			(p || m) && /* @__PURE__ */ W(ar, { children: [f("Funding (8h) / Countdown"), /* @__PURE__ */ W("strong", { children: [
+			(p || m) && /* @__PURE__ */ W(ur, { children: [f("Funding (8h) / Countdown"), /* @__PURE__ */ W("strong", { children: [
 				p ?? "—",
 				" / ",
 				m ?? "—"
 			] })] }),
-			/* @__PURE__ */ W(or, { children: [/* @__PURE__ */ W("span", { children: [
+			/* @__PURE__ */ W(dr, { children: [/* @__PURE__ */ W("span", { children: [
 				f("Price"),
 				/* @__PURE__ */ U("br", {}),
 				"(",
 				r,
 				")"
-			] }), /* @__PURE__ */ W(sr, { children: [
+			] }), /* @__PURE__ */ W(fr, { children: [
 				f("Size"),
 				/* @__PURE__ */ U("br", {}),
 				"(",
@@ -2297,24 +2394,24 @@ var Zt = B.div`
 				})
 			] })] }),
 			o !== "bids" && w.asks.map(([e, t]) => D(e, t, "ask")),
-			o === "both" && /* @__PURE__ */ W(ur, { children: [/* @__PURE__ */ U(dr, { children: h ?? w.bids[0]?.[0] ?? "—" }), g && /* @__PURE__ */ U(fr, { children: g })] }),
+			o === "both" && /* @__PURE__ */ W(hr, { children: [/* @__PURE__ */ U(gr, { children: h ?? w.bids[0]?.[0] ?? "—" }), g && /* @__PURE__ */ U(_r, { children: g })] }),
 			o !== "asks" && w.bids.map(([e, t]) => D(e, t, "bid")),
-			/* @__PURE__ */ W(pr, { children: [/* @__PURE__ */ W(mr, {
+			/* @__PURE__ */ W(vr, { children: [/* @__PURE__ */ W(yr, {
 				type: "button",
 				"aria-label": f("Choose view"),
 				"aria-haspopup": "dialog",
 				onClick: () => S(!0),
 				children: [
-					o === "both" && /* @__PURE__ */ U($n, {
+					o === "both" && /* @__PURE__ */ U(ir, {
 						bidColor: A,
 						askColor: k,
 						listColor: j
 					}),
-					o === "asks" && /* @__PURE__ */ U(tr, {
+					o === "asks" && /* @__PURE__ */ U(or, {
 						askColor: k,
 						listColor: j
 					}),
-					o === "bids" && /* @__PURE__ */ U(er, {
+					o === "bids" && /* @__PURE__ */ U(ar, {
 						bidColor: A,
 						listColor: j
 					})
@@ -2322,7 +2419,7 @@ var Zt = B.div`
 			}), /* @__PURE__ */ W("div", {
 				ref: C,
 				style: { position: "relative" },
-				children: [/* @__PURE__ */ W(hr, {
+				children: [/* @__PURE__ */ W(br, {
 					type: "button",
 					"aria-haspopup": "listbox",
 					"aria-expanded": y,
@@ -2335,9 +2432,9 @@ var Zt = B.div`
 							"aria-hidden": "true"
 						})
 					]
-				}), y && /* @__PURE__ */ U(gr, {
+				}), y && /* @__PURE__ */ U(xr, {
 					role: "listbox",
-					children: _.map((e) => /* @__PURE__ */ U(_r, {
+					children: _.map((e) => /* @__PURE__ */ U(Sr, {
 						type: "button",
 						role: "option",
 						"aria-selected": e === l,
@@ -2349,25 +2446,25 @@ var Zt = B.div`
 					}, e))
 				})]
 			})] }),
-			x && typeof document < "u" && ee(/* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(vr, { onClick: () => S(!1) }), /* @__PURE__ */ W(yr, {
+			x && typeof document < "u" && G(/* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(Cr, { onClick: () => S(!1) }), /* @__PURE__ */ W(wr, {
 				role: "dialog",
 				"aria-label": f("Choose view"),
-				children: [/* @__PURE__ */ U(br, {}), O.map((e) => /* @__PURE__ */ W(xr, {
+				children: [/* @__PURE__ */ U(Tr, {}), O.map((e) => /* @__PURE__ */ W(Er, {
 					type: "button",
 					$active: o === e.key,
 					onClick: () => {
 						c(e.key), S(!1);
 					},
-					children: [/* @__PURE__ */ U("span", { children: e.label }), o === e.key && /* @__PURE__ */ U(Sr, { children: "✓" })]
+					children: [/* @__PURE__ */ U("span", { children: e.label }), o === e.key && /* @__PURE__ */ U(Dr, { children: "✓" })]
 				}, e.key))]
 			})] }), document.body)
 		]
 	});
-}, wr = (e) => {
+}, kr = (e) => {
 	let { isMobile: t } = h();
-	return U(t ? Cr : Tr, { ...e });
-}, Tr = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, lastPrice: o = 0, view: s, onViewChange: c, priceStep: l, onPriceStepChange: u, sizeUnit: d, onSizeUnitChange: f, hidden: p, embedded: m, t: h = nr }) => {
-	let g = V(), _ = d === "QUOTE" ? r : n, v = F(() => Xn(i, o), [i, o]);
+	return U(t ? Or : Ar, { ...e });
+}, Ar = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, lastPrice: o = 0, view: s, onViewChange: c, priceStep: l, onPriceStepChange: u, sizeUnit: d, onSizeUnitChange: f, hidden: p, embedded: m, t: h = sr }) => {
+	let g = V(), _ = d === "QUOTE" ? r : n, v = F(() => tr(i, o), [i, o]);
 	M(() => {
 		v.length !== 0 && (v.includes(l) || u(v[v.length - 1]));
 	}, [
@@ -2376,7 +2473,7 @@ var Zt = B.div`
 		u
 	]);
 	let y = F(() => {
-		let n = Math.max(i, Number(l) || i), r = Math.max(1, Math.round(n / i)), o = Kn(e, "ask", i, r, a), s = Kn(t, "bid", i, r, a), c = En * 2, u = o.slice(0, c).reverse(), d = s.slice(0, c), f = e[0] ? Number(e[0][0]) : void 0, p = t[0] ? Number(t[0][0]) : void 0;
+		let n = Math.max(i, Number(l) || i), r = Math.max(1, Math.round(n / i)), o = Zn(e, "ask", i, r, a), s = Zn(t, "bid", i, r, a), c = jn * 2, u = o.slice(0, c).reverse(), d = s.slice(0, c), f = e[0] ? Number(e[0][0]) : void 0, p = t[0] ? Number(t[0][0]) : void 0;
 		return {
 			asks: u,
 			bids: d,
@@ -2406,39 +2503,39 @@ var Zt = B.div`
 		let n = e === "bid" ? g.colors.success : g.colors.failure, r = Math.max(0, Math.min(100, t * 100)).toFixed(2);
 		return { background: `linear-gradient(to right, ${`color-mix(in srgb, ${n} 30%, transparent)`} 0%, ${`color-mix(in srgb, ${n} 10%, transparent)`} ${r}%, transparent ${r}%, transparent 100%)` };
 	}, T = (e) => d === "QUOTE" ? e >= 1e6 ? `${(e / 1e6).toFixed(2)}M` : e >= 1e3 ? `${(e / 1e3).toFixed(2)}K` : e.toFixed(2) : e.toFixed(3), E = /* @__PURE__ */ W(H, { children: [
-		/* @__PURE__ */ W(On, { children: [/* @__PURE__ */ W(kn, { children: [
-			/* @__PURE__ */ U(An, {
+		/* @__PURE__ */ W(Nn, { children: [/* @__PURE__ */ W(Pn, { children: [
+			/* @__PURE__ */ U(Fn, {
 				title: h("Both"),
 				$active: s === "both",
 				onClick: () => c("both"),
 				"aria-label": h("Both"),
-				children: /* @__PURE__ */ U($n, {
+				children: /* @__PURE__ */ U(ir, {
 					bidColor: g.colors.success,
 					askColor: g.colors.failure,
 					listColor: g.colors.textSubtle
 				})
 			}),
-			/* @__PURE__ */ U(An, {
+			/* @__PURE__ */ U(Fn, {
 				title: h("Bids"),
 				$active: s === "bids",
 				onClick: () => c("bids"),
 				"aria-label": h("Bids"),
-				children: /* @__PURE__ */ U(er, {
+				children: /* @__PURE__ */ U(ar, {
 					bidColor: g.colors.success,
 					listColor: g.colors.textSubtle
 				})
 			}),
-			/* @__PURE__ */ U(An, {
+			/* @__PURE__ */ U(Fn, {
 				title: h("Asks"),
 				$active: s === "asks",
 				onClick: () => c("asks"),
 				"aria-label": h("Asks"),
-				children: /* @__PURE__ */ U(tr, {
+				children: /* @__PURE__ */ U(or, {
 					askColor: g.colors.failure,
 					listColor: g.colors.textSubtle
 				})
 			})
-		] }), /* @__PURE__ */ W(Fn, { children: [/* @__PURE__ */ U(Qn, {
+		] }), /* @__PURE__ */ W(Bn, { children: [/* @__PURE__ */ U(rr, {
 			label: l,
 			items: v.map((e) => ({
 				value: e,
@@ -2446,7 +2543,7 @@ var Zt = B.div`
 			})),
 			activeValue: l,
 			onSelect: u
-		}), /* @__PURE__ */ U(Qn, {
+		}), /* @__PURE__ */ U(rr, {
 			label: _,
 			items: [{
 				value: "BASE",
@@ -2458,7 +2555,7 @@ var Zt = B.div`
 			activeValue: d,
 			onSelect: (e) => f(e)
 		})] })] }),
-		/* @__PURE__ */ W(In, { children: [
+		/* @__PURE__ */ W(Vn, { children: [
 			/* @__PURE__ */ W("span", { children: [
 				h("Price"),
 				" (",
@@ -2484,52 +2581,52 @@ var Zt = B.div`
 				]
 			})
 		] }),
-		/* @__PURE__ */ W(Ln, { children: [
-			s !== "bids" && /* @__PURE__ */ U(Rn, {
+		/* @__PURE__ */ W(Hn, { children: [
+			s !== "bids" && /* @__PURE__ */ U(Un, {
 				$size: s === "asks" ? "full" : "half",
-				children: x.slice(s === "asks" ? 0 : Math.max(0, x.length - En)).map((e) => /* @__PURE__ */ W(zn, {
+				children: x.slice(s === "asks" ? 0 : Math.max(0, x.length - jn)).map((e) => /* @__PURE__ */ W(Wn, {
 					$side: "ask",
 					style: w("ask", e.total / C),
 					children: [
-						/* @__PURE__ */ U(Bn, {
+						/* @__PURE__ */ U(Gn, {
 							$side: "ask",
 							children: e.price
 						}),
-						/* @__PURE__ */ U(Vn, {
+						/* @__PURE__ */ U(Kn, {
 							$align: "center",
 							children: T(Number(e.qty))
 						}),
-						/* @__PURE__ */ U(Vn, {
+						/* @__PURE__ */ U(Kn, {
 							$align: "right",
 							children: T(e.total)
 						})
 					]
 				}, `a-${e.price}`))
 			}),
-			s === "both" && /* @__PURE__ */ W(Hn, {
+			s === "both" && /* @__PURE__ */ W(qn, {
 				role: "row",
 				"aria-label": h("Spread"),
 				children: [
-					/* @__PURE__ */ U(Un, { children: h("Spread") }),
-					/* @__PURE__ */ U(Wn, { children: y.spread === void 0 ? "—" : y.spread.toFixed(2) }),
-					/* @__PURE__ */ U(Gn, { children: y.spreadPct === void 0 ? "" : `${y.spreadPct.toFixed(3)}%` })
+					/* @__PURE__ */ U(Jn, { children: h("Spread") }),
+					/* @__PURE__ */ U(Yn, { children: y.spread === void 0 ? "—" : y.spread.toFixed(2) }),
+					/* @__PURE__ */ U(Xn, { children: y.spreadPct === void 0 ? "" : `${y.spreadPct.toFixed(3)}%` })
 				]
 			}),
-			s !== "asks" && /* @__PURE__ */ U(Rn, {
+			s !== "asks" && /* @__PURE__ */ U(Un, {
 				$size: s === "bids" ? "full" : "half",
-				children: S.slice(0, s === "bids" ? En * 2 : En).map((e) => /* @__PURE__ */ W(zn, {
+				children: S.slice(0, s === "bids" ? jn * 2 : jn).map((e) => /* @__PURE__ */ W(Wn, {
 					$side: "bid",
 					style: w("bid", e.total / C),
 					children: [
-						/* @__PURE__ */ U(Bn, {
+						/* @__PURE__ */ U(Gn, {
 							$side: "bid",
 							children: e.price
 						}),
-						/* @__PURE__ */ U(Vn, {
+						/* @__PURE__ */ U(Kn, {
 							$align: "center",
 							children: T(Number(e.qty))
 						}),
-						/* @__PURE__ */ U(Vn, {
+						/* @__PURE__ */ U(Kn, {
 							$align: "right",
 							children: T(e.total)
 						})
@@ -2541,22 +2638,22 @@ var Zt = B.div`
 	return m ? /* @__PURE__ */ U("div", {
 		style: p ? { display: "none" } : { display: "contents" },
 		children: E
-	}) : /* @__PURE__ */ U(G, {
+	}) : /* @__PURE__ */ U(K, {
 		style: p ? { display: "none" } : void 0,
 		children: E
 	});
-}, Er = B(G)`
+}, jr = B(K)`
   flex: 1;
   min-height: 200px;
-`, Dr = B.div`
+`, Mr = B.div`
   padding: 8px 12px 12px;
   overflow-x: auto;
   flex: 1;
-`, Or = B(E)`
+`, Nr = B(E)`
   align-items: center;
   justify-content: center;
   min-height: 120px;
-`, kr = B.div`
+`, Pr = B.div`
   display: grid;
   grid-template-columns: repeat(8, minmax(min-content, 1fr)) auto;
   /* Cells sit flush horizontally so the row-hover background reads as
@@ -2568,7 +2665,7 @@ var Zt = B.div`
   & > * {
     padding: 16px 12px;
   }
-`, Ar = B.div`
+`, Fr = B.div`
   display: contents;
   /* Padding lives on the cells (RowGroup is display:contents so any
    * padding set here would be dropped) — gives the hover strip visible
@@ -2589,16 +2686,16 @@ var Zt = B.div`
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
   }
-`, jr = B(E)`
+`, Ir = B(E)`
   gap: 6px;
   align-items: center;
-`, Mr = B.div`
+`, Lr = B.div`
   font-size: 14px;
   line-height: 1.2;
   display: flex;
   flex-direction: column;
   gap: 0;
-`, Nr = B.span`
+`, Rr = B.span`
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
@@ -2610,9 +2707,9 @@ var Zt = B.div`
   line-height: 1.4;
   letter-spacing: 0;
   flex-shrink: 0;
-`, Pr = B.span`
+`, zr = B.span`
   color: ${({ $kind: e, theme: t }) => e === "tp" ? t.colors.success : t.colors.failure};
-`, Fr = B.div`
+`, Br = B.div`
   display: grid;
   grid-template-columns: repeat(7, minmax(min-content, 1fr)) auto;
   /* Match the Positions table spacing: zero column-gap so row hover
@@ -2623,10 +2720,10 @@ var Zt = B.div`
   & > * {
     padding: 16px 12px;
   }
-`, Ir = R`
+`, Vr = R`
   max-height: 360px;
   overflow-y: auto;
-`, Lr = B.div`
+`, Hr = B.div`
   display: grid;
   grid-template-columns: 148px 156px 1fr 1fr 1fr 1fr;
   column-gap: 0;
@@ -2635,8 +2732,8 @@ var Zt = B.div`
   & > * {
     padding: 16px 12px;
   }
-  ${Ir}
-`, Rr = B.div`
+  ${Vr}
+`, Ur = B.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   column-gap: 0;
@@ -2645,8 +2742,8 @@ var Zt = B.div`
   & > * {
     padding: 16px 12px;
   }
-  ${Ir}
-`, zr = B.div`
+  ${Vr}
+`, Wr = B.div`
   display: grid;
   grid-template-columns: 148px 156px minmax(min-content, 0.6fr) repeat(5, minmax(min-content, 1fr));
   column-gap: 0;
@@ -2655,8 +2752,8 @@ var Zt = B.div`
   & > * {
     padding: 16px 12px;
   }
-  ${Ir}
-`, Br = B.div`
+  ${Vr}
+`, Gr = B.div`
   display: flex;
   flex-direction: column;
   font-size: 14px;
@@ -2665,12 +2762,12 @@ var Zt = B.div`
   & > span:last-child {
     color: ${({ theme: e }) => e.colors.textSubtle};
   }
-`, Vr = B.div`
+`, Kr = B.div`
   display: flex;
   flex-direction: column;
   font-size: 14px;
   line-height: 1.5;
-`, Hr = B.button`
+`, qr = B.button`
   background: transparent;
   border: 0;
   padding: 0;
@@ -2698,7 +2795,7 @@ var Zt = B.div`
   background: ${({ theme: e }) => e.colors.card};
 `, Z = B(r).attrs({ fontSize: "14px" })`
   font-variant-numeric: tabular-nums;
-`, Ur = (e) => e, Wr = ({ p: e, useMarkPriceForSymbol: t, computeLiqPrice: n, onClose: r, onEditTpSl: a, closingSymbol: o, t: s }) => {
+`, Jr = (e) => e, Yr = ({ p: e, useMarkPriceForSymbol: t, computeLiqPrice: n, onClose: r, onEditTpSl: a, closingSymbol: o, t: s }) => {
 	let c = V(), l = t?.(e.symbol), u = e.positionAmt >= 0 ? "BUY" : "SELL", d = Number.isFinite(l) && Number.isFinite(e.entryPrice) ? (l - e.entryPrice) * e.positionAmt : Number(e.unrealizedProfit), f = Number.isFinite(e.entryPrice) && Number.isFinite(e.leverage) ? n?.({
 		side: u,
 		entryPrice: e.entryPrice,
@@ -2711,7 +2808,7 @@ var Zt = B.div`
 			children: /* @__PURE__ */ W(E, {
 				alignItems: "center",
 				style: { gap: 6 },
-				children: [/* @__PURE__ */ U("span", { children: e.symbol }), /* @__PURE__ */ W(Nr, { children: [e.leverage, "x"] })]
+				children: [/* @__PURE__ */ U("span", { children: e.symbol }), /* @__PURE__ */ W(Rr, { children: [e.leverage, "x"] })]
 			})
 		}),
 		/* @__PURE__ */ U(Z, {
@@ -2726,14 +2823,14 @@ var Zt = B.div`
 			style: { color: d >= 0 ? c.colors.success : c.colors.failure },
 			children: Number.isFinite(d) ? d.toFixed(4) : "—"
 		}),
-		/* @__PURE__ */ W(Mr, { children: [/* @__PURE__ */ W(Pr, {
+		/* @__PURE__ */ W(Lr, { children: [/* @__PURE__ */ W(zr, {
 			$kind: "tp",
 			children: [
 				s("TP"),
 				": ",
 				e.tpStopPrice ? Number(e.tpStopPrice).toFixed(2) : "—"
 			]
-		}), /* @__PURE__ */ W(Pr, {
+		}), /* @__PURE__ */ W(zr, {
 			$kind: "sl",
 			children: [
 				s("SL"),
@@ -2741,7 +2838,7 @@ var Zt = B.div`
 				e.slStopPrice ? Number(e.slStopPrice).toFixed(2) : "—"
 			]
 		})] }),
-		/* @__PURE__ */ W(jr, { children: [/* @__PURE__ */ U(i, {
+		/* @__PURE__ */ W(Ir, { children: [/* @__PURE__ */ U(i, {
 			scale: "xs",
 			variant: "tertiary",
 			onClick: () => a(e, l ?? NaN),
@@ -2756,10 +2853,10 @@ var Zt = B.div`
 			children: s("Close")
 		})] })
 	] });
-}, Gr = (e) => {
+}, Xr = (e) => {
 	let { isMobile: t } = h();
-	return e.isMobile ?? t ? /* @__PURE__ */ U(Ai, { ...e }) : /* @__PURE__ */ U(Kr, { ...e });
-}, Kr = ({ tab: e, onTabChange: t, positions: n, openOrders: a, orderHistory: o = [], tradeHistory: s = [], transactionHistory: c = [], onShareTrade: l, useMarkPriceForSymbol: u, computeLiqPrice: d, onClosePosition: f, onEditTpSl: p, onCancelOrder: m, closingSymbol: h = null, cancellingOrderId: g = null, t: _ = Ur }) => {
+	return e.isMobile ?? t ? /* @__PURE__ */ U(Fi, { ...e }) : /* @__PURE__ */ U(Zr, { ...e });
+}, Zr = ({ tab: e, onTabChange: t, positions: n, openOrders: a, orderHistory: o = [], tradeHistory: s = [], transactionHistory: c = [], onShareTrade: l, useMarkPriceForSymbol: u, computeLiqPrice: d, onClosePosition: f, onEditTpSl: p, onCancelOrder: m, closingSymbol: h = null, cancellingOrderId: g = null, t: _ = Jr }) => {
 	let v = V(), y = [
 		"positions",
 		"orders",
@@ -2767,47 +2864,47 @@ var Zt = B.div`
 		"trades",
 		"transactions"
 	];
-	return /* @__PURE__ */ W(Er, { children: [/* @__PURE__ */ W(ne, {
+	return /* @__PURE__ */ W(jr, { children: [/* @__PURE__ */ W(te, {
 		activeIndex: y.indexOf(e),
 		onItemClick: (e) => t(y[e]),
 		children: [
-			/* @__PURE__ */ W(q, { children: [
+			/* @__PURE__ */ W(J, { children: [
 				_("Positions"),
 				" (",
 				n.length,
 				")"
 			] }),
-			/* @__PURE__ */ W(q, { children: [
+			/* @__PURE__ */ W(J, { children: [
 				_("Open Orders"),
 				" (",
 				a.length,
 				")"
 			] }),
-			/* @__PURE__ */ W(q, { children: [
+			/* @__PURE__ */ W(J, { children: [
 				_("Order History"),
 				" (",
 				o.length,
 				")"
 			] }),
-			/* @__PURE__ */ W(q, { children: [
+			/* @__PURE__ */ W(J, { children: [
 				_("Trade History"),
 				" (",
 				s.length,
 				")"
 			] }),
-			/* @__PURE__ */ W(q, { children: [
+			/* @__PURE__ */ W(J, { children: [
 				_("Transaction History"),
 				" (",
 				c.length,
 				")"
 			] })
 		]
-	}), /* @__PURE__ */ W(Dr, { children: [
-		e === "positions" && (n.length === 0 ? /* @__PURE__ */ U(Or, { children: /* @__PURE__ */ U(r, {
+	}), /* @__PURE__ */ W(Mr, { children: [
+		e === "positions" && (n.length === 0 ? /* @__PURE__ */ U(Nr, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
 			children: _("No open positions")
-		}) }) : /* @__PURE__ */ W(kr, { children: [
+		}) }) : /* @__PURE__ */ W(Pr, { children: [
 			/* @__PURE__ */ U(X, { children: _("Symbol") }),
 			/* @__PURE__ */ U(X, { children: _("Size") }),
 			/* @__PURE__ */ U(X, { children: _("Entry") }),
@@ -2817,7 +2914,7 @@ var Zt = B.div`
 			/* @__PURE__ */ U(X, { children: _("uPnL") }),
 			/* @__PURE__ */ U(X, { children: _("TP/SL") }),
 			/* @__PURE__ */ U(X, {}),
-			n.map((e) => /* @__PURE__ */ U(Ar, { children: /* @__PURE__ */ U(Wr, {
+			n.map((e) => /* @__PURE__ */ U(Fr, { children: /* @__PURE__ */ U(Yr, {
 				p: e,
 				useMarkPriceForSymbol: u,
 				computeLiqPrice: d,
@@ -2827,11 +2924,11 @@ var Zt = B.div`
 				t: _
 			}) }, e.id))
 		] })),
-		e === "orders" && (a.length === 0 ? /* @__PURE__ */ U(Or, { children: /* @__PURE__ */ U(r, {
+		e === "orders" && (a.length === 0 ? /* @__PURE__ */ U(Nr, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
 			children: _("No open orders")
-		}) }) : /* @__PURE__ */ W(Fr, { children: [
+		}) }) : /* @__PURE__ */ W(Br, { children: [
 			/* @__PURE__ */ U(X, { children: _("Symbol") }),
 			/* @__PURE__ */ U(X, { children: _("Side") }),
 			/* @__PURE__ */ U(X, { children: _("Type") }),
@@ -2842,7 +2939,7 @@ var Zt = B.div`
 			/* @__PURE__ */ U(X, {}),
 			a.map((e) => {
 				let t = g === e.id;
-				return /* @__PURE__ */ W(Ar, { children: [
+				return /* @__PURE__ */ W(Fr, { children: [
 					/* @__PURE__ */ U(Z, {
 						bold: !0,
 						children: e.symbol
@@ -2856,7 +2953,7 @@ var Zt = B.div`
 					/* @__PURE__ */ U(Z, { children: e.origQty }),
 					/* @__PURE__ */ U(Z, { children: e.executedQty }),
 					/* @__PURE__ */ U(Z, { children: e.status }),
-					/* @__PURE__ */ U(jr, { children: /* @__PURE__ */ U(i, {
+					/* @__PURE__ */ U(Ir, { children: /* @__PURE__ */ U(i, {
 						scale: "xs",
 						variant: "secondary",
 						disabled: t,
@@ -2867,11 +2964,11 @@ var Zt = B.div`
 				] }, e.id);
 			})
 		] })),
-		e === "history" && (o.length === 0 ? /* @__PURE__ */ U(Or, { children: /* @__PURE__ */ U(r, {
+		e === "history" && (o.length === 0 ? /* @__PURE__ */ U(Nr, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
 			children: _("No order history")
-		}) }) : /* @__PURE__ */ W(zr, { children: [
+		}) }) : /* @__PURE__ */ W(Wr, { children: [
 			/* @__PURE__ */ U(X, { children: _("Time") }),
 			/* @__PURE__ */ U(X, { children: _("Symbol") }),
 			/* @__PURE__ */ U(X, { children: _("Side") }),
@@ -2880,10 +2977,10 @@ var Zt = B.div`
 			/* @__PURE__ */ U(X, { children: _("Size") }),
 			/* @__PURE__ */ U(X, { children: _("Filled") }),
 			/* @__PURE__ */ U(X, { children: _("Status") }),
-			o.map((e) => /* @__PURE__ */ W(Ar, { children: [
+			o.map((e) => /* @__PURE__ */ W(Fr, { children: [
 				/* @__PURE__ */ U(Z, {
 					as: "div",
-					children: /* @__PURE__ */ W(Br, { children: [/* @__PURE__ */ U("span", { children: e.date }), /* @__PURE__ */ U("span", { children: e.time })] })
+					children: /* @__PURE__ */ W(Gr, { children: [/* @__PURE__ */ U("span", { children: e.date }), /* @__PURE__ */ U("span", { children: e.time })] })
 				}),
 				/* @__PURE__ */ U(Z, {
 					bold: !0,
@@ -2900,11 +2997,11 @@ var Zt = B.div`
 				/* @__PURE__ */ U(Z, { children: e.status })
 			] }, e.id))
 		] })),
-		e === "trades" && (s.length === 0 ? /* @__PURE__ */ U(Or, { children: /* @__PURE__ */ U(r, {
+		e === "trades" && (s.length === 0 ? /* @__PURE__ */ U(Nr, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
 			children: _("No trades yet")
-		}) }) : /* @__PURE__ */ W(Lr, { children: [
+		}) }) : /* @__PURE__ */ W(Hr, { children: [
 			/* @__PURE__ */ U(X, { children: _("Time") }),
 			/* @__PURE__ */ U(X, { children: _("Symbol") }),
 			/* @__PURE__ */ U(X, { children: _("Price") }),
@@ -2913,14 +3010,14 @@ var Zt = B.div`
 			/* @__PURE__ */ U(X, { children: _("Realized profit") }),
 			s.map((e) => {
 				let t = e.side === "BUY" ? v.colors.success : v.colors.failure, n = e.realizedProfit.startsWith("+");
-				return /* @__PURE__ */ W(Ar, { children: [
+				return /* @__PURE__ */ W(Fr, { children: [
 					/* @__PURE__ */ U(Z, {
 						as: "div",
-						children: /* @__PURE__ */ W(Br, { children: [/* @__PURE__ */ U("span", { children: e.date }), /* @__PURE__ */ U("span", { children: e.time })] })
+						children: /* @__PURE__ */ W(Gr, { children: [/* @__PURE__ */ U("span", { children: e.date }), /* @__PURE__ */ U("span", { children: e.time })] })
 					}),
 					/* @__PURE__ */ U(Z, {
 						as: "div",
-						children: /* @__PURE__ */ W(Vr, { children: [/* @__PURE__ */ U("span", { children: e.symbol }), /* @__PURE__ */ U("span", {
+						children: /* @__PURE__ */ W(Kr, { children: [/* @__PURE__ */ U("span", { children: e.symbol }), /* @__PURE__ */ U("span", {
 							style: {
 								color: t,
 								fontSize: 12
@@ -2939,7 +3036,7 @@ var Zt = B.div`
 							children: [/* @__PURE__ */ U("span", {
 								style: { color: n ? v.colors.success : v.colors.failure },
 								children: e.realizedProfit
-							}), l && /* @__PURE__ */ U(Hr, {
+							}), l && /* @__PURE__ */ U(qr, {
 								type: "button",
 								onClick: () => l(e),
 								"aria-label": _("Share trade"),
@@ -2963,19 +3060,19 @@ var Zt = B.div`
 				] }, e.id);
 			})
 		] })),
-		e === "transactions" && (c.length === 0 ? /* @__PURE__ */ U(Or, { children: /* @__PURE__ */ U(r, {
+		e === "transactions" && (c.length === 0 ? /* @__PURE__ */ U(Nr, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
 			children: _("No transactions yet")
-		}) }) : /* @__PURE__ */ W(Rr, { children: [
+		}) }) : /* @__PURE__ */ W(Ur, { children: [
 			/* @__PURE__ */ U(X, { children: _("Time") }),
 			/* @__PURE__ */ U(X, { children: _("Type") }),
 			/* @__PURE__ */ U(X, { children: _("Amount") }),
 			/* @__PURE__ */ U(X, { children: _("Symbol") }),
-			c.map((e) => /* @__PURE__ */ W(Ar, { children: [
+			c.map((e) => /* @__PURE__ */ W(Fr, { children: [
 				/* @__PURE__ */ U(Z, {
 					as: "div",
-					children: /* @__PURE__ */ W(Br, { children: [/* @__PURE__ */ U("span", { children: e.date }), /* @__PURE__ */ U("span", { children: e.time })] })
+					children: /* @__PURE__ */ W(Gr, { children: [/* @__PURE__ */ U("span", { children: e.date }), /* @__PURE__ */ U("span", { children: e.time })] })
 				}),
 				/* @__PURE__ */ U(Z, { children: e.type }),
 				/* @__PURE__ */ U(Z, { children: e.amount }),
@@ -2983,13 +3080,13 @@ var Zt = B.div`
 			] }, e.id))
 		] }))
 	] })] });
-}, qr = B.nav`
+}, Qr = B.nav`
   display: flex;
   align-items: center;
   border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   padding: 0 12px;
-`, Jr = B.button`
+`, $r = B.button`
   border: 0;
   background: transparent;
   padding: 12px 8px;
@@ -3009,9 +3106,9 @@ var Zt = B.div`
     background: ${({ theme: e }) => e.colors.primary};
     opacity: ${({ $active: e }) => e ? 1 : 0};
   }
-`, Yr = B.span`
+`, ei = B.span`
   flex: 1;
-`, Xr = B.button`
+`, ti = B.button`
   border: 0;
   background: transparent;
   padding: 8px;
@@ -3023,18 +3120,18 @@ var Zt = B.div`
   &:hover {
     color: ${({ theme: e }) => e.colors.text};
   }
-`, Zr = B.div`
+`, ni = B.div`
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
   font-size: 13px;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Qr = B.span`
+`, ri = B.span`
   width: 1px;
   height: 16px;
   background: ${({ theme: e }) => e.colors.cardBorder};
-`, $r = B.button`
+`, ii = B.button`
   background: transparent;
   border: 0;
   color: ${({ theme: e }) => e.colors.text};
@@ -3044,53 +3141,53 @@ var Zt = B.div`
   align-items: center;
   gap: 4px;
   cursor: pointer;
-`, ei = B.label`
+`, ai = B.label`
   display: inline-flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   user-select: none;
-`, ti = B.div`
+`, oi = B.div`
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 64px 12px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 14px;
-`, ni = B.div`
+`, si = B.div`
   display: flex;
   flex-direction: column;
-`, ri = B.div`
+`, ci = B.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
   padding: 12px;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   font-variant-numeric: tabular-nums;
-`, ii = B.div`
+`, li = B.div`
   display: flex;
   align-items: center;
   gap: 8px;
-`, ai = B.span`
+`, ui = B.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
-`, oi = B.span`
+`, di = B.span`
   font-size: 12px;
   font-weight: 500;
   color: ${({ $side: e, theme: t }) => e === "BUY" ? t.colors.success : t.colors.failure};
-`, si = B.span`
+`, fi = B.span`
   flex: 1;
-`, ci = B.span`
+`, pi = B.span`
   font-size: 13px;
   font-weight: 600;
   color: ${({ $up: e, theme: t }) => e ? t.colors.success : t.colors.failure};
-`, li = B.div`
+`, mi = B.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4px 12px;
   font-size: 12px;
-`, ui = B.div`
+`, hi = B.div`
   display: flex;
   justify-content: space-between;
   color: ${({ theme: e }) => e.colors.textSubtle};
@@ -3098,34 +3195,34 @@ var Zt = B.div`
     color: ${({ theme: e }) => e.colors.text};
     font-weight: 500;
   }
-`, di = B.div`
+`, gi = B.div`
   display: flex;
   gap: 8px;
   margin-top: 4px;
-`, fi = B.div`
+`, _i = B.div`
   display: flex;
   flex-direction: column;
   background: ${({ theme: e }) => e.colors.card};
-`, pi = B.div`
+`, vi = B.div`
   position: fixed;
   inset: 0;
   z-index: 200;
   background: ${({ theme: e }) => e.colors.card};
   display: flex;
   flex-direction: column;
-`, mi = B.header`
+`, yi = B.header`
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   flex-shrink: 0;
-`, hi = B.span`
+`, bi = B.span`
   flex: 1;
   font-weight: 600;
   font-size: 16px;
   color: ${({ theme: e }) => e.colors.text};
-`, gi = B.button`
+`, xi = B.button`
   width: 32px;
   height: 32px;
   display: inline-flex;
@@ -3139,12 +3236,12 @@ var Zt = B.div`
   &:hover {
     color: ${({ theme: e }) => e.colors.text};
   }
-`, _i = B.nav`
+`, Si = B.nav`
   display: flex;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   padding: 0 12px;
   flex-shrink: 0;
-`, vi = B.button`
+`, Ci = B.button`
   flex: 1;
   padding: 12px 8px;
   border: 0;
@@ -3165,17 +3262,17 @@ var Zt = B.div`
     background: ${({ theme: e }) => e.colors.primary};
     opacity: ${({ $active: e }) => e ? 1 : 0};
   }
-`, yi = B.div`
+`, wi = B.div`
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   padding: 0;
-`, bi = B.div`
+`, Ti = B.div`
   text-align: center;
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 14px;
   padding: 48px 0;
-`, xi = B.div`
+`, Ei = B.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -3184,24 +3281,24 @@ var Zt = B.div`
   font-variant-numeric: tabular-nums;
   font-size: 13px;
   gap: 12px;
-`, Si = B.div`
+`, Di = B.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-`, Ci = B.span`
+`, Oi = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-weight: 600;
-`, wi = B.span`
+`, ki = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 12px;
-`, Ti = B.div`
+`, Ai = B.div`
   text-align: right;
   display: flex;
   flex-direction: column;
   gap: 2px;
   flex-shrink: 0;
-`, Ei = [
+`, ji = [
 	{
 		key: "orders",
 		label: "Order History",
@@ -3217,14 +3314,14 @@ var Zt = B.div`
 		label: "Transactions",
 		emptyKey: "No transactions yet"
 	}
-], Di = ({ open: e, onClose: t, tab: n, onTabChange: r, orderHistory: i, tradeHistory: a, transactionHistory: o, t: s }) => {
+], Mi = ({ open: e, onClose: t, tab: n, onTabChange: r, orderHistory: i, tradeHistory: a, transactionHistory: o, t: s }) => {
 	let c = V();
-	return !e || typeof document > "u" ? null : ee(/* @__PURE__ */ W(pi, {
+	return !e || typeof document > "u" ? null : G(/* @__PURE__ */ W(vi, {
 		role: "dialog",
 		"aria-modal": "true",
 		"aria-label": s("History"),
 		children: [
-			/* @__PURE__ */ W(mi, { children: [/* @__PURE__ */ U(hi, { children: s("History") }), /* @__PURE__ */ U(gi, {
+			/* @__PURE__ */ W(yi, { children: [/* @__PURE__ */ U(bi, { children: s("History") }), /* @__PURE__ */ U(xi, {
 				type: "button",
 				"aria-label": s("Close"),
 				onClick: t,
@@ -3233,9 +3330,9 @@ var Zt = B.div`
 					"aria-hidden": "true"
 				})
 			})] }),
-			/* @__PURE__ */ U(_i, {
+			/* @__PURE__ */ U(Si, {
 				role: "tablist",
-				children: Ei.map((e) => /* @__PURE__ */ U(vi, {
+				children: ji.map((e) => /* @__PURE__ */ U(Ci, {
 					type: "button",
 					role: "tab",
 					"aria-selected": n === e.key,
@@ -3244,9 +3341,9 @@ var Zt = B.div`
 					children: s(e.label)
 				}, e.key))
 			}),
-			/* @__PURE__ */ W(yi, { children: [
-				n === "orders" && (i.length === 0 ? /* @__PURE__ */ U(bi, { children: s("No order history yet") }) : i.map((e) => /* @__PURE__ */ W(xi, { children: [/* @__PURE__ */ W(Si, { children: [
-					/* @__PURE__ */ W(Ci, { children: [
+			/* @__PURE__ */ W(wi, { children: [
+				n === "orders" && (i.length === 0 ? /* @__PURE__ */ U(Ti, { children: s("No order history yet") }) : i.map((e) => /* @__PURE__ */ W(Ei, { children: [/* @__PURE__ */ W(Di, { children: [
+					/* @__PURE__ */ W(Oi, { children: [
 						e.symbol,
 						" ",
 						/* @__PURE__ */ U("span", {
@@ -3257,12 +3354,12 @@ var Zt = B.div`
 							children: e.side === "BUY" ? s("Buy") : s("Sell")
 						})
 					] }),
-					/* @__PURE__ */ W(wi, { children: [
+					/* @__PURE__ */ W(ki, { children: [
 						e.date,
 						" ",
 						e.time
 					] }),
-					/* @__PURE__ */ W(wi, { children: [
+					/* @__PURE__ */ W(ki, { children: [
 						e.type,
 						" · ",
 						e.price,
@@ -3271,17 +3368,17 @@ var Zt = B.div`
 						"/",
 						e.origQty
 					] })
-				] }), /* @__PURE__ */ U(Ti, { children: /* @__PURE__ */ U("span", {
+				] }), /* @__PURE__ */ U(Ai, { children: /* @__PURE__ */ U("span", {
 					style: {
 						color: c.colors.textSubtle,
 						fontSize: 12
 					},
 					children: e.status
 				}) })] }, e.id))),
-				n === "trades" && (a.length === 0 ? /* @__PURE__ */ U(bi, { children: s("No trade history yet") }) : a.map((e) => {
+				n === "trades" && (a.length === 0 ? /* @__PURE__ */ U(Ti, { children: s("No trade history yet") }) : a.map((e) => {
 					let t = e.realizedProfit.startsWith("+");
-					return /* @__PURE__ */ W(xi, { children: [/* @__PURE__ */ W(Si, { children: [
-						/* @__PURE__ */ W(Ci, { children: [
+					return /* @__PURE__ */ W(Ei, { children: [/* @__PURE__ */ W(Di, { children: [
+						/* @__PURE__ */ W(Oi, { children: [
 							e.symbol,
 							" ",
 							/* @__PURE__ */ U("span", {
@@ -3292,12 +3389,12 @@ var Zt = B.div`
 								children: e.side === "BUY" ? s("Buy") : s("Sell")
 							})
 						] }),
-						/* @__PURE__ */ W(wi, { children: [
+						/* @__PURE__ */ W(ki, { children: [
 							e.date,
 							" ",
 							e.time
 						] }),
-						/* @__PURE__ */ W(wi, { children: [
+						/* @__PURE__ */ W(ki, { children: [
 							e.price,
 							" · ",
 							e.quantity,
@@ -3306,7 +3403,7 @@ var Zt = B.div`
 							" ",
 							e.fee
 						] })
-					] }), /* @__PURE__ */ U(Ti, { children: /* @__PURE__ */ U("span", {
+					] }), /* @__PURE__ */ U(Ai, { children: /* @__PURE__ */ U("span", {
 						style: {
 							color: t ? c.colors.success : c.colors.failure,
 							fontWeight: 600
@@ -3314,33 +3411,33 @@ var Zt = B.div`
 						children: e.realizedProfit
 					}) })] }, e.id);
 				})),
-				n === "tx" && (o.length === 0 ? /* @__PURE__ */ U(bi, { children: s("No transactions yet") }) : o.map((e) => {
+				n === "tx" && (o.length === 0 ? /* @__PURE__ */ U(Ti, { children: s("No transactions yet") }) : o.map((e) => {
 					let t = e.amount.startsWith("+");
-					return /* @__PURE__ */ W(xi, { children: [/* @__PURE__ */ W(Si, { children: [/* @__PURE__ */ U(Ci, { children: e.type }), /* @__PURE__ */ W(wi, { children: [
+					return /* @__PURE__ */ W(Ei, { children: [/* @__PURE__ */ W(Di, { children: [/* @__PURE__ */ U(Oi, { children: e.type }), /* @__PURE__ */ W(ki, { children: [
 						e.date,
 						" ",
 						e.time
-					] })] }), /* @__PURE__ */ W(Ti, { children: [/* @__PURE__ */ U("span", {
+					] })] }), /* @__PURE__ */ W(Ai, { children: [/* @__PURE__ */ U("span", {
 						style: {
 							color: t ? c.colors.success : c.colors.failure,
 							fontWeight: 600
 						},
 						children: e.amount
-					}), /* @__PURE__ */ U(wi, { children: e.symbol })] })] }, e.id);
+					}), /* @__PURE__ */ U(ki, { children: e.symbol })] })] }, e.id);
 				}))
 			] })
 		]
 	}), document.body);
-}, Oi = ({ p: e, useMarkPriceForSymbol: t, computeLiqPrice: n, onClose: r, onEditTpSl: a, closingSymbol: o, t: s }) => {
+}, Ni = ({ p: e, useMarkPriceForSymbol: t, computeLiqPrice: n, onClose: r, onEditTpSl: a, closingSymbol: o, t: s }) => {
 	let c = t?.(e.symbol), l = e.positionAmt >= 0 ? "BUY" : "SELL", u = Number.isFinite(c) && Number.isFinite(e.entryPrice) ? (c - e.entryPrice) * e.positionAmt : Number(e.unrealizedProfit), d = Number.isFinite(e.entryPrice) && Number.isFinite(e.leverage) ? n?.({
 		side: l,
 		entryPrice: e.entryPrice,
 		leverage: e.leverage
 	}) : void 0, f = o === e.symbol, p = Math.abs(e.positionAmt);
-	return /* @__PURE__ */ W(ri, { children: [
-		/* @__PURE__ */ W(ii, { children: [
-			/* @__PURE__ */ U(ai, { children: e.symbol }),
-			/* @__PURE__ */ W(oi, {
+	return /* @__PURE__ */ W(ci, { children: [
+		/* @__PURE__ */ W(li, { children: [
+			/* @__PURE__ */ U(ui, { children: e.symbol }),
+			/* @__PURE__ */ W(di, {
 				$side: l,
 				children: [
 					s(l === "BUY" ? "Long" : "Short"),
@@ -3349,21 +3446,21 @@ var Zt = B.div`
 					"x"
 				]
 			}),
-			/* @__PURE__ */ U(si, {}),
-			/* @__PURE__ */ U(ci, {
+			/* @__PURE__ */ U(fi, {}),
+			/* @__PURE__ */ U(pi, {
 				$up: u >= 0,
 				children: Number.isFinite(u) ? `${u >= 0 ? "+" : ""}${u.toFixed(4)}` : "—"
 			})
 		] }),
-		/* @__PURE__ */ W(li, { children: [
-			/* @__PURE__ */ W(ui, { children: [/* @__PURE__ */ U("span", { children: s("Size") }), /* @__PURE__ */ U("strong", { children: p })] }),
-			/* @__PURE__ */ W(ui, { children: [/* @__PURE__ */ U("span", { children: s("Entry") }), /* @__PURE__ */ U("strong", { children: Number.isFinite(e.entryPrice) ? e.entryPrice.toFixed(2) : "—" })] }),
-			/* @__PURE__ */ W(ui, { children: [/* @__PURE__ */ U("span", { children: s("Mark") }), /* @__PURE__ */ U("strong", { children: c !== void 0 && Number.isFinite(c) ? c.toFixed(2) : "—" })] }),
-			/* @__PURE__ */ W(ui, { children: [/* @__PURE__ */ U("span", { children: s("Liq") }), /* @__PURE__ */ U("strong", { children: d ? d.toFixed(2) : "—" })] }),
-			/* @__PURE__ */ W(ui, { children: [/* @__PURE__ */ U("span", { children: s("TP") }), /* @__PURE__ */ U("strong", { children: e.tpStopPrice ? Number(e.tpStopPrice).toFixed(2) : "—" })] }),
-			/* @__PURE__ */ W(ui, { children: [/* @__PURE__ */ U("span", { children: s("SL") }), /* @__PURE__ */ U("strong", { children: e.slStopPrice ? Number(e.slStopPrice).toFixed(2) : "—" })] })
+		/* @__PURE__ */ W(mi, { children: [
+			/* @__PURE__ */ W(hi, { children: [/* @__PURE__ */ U("span", { children: s("Size") }), /* @__PURE__ */ U("strong", { children: p })] }),
+			/* @__PURE__ */ W(hi, { children: [/* @__PURE__ */ U("span", { children: s("Entry") }), /* @__PURE__ */ U("strong", { children: Number.isFinite(e.entryPrice) ? e.entryPrice.toFixed(2) : "—" })] }),
+			/* @__PURE__ */ W(hi, { children: [/* @__PURE__ */ U("span", { children: s("Mark") }), /* @__PURE__ */ U("strong", { children: c !== void 0 && Number.isFinite(c) ? c.toFixed(2) : "—" })] }),
+			/* @__PURE__ */ W(hi, { children: [/* @__PURE__ */ U("span", { children: s("Liq") }), /* @__PURE__ */ U("strong", { children: d ? d.toFixed(2) : "—" })] }),
+			/* @__PURE__ */ W(hi, { children: [/* @__PURE__ */ U("span", { children: s("TP") }), /* @__PURE__ */ U("strong", { children: e.tpStopPrice ? Number(e.tpStopPrice).toFixed(2) : "—" })] }),
+			/* @__PURE__ */ W(hi, { children: [/* @__PURE__ */ U("span", { children: s("SL") }), /* @__PURE__ */ U("strong", { children: e.slStopPrice ? Number(e.slStopPrice).toFixed(2) : "—" })] })
 		] }),
-		/* @__PURE__ */ W(di, { children: [/* @__PURE__ */ U(i, {
+		/* @__PURE__ */ W(gi, { children: [/* @__PURE__ */ U(i, {
 			scale: "xs",
 			variant: "tertiary",
 			onClick: () => a(e, c ?? NaN),
@@ -3378,12 +3475,12 @@ var Zt = B.div`
 			children: s("Close")
 		})] })
 	] });
-}, ki = ({ o: e, onCancel: t, cancellingOrderId: n, t: r }) => {
+}, Pi = ({ o: e, onCancel: t, cancellingOrderId: n, t: r }) => {
 	let a = n === e.id;
-	return /* @__PURE__ */ W(ri, { children: [
-		/* @__PURE__ */ W(ii, { children: [
-			/* @__PURE__ */ U(ai, { children: e.symbol }),
-			/* @__PURE__ */ W(oi, {
+	return /* @__PURE__ */ W(ci, { children: [
+		/* @__PURE__ */ W(li, { children: [
+			/* @__PURE__ */ U(ui, { children: e.symbol }),
+			/* @__PURE__ */ W(di, {
 				$side: e.side,
 				children: [
 					e.side === "BUY" ? r("Buy") : r("Sell"),
@@ -3391,7 +3488,7 @@ var Zt = B.div`
 					e.type
 				]
 			}),
-			/* @__PURE__ */ U(si, {}),
+			/* @__PURE__ */ U(fi, {}),
 			/* @__PURE__ */ U("span", {
 				style: {
 					fontSize: 12,
@@ -3400,12 +3497,12 @@ var Zt = B.div`
 				children: e.status
 			})
 		] }),
-		/* @__PURE__ */ W(li, { children: [/* @__PURE__ */ W(ui, { children: [/* @__PURE__ */ U("span", { children: r("Price") }), /* @__PURE__ */ U("strong", { children: e.price })] }), /* @__PURE__ */ W(ui, { children: [/* @__PURE__ */ U("span", { children: r("Filled") }), /* @__PURE__ */ W("strong", { children: [
+		/* @__PURE__ */ W(mi, { children: [/* @__PURE__ */ W(hi, { children: [/* @__PURE__ */ U("span", { children: r("Price") }), /* @__PURE__ */ U("strong", { children: e.price })] }), /* @__PURE__ */ W(hi, { children: [/* @__PURE__ */ U("span", { children: r("Filled") }), /* @__PURE__ */ W("strong", { children: [
 			e.executedQty,
 			"/",
 			e.origQty
 		] })] })] }),
-		/* @__PURE__ */ U(di, { children: /* @__PURE__ */ U(i, {
+		/* @__PURE__ */ U(gi, { children: /* @__PURE__ */ U(i, {
 			scale: "xs",
 			variant: "secondary",
 			disabled: a,
@@ -3414,7 +3511,7 @@ var Zt = B.div`
 			children: r("Cancel")
 		}) })
 	] });
-}, Ai = ({ tab: e, onTabChange: t, positions: n, openOrders: r, orderHistory: i = [], tradeHistory: a = [], transactionHistory: c = [], onClosePosition: l, onEditTpSl: u, onCancelOrder: d, useMarkPriceForSymbol: f, computeLiqPrice: p, closingSymbol: m, cancellingOrderId: h, positionsCount: g, hideOtherSymbols: _ = !1, onHideOtherSymbolsChange: v, instrumentFilterLabel: y, onInstrumentFilterClick: b, historyOpen: x = !1, onHistoryToggle: S, historyTab: C = "orders", onHistoryTabChange: w, t: T = Ur }) => {
+}, Fi = ({ tab: e, onTabChange: t, positions: n, openOrders: r, orderHistory: i = [], tradeHistory: a = [], transactionHistory: c = [], onClosePosition: l, onEditTpSl: u, onCancelOrder: d, useMarkPriceForSymbol: f, computeLiqPrice: p, closingSymbol: m, cancellingOrderId: h, positionsCount: g, hideOtherSymbols: _ = !1, onHideOtherSymbolsChange: v, instrumentFilterLabel: y, onInstrumentFilterClick: b, historyOpen: x = !1, onHistoryToggle: S, historyTab: C = "orders", onHistoryTabChange: w, t: T = Jr }) => {
 	let E = [
 		{
 			key: "orders",
@@ -3441,11 +3538,11 @@ var Zt = B.div`
 	], D = E.find((t) => t.key === e) ?? E[0], O = (n) => {
 		n !== e && t(n);
 	};
-	return /* @__PURE__ */ W(fi, { children: [
-		/* @__PURE__ */ W(qr, {
+	return /* @__PURE__ */ W(_i, { children: [
+		/* @__PURE__ */ W(Qr, {
 			role: "tablist",
 			children: [
-				E.map((t) => /* @__PURE__ */ W(Jr, {
+				E.map((t) => /* @__PURE__ */ W($r, {
 					type: "button",
 					role: "tab",
 					"aria-selected": t.key === e,
@@ -3453,8 +3550,8 @@ var Zt = B.div`
 					onClick: () => O(t.key),
 					children: [t.label, typeof t.count == "number" && t.count > 0 ? ` (${t.count})` : ""]
 				}, t.key)),
-				/* @__PURE__ */ U(Yr, {}),
-				/* @__PURE__ */ U(Xr, {
+				/* @__PURE__ */ U(ei, {}),
+				/* @__PURE__ */ U(ti, {
 					type: "button",
 					"aria-label": T("History"),
 					onClick: () => S?.(!0),
@@ -3465,8 +3562,8 @@ var Zt = B.div`
 				})
 			]
 		}),
-		/* @__PURE__ */ W(Zr, { children: [
-			/* @__PURE__ */ W($r, {
+		/* @__PURE__ */ W(ni, { children: [
+			/* @__PURE__ */ W(ii, {
 				type: "button",
 				onClick: b,
 				children: [
@@ -3478,14 +3575,14 @@ var Zt = B.div`
 					})
 				]
 			}),
-			/* @__PURE__ */ U(Qr, {}),
-			/* @__PURE__ */ W(ei, { children: [/* @__PURE__ */ U("input", {
+			/* @__PURE__ */ U(ri, {}),
+			/* @__PURE__ */ W(ai, { children: [/* @__PURE__ */ U("input", {
 				type: "checkbox",
 				checked: _,
 				onChange: (e) => v?.(e.target.checked)
 			}), /* @__PURE__ */ U("span", { children: T("Hide other symbols") })] })
 		] }),
-		e === "positions" && n.length > 0 ? /* @__PURE__ */ U(ni, { children: n.map((e) => /* @__PURE__ */ U(Oi, {
+		e === "positions" && n.length > 0 ? /* @__PURE__ */ U(si, { children: n.map((e) => /* @__PURE__ */ U(Ni, {
 			p: e,
 			useMarkPriceForSymbol: f,
 			computeLiqPrice: p,
@@ -3493,13 +3590,13 @@ var Zt = B.div`
 			onEditTpSl: u,
 			closingSymbol: m,
 			t: T
-		}, e.id)) }) : e === "orders" && r.length > 0 ? /* @__PURE__ */ U(ni, { children: r.map((e) => /* @__PURE__ */ U(ki, {
+		}, e.id)) }) : e === "orders" && r.length > 0 ? /* @__PURE__ */ U(si, { children: r.map((e) => /* @__PURE__ */ U(Pi, {
 			o: e,
 			onCancel: d,
 			cancellingOrderId: h,
 			t: T
-		}, e.id)) }) : /* @__PURE__ */ U(ti, { children: D.emptyText }),
-		/* @__PURE__ */ U(Di, {
+		}, e.id)) }) : /* @__PURE__ */ U(oi, { children: D.emptyText }),
+		/* @__PURE__ */ U(Mi, {
 			open: x,
 			onClose: () => S?.(!1),
 			tab: C,
@@ -3510,20 +3607,20 @@ var Zt = B.div`
 			t: T
 		})
 	] });
-}, ji = (e) => {
+}, Ii = (e) => {
 	if (!e) return "";
 	let t = e.startsWith("-"), [n = "", r] = (t ? e.slice(1) : e).split("."), i = n.replace(/\B(?=(\d{3})+(?!\d))/g, ","), a = r === void 0 ? i : `${i}.${r}`;
 	return t ? `-${a}` : a;
-}, Mi = (e) => e === "" || e === "-" ? "" : e.startsWith("-") ? e.slice(1) : e, Ni = (e) => {
+}, Li = (e) => e === "" || e === "-" ? "" : e.startsWith("-") ? e.slice(1) : e, Ri = (e) => {
 	if (e === "" || e === "-") return e;
 	let t = Number(e);
 	return !Number.isFinite(t) || t === 0 ? e.startsWith("-") ? e.slice(1) : e : e.startsWith("-") ? e : `-${e}`;
 };
-function Pi(e, t) {
+function zi(e, t) {
 	let n = I(null);
 	return {
 		ref: n,
-		value: ji(e),
+		value: Ii(e),
 		onChange: (e) => {
 			let r = e.target, i = r.value, a = r.selectionStart ?? i.length, o = i.slice(0, a).replace(/[,-]/g, "").length, s = i.replace(/,/g, "");
 			s !== "" && !/^-?\d*\.?\d*$/.test(s) || (t(s), requestAnimationFrame(() => {
@@ -3538,20 +3635,20 @@ function Pi(e, t) {
 }
 //#endregion
 //#region src/widgets/TpSlModal.tsx
-var Fi = B(E)`
+var Bi = B(E)`
   flex-direction: column;
   gap: 8px;
-`, Ii = B(E)`
+`, Vi = B(E)`
   gap: 8px;
-`, Li = B.div`
+`, Hi = B.div`
   height: 1px;
   width: 100%;
   background: ${({ theme: e }) => e.colors.cardBorder};
   margin: 4px 0;
-`, Ri = B(r).attrs({
+`, Ui = B(r).attrs({
 	fontSize: "14px",
 	color: "textSubtle"
-})``, zi = B(v)`
+})``, Wi = B(v)`
   height: 37px;
   padding: 8px 12px;
   font-size: 14px;
@@ -3568,11 +3665,11 @@ var Fi = B(E)`
     outline: none;
     border-color: ${({ theme: e }) => e.colors.secondary};
   }
-`, Bi = B(E)`
+`, Gi = B(E)`
   justify-content: space-between;
   padding: 4px 0;
   font-size: 12px;
-`, Vi = (e) => e, Hi = ({ isOpen: e, symbol: t, positionSide: n, qty: a, entryPrice: o, markPrice: s, onConfirm: c, onClose: l, t: u = Vi }) => {
+`, Ki = (e) => e, qi = ({ isOpen: e, symbol: t, positionSide: n, qty: a, entryPrice: o, markPrice: s, onConfirm: c, onClose: l, t: u = Ki }) => {
 	let d = V(), p = n === "LONG" ? 1 : -1, [m, h] = L(""), [_, v] = L(""), [y, b] = L(""), [x, C] = L(""), [w, T] = L(!1);
 	M(() => {
 		e || (h(""), v(""), b(""), C(""));
@@ -3582,7 +3679,7 @@ var Fi = B(E)`
 		let t = Number(e);
 		v(Number.isFinite(t) ? k(O(t), 4) : "");
 	}, j = (e) => {
-		let t = Mi(e);
+		let t = Li(e);
 		if (v(t), t === "" || t === "-") return h("");
 		let n = Number(t);
 		h(Number.isFinite(n) ? k(D(n), 2) : "");
@@ -3591,7 +3688,7 @@ var Fi = B(E)`
 		let t = Number(e);
 		C(Number.isFinite(t) ? k(O(t), 4) : "");
 	}, P = (e) => {
-		let t = Ni(e);
+		let t = Ri(e);
 		if (C(t), t === "" || t === "-") return b("");
 		let n = Number(t);
 		b(Number.isFinite(n) ? k(D(n), 2) : "");
@@ -3642,7 +3739,7 @@ var Fi = B(E)`
 					maxWidth: 440
 				},
 				children: [
-					/* @__PURE__ */ W(Bi, { children: [/* @__PURE__ */ U(r, {
+					/* @__PURE__ */ W(Gi, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						color: "textSubtle",
 						children: u("Symbol")
@@ -3656,7 +3753,7 @@ var Fi = B(E)`
 							n
 						]
 					})] }),
-					/* @__PURE__ */ W(Bi, { children: [/* @__PURE__ */ U(r, {
+					/* @__PURE__ */ W(Gi, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						color: "textSubtle",
 						children: u("Entry")
@@ -3664,9 +3761,9 @@ var Fi = B(E)`
 						fontSize: "14px",
 						bold: !0,
 						style: { fontVariantNumeric: "tabular-nums" },
-						children: Number.isFinite(o) ? ji(o.toFixed(2)) : "—"
+						children: Number.isFinite(o) ? Ii(o.toFixed(2)) : "—"
 					})] }),
-					/* @__PURE__ */ W(Bi, { children: [/* @__PURE__ */ U(r, {
+					/* @__PURE__ */ W(Gi, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						color: "textSubtle",
 						children: u("Mark")
@@ -3674,45 +3771,45 @@ var Fi = B(E)`
 						fontSize: "14px",
 						bold: !0,
 						style: { fontVariantNumeric: "tabular-nums" },
-						children: Number.isFinite(s) ? ji(s.toFixed(2)) : "—"
+						children: Number.isFinite(s) ? Ii(s.toFixed(2)) : "—"
 					})] }),
-					/* @__PURE__ */ U(Li, {}),
-					/* @__PURE__ */ W(Fi, { children: [/* @__PURE__ */ U(r, {
+					/* @__PURE__ */ U(Hi, {}),
+					/* @__PURE__ */ W(Bi, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						bold: !0,
 						color: d.colors.success,
 						children: u("Take Profit")
-					}), /* @__PURE__ */ W(Ii, { children: [/* @__PURE__ */ W(f, {
+					}), /* @__PURE__ */ W(Vi, { children: [/* @__PURE__ */ W(f, {
 						style: { flex: 1 },
-						children: [/* @__PURE__ */ U(Ri, { children: u("Trigger Price") }), /* @__PURE__ */ U(zi, {
-							...Pi(m, A),
+						children: [/* @__PURE__ */ U(Ui, { children: u("Trigger Price") }), /* @__PURE__ */ U(Wi, {
+							...zi(m, A),
 							placeholder: "0.00",
 							inputMode: "decimal"
 						})]
 					}), /* @__PURE__ */ W(f, {
 						style: { flex: 1 },
-						children: [/* @__PURE__ */ U(Ri, { children: u("PnL (USDT)") }), /* @__PURE__ */ U(zi, {
-							...Pi(_, j),
+						children: [/* @__PURE__ */ U(Ui, { children: u("PnL (USDT)") }), /* @__PURE__ */ U(Wi, {
+							...zi(_, j),
 							placeholder: "0.00",
 							inputMode: "decimal"
 						})]
 					})] })] }),
-					/* @__PURE__ */ W(Fi, { children: [/* @__PURE__ */ U(r, {
+					/* @__PURE__ */ W(Bi, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						bold: !0,
 						color: d.colors.failure,
 						children: u("Stop Loss")
-					}), /* @__PURE__ */ W(Ii, { children: [/* @__PURE__ */ W(f, {
+					}), /* @__PURE__ */ W(Vi, { children: [/* @__PURE__ */ W(f, {
 						style: { flex: 1 },
-						children: [/* @__PURE__ */ U(Ri, { children: u("Trigger Price") }), /* @__PURE__ */ U(zi, {
-							...Pi(y, N),
+						children: [/* @__PURE__ */ U(Ui, { children: u("Trigger Price") }), /* @__PURE__ */ U(Wi, {
+							...zi(y, N),
 							placeholder: "0.00",
 							inputMode: "decimal"
 						})]
 					}), /* @__PURE__ */ W(f, {
 						style: { flex: 1 },
-						children: [/* @__PURE__ */ U(Ri, { children: u("PnL (USDT)") }), /* @__PURE__ */ U(zi, {
-							...Pi(x, P),
+						children: [/* @__PURE__ */ U(Ui, { children: u("PnL (USDT)") }), /* @__PURE__ */ U(Wi, {
+							...zi(x, P),
 							placeholder: "0.00",
 							inputMode: "decimal"
 						})]
@@ -3733,27 +3830,27 @@ var Fi = B(E)`
 			})
 		})
 	});
-}, Ui = [
+}, Ji = [
 	"1m",
 	"5m",
 	"15m",
 	"1h",
 	"4h",
 	"1d"
-], Wi = B(G)`
+], Yi = B(K)`
   flex: 1;
   min-height: ${({ $minHeight: e }) => e};
-`, Gi = (e) => typeof e == "number" ? `${e}px` : e, Ki = B.div`
+`, Xi = (e) => typeof e == "number" ? `${e}px` : e, Zi = B.div`
   border-bottom: 1px solid var(--pcs-colors-card-border);
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-`, qi = B.div`
+`, Qi = B.div`
   display: inline-flex;
   align-items: center;
   gap: 16px;
-`, Ji = B.button`
+`, $i = B.button`
   border: 0;
   background: transparent;
   font-family: inherit;
@@ -3765,7 +3862,7 @@ var Fi = B(E)`
       color: var(--pcs-colors-primary);
       font-weight: 700;
     `}
-`, Yi = B.div`
+`, ea = B.div`
   position: relative;
   height: ${({ $minHeight: e }) => e}px;
   border-radius: 12px;
@@ -3775,7 +3872,7 @@ var Fi = B(E)`
     color-mix(in srgb, var(--pcs-colors-primary) 12%, transparent) 0%,
     transparent 100%
   );
-`, Xi = B.span`
+`, ta = B.span`
   position: absolute;
   inset: 0;
   background:
@@ -3783,7 +3880,7 @@ var Fi = B(E)`
     radial-gradient(120px 50px at 42% 38%, color-mix(in srgb, var(--pcs-colors-success) 14%, transparent), transparent 70%),
     radial-gradient(160px 70px at 72% 55%, color-mix(in srgb, var(--pcs-colors-primary) 12%, transparent), transparent 70%);
   border-bottom: 2px solid color-mix(in srgb, var(--pcs-colors-primary) 50%, transparent);
-`, Zi = B.span`
+`, na = B.span`
   position: absolute;
   right: 8px;
   top: 32%;
@@ -3794,15 +3891,15 @@ var Fi = B(E)`
   background: var(--pcs-colors-primary);
   color: var(--pcs-colors-inverted-contrast, #fff);
   font-size: 12px;
-`, Qi = ({ children: e, timeframes: t = Ui, activeTimeframe: n, onTimeframeChange: r, priceLabel: i, mobileMinHeight: a = 220 }) => {
+`, ra = ({ children: e, timeframes: t = Ji, activeTimeframe: n, onTimeframeChange: r, priceLabel: i, mobileMinHeight: a = 220 }) => {
 	let o = O.Children.count(e) > 0;
-	return /* @__PURE__ */ W(Ki, {
+	return /* @__PURE__ */ W(Zi, {
 		"aria-label": "Price chart",
-		children: [/* @__PURE__ */ U(qi, {
+		children: [/* @__PURE__ */ U(Qi, {
 			role: "tablist",
 			children: t.map((e) => {
 				let t = e === n;
-				return /* @__PURE__ */ U(Ji, {
+				return /* @__PURE__ */ U($i, {
 					type: "button",
 					role: "tab",
 					"aria-selected": t,
@@ -3811,43 +3908,43 @@ var Fi = B(E)`
 					children: e
 				}, e);
 			})
-		}), /* @__PURE__ */ W(Yi, {
+		}), /* @__PURE__ */ W(ea, {
 			$minHeight: a,
-			children: [o ? e : /* @__PURE__ */ U(Xi, {}), i !== void 0 && /* @__PURE__ */ U(Zi, { children: i })]
+			children: [o ? e : /* @__PURE__ */ U(ta, {}), i !== void 0 && /* @__PURE__ */ U(na, { children: i })]
 		})]
 	});
-}, $i = (e) => {
+}, ia = (e) => {
 	let { isMobile: t } = h();
-	if (t) return /* @__PURE__ */ U(Qi, { ...e });
+	if (t) return /* @__PURE__ */ U(ra, { ...e });
 	let { children: n, minHeight: r = "420px" } = e;
-	return /* @__PURE__ */ U(Wi, {
-		$minHeight: Gi(r),
+	return /* @__PURE__ */ U(Yi, {
+		$minHeight: Xi(r),
 		children: n
 	});
-}, ea = B(G)`
+}, aa = B(K)`
   height: 100%;
-`, ta = B.div`
+`, oa = B.div`
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-`, na = B.div`
+`, sa = B.div`
   display: ${({ $hidden: e }) => e ? "none" : "contents"};
-`, ra = (e) => e, ia = ({ tab: e, onTabChange: t, bookContent: n, tradesContent: r, t: i = ra }) => /* @__PURE__ */ W(ea, { children: [/* @__PURE__ */ W(ne, {
+`, ca = (e) => e, la = ({ tab: e, onTabChange: t, bookContent: n, tradesContent: r, t: i = ca }) => /* @__PURE__ */ W(aa, { children: [/* @__PURE__ */ W(te, {
 	fullWidth: !0,
 	activeIndex: e === "book" ? 0 : 1,
 	onItemClick: (e) => t(e === 0 ? "book" : "trades"),
-	children: [/* @__PURE__ */ U(q, { children: i("Order Book") }), /* @__PURE__ */ U(q, { children: i("Trades") })]
-}), /* @__PURE__ */ W(ta, { children: [/* @__PURE__ */ U(na, {
+	children: [/* @__PURE__ */ U(J, { children: i("Order Book") }), /* @__PURE__ */ U(J, { children: i("Trades") })]
+}), /* @__PURE__ */ W(oa, { children: [/* @__PURE__ */ U(sa, {
 	$hidden: e !== "book",
 	children: n
-}), /* @__PURE__ */ U(na, {
+}), /* @__PURE__ */ U(sa, {
 	$hidden: e !== "trades",
 	children: r
-})] })] }), aa = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='15'%20height='32'%20fill='none'%20viewBox='0%200%2015%2032'%3e%3cpath%20fill='%230098A1'%20d='M9.58803%2020.8649C7.72935%2021.3629%208.02539%2024.0334%208.76388%2026.7895C9.50238%2029.5456%2010.5812%2032.0062%2012.4399%2031.5082C14.2986%2031.0102%2015.2334%2028.0099%2014.4949%2025.2538C13.7564%2022.4978%2011.4467%2020.3669%209.58803%2020.8649Z'/%3e%3cpath%20fill='%231FC7D4'%20d='M1%2024.4516C1%2020.8885%203.88849%2018%207.45161%2018H15V28H4.54839C2.58867%2028%201%2026.4113%201%2024.4516Z'/%3e%3cpath%20fill='%2353DEE9'%20d='M6.11115%2017.2246C6.79693%2018.4124%205.77784%2019.3343%204.52793%2020.0559C3.27802%2020.7776%201.97011%2021.1992%201.28433%2020.0114C0.598546%2018.8236%201.1635%2017.1151%202.41341%2016.3935C3.66332%2015.6718%205.42537%2016.0368%206.11115%2017.2246Z'/%3e%3cpath%20fill='%231FC7D4'%20d='M1.64665%2023.6601C0.285995%2025.0207%201.87759%2027.1854%203.89519%2029.203C5.91279%2031.2206%208.07743%2032.8122%209.43808%2031.4515C10.7987%2030.0909%2010.1082%2027.0252%208.09058%2025.0076C6.07298%2022.99%203.0073%2022.2994%201.64665%2023.6601Z'/%3e%3c/svg%3e", oa = "data:image/svg+xml,%3csvg%20width='24'%20height='32'%20viewBox='0%200%2028%2032'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3crect%20x='1'%20y='19'%20width='17'%20height='11'%20fill='%231FC7D4'/%3e%3cpath%20d='M9.507%2024.706C8.14635%2026.0666%209.73795%2028.2313%2011.7555%2030.2489C13.7731%2032.2665%2015.9378%2033.8581%2017.2984%2032.4974C18.6591%2031.1368%2017.9685%2028.0711%2015.9509%2026.0535C13.9333%2024.0359%2010.8676%2023.3453%209.507%2024.706Z'%20fill='%231FC7D4'/%3e%3cpath%20d='M15.507%2022.706C14.1463%2024.0666%2015.7379%2026.2313%2017.7555%2028.2489C19.7731%2030.2665%2021.9378%2031.8581%2023.2984%2030.4974C24.6591%2029.1368%2023.9685%2026.0711%2021.9509%2024.0535C19.9333%2022.0359%2016.8676%2021.3453%2015.507%2022.706Z'%20fill='%231FC7D4'/%3e%3cg%20filter='url(%23filter0_d)'%3e%3cpath%20fill-rule='evenodd'%20clip-rule='evenodd'%20d='M14.146%206.75159C14.2105%207.10896%2014.2703%207.48131%2014.3281%207.86164C14.2189%207.85865%2014.1095%207.85714%2014%207.85714C13.3803%207.85714%2012.7648%207.90539%2012.159%207.99779C11.879%207.41458%2011.5547%206.82246%2011.1872%206.23145C8.69897%202.22947%206.53826%201.98679%204.67882%202.98366C2.81938%203.98052%202.85628%206.67644%205.26696%209.40538C5.58076%209.76061%205.90097%2010.1398%206.2247%2010.5286C3.69013%2012.4659%202%2015.2644%202%2018.2695C2%2023.8292%207.78518%2025%2014%2025C20.2148%2025%2026%2023.8292%2026%2018.2695C26%2014.8658%2023.8318%2011.7272%2020.7243%209.80476C20.9022%208.86044%2021%207.83019%2021%206.75159C21%202.19612%2019.2549%201%2017.1022%201C14.9495%201%2013.5261%203.31847%2014.146%206.75159Z'%20fill='url(%23paint0_linear_bunnyhead_main)'/%3e%3c/g%3e%3cg%20transform='translate(2)'%3e%3cpath%20d='M12.7284%2016.4446C12.796%2017.3149%2012.4446%2019.0556%2010.498%2019.0556'%20stroke='%23452A7A'%20stroke-linecap='round'/%3e%3cpath%20d='M12.7457%2016.4446C12.6781%2017.3149%2013.0296%2019.0556%2014.9761%2019.0556'%20stroke='%23452A7A'%20stroke-linecap='round'/%3e%3cpath%20d='M9%2014.5C9%2015.6046%208.55228%2016%208%2016C7.44772%2016%207%2015.6046%207%2014.5C7%2013.3954%207.44772%2013%208%2013C8.55228%2013%209%2013.3954%209%2014.5Z'%20fill='%23452A7A'/%3e%3cpath%20d='M18%2014.5C18%2015.6046%2017.5523%2016%2017%2016C16.4477%2016%2016%2015.6046%2016%2014.5C16%2013.3954%2016.4477%2013%2017%2013C17.5523%2013%2018%2013.3954%2018%2014.5Z'%20fill='%23452A7A'/%3e%3c/g%3e%3cdefs%3e%3cfilter%20id='filter0_d'%3e%3cfeFlood%20flood-opacity='0'%20result='BackgroundImageFix'/%3e%3cfeColorMatrix%20in='SourceAlpha'%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200'/%3e%3cfeOffset%20dy='1'/%3e%3cfeGaussianBlur%20stdDeviation='1'/%3e%3cfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.5%200'/%3e%3cfeBlend%20mode='normal'%20in2='BackgroundImageFix'%20result='effect1_dropShadow'/%3e%3cfeBlend%20mode='normal'%20in='SourceGraphic'%20in2='effect1_dropShadow'%20result='shape'/%3e%3c/filter%3e%3clinearGradient%20id='paint0_linear_bunnyhead_main'%20x1='14'%20y1='1'%20x2='14'%20y2='25'%20gradientUnits='userSpaceOnUse'%3e%3cstop%20stop-color='%2353DEE9'/%3e%3cstop%20offset='1'%20stop-color='%231FC7D4'/%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e", sa = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='32'%20fill='none'%20viewBox='0%200%2028%2032'%3e%3crect%20width='17'%20height='11'%20x='1'%20y='19'%20fill='%231FC7D4'/%3e%3cpath%20fill='%231FC7D4'%20d='M9.507%2024.706C8.14635%2026.0666%209.73795%2028.2313%2011.7555%2030.2489C13.7731%2032.2665%2015.9378%2033.8581%2017.2984%2032.4974C18.6591%2031.1368%2017.9685%2028.0711%2015.9509%2026.0535C13.9333%2024.0359%2010.8676%2023.3453%209.507%2024.706Z'/%3e%3cpath%20fill='%231FC7D4'%20d='M15.507%2022.706C14.1463%2024.0666%2015.7379%2026.2313%2017.7555%2028.2489C19.7731%2030.2665%2021.9378%2031.8581%2023.2984%2030.4974C24.6591%2029.1368%2023.9685%2026.0711%2021.9509%2024.0535C19.9333%2022.0359%2016.8676%2021.3453%2015.507%2022.706Z'/%3e%3cg%20filter='url(%23filter0_d)'%3e%3cpath%20fill='url(%23paint0_linear_bunnyhead_max)'%20fill-rule='evenodd'%20d='M14.146%206.75159C14.2105%207.10896%2014.2703%207.48131%2014.3281%207.86164C14.2189%207.85865%2014.1095%207.85714%2014%207.85714C13.3803%207.85714%2012.7648%207.90539%2012.159%207.99779C11.879%207.41458%2011.5547%206.82246%2011.1872%206.23145C8.69897%202.22947%206.53826%201.98679%204.67882%202.98366C2.81938%203.98052%202.85628%206.67644%205.26696%209.40538C5.58076%209.76061%205.90097%2010.1398%206.2247%2010.5286C3.69013%2012.4659%202%2015.2644%202%2018.2695C2%2023.8292%207.78518%2025%2014%2025C20.2148%2025%2026%2023.8292%2026%2018.2695C26%2014.8658%2023.8318%2011.7272%2020.7243%209.80476C20.9022%208.86044%2021%207.83019%2021%206.75159C21%202.19612%2019.2549%201%2017.1022%201C14.9495%201%2013.5261%203.31847%2014.146%206.75159Z'%20clip-rule='evenodd'/%3e%3c/g%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M11.5047%2016.0634C10.9435%2014.4456%208.79685%2014.4456%208.08131%2016.0635'/%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M20.8894%2016.0634C20.3283%2014.4456%2018.1816%2014.4456%2017.4661%2016.0635'/%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M14.7284%2017.4446C14.796%2018.3149%2014.4446%2020.0556%2012.498%2020.0556'/%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M14.7457%2017.4446C14.6781%2018.3149%2015.0296%2020.0556%2016.9761%2020.0556'/%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M13.4505%2020.0787C13.4505%2021.5097%2015.955%2021.5097%2015.955%2020.0787'/%3e%3cdefs%3e%3cfilter%20id='filter0_d'%20width='28'%20height='28'%20x='0'%20y='0'%20color-interpolation-filters='sRGB'%20filterUnits='userSpaceOnUse'%3e%3cfeFlood%20flood-opacity='0'%20result='BackgroundImageFix'/%3e%3cfeColorMatrix%20in='SourceAlpha'%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200'/%3e%3cfeOffset%20dy='1'/%3e%3cfeGaussianBlur%20stdDeviation='1'/%3e%3cfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.5%200'/%3e%3cfeBlend%20in2='BackgroundImageFix'%20mode='normal'%20result='effect1_dropShadow'/%3e%3cfeBlend%20in='SourceGraphic'%20in2='effect1_dropShadow'%20mode='normal'%20result='shape'/%3e%3c/filter%3e%3clinearGradient%20id='paint0_linear_bunnyhead_max'%20x1='14'%20x2='14'%20y1='1'%20y2='25'%20gradientUnits='userSpaceOnUse'%3e%3cstop%20stop-color='%2353DEE9'/%3e%3cstop%20offset='1'%20stop-color='%231FC7D4'/%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e";
+})] })] }), ua = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='15'%20height='32'%20fill='none'%20viewBox='0%200%2015%2032'%3e%3cpath%20fill='%230098A1'%20d='M9.58803%2020.8649C7.72935%2021.3629%208.02539%2024.0334%208.76388%2026.7895C9.50238%2029.5456%2010.5812%2032.0062%2012.4399%2031.5082C14.2986%2031.0102%2015.2334%2028.0099%2014.4949%2025.2538C13.7564%2022.4978%2011.4467%2020.3669%209.58803%2020.8649Z'/%3e%3cpath%20fill='%231FC7D4'%20d='M1%2024.4516C1%2020.8885%203.88849%2018%207.45161%2018H15V28H4.54839C2.58867%2028%201%2026.4113%201%2024.4516Z'/%3e%3cpath%20fill='%2353DEE9'%20d='M6.11115%2017.2246C6.79693%2018.4124%205.77784%2019.3343%204.52793%2020.0559C3.27802%2020.7776%201.97011%2021.1992%201.28433%2020.0114C0.598546%2018.8236%201.1635%2017.1151%202.41341%2016.3935C3.66332%2015.6718%205.42537%2016.0368%206.11115%2017.2246Z'/%3e%3cpath%20fill='%231FC7D4'%20d='M1.64665%2023.6601C0.285995%2025.0207%201.87759%2027.1854%203.89519%2029.203C5.91279%2031.2206%208.07743%2032.8122%209.43808%2031.4515C10.7987%2030.0909%2010.1082%2027.0252%208.09058%2025.0076C6.07298%2022.99%203.0073%2022.2994%201.64665%2023.6601Z'/%3e%3c/svg%3e", da = "data:image/svg+xml,%3csvg%20width='24'%20height='32'%20viewBox='0%200%2028%2032'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3crect%20x='1'%20y='19'%20width='17'%20height='11'%20fill='%231FC7D4'/%3e%3cpath%20d='M9.507%2024.706C8.14635%2026.0666%209.73795%2028.2313%2011.7555%2030.2489C13.7731%2032.2665%2015.9378%2033.8581%2017.2984%2032.4974C18.6591%2031.1368%2017.9685%2028.0711%2015.9509%2026.0535C13.9333%2024.0359%2010.8676%2023.3453%209.507%2024.706Z'%20fill='%231FC7D4'/%3e%3cpath%20d='M15.507%2022.706C14.1463%2024.0666%2015.7379%2026.2313%2017.7555%2028.2489C19.7731%2030.2665%2021.9378%2031.8581%2023.2984%2030.4974C24.6591%2029.1368%2023.9685%2026.0711%2021.9509%2024.0535C19.9333%2022.0359%2016.8676%2021.3453%2015.507%2022.706Z'%20fill='%231FC7D4'/%3e%3cg%20filter='url(%23filter0_d)'%3e%3cpath%20fill-rule='evenodd'%20clip-rule='evenodd'%20d='M14.146%206.75159C14.2105%207.10896%2014.2703%207.48131%2014.3281%207.86164C14.2189%207.85865%2014.1095%207.85714%2014%207.85714C13.3803%207.85714%2012.7648%207.90539%2012.159%207.99779C11.879%207.41458%2011.5547%206.82246%2011.1872%206.23145C8.69897%202.22947%206.53826%201.98679%204.67882%202.98366C2.81938%203.98052%202.85628%206.67644%205.26696%209.40538C5.58076%209.76061%205.90097%2010.1398%206.2247%2010.5286C3.69013%2012.4659%202%2015.2644%202%2018.2695C2%2023.8292%207.78518%2025%2014%2025C20.2148%2025%2026%2023.8292%2026%2018.2695C26%2014.8658%2023.8318%2011.7272%2020.7243%209.80476C20.9022%208.86044%2021%207.83019%2021%206.75159C21%202.19612%2019.2549%201%2017.1022%201C14.9495%201%2013.5261%203.31847%2014.146%206.75159Z'%20fill='url(%23paint0_linear_bunnyhead_main)'/%3e%3c/g%3e%3cg%20transform='translate(2)'%3e%3cpath%20d='M12.7284%2016.4446C12.796%2017.3149%2012.4446%2019.0556%2010.498%2019.0556'%20stroke='%23452A7A'%20stroke-linecap='round'/%3e%3cpath%20d='M12.7457%2016.4446C12.6781%2017.3149%2013.0296%2019.0556%2014.9761%2019.0556'%20stroke='%23452A7A'%20stroke-linecap='round'/%3e%3cpath%20d='M9%2014.5C9%2015.6046%208.55228%2016%208%2016C7.44772%2016%207%2015.6046%207%2014.5C7%2013.3954%207.44772%2013%208%2013C8.55228%2013%209%2013.3954%209%2014.5Z'%20fill='%23452A7A'/%3e%3cpath%20d='M18%2014.5C18%2015.6046%2017.5523%2016%2017%2016C16.4477%2016%2016%2015.6046%2016%2014.5C16%2013.3954%2016.4477%2013%2017%2013C17.5523%2013%2018%2013.3954%2018%2014.5Z'%20fill='%23452A7A'/%3e%3c/g%3e%3cdefs%3e%3cfilter%20id='filter0_d'%3e%3cfeFlood%20flood-opacity='0'%20result='BackgroundImageFix'/%3e%3cfeColorMatrix%20in='SourceAlpha'%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200'/%3e%3cfeOffset%20dy='1'/%3e%3cfeGaussianBlur%20stdDeviation='1'/%3e%3cfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.5%200'/%3e%3cfeBlend%20mode='normal'%20in2='BackgroundImageFix'%20result='effect1_dropShadow'/%3e%3cfeBlend%20mode='normal'%20in='SourceGraphic'%20in2='effect1_dropShadow'%20result='shape'/%3e%3c/filter%3e%3clinearGradient%20id='paint0_linear_bunnyhead_main'%20x1='14'%20y1='1'%20x2='14'%20y2='25'%20gradientUnits='userSpaceOnUse'%3e%3cstop%20stop-color='%2353DEE9'/%3e%3cstop%20offset='1'%20stop-color='%231FC7D4'/%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e", fa = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='32'%20fill='none'%20viewBox='0%200%2028%2032'%3e%3crect%20width='17'%20height='11'%20x='1'%20y='19'%20fill='%231FC7D4'/%3e%3cpath%20fill='%231FC7D4'%20d='M9.507%2024.706C8.14635%2026.0666%209.73795%2028.2313%2011.7555%2030.2489C13.7731%2032.2665%2015.9378%2033.8581%2017.2984%2032.4974C18.6591%2031.1368%2017.9685%2028.0711%2015.9509%2026.0535C13.9333%2024.0359%2010.8676%2023.3453%209.507%2024.706Z'/%3e%3cpath%20fill='%231FC7D4'%20d='M15.507%2022.706C14.1463%2024.0666%2015.7379%2026.2313%2017.7555%2028.2489C19.7731%2030.2665%2021.9378%2031.8581%2023.2984%2030.4974C24.6591%2029.1368%2023.9685%2026.0711%2021.9509%2024.0535C19.9333%2022.0359%2016.8676%2021.3453%2015.507%2022.706Z'/%3e%3cg%20filter='url(%23filter0_d)'%3e%3cpath%20fill='url(%23paint0_linear_bunnyhead_max)'%20fill-rule='evenodd'%20d='M14.146%206.75159C14.2105%207.10896%2014.2703%207.48131%2014.3281%207.86164C14.2189%207.85865%2014.1095%207.85714%2014%207.85714C13.3803%207.85714%2012.7648%207.90539%2012.159%207.99779C11.879%207.41458%2011.5547%206.82246%2011.1872%206.23145C8.69897%202.22947%206.53826%201.98679%204.67882%202.98366C2.81938%203.98052%202.85628%206.67644%205.26696%209.40538C5.58076%209.76061%205.90097%2010.1398%206.2247%2010.5286C3.69013%2012.4659%202%2015.2644%202%2018.2695C2%2023.8292%207.78518%2025%2014%2025C20.2148%2025%2026%2023.8292%2026%2018.2695C26%2014.8658%2023.8318%2011.7272%2020.7243%209.80476C20.9022%208.86044%2021%207.83019%2021%206.75159C21%202.19612%2019.2549%201%2017.1022%201C14.9495%201%2013.5261%203.31847%2014.146%206.75159Z'%20clip-rule='evenodd'/%3e%3c/g%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M11.5047%2016.0634C10.9435%2014.4456%208.79685%2014.4456%208.08131%2016.0635'/%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M20.8894%2016.0634C20.3283%2014.4456%2018.1816%2014.4456%2017.4661%2016.0635'/%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M14.7284%2017.4446C14.796%2018.3149%2014.4446%2020.0556%2012.498%2020.0556'/%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M14.7457%2017.4446C14.6781%2018.3149%2015.0296%2020.0556%2016.9761%2020.0556'/%3e%3cpath%20stroke='%23452A7A'%20stroke-linecap='round'%20d='M13.4505%2020.0787C13.4505%2021.5097%2015.955%2021.5097%2015.955%2020.0787'/%3e%3cdefs%3e%3cfilter%20id='filter0_d'%20width='28'%20height='28'%20x='0'%20y='0'%20color-interpolation-filters='sRGB'%20filterUnits='userSpaceOnUse'%3e%3cfeFlood%20flood-opacity='0'%20result='BackgroundImageFix'/%3e%3cfeColorMatrix%20in='SourceAlpha'%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%20127%200'/%3e%3cfeOffset%20dy='1'/%3e%3cfeGaussianBlur%20stdDeviation='1'/%3e%3cfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200%200.5%200'/%3e%3cfeBlend%20in2='BackgroundImageFix'%20mode='normal'%20result='effect1_dropShadow'/%3e%3cfeBlend%20in='SourceGraphic'%20in2='effect1_dropShadow'%20mode='normal'%20result='shape'/%3e%3c/filter%3e%3clinearGradient%20id='paint0_linear_bunnyhead_max'%20x1='14'%20x2='14'%20y1='1'%20y2='25'%20gradientUnits='userSpaceOnUse'%3e%3cstop%20stop-color='%2353DEE9'/%3e%3cstop%20offset='1'%20stop-color='%231FC7D4'/%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e";
 //#endregion
 //#region src/widgets/BunnySlider.tsx
-function ca({ name: e = "bunny-slider", min: t = 0, max: n = 100, step: r = "any", value: i, onValueChanged: a, disabled: o = !1, valueLabel: s, width: c = "100%" }) {
+function pa({ name: e = "bunny-slider", min: t = 0, max: n = 100, step: r = "any", value: i, onValueChanged: a, disabled: o = !1, valueLabel: s, width: c = "100%" }) {
 	let l = I(null), [u, d] = L(0);
 	P(() => {
 		let e = l.current;
@@ -3855,29 +3952,29 @@ function ca({ name: e = "bunny-slider", min: t = 0, max: n = 100, step: r = "any
 		let t = new ResizeObserver(() => d(e.clientWidth));
 		return t.observe(e), d(e.clientWidth), () => t.disconnect();
 	}, []);
-	let f = n <= t ? t + 1 : n, p = Math.max(0, Math.min(1, (i - t) / (f - t))), m = 14 + Math.max(0, u - 14 - 24) * p, h = m - 14 + 24 / 2, g = p >= .999, _ = g ? sa : oa;
-	return /* @__PURE__ */ W(la, {
+	let f = n <= t ? t + 1 : n, p = Math.max(0, Math.min(1, (i - t) / (f - t))), m = 14 + Math.max(0, u - 14 - 24) * p, h = m - 14 + 24 / 2, g = p >= .999, _ = g ? fa : da;
+	return /* @__PURE__ */ W(ma, {
 		ref: l,
 		style: { width: typeof c == "number" ? `${c}px` : c },
 		"aria-disabled": o || void 0,
 		children: [
-			/* @__PURE__ */ U(ua, { className: "bs-track" }),
-			/* @__PURE__ */ U(fa, {
+			/* @__PURE__ */ U(ha, { className: "bs-track" }),
+			/* @__PURE__ */ U(_a, {
 				className: "bs-back",
-				style: { backgroundImage: `url("${aa}")` }
+				style: { backgroundImage: `url("${ua}")` }
 			}),
-			/* @__PURE__ */ U(da, {
+			/* @__PURE__ */ U(ga, {
 				className: "bs-fill",
 				style: { width: Math.max(0, h) }
 			}),
-			/* @__PURE__ */ U(pa, {
+			/* @__PURE__ */ U(va, {
 				className: `bs-front${g ? " bs-front--max" : ""}`,
 				style: {
 					left: m,
 					backgroundImage: `url("${_}")`
 				}
 			}),
-			/* @__PURE__ */ U(ma, {
+			/* @__PURE__ */ U(ya, {
 				className: "bs-input",
 				name: e,
 				type: "range",
@@ -3889,7 +3986,7 @@ function ca({ name: e = "bunny-slider", min: t = 0, max: n = 100, step: r = "any
 				onChange: (e) => a(parseFloat(e.target.value)),
 				"aria-label": e
 			}),
-			s && /* @__PURE__ */ U(ha, {
+			s && /* @__PURE__ */ U(ba, {
 				className: "bs-value-label",
 				style: { left: m + 24 / 2 },
 				children: g ? "MAX" : s
@@ -3897,7 +3994,7 @@ function ca({ name: e = "bunny-slider", min: t = 0, max: n = 100, step: r = "any
 		]
 	});
 }
-var la = B.div`
+var ma = B.div`
   position: relative;
   width: 100%;
   height: 32px;
@@ -3918,7 +4015,7 @@ var la = B.div`
   &:not([aria-disabled='true']):hover .bs-front {
     transform: scale(1.06);
   }
-`, ua = B.span`
+`, ha = B.span`
   position: absolute;
   left: 14px;
   right: 0;
@@ -3926,7 +4023,7 @@ var la = B.div`
   height: 2px;
   background: ${({ theme: e }) => e?.colors?.inputSecondary ?? "var(--pcs-colors-input-secondary, #D7CAEC)"};
   pointer-events: none;
-`, da = B.span`
+`, ga = B.span`
   position: absolute;
   left: 14px;
   top: 18px;
@@ -3934,7 +4031,7 @@ var la = B.div`
   background: ${({ theme: e }) => e?.colors?.primary ?? "var(--pcs-colors-primary, #1FC7D4)"};
   pointer-events: none;
   transition: width 60ms linear;
-`, fa = B.span`
+`, _a = B.span`
   position: absolute;
   left: 0;
   top: 0;
@@ -3943,7 +4040,7 @@ var la = B.div`
   pointer-events: none;
   background-size: 15px 32px;
   background-repeat: no-repeat;
-`, pa = B.span`
+`, va = B.span`
   position: absolute;
   top: 0;
   width: 24px;
@@ -3953,7 +4050,7 @@ var la = B.div`
   background-repeat: no-repeat;
   background-size: 24px 32px;
   transition: left 60ms linear, transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-`, ma = B.input`
+`, ya = B.input`
   position: absolute;
   inset: 0;
   width: 100%;
@@ -3996,7 +4093,7 @@ var la = B.div`
   &:active::-moz-range-thumb {
     cursor: grabbing;
   }
-`, ha = B.span`
+`, ba = B.span`
   position: absolute;
   bottom: -20px;
   font-size: 12px;
@@ -4006,15 +4103,15 @@ var la = B.div`
   pointer-events: none;
   transform: translateX(-50%);
   white-space: nowrap;
-`, ga = B(G)`
+`, xa = B(K)`
   & > div {
     padding: 0 12px 12px;
     gap: 12px;
   }
-`, _a = B(E)`
+`, Sa = B(E)`
   align-items: center;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-`, va = B.button`
+`, Ca = B.button`
   background: transparent;
   border: 0;
   border-bottom: 2px solid ${({ $active: e, theme: t }) => e ? t.colors.primary : "transparent"};
@@ -4030,117 +4127,312 @@ var la = B.div`
   &:hover {
     color: ${({ theme: e }) => e.colors.text};
   }
-`, ya = B(E)`
-  background: ${({ theme: e }) => e.colors.input};
+`, wa = B(E)`
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  align-self: stretch;
+  border-radius: 12px;
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-  border-radius: 12px;
-  padding: 4px;
-  gap: 0;
-`, ba = B.button`
-  flex: 1;
-  border: 0;
-  background: ${({ $active: e, $side: t, theme: n }) => e ? t === "BUY" ? n.colors.success : n.colors.failure : "transparent"};
-  color: ${({ $active: e, theme: t }) => e ? t.colors.invertedContrast : t.colors.textSubtle};
-  font-weight: ${({ $active: e }) => e ? 600 : 400};
-  font-size: 16px;
-  padding: 6px 8px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-`, xa = B.button`
-  flex: 1;
   background: ${({ theme: e }) => e.colors.input};
-  border: 0;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+`, Ta = B.span`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
   border-radius: 12px;
-  color: ${({ theme: e }) => e.colors.primary};
-  font-size: 16px;
-  font-weight: 600;
-  padding: 4px 8px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.10);
+  background: ${({ $side: e }) => e === "BUY" ? "#31D0AA" : "#ED4B9E"};
+  transform: translateX(${({ $side: e }) => e === "BUY" ? "0%" : "100%"});
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.25s ease;
+  pointer-events: none;
+  z-index: 0;
+`, Ea = B(wa)`
+  &:has(button:active) ${Ta} {
+    border-bottom-width: 0;
+    bottom: -2px;
+  }
+`, Da = B.button`
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1 0 0;
+  align-self: stretch;
+  padding: 8px;
   justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: ${({ $active: e, theme: t }) => e ? "#FFF" : t.colors.textSubtle};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: ${({ $active: e }) => e ? 600 : 400};
+  line-height: 150%;
+  cursor: pointer;
+  transition: color 0.25s ease;
+
+  html.dark & {
+    color: ${({ $active: e, theme: t }) => e ? "#000" : t.colors.textSubtle};
+  }
+`, Oa = B.button`
+  display: flex;
+  flex: 1 0 0;
+  padding: 3px 4px 5px 4px;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.10);
+  border-radius: 12px;
+  background: #EFF4F5;
+  color: #02919D;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  cursor: pointer;
   transition: filter 0.12s;
   &:hover {
-    filter: brightness(1.08);
+    filter: brightness(0.97);
   }
-`, Sa = B(E)`
+  &:active:not(:disabled) {
+    border-bottom-width: 0;
+    padding-bottom: 7px;
+  }
+
+  html.dark & {
+    background: #353547;
+  }
+`, ka = B.span`
+  display: flex;
+  padding: 0 4px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+`, Aa = B(E)`
   align-items: center;
   justify-content: space-between;
   font-size: 14px;
-`, Ca = B(r).attrs({
+`, ja = B(r).attrs({
 	fontSize: "14px",
 	color: "textSubtle"
-})``, wa = B(E)`
+})``, Ma = B(E)`
   align-items: center;
   gap: 4px;
   font-variant-numeric: tabular-nums;
-`, Ta = B.div`
+`, Na = B.div`
   position: relative;
   display: flex;
-  align-items: center;
   height: 48px;
   padding: 0 16px;
-  background: ${({ theme: e }) => e.colors.input};
-  border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
   border-radius: 16px;
-  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+  border: 1px solid #D7CAEC;
+  background: #EEEAF4;
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
   gap: 8px;
-`, Ea = B(r).attrs({
-	fontSize: "14px",
-	color: "textSubtle"
-})`
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
+
+  html.dark & {
+    border-color: #55496E;
+    background: #372F47;
+    box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+    &:focus-within {
+      box-shadow:
+        0 0 0 1px #7645D9,
+        0 0 0 4px rgba(118, 69, 217, 0.20);
+    }
+  }
+`, Pa = B.span`
   pointer-events: none;
   flex-shrink: 0;
-`, Da = B.input`
+  color: #7A6EAA;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+`, Fa = B.input`
   flex: 1;
   min-width: 0;
   border: 0;
   outline: 0;
   background: transparent;
   text-align: right;
-  font-size: 14px;
-  color: ${({ theme: e }) => e.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  color: #7A6EAA;
   font-variant-numeric: tabular-nums;
   &::placeholder {
-    color: ${({ theme: e }) => e.colors.textSubtle};
+    color: #7A6EAA;
   }
-`, Oa = B(i).attrs({
+`, Ia = B(i).attrs({
 	variant: "text",
 	scale: "xs"
 })`
   padding: 0;
-  font-weight: 600;
+  color: ${({ theme: e }) => e.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  gap: 4px;
+  height: auto;
+`, La = B.span`
+  position: relative;
+  display: inline-flex;
+`, Ra = B.span`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px dashed #5B4776;
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.text};
-  gap: 2px;
-  height: auto;
-`, ka = B.div`
+  cursor: help;
+`, za = B.div`
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  width: 200px;
+  padding: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  border-radius: 16px;
+  background: #08060B;
+  color: #FFF;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.16),
+    0 4px 8px 0 rgba(0, 0, 0, 0.32);
+  pointer-events: none;
+  z-index: 100;
+  white-space: normal;
+  text-align: center;
+
+  /* Down-pointing notch — bottom edge of the bubble. Inherits the
+     bubble's bg via currentColor so the color flip cascades. */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid currentColor;
+    color: #08060B;
+  }
+
+  html.dark & {
+    background: #FFF;
+    color: #000;
+    box-shadow:
+      0 1px 2px 0 rgba(0, 0, 0, 0.08),
+      0 4px 8px 0 rgba(0, 0, 0, 0.16);
+    &::after {
+      color: #FFF;
+    }
+  }
+`, Ba = () => /* @__PURE__ */ U("svg", {
+	width: "12",
+	height: "12",
+	viewBox: "0 0 12 12",
+	fill: "none",
+	"aria-hidden": !0,
+	style: {
+		flexShrink: 0,
+		aspectRatio: "1 / 1"
+	},
+	children: /* @__PURE__ */ U("path", {
+		d: "M2.72261 3.10042C2.52319 3.10042 2.3779 3.18542 2.28674 3.35542C2.19558 3.52542 2.20318 3.69303 2.30956 3.85825L5.59261 8.78348C5.69232 8.92783 5.82812 9 6.00001 9C6.17189 9 6.30769 8.92783 6.40741 8.78348L9.69046 3.85825C9.79683 3.69303 9.80444 3.52542 9.71328 3.35542C9.62212 3.18542 9.47683 3.10042 9.27741 3.10042H2.72261Z",
+		fill: "#B8ADD2"
+	})
+}), Va = B.div`
   position: relative;
   display: flex;
-  align-items: center;
   height: 48px;
   padding: 0 16px;
-  background: ${({ theme: e }) => e.colors.input};
-  border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
   border-radius: 16px;
-  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+  border: 1px solid #D7CAEC;
+  background: #EEEAF4;
+  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
   gap: 8px;
-`, Aa = B.input`
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
+
+  html.dark & {
+    border-color: #55496E;
+    background: #372F47;
+    box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
+    &:focus-within {
+      box-shadow:
+        0 0 0 1px #7645D9,
+        0 0 0 4px rgba(118, 69, 217, 0.20);
+    }
+  }
+`, Ha = B.input`
   flex: 1;
   min-width: 0;
   border: 0;
   outline: 0;
   background: transparent;
   text-align: right;
-  font-size: 14px;
-  color: ${({ theme: e }) => e.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  color: #7A6EAA;
   font-variant-numeric: tabular-nums;
   &::placeholder {
-    color: ${({ theme: e }) => e.colors.textSubtle};
+    color: #7A6EAA;
   }
-`, ja = B.button`
+`, Ua = B.button`
   flex-shrink: 0;
   background: transparent;
   border: 0;
@@ -4155,7 +4447,7 @@ var la = B.div`
   &:hover {
     opacity: 0.8;
   }
-`, Ma = B.div`
+`, Wa = B.div`
   position: fixed;
   z-index: 9999;
   display: flex;
@@ -4172,7 +4464,7 @@ var la = B.div`
     0 0 0 1px ${({ theme: e }) => e.colors.secondary},
     0 0 0 4px rgba(118, 69, 217, 0.2);
   overflow: hidden;
-`, Na = B.button`
+`, Ga = B.button`
   background: ${({ $active: e, theme: t }) => e ? t.colors.tertiary : "transparent"};
   border: 0;
   padding: 10px 14px;
@@ -4185,7 +4477,7 @@ var la = B.div`
   &:hover {
     background: ${({ theme: e }) => e.colors.tertiary};
   }
-`, Pa = B.select`
+`, Ka = B.select`
   flex-shrink: 0;
   background: transparent;
   border: 0;
@@ -4195,22 +4487,22 @@ var la = B.div`
   font-weight: 600;
   font-family: Kanit, sans-serif;
   cursor: pointer;
-`, Fa = B(v)`
+`, qa = B(v)`
   height: 36px;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
-`, Ia = B.div`
+`, Ja = B.div`
   padding: 4px 0;
-`, La = B(E)`
+`, Ya = B(E)`
   gap: 8px;
-`, Ra = B.div`
+`, Xa = B.div`
   display: inline-flex;
   align-items: center;
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-radius: 999px;
   padding: 2px;
   background: ${({ theme: e }) => e.colors.input};
-`, za = B.button`
+`, Za = B.button`
   border: 0;
   padding: 2px 8px;
   border-radius: 999px;
@@ -4220,17 +4512,17 @@ var la = B.div`
   background: ${({ $active: e, theme: t }) => e ? t.colors.card : "transparent"};
   color: ${({ $active: e, theme: t }) => e ? t.colors.text : t.colors.textSubtle};
   font-weight: ${({ $active: e }) => e ? 600 : 400};
-`, Ba = ({ value: e, onChange: t }) => /* @__PURE__ */ W(Ra, {
+`, Qa = ({ value: e, onChange: t }) => /* @__PURE__ */ W(Xa, {
 	role: "tablist",
 	"aria-label": "Trigger source",
-	children: [/* @__PURE__ */ U(za, {
+	children: [/* @__PURE__ */ U(Za, {
 		type: "button",
 		role: "tab",
 		"aria-selected": e === "LAST",
 		$active: e === "LAST",
 		onClick: () => t("LAST"),
 		children: "Last"
-	}), /* @__PURE__ */ U(za, {
+	}), /* @__PURE__ */ U(Za, {
 		type: "button",
 		role: "tab",
 		"aria-selected": e === "MARK",
@@ -4238,7 +4530,7 @@ var la = B.div`
 		onClick: () => t("MARK"),
 		children: "Mark"
 	})]
-}), Va = B(i)`
+}), $a = B(i)`
   background: ${({ $side: e, theme: t }) => e === "BUY" ? t.colors.success : t.colors.failure};
   color: ${({ theme: e }) => e.colors.invertedContrast};
   border: 0;
@@ -4250,25 +4542,31 @@ var la = B.div`
   &:hover:not(:disabled) {
     filter: brightness(1.07);
   }
-`, Ha = B.div`
+`, eo = B.div`
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px 12px;
   padding-top: 12px;
   border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-`, Ua = B(r).attrs({
+`, to = B(r).attrs({
 	fontSize: "14px",
 	color: "textSubtle"
-})``, Wa = B(r).attrs({ fontSize: "14px" })`
+})`
+  display: inline-flex;
+  width: fit-content;
+  justify-self: start;
+  border-bottom: 1px dashed #5B4776;
+  cursor: help;
+`, no = B(r).attrs({ fontSize: "14px" })`
   font-variant-numeric: tabular-nums;
   text-align: right;
-`, Ga = (e, t) => t ? Object.entries(t).reduce((e, [t, n]) => e.split(`%${t}%`).join(String(n)), e) : e, Ka = B(E)`
+`, ro = (e, t) => t ? Object.entries(t).reduce((e, [t, n]) => e.split(`%${t}%`).join(String(n)), e) : e, io = B(E)`
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-`, qa = B(E)`
+`, ao = B(E)`
   gap: 6px;
-`, Ja = B.button`
+`, oo = B.button`
   flex: 1;
   background: ${({ theme: e }) => e.colors.input};
   border: 0;
@@ -4283,7 +4581,7 @@ var la = B.div`
     opacity: 0.6;
     cursor: not-allowed;
   }
-`, Ya = B.button`
+`, so = B.button`
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -4298,9 +4596,9 @@ var la = B.div`
   font-family: inherit;
   font-size: 13px;
   cursor: pointer;
-`, Xa = B.span`
+`, co = B.span`
   text-align: center;
-`, Za = B.div`
+`, lo = B.div`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -4309,7 +4607,7 @@ var la = B.div`
   background: ${({ theme: e }) => e.colors.input};
   border: 0;
   border-radius: 10px;
-`, Qa = B.input`
+`, uo = B.input`
   flex: 1;
   min-width: 0;
   border: 0;
@@ -4322,7 +4620,7 @@ var la = B.div`
   &::placeholder {
     color: ${({ theme: e }) => e.colors.textSubtle};
   }
-`, $a = B.button`
+`, fo = B.button`
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -4334,7 +4632,7 @@ var la = B.div`
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-`, eo = B(E)`
+`, po = B(E)`
   align-items: center;
   gap: 8px;
   font-size: 13px;
@@ -4345,12 +4643,12 @@ var la = B.div`
     font-weight: 400;
     font-variant-numeric: tabular-nums;
   }
-`, to = B(E)`
+`, mo = B(E)`
   align-items: center;
   gap: 8px;
   font-size: 13px;
   color: ${({ theme: e }) => e.colors.text};
-`, no = B.div`
+`, ho = B.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -4361,10 +4659,10 @@ var la = B.div`
     color: ${({ theme: e, $tone: t }) => t === "up" ? e.colors.success : e.colors.failure};
     font-variant-numeric: tabular-nums;
   }
-`, ro = B(E)`
+`, go = B(E)`
   justify-content: space-between;
   align-items: center;
-`, io = B.button`
+`, _o = B.button`
   width: 100%;
   height: 44px;
   border: 0;
@@ -4383,7 +4681,7 @@ var la = B.div`
     opacity: 0.6;
     cursor: not-allowed;
   }
-`, ao = B.div`
+`, vo = B.div`
   position: fixed;
   z-index: 200;
   background: ${({ theme: e }) => e.colors.card};
@@ -4391,7 +4689,7 @@ var la = B.div`
   border-radius: 8px;
   box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6);
   overflow: hidden;
-`, oo = B.button`
+`, yo = B.button`
   display: block;
   width: 100%;
   text-align: left;
@@ -4405,7 +4703,7 @@ var la = B.div`
   &:hover {
     background: ${({ theme: e }) => e.colors.input};
   }
-`, so = [
+`, bo = [
 	{
 		key: "market",
 		label: "Market"
@@ -4422,16 +4720,16 @@ var la = B.div`
 		key: "stop-market",
 		label: "Stop Market"
 	}
-], co = ({ baseAsset: e, quoteAsset: t, draft: n, onDraftChange: i, typeKey: a, onTypeKeyChange: o, availableBalanceText: c, preview: d, feeText: m, sizePercent: h, onSizePercentChange: g, cta: _, canSubmit: v, isSubmitting: y = !1, marginSubmitting: b = !1, authReady: S = !0, hasAddress: C = !0, errorSlot: w, onSubmit: T, onLeverageClick: E, onMarginModeToggle: D, onDepositClick: O, extraControls: k, t: A = Ga }) => {
+], xo = ({ baseAsset: e, quoteAsset: t, draft: n, onDraftChange: i, typeKey: a, onTypeKeyChange: o, availableBalanceText: c, preview: d, feeText: m, sizePercent: h, onSizePercentChange: g, cta: _, canSubmit: v, isSubmitting: y = !1, marginSubmitting: b = !1, authReady: S = !0, hasAddress: C = !0, errorSlot: w, onSubmit: T, onLeverageClick: E, onMarginModeToggle: D, onDepositClick: O, extraControls: k, t: A = ro }) => {
 	let j = n.sizeUnit === "QUOTE" ? t : e, N = a === "stop-limit" || a === "stop-market", P = a === "limit" || a === "stop-limit", F = N, R = () => i({
 		...n,
 		sizeUnit: n.sizeUnit === "BASE" ? "QUOTE" : "BASE",
 		quantity: ""
-	}), z = I(null), B = I(null), [V, H] = L(!1), [G, K] = L(null);
+	}), z = I(null), B = I(null), [V, H] = L(!1), [K, q] = L(null);
 	M(() => {
 		if (!V || !z.current) return;
 		let e = z.current.getBoundingClientRect();
-		K({
+		q({
 			top: e.bottom + 4,
 			left: e.left,
 			width: e.width
@@ -4444,21 +4742,21 @@ var la = B.div`
 		};
 		return document.addEventListener("mousedown", e), () => document.removeEventListener("mousedown", e);
 	}, [V]);
-	let te = so.find((e) => e.key === a)?.label ?? "Market", q = d.liq, ne = d.cost;
-	return /* @__PURE__ */ W(Ka, { children: [
-		/* @__PURE__ */ W(qa, { children: [
-			/* @__PURE__ */ U(Ja, {
+	let ee = bo.find((e) => e.key === a)?.label ?? "Market", J = d.liq, te = d.cost;
+	return /* @__PURE__ */ W(io, { children: [
+		/* @__PURE__ */ W(ao, { children: [
+			/* @__PURE__ */ U(oo, {
 				disabled: b,
 				onClick: D,
 				children: n.marginMode === "CROSS" ? A("Cross") : A("Isolated")
 			}),
-			/* @__PURE__ */ U(Ja, {
+			/* @__PURE__ */ U(oo, {
 				onClick: E,
 				children: `${n.leverage}x`
 			}),
 			k
 		] }),
-		/* @__PURE__ */ W(Ya, {
+		/* @__PURE__ */ W(so, {
 			ref: z,
 			type: "button",
 			"aria-haspopup": "listbox",
@@ -4469,22 +4767,22 @@ var la = B.div`
 					width: "14px",
 					color: "textSubtle"
 				}),
-				/* @__PURE__ */ U(Xa, { children: A(te) }),
+				/* @__PURE__ */ U(co, { children: A(ee) }),
 				/* @__PURE__ */ U(s, {
 					width: "14px",
 					color: "textSubtle"
 				})
 			]
 		}),
-		V && G && typeof document < "u" && ee(/* @__PURE__ */ U(ao, {
+		V && K && typeof document < "u" && G(/* @__PURE__ */ U(vo, {
 			ref: B,
 			role: "listbox",
 			style: {
-				top: G.top,
-				left: G.left,
-				width: G.width
+				top: K.top,
+				left: K.left,
+				width: K.width
 			},
-			children: so.map((e) => /* @__PURE__ */ U(oo, {
+			children: bo.map((e) => /* @__PURE__ */ U(yo, {
 				role: "option",
 				"aria-selected": e.key === a,
 				$active: e.key === a,
@@ -4494,13 +4792,13 @@ var la = B.div`
 				children: A(e.label)
 			}, e.key))
 		}), document.body),
-		F && /* @__PURE__ */ W(Za, { children: [
+		F && /* @__PURE__ */ W(lo, { children: [
 			/* @__PURE__ */ U(r, {
 				fontSize: "13px",
 				color: "textSubtle",
 				children: A("Stop")
 			}),
-			/* @__PURE__ */ U(Qa, {
+			/* @__PURE__ */ U(uo, {
 				value: n.stopPrice,
 				onChange: (e) => i({
 					...n,
@@ -4511,7 +4809,7 @@ var la = B.div`
 				"aria-label": A("Stop price"),
 				style: { textAlign: "right" }
 			}),
-			/* @__PURE__ */ W($a, {
+			/* @__PURE__ */ W(fo, {
 				type: "button",
 				onClick: () => i({
 					...n,
@@ -4520,13 +4818,13 @@ var la = B.div`
 				children: [n.stopPriceSource === "MARK" ? A("Mark") : A("Last"), /* @__PURE__ */ U(s, { width: "12px" })]
 			})
 		] }),
-		P && /* @__PURE__ */ W(Za, { children: [
+		P && /* @__PURE__ */ W(lo, { children: [
 			/* @__PURE__ */ U(r, {
 				fontSize: "13px",
 				color: "textSubtle",
 				children: A("Price")
 			}),
-			/* @__PURE__ */ U(Qa, {
+			/* @__PURE__ */ U(uo, {
 				value: n.price,
 				onChange: (e) => i({
 					...n,
@@ -4543,7 +4841,7 @@ var la = B.div`
 				children: t
 			})
 		] }),
-		/* @__PURE__ */ W(Za, { children: [/* @__PURE__ */ U(Qa, {
+		/* @__PURE__ */ W(lo, { children: [/* @__PURE__ */ U(uo, {
 			value: n.quantity,
 			onChange: (e) => i({
 				...n,
@@ -4551,19 +4849,19 @@ var la = B.div`
 			}),
 			placeholder: A("Size"),
 			inputMode: "decimal"
-		}), /* @__PURE__ */ W($a, {
+		}), /* @__PURE__ */ W(fo, {
 			type: "button",
 			onClick: R,
 			children: [j, /* @__PURE__ */ U(s, { width: "12px" })]
 		})] }),
-		/* @__PURE__ */ U(f, { children: /* @__PURE__ */ U(ca, {
+		/* @__PURE__ */ U(f, { children: /* @__PURE__ */ U(pa, {
 			min: 0,
 			max: 100,
 			step: 1,
 			value: h,
 			onValueChanged: g
 		}) }),
-		/* @__PURE__ */ W(eo, { children: [
+		/* @__PURE__ */ W(po, { children: [
 			/* @__PURE__ */ U("span", { children: A("Avbl") }),
 			/* @__PURE__ */ U("strong", { children: `${c} ${t}` }),
 			/* @__PURE__ */ U(p, {
@@ -4583,7 +4881,7 @@ var la = B.div`
 				})
 			})
 		] }),
-		/* @__PURE__ */ W(to, { children: [/* @__PURE__ */ U(l, {
+		/* @__PURE__ */ W(mo, { children: [/* @__PURE__ */ U(l, {
 			scale: "sm",
 			checked: n.tpSlEnabled,
 			onChange: (e) => i({
@@ -4591,7 +4889,7 @@ var la = B.div`
 				tpSlEnabled: e.target.checked
 			})
 		}), /* @__PURE__ */ U("span", { children: A("TP/SL") })] }),
-		/* @__PURE__ */ W(to, { children: [/* @__PURE__ */ U(l, {
+		/* @__PURE__ */ W(mo, { children: [/* @__PURE__ */ U(l, {
 			scale: "sm",
 			checked: n.reduceOnly,
 			onChange: (e) => i({
@@ -4600,48 +4898,48 @@ var la = B.div`
 			})
 		}), /* @__PURE__ */ U("span", { children: A("Reduce-Only") })] }),
 		w,
-		/* @__PURE__ */ W(no, {
+		/* @__PURE__ */ W(ho, {
 			$tone: "up",
 			children: [
-				/* @__PURE__ */ W(ro, { children: [/* @__PURE__ */ U("span", { children: A("Est. liq. price") }), /* @__PURE__ */ U("span", {
+				/* @__PURE__ */ W(go, { children: [/* @__PURE__ */ U("span", { children: A("Est. liq. price") }), /* @__PURE__ */ U("span", {
 					className: "v",
-					children: q
+					children: J
 				})] }),
-				/* @__PURE__ */ W(ro, { children: [/* @__PURE__ */ U("span", { children: A("Margin") }), /* @__PURE__ */ U("span", {
+				/* @__PURE__ */ W(go, { children: [/* @__PURE__ */ U("span", { children: A("Margin") }), /* @__PURE__ */ U("span", {
 					className: "v",
-					children: ne
+					children: te
 				})] }),
-				/* @__PURE__ */ W(ro, { children: [/* @__PURE__ */ U("span", { children: A("Max") }), /* @__PURE__ */ U("span", {
+				/* @__PURE__ */ W(go, { children: [/* @__PURE__ */ U("span", { children: A("Max") }), /* @__PURE__ */ U("span", {
 					className: "v",
 					children: "—"
 				})] })
 			]
 		}),
-		/* @__PURE__ */ U(io, {
+		/* @__PURE__ */ U(_o, {
 			type: "button",
 			$side: "BUY",
 			disabled: !v || y,
 			onClick: () => T({ sideOverride: "BUY" }),
 			children: A("Buy/Long")
 		}),
-		/* @__PURE__ */ W(no, {
+		/* @__PURE__ */ W(ho, {
 			$tone: "down",
 			children: [
-				/* @__PURE__ */ W(ro, { children: [/* @__PURE__ */ U("span", { children: A("Est. liq. price") }), /* @__PURE__ */ U("span", {
+				/* @__PURE__ */ W(go, { children: [/* @__PURE__ */ U("span", { children: A("Est. liq. price") }), /* @__PURE__ */ U("span", {
 					className: "v",
-					children: q
+					children: J
 				})] }),
-				/* @__PURE__ */ W(ro, { children: [/* @__PURE__ */ U("span", { children: A("Margin") }), /* @__PURE__ */ U("span", {
+				/* @__PURE__ */ W(go, { children: [/* @__PURE__ */ U("span", { children: A("Margin") }), /* @__PURE__ */ U("span", {
 					className: "v",
-					children: ne
+					children: te
 				})] }),
-				/* @__PURE__ */ W(ro, { children: [/* @__PURE__ */ U("span", { children: A("Max") }), /* @__PURE__ */ U("span", {
+				/* @__PURE__ */ W(go, { children: [/* @__PURE__ */ U("span", { children: A("Max") }), /* @__PURE__ */ U("span", {
 					className: "v",
 					children: "—"
 				})] })
 			]
 		}),
-		/* @__PURE__ */ U(io, {
+		/* @__PURE__ */ U(_o, {
 			type: "button",
 			$side: "SELL",
 			disabled: !v || y,
@@ -4659,30 +4957,30 @@ var la = B.div`
 			]
 		})
 	] });
-}, lo = (e) => {
+}, So = (e) => {
 	let { isMobile: t } = h();
-	if (t) return /* @__PURE__ */ U(co, { ...e });
-	let { baseAsset: n, quoteAsset: i, draft: a, onDraftChange: o, typeKey: s, onTypeKeyChange: c, availableBalanceText: m, preview: g, feeText: _, sizePercent: v, onSizePercentChange: y, cta: b, canSubmit: x, isSubmitting: S = !1, marginSubmitting: C = !1, authReady: w = !0, hasAddress: T = !0, errorSlot: D, onSubmit: O, onLeverageClick: k, onMarginModeToggle: A, onDepositClick: j, extraControls: N, markPrice: P, priceDecimals: F = 2, t: R = Ga } = e, z = a.sizeUnit === "QUOTE" ? i : n, B = (e) => o({
+	if (t) return /* @__PURE__ */ U(xo, { ...e });
+	let { baseAsset: n, quoteAsset: i, draft: a, onDraftChange: o, typeKey: s, onTypeKeyChange: c, availableBalanceText: m, preview: g, feeText: _, sizePercent: v, onSizePercentChange: y, cta: b, canSubmit: x, isSubmitting: S = !1, marginSubmitting: C = !1, authReady: w = !0, hasAddress: T = !0, errorSlot: D, onSubmit: O, onLeverageClick: k, onMarginModeToggle: A, onDepositClick: j, extraControls: N, markPrice: P, priceDecimals: F = 2, t: R = ro } = e, z = a.sizeUnit === "QUOTE" ? i : n, B = (e) => o({
 		...a,
 		side: e
 	}), V = () => o({
 		...a,
 		sizeUnit: a.sizeUnit === "BASE" ? "QUOTE" : "BASE",
 		quantity: ""
-	}), G = () => o({
+	}), K = () => o({
 		...a,
 		tpSlEnabled: !a.tpSlEnabled
-	}), K = Number(a.price) || (typeof P == "number" ? P : 0), te = (() => {
+	}), q = Number(a.price) || (typeof P == "number" ? P : 0), ee = (() => {
 		let e = Number(a.quantity);
-		return !Number.isFinite(e) || e <= 0 ? 0 : a.sizeUnit === "BASE" ? e : K > 0 ? e / K : 0;
-	})(), q = a.side === "BUY" ? 1 : -1, ne = K > 0 && te > 0, re = (e) => Number.isFinite(e) ? e.toFixed(2) : "", ie = (e) => Number.isFinite(e) ? e.toFixed(F) : "", J = (e) => e.replace(/,/g, ""), Y = (e) => {
-		let t = Number(J(e));
-		return !Number.isFinite(t) || !ne ? "" : re((t - K) * te * q);
+		return !Number.isFinite(e) || e <= 0 ? 0 : a.sizeUnit === "BASE" ? e : q > 0 ? e / q : 0;
+	})(), J = a.side === "BUY" ? 1 : -1, te = q > 0 && ee > 0, ne = (e) => Number.isFinite(e) ? e.toFixed(2) : "", re = (e) => Number.isFinite(e) ? e.toFixed(F) : "", Y = (e) => e.replace(/,/g, ""), ie = (e) => {
+		let t = Number(Y(e));
+		return !Number.isFinite(t) || !te ? "" : ne((t - q) * ee * J);
 	}, ae = (e) => {
-		let t = Number(J(e));
-		return !Number.isFinite(t) || !ne ? "" : ie(K + t * q / te);
+		let t = Number(Y(e));
+		return !Number.isFinite(t) || !te ? "" : re(q + t * J / ee);
 	}, oe = (e) => {
-		let t = J(e);
+		let t = Y(e);
 		if (t === "") return o({
 			...a,
 			takeProfitPrice: "",
@@ -4691,10 +4989,10 @@ var la = B.div`
 		o({
 			...a,
 			takeProfitPrice: t,
-			takeProfitPnl: Y(t)
+			takeProfitPnl: ie(t)
 		});
 	}, se = (e) => {
-		let t = Mi(J(e));
+		let t = Li(Y(e));
 		if (t === "" || t === "-") return o({
 			...a,
 			takeProfitPnl: "",
@@ -4706,7 +5004,7 @@ var la = B.div`
 			takeProfitPrice: ae(t)
 		});
 	}, ce = (e) => {
-		let t = J(e);
+		let t = Y(e);
 		if (t === "") return o({
 			...a,
 			stopLossPrice: "",
@@ -4715,10 +5013,10 @@ var la = B.div`
 		o({
 			...a,
 			stopLossPrice: t,
-			stopLossPnl: Y(t)
+			stopLossPnl: ie(t)
 		});
 	}, le = (e) => {
-		let t = Ni(J(e));
+		let t = Ri(Y(e));
 		if (t === "" || t === "-") return o({
 			...a,
 			stopLossPnl: "",
@@ -4732,7 +5030,7 @@ var la = B.div`
 	}, ue = s === "stop-limit" || s === "stop-market", de = s === "limit" || s === "stop-limit", fe = ue, pe = I(null), me = I(null), [he, ge] = L(!1), [_e, ve] = L({
 		top: 0,
 		left: 0
-	});
+	}), [ye, be] = L(!1), [xe, Se] = L(!1), [Ce, we] = L(null);
 	M(() => {
 		if (!he || !pe.current || !me.current) return;
 		let e = pe.current.getBoundingClientRect(), t = me.current.getBoundingClientRect(), n = e.bottom + 4, r = window.innerWidth - t.width - 8;
@@ -4748,75 +5046,82 @@ var la = B.div`
 		};
 		return document.addEventListener("click", e), () => document.removeEventListener("click", e);
 	}, [he]);
-	let ye = ue, be = s === "stop-market" ? `${R("Stop Market")} ▾` : `${R("Stop Limit")} ▾`, xe = () => {
+	let Te = ue, Ee = s === "stop-market" ? `${R("Stop Market")} ▾` : `${R("Stop Limit")} ▾`, De = () => {
 		ge((e) => !e);
-	}, Se = (e) => {
+	}, Oe = (e) => {
 		c(e), ge(!1);
 	};
-	return /* @__PURE__ */ W(ga, { children: [
-		/* @__PURE__ */ W(_a, { children: [
-			["market", "limit"].map((e) => /* @__PURE__ */ U(va, {
+	return /* @__PURE__ */ W(xa, { children: [
+		/* @__PURE__ */ W(Sa, { children: [
+			["market", "limit"].map((e) => /* @__PURE__ */ U(Ca, {
 				$active: s === e,
 				onClick: () => c(e),
 				children: R(e === "market" ? "Market" : "Limit")
 			}, e)),
-			/* @__PURE__ */ U(va, {
+			/* @__PURE__ */ U(Ca, {
 				ref: pe,
-				$active: ye,
-				onClick: xe,
+				$active: Te,
+				onClick: De,
 				"aria-haspopup": "menu",
 				"aria-expanded": he,
-				children: be
+				children: Ee
 			}),
-			he && typeof document < "u" && ee(/* @__PURE__ */ W(Ma, {
+			he && typeof document < "u" && G(/* @__PURE__ */ W(Wa, {
 				ref: me,
 				style: {
 					top: _e.top,
 					left: _e.left
 				},
 				role: "menu",
-				children: [/* @__PURE__ */ U(Na, {
+				children: [/* @__PURE__ */ U(Ga, {
 					$active: s === "stop-limit",
 					role: "menuitem",
-					onClick: () => Se("stop-limit"),
+					onClick: () => Oe("stop-limit"),
 					children: R("Stop Limit")
-				}), /* @__PURE__ */ U(Na, {
+				}), /* @__PURE__ */ U(Ga, {
 					$active: s === "stop-market",
 					role: "menuitem",
-					onClick: () => Se("stop-market"),
+					onClick: () => Oe("stop-market"),
 					children: R("Stop Market")
 				})]
 			}), document.body)
 		] }),
-		/* @__PURE__ */ W(ya, { children: [/* @__PURE__ */ U(ba, {
-			$active: a.side === "BUY",
-			$side: "BUY",
-			onClick: () => B("BUY"),
-			children: R("Buy")
-		}), /* @__PURE__ */ U(ba, {
-			$active: a.side === "SELL",
-			$side: "SELL",
-			onClick: () => B("SELL"),
-			children: R("Sell")
-		})] }),
+		/* @__PURE__ */ W(Ea, { children: [
+			/* @__PURE__ */ U(Ta, {
+				$side: a.side,
+				"aria-hidden": !0
+			}),
+			/* @__PURE__ */ U(Da, {
+				$active: a.side === "BUY",
+				$side: "BUY",
+				onClick: () => B("BUY"),
+				children: R("Buy / Long")
+			}),
+			/* @__PURE__ */ U(Da, {
+				$active: a.side === "SELL",
+				$side: "SELL",
+				onClick: () => B("SELL"),
+				children: R("Sell / Short")
+			})
+		] }),
 		/* @__PURE__ */ W(E, {
 			style: { gap: 8 },
 			children: [
-				/* @__PURE__ */ U(xa, {
+				/* @__PURE__ */ U(Oa, {
 					disabled: C,
 					onClick: A,
 					title: R("Margin mode"),
-					children: a.marginMode === "CROSS" ? R("Cross") : R("Isolated")
+					children: /* @__PURE__ */ U(ka, { children: a.marginMode === "CROSS" ? R("Cross") : R("Isolated") })
 				}),
-				/* @__PURE__ */ W(xa, {
+				/* @__PURE__ */ U(Oa, {
 					onClick: k,
 					title: R("Leverage"),
-					children: [a.leverage, "x"]
+					children: /* @__PURE__ */ W(ka, { children: [a.leverage, "x"] })
 				}),
 				N
 			]
 		}),
-		/* @__PURE__ */ W(Sa, { children: [/* @__PURE__ */ U(Ca, { children: R("Avbl") }), /* @__PURE__ */ W(wa, { children: [/* @__PURE__ */ W(r, {
+		/* @__PURE__ */ W(Aa, { children: [/* @__PURE__ */ U(ja, { children: R("Avbl") }), /* @__PURE__ */ W(Ma, { children: [/* @__PURE__ */ W(r, {
 			fontSize: "14px",
 			style: { fontVariantNumeric: "tabular-nums" },
 			children: [
@@ -4841,9 +5146,9 @@ var la = B.div`
 				width: "14px"
 			})
 		})] })] }),
-		fe && /* @__PURE__ */ W(ka, { children: [
-			/* @__PURE__ */ U(Ea, { children: R("Stop") }),
-			/* @__PURE__ */ U(Aa, {
+		fe && /* @__PURE__ */ W(Va, { children: [
+			/* @__PURE__ */ U(Pa, { children: R("Stop") }),
+			/* @__PURE__ */ U(Ha, {
 				value: a.stopPrice,
 				onChange: (e) => o({
 					...a,
@@ -4853,7 +5158,7 @@ var la = B.div`
 				inputMode: "decimal",
 				"aria-label": R("Stop price")
 			}),
-			/* @__PURE__ */ W(ja, {
+			/* @__PURE__ */ W(Ua, {
 				type: "button",
 				onClick: () => o({
 					...a,
@@ -4863,9 +5168,9 @@ var la = B.div`
 				children: [a.stopPriceSource === "MARK" ? R("Mark") : R("Last"), " ▾"]
 			})
 		] }),
-		de && /* @__PURE__ */ W(ka, { children: [
-			/* @__PURE__ */ U(Ea, { children: R("Price") }),
-			/* @__PURE__ */ U(Aa, {
+		de && /* @__PURE__ */ W(Va, { children: [
+			/* @__PURE__ */ U(Pa, { children: R("Price") }),
+			/* @__PURE__ */ U(Ha, {
 				value: a.price,
 				onChange: (e) => o({
 					...a,
@@ -4875,17 +5180,17 @@ var la = B.div`
 				inputMode: "decimal",
 				"aria-label": R("Limit price")
 			}),
-			/* @__PURE__ */ U(Oa, {
+			/* @__PURE__ */ U(Ia, {
 				as: "div",
 				onClick: void 0,
 				style: { cursor: "default" },
 				children: i
 			})
 		] }),
-		s === "stop-limit" && /* @__PURE__ */ W(ka, { children: [
-			/* @__PURE__ */ U(Ea, { children: R("TIF") }),
+		s === "stop-limit" && /* @__PURE__ */ W(Va, { children: [
+			/* @__PURE__ */ U(Pa, { children: R("TIF") }),
 			/* @__PURE__ */ U(E, { flex: 1 }),
-			/* @__PURE__ */ W(Pa, {
+			/* @__PURE__ */ W(Ka, {
 				value: a.timeInForce === "GTX" ? "GTC" : a.timeInForce,
 				onChange: (e) => o({
 					...a,
@@ -4908,9 +5213,9 @@ var la = B.div`
 				]
 			})
 		] }),
-		/* @__PURE__ */ W(Ta, { children: [
-			/* @__PURE__ */ U(Ea, { children: R("Size") }),
-			/* @__PURE__ */ U(Da, {
+		/* @__PURE__ */ W(Na, { children: [
+			/* @__PURE__ */ U(Pa, { children: R("Size") }),
+			/* @__PURE__ */ U(Fa, {
 				value: a.quantity,
 				onChange: (e) => o({
 					...a,
@@ -4919,13 +5224,13 @@ var la = B.div`
 				placeholder: "0",
 				inputMode: "decimal"
 			}),
-			/* @__PURE__ */ W(Oa, {
+			/* @__PURE__ */ W(Ia, {
 				onClick: V,
 				title: R("Toggle unit"),
-				children: [z, " ▾"]
+				children: [z, /* @__PURE__ */ U(Ba, {})]
 			})
 		] }),
-		/* @__PURE__ */ U(Ia, { children: /* @__PURE__ */ U(d, {
+		/* @__PURE__ */ U(Ja, { children: /* @__PURE__ */ U(d, {
 			variant: "dotted",
 			min: 0,
 			max: 100,
@@ -4943,9 +5248,13 @@ var la = B.div`
 					...a,
 					reduceOnly: e.target.checked
 				})
-			}), /* @__PURE__ */ U(r, {
-				fontSize: "14px",
-				children: R("Reduce Only")
+			}), /* @__PURE__ */ W(La, {
+				onMouseEnter: () => be(!0),
+				onMouseLeave: () => be(!1),
+				children: [/* @__PURE__ */ U(Ra, { children: R("Reduce Only") }), ye && /* @__PURE__ */ U(za, {
+					role: "tooltip",
+					children: R("Reduce-Only order will only reduce your position, not increase it.")
+				})]
 			})]
 		}),
 		/* @__PURE__ */ W(E, {
@@ -4954,10 +5263,14 @@ var la = B.div`
 			children: [/* @__PURE__ */ U(l, {
 				scale: "sm",
 				checked: a.tpSlEnabled,
-				onChange: G
-			}), /* @__PURE__ */ U(r, {
-				fontSize: "14px",
-				children: R("Take Profit / Stop Loss")
+				onChange: K
+			}), /* @__PURE__ */ W(La, {
+				onMouseEnter: () => Se(!0),
+				onMouseLeave: () => Se(!1),
+				children: [/* @__PURE__ */ U(Ra, { children: R("Take Profit / Stop Loss") }), xe && /* @__PURE__ */ U(za, {
+					role: "tooltip",
+					children: R("Set Take Profit or Stop Loss before opening. It activates after entry. Choose Last or Mark price as the trigger.")
+				})]
 			})]
 		}),
 		a.tpSlEnabled && /* @__PURE__ */ W(E, {
@@ -4972,22 +5285,22 @@ var la = B.div`
 					bold: !0,
 					color: "success",
 					children: R("Take Profit")
-				}), /* @__PURE__ */ U(Ba, {
+				}), /* @__PURE__ */ U(Qa, {
 					value: a.takeProfitSource ?? "LAST",
 					onChange: (e) => o({
 						...a,
 						takeProfitSource: e
 					})
 				})]
-			}), /* @__PURE__ */ W(La, { children: [/* @__PURE__ */ W(f, {
+			}), /* @__PURE__ */ W(Ya, { children: [/* @__PURE__ */ W(f, {
 				style: { flex: 1 },
 				children: [/* @__PURE__ */ U(r, {
 					fontSize: "12px",
 					color: "textSubtle",
 					mb: "4px",
 					children: R("Trigger Price")
-				}), /* @__PURE__ */ U(Fa, {
-					...Pi(a.takeProfitPrice, oe),
+				}), /* @__PURE__ */ U(qa, {
+					...zi(a.takeProfitPrice, oe),
 					placeholder: "0.00",
 					inputMode: "decimal"
 				})]
@@ -4998,8 +5311,8 @@ var la = B.div`
 					color: "textSubtle",
 					mb: "4px",
 					children: R("PnL (USDT)")
-				}), /* @__PURE__ */ U(Fa, {
-					...Pi(a.takeProfitPnl ?? "", se),
+				}), /* @__PURE__ */ U(qa, {
+					...zi(a.takeProfitPnl ?? "", se),
 					placeholder: "0.00",
 					inputMode: "decimal"
 				})]
@@ -5012,22 +5325,22 @@ var la = B.div`
 					bold: !0,
 					color: "failure",
 					children: R("Stop Loss")
-				}), /* @__PURE__ */ U(Ba, {
+				}), /* @__PURE__ */ U(Qa, {
 					value: a.stopLossSource ?? "LAST",
 					onChange: (e) => o({
 						...a,
 						stopLossSource: e
 					})
 				})]
-			}), /* @__PURE__ */ W(La, { children: [/* @__PURE__ */ W(f, {
+			}), /* @__PURE__ */ W(Ya, { children: [/* @__PURE__ */ W(f, {
 				style: { flex: 1 },
 				children: [/* @__PURE__ */ U(r, {
 					fontSize: "12px",
 					color: "textSubtle",
 					mb: "4px",
 					children: R("Trigger Price")
-				}), /* @__PURE__ */ U(Fa, {
-					...Pi(a.stopLossPrice, ce),
+				}), /* @__PURE__ */ U(qa, {
+					...zi(a.stopLossPrice, ce),
 					placeholder: "0.00",
 					inputMode: "decimal"
 				})]
@@ -5038,42 +5351,63 @@ var la = B.div`
 					color: "textSubtle",
 					mb: "4px",
 					children: R("PnL (USDT)")
-				}), /* @__PURE__ */ U(Fa, {
-					...Pi(a.stopLossPnl ?? "", le),
+				}), /* @__PURE__ */ U(qa, {
+					...zi(a.stopLossPnl ?? "", le),
 					placeholder: "0.00",
 					inputMode: "decimal"
 				})]
 			})] })] })]
 		}),
 		D,
-		w ? /* @__PURE__ */ U(Va, {
+		w ? /* @__PURE__ */ U($a, {
 			onClick: () => O(),
 			disabled: !x,
 			isLoading: S,
 			scale: "md",
 			$side: a.side,
 			children: b
-		}) : /* @__PURE__ */ U(Va, {
+		}) : /* @__PURE__ */ U($a, {
 			$side: a.side,
 			onClick: () => O(),
 			scale: "md",
 			disabled: !T,
 			children: b
 		}),
-		/* @__PURE__ */ W(Ha, { children: [
-			/* @__PURE__ */ U(Ua, { children: R("Cost") }),
-			/* @__PURE__ */ U(Wa, { children: g.cost }),
-			!ue && /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(Ua, { children: R("Est. Liq. Price") }), /* @__PURE__ */ U(Wa, { children: g.liq })] }),
-			/* @__PURE__ */ U(Ua, { children: R("Fees") }),
-			/* @__PURE__ */ U(Wa, { children: _ })
+		/* @__PURE__ */ W(eo, { children: [
+			/* @__PURE__ */ W(La, {
+				onMouseEnter: () => we("cost"),
+				onMouseLeave: () => we(null),
+				children: [/* @__PURE__ */ U(to, { children: R("Cost") }), Ce === "cost" && /* @__PURE__ */ U(za, {
+					role: "tooltip",
+					children: R("Total margin required to open this position.")
+				})]
+			}),
+			/* @__PURE__ */ U(no, { children: g.cost }),
+			!ue && /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(La, {
+				onMouseEnter: () => we("liq"),
+				onMouseLeave: () => we(null),
+				children: [/* @__PURE__ */ U(to, { children: R("Est. Liq. Price") }), Ce === "liq" && /* @__PURE__ */ U(za, {
+					role: "tooltip",
+					children: R("Total margin required to open this position.")
+				})]
+			}), /* @__PURE__ */ U(no, { children: g.liq })] }),
+			/* @__PURE__ */ W(La, {
+				onMouseEnter: () => we("fees"),
+				onMouseLeave: () => we(null),
+				children: [/* @__PURE__ */ U(to, { children: R("Fees") }), Ce === "fees" && /* @__PURE__ */ U(za, {
+					role: "tooltip",
+					children: R("Trading and funding fees applied to this position.")
+				})]
+			}),
+			/* @__PURE__ */ U(no, { children: _ })
 		] })
 	] });
-}, uo = B(E)`
+}, Co = B(E)`
   flex-direction: column;
   gap: 20px;
   min-width: 380px;
   max-width: 420px;
-`, fo = B.button`
+`, wo = B.button`
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
@@ -5088,7 +5422,7 @@ var la = B.div`
   cursor: pointer;
   transition: filter 0.12s;
   &:hover { filter: brightness(1.1); }
-`, po = B(E)`
+`, To = B(E)`
   align-items: center;
   justify-content: space-between;
   padding: 16px;
@@ -5096,18 +5430,18 @@ var la = B.div`
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
   border-radius: 16px;
-`, mo = B(r).attrs({
+`, Eo = B(r).attrs({
 	fontSize: "12px",
 	bold: !0
 })`
   text-transform: uppercase;
   letter-spacing: 0.04em;
-`, ho = B(E)`
+`, Do = B(E)`
   flex-direction: column;
   gap: 4px;
   max-height: 320px;
   overflow-y: auto;
-`, go = B.button`
+`, Oo = B.button`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -5125,17 +5459,17 @@ var la = B.div`
     opacity: 0.5;
     cursor: not-allowed;
   }
-`, _o = B(E)`
+`, ko = B(E)`
   flex-direction: column;
-`, vo = B(E)`
+`, Ao = B(E)`
   flex-direction: column;
   gap: 8px;
-`, yo = B(E)`
+`, jo = B(E)`
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   height: 24px;
-`, bo = B(E)`
+`, Mo = B(E)`
   align-items: center;
   justify-content: center;
   gap: 16px;
@@ -5152,7 +5486,7 @@ var la = B.div`
       inset 0px 2px 0px -1px ${({ theme: e }) => e.colors.cardBorder},
       0 0 0 4px ${({ theme: e }) => `color-mix(in srgb, ${e.colors.secondary} 20%, transparent)`};
   }
-`, xo = B.button`
+`, No = B.button`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -5165,7 +5499,7 @@ var la = B.div`
   flex-shrink: 0;
   font-family: inherit;
   &:hover { filter: brightness(1.05); }
-`, So = B.input`
+`, Po = B.input`
   background: transparent;
   border: 0;
   outline: 0;
@@ -5180,10 +5514,10 @@ var la = B.div`
   &::placeholder {
     color: ${({ theme: e }) => e.colors.textSubtle};
   }
-`, Co = B(E)`
+`, Fo = B(E)`
   align-items: center;
   gap: 8px;
-`, wo = B.button`
+`, Io = B.button`
   background: transparent;
   border: 0;
   color: ${({ theme: e }) => e.colors.primary};
@@ -5194,12 +5528,12 @@ var la = B.div`
   padding: 4px 0;
   cursor: pointer;
   &:hover { filter: brightness(1.1); }
-`, To = B.span`
+`, Lo = B.span`
   display: inline-block;
   width: 1px;
   height: 16px;
   background: ${({ theme: e }) => e.colors.cardBorder};
-`, Eo = B.div`
+`, Ro = B.div`
   background: ${({ theme: e }) => e.colors.backgroundAlt};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-radius: 16px;
@@ -5207,17 +5541,17 @@ var la = B.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`, Do = B(E)`
+`, zo = B(E)`
   justify-content: space-between;
   align-items: center;
-`, Oo = B(E)`
+`, Bo = B(E)`
   flex-direction: column;
   gap: 8px;
-`, ko = B(E)`
+`, Vo = B(E)`
   align-items: center;
   gap: 8px;
   opacity: ${({ $state: e }) => e === "pending" ? .5 : 1};
-`, Ao = B.div`
+`, Ho = B.div`
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -5226,13 +5560,13 @@ var la = B.div`
   font-size: 12px;
   background: ${({ $state: e, theme: t }) => e === "done" ? t.colors.success : t.colors.input};
   color: ${({ $state: e, theme: t }) => e === "done" ? "#fff" : t.colors.text};
-`, jo = B(r).attrs({
+`, Uo = B(r).attrs({
 	fontSize: "32px",
 	bold: !0
 })`
   text-align: center;
   font-variant-numeric: tabular-nums;
-`, Mo = B.div`
+`, Wo = B.div`
   width: ${({ $size: e = 24 }) => e}px;
   height: ${({ $size: e = 24 }) => e}px;
   border-radius: 50%;
@@ -5244,11 +5578,11 @@ var la = B.div`
   font-weight: 700;
   flex-shrink: 0;
   overflow: hidden;
-`, No = (e, t) => t ? Object.entries(t).reduce((e, [t, n]) => e.split(`%${t}%`).join(String(n)), e) : e, Po = [
+`, Go = (e, t) => t ? Object.entries(t).reduce((e, [t, n]) => e.split(`%${t}%`).join(String(n)), e) : e, Ko = [
 	25,
 	50,
 	75
-], Fo = ({ isOpen: e, onClose: t, step: n, evmAddress: a, solanaAddress: o, perpBalanceText: s, isLoadingAssets: c = !1, assets: l, selectedAssetId: u, onSelectAsset: d, otherSupportedSymbols: f = [], selectedAsset: p, amount: m, onAmountChange: h, sourceAddress: v, errorSlot: y, onPercentClick: b, submitState: x, canContinue: C, onContinue: w, onBack: T, receipt: D, checkingElapsedMs: k = 0, onDepositAgain: A, onRetry: j, t: M = No, renderTokenIcon: N, renderSpinner: P }) => {
+], qo = ({ isOpen: e, onClose: t, step: n, evmAddress: a, solanaAddress: o, perpBalanceText: s, isLoadingAssets: c = !1, assets: l, selectedAssetId: u, onSelectAsset: d, otherSupportedSymbols: f = [], selectedAsset: p, amount: m, onAmountChange: h, sourceAddress: v, errorSlot: y, onPercentClick: b, submitState: x, canContinue: C, onContinue: w, onBack: T, receipt: D, checkingElapsedMs: k = 0, onDepositAgain: A, onRetry: j, t: M = Go, renderTokenIcon: N, renderSpinner: P }) => {
 	let F = M(n === "success" ? "Deposit Successful" : n === "checking" ? "Processing Deposit" : n === "failed" ? "Deposit Failed" : "Fund Your Perp Account"), I = (() => {
 		switch (x) {
 			case "switching-chain": return M("Switching chain...");
@@ -5260,7 +5594,7 @@ var la = B.div`
 			case "failed": return M("Retry");
 			default: return M("Continue");
 		}
-	})(), L = (e, t = 24) => N ? N(e, t) : /* @__PURE__ */ U(Mo, {
+	})(), L = (e, t = 24) => N ? N(e, t) : /* @__PURE__ */ U(Wo, {
 		$size: t,
 		children: e.symbol.slice(0, 1)
 	}), R = (e) => P ? P(e) : /* @__PURE__ */ U("div", {
@@ -5281,8 +5615,8 @@ var la = B.div`
 		children: /* @__PURE__ */ U(g, {
 			title: F,
 			onDismiss: t,
-			children: /* @__PURE__ */ W(uo, { children: [
-				n === "amount" && /* @__PURE__ */ W(fo, {
+			children: /* @__PURE__ */ W(Co, { children: [
+				n === "amount" && /* @__PURE__ */ W(wo, {
 					type: "button",
 					onClick: T,
 					"aria-label": "back",
@@ -5292,10 +5626,10 @@ var la = B.div`
 					}), /* @__PURE__ */ U("span", { children: M("Back") })]
 				}),
 				n === "select" && /* @__PURE__ */ W(H, { children: [
-					/* @__PURE__ */ W(po, { children: [/* @__PURE__ */ W(E, {
+					/* @__PURE__ */ W(To, { children: [/* @__PURE__ */ W(E, {
 						flexDirection: "column",
 						style: { gap: 2 },
-						children: [/* @__PURE__ */ U(mo, { children: M("Perp Balance") }), /* @__PURE__ */ U(r, {
+						children: [/* @__PURE__ */ U(Eo, { children: M("Perp Balance") }), /* @__PURE__ */ U(r, {
 							fontSize: "12px",
 							color: "textSubtle",
 							children: M("In Aster Contract")
@@ -5344,14 +5678,14 @@ var la = B.div`
 							})
 						]
 					}),
-					l.length > 0 && /* @__PURE__ */ U(ho, { children: l.map((e) => /* @__PURE__ */ W(go, {
+					l.length > 0 && /* @__PURE__ */ U(Do, { children: l.map((e) => /* @__PURE__ */ W(Oo, {
 						$selected: u === e.id,
 						onClick: () => d(e.id),
 						title: e.displayName,
 						children: [/* @__PURE__ */ W(E, {
 							alignItems: "center",
 							style: { gap: 12 },
-							children: [L(e, 40), /* @__PURE__ */ W(_o, { children: [/* @__PURE__ */ U(r, {
+							children: [L(e, 40), /* @__PURE__ */ W(ko, { children: [/* @__PURE__ */ U(r, {
 								fontSize: "14px",
 								bold: !0,
 								children: e.symbol
@@ -5387,7 +5721,7 @@ var la = B.div`
 					})
 				] }),
 				n === "amount" && p && /* @__PURE__ */ W(H, { children: [
-					/* @__PURE__ */ W(vo, { children: [/* @__PURE__ */ W(yo, { children: [/* @__PURE__ */ U(r, {
+					/* @__PURE__ */ W(Ao, { children: [/* @__PURE__ */ W(jo, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "12px",
 						bold: !0,
 						color: "textSubtle",
@@ -5395,45 +5729,45 @@ var la = B.div`
 							amt: p.balanceText,
 							sym: p.symbol
 						})
-					}), /* @__PURE__ */ W(Co, { children: [
-						Po.map((e, t) => /* @__PURE__ */ W(O.Fragment, { children: [t > 0 && /* @__PURE__ */ U(To, {}), /* @__PURE__ */ W(wo, {
+					}), /* @__PURE__ */ W(Fo, { children: [
+						Ko.map((e, t) => /* @__PURE__ */ W(O.Fragment, { children: [t > 0 && /* @__PURE__ */ U(Lo, {}), /* @__PURE__ */ W(Io, {
 							onClick: () => b(e),
 							children: [e, "%"]
 						})] }, e)),
-						/* @__PURE__ */ U(To, {}),
-						/* @__PURE__ */ U(wo, {
+						/* @__PURE__ */ U(Lo, {}),
+						/* @__PURE__ */ U(Io, {
 							onClick: () => b(100),
 							children: M("MAX")
 						})
-					] })] }), /* @__PURE__ */ W(bo, { children: [/* @__PURE__ */ W(xo, {
+					] })] }), /* @__PURE__ */ W(Mo, { children: [/* @__PURE__ */ W(No, {
 						type: "button",
 						children: [L(p, 40), /* @__PURE__ */ U(r, {
 							fontSize: "14px",
 							bold: !0,
 							children: p.displayName || p.symbol
 						})]
-					}), /* @__PURE__ */ U(So, {
+					}), /* @__PURE__ */ U(Po, {
 						value: m,
 						onChange: (e) => h(e.target.value),
 						placeholder: "0.0",
 						inputMode: "decimal"
 					})] })] }),
-					/* @__PURE__ */ W(Eo, { children: [
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(mo, {
+					/* @__PURE__ */ W(Ro, { children: [
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(Eo, {
 							color: "textSubtle",
 							children: M("Source")
 						}), /* @__PURE__ */ U(r, {
 							fontSize: "14px",
 							children: v ?? "—"
 						})] }),
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(mo, {
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(Eo, {
 							color: "textSubtle",
 							children: M("Destination")
 						}), /* @__PURE__ */ U(r, {
 							fontSize: "14px",
 							children: M("Aster perp account")
 						})] }),
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(mo, {
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(Eo, {
 							color: "textSubtle",
 							children: M("Token")
 						}), /* @__PURE__ */ W(E, {
@@ -5467,10 +5801,10 @@ var la = B.div`
 							children: M("Your deposit is on its way. This usually takes 30-60 seconds.")
 						})]
 					}),
-					/* @__PURE__ */ W(Oo, { children: [
-						/* @__PURE__ */ W(ko, {
+					/* @__PURE__ */ W(Bo, { children: [
+						/* @__PURE__ */ W(Vo, {
 							$state: "done",
-							children: [/* @__PURE__ */ U(Ao, {
+							children: [/* @__PURE__ */ U(Ho, {
 								$state: "done",
 								children: "✓"
 							}), /* @__PURE__ */ U(r, {
@@ -5478,9 +5812,9 @@ var la = B.div`
 								children: M("Transaction broadcast")
 							})]
 						}),
-						/* @__PURE__ */ W(ko, {
+						/* @__PURE__ */ W(Vo, {
 							$state: "done",
-							children: [/* @__PURE__ */ U(Ao, {
+							children: [/* @__PURE__ */ U(Ho, {
 								$state: "done",
 								children: "✓"
 							}), /* @__PURE__ */ U(r, {
@@ -5488,9 +5822,9 @@ var la = B.div`
 								children: M("Confirmed on-chain")
 							})]
 						}),
-						/* @__PURE__ */ W(ko, {
+						/* @__PURE__ */ W(Vo, {
 							$state: "active",
-							children: [/* @__PURE__ */ U(Ao, {
+							children: [/* @__PURE__ */ U(Ho, {
 								$state: "active",
 								children: R(16)
 							}), /* @__PURE__ */ U(r, {
@@ -5499,8 +5833,8 @@ var la = B.div`
 							})]
 						})
 					] }),
-					/* @__PURE__ */ W(Eo, { children: [
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(mo, {
+					/* @__PURE__ */ W(Ro, { children: [
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(Eo, {
 							color: "textSubtle",
 							children: M("Amount")
 						}), /* @__PURE__ */ W(r, {
@@ -5512,7 +5846,7 @@ var la = B.div`
 								D.assetSymbol
 							]
 						})] }),
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(mo, {
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(Eo, {
 							color: "textSubtle",
 							children: M("Tx hash")
 						}), /* @__PURE__ */ W(r, {
@@ -5525,7 +5859,7 @@ var la = B.div`
 								D.hash.slice(-8)
 							]
 						})] }),
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(mo, {
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(Eo, {
 							color: "textSubtle",
 							children: M("Elapsed")
 						}), /* @__PURE__ */ W(r, {
@@ -5543,13 +5877,13 @@ var la = B.div`
 					})
 				] }),
 				n === "success" && D && /* @__PURE__ */ W(H, { children: [
-					/* @__PURE__ */ W(jo, { children: [
+					/* @__PURE__ */ W(Uo, { children: [
 						D.amount,
 						" ",
 						D.assetSymbol
 					] }),
-					/* @__PURE__ */ W(Eo, { children: [
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(r, {
+					/* @__PURE__ */ W(Ro, { children: [
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(r, {
 							fontSize: "14px",
 							color: "textSubtle",
 							children: M("Source")
@@ -5558,7 +5892,7 @@ var la = B.div`
 							bold: !0,
 							children: D.sourceAddress ?? "—"
 						})] }),
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(r, {
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(r, {
 							fontSize: "14px",
 							color: "textSubtle",
 							children: M("Destination")
@@ -5567,7 +5901,7 @@ var la = B.div`
 							bold: !0,
 							children: M("Aster perp account")
 						})] }),
-						/* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(r, {
+						/* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(r, {
 							fontSize: "14px",
 							color: "textSubtle",
 							children: M("Processing time")
@@ -5577,7 +5911,7 @@ var la = B.div`
 							children: M("~1-2 min")
 						})] })
 					] }),
-					/* @__PURE__ */ U(Eo, { children: /* @__PURE__ */ W(Do, { children: [/* @__PURE__ */ U(r, {
+					/* @__PURE__ */ U(Ro, { children: /* @__PURE__ */ W(zo, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						color: "textSubtle",
 						children: M("Tx hash")
@@ -5644,7 +5978,7 @@ var la = B.div`
 			] })
 		})
 	});
-}, Io = (e) => e, Lo = ({ isOpen: e, onClose: a, phase: o, eoaAddress: s, agentAddress: c, isProvisioning: l = !1, linkButtonLabel: u, isLinkDisabled: d = !1, isLinkPending: p = !1, onLinkWallet: m, approveButtonLabel: h, isApproveDisabled: _ = !1, isApprovePending: v = !1, onApprove: y, errorSlot: b, t: x = Io }) => {
+}, Jo = (e) => e, Yo = ({ isOpen: e, onClose: a, phase: o, eoaAddress: s, agentAddress: c, isProvisioning: l = !1, linkButtonLabel: u, isLinkDisabled: d = !1, isLinkPending: p = !1, onLinkWallet: m, approveButtonLabel: h, isApproveDisabled: _ = !1, isApprovePending: v = !1, onApprove: y, errorSlot: b, t: x = Jo }) => {
 	let C = c ?? x(l ? "Provisioning..." : "Will be created in step 1");
 	return /* @__PURE__ */ U(S, {
 		isOpen: e,
@@ -5717,12 +6051,12 @@ var la = B.div`
 			})
 		})
 	});
-}, Ro = [
+}, Xo = [
 	50,
 	250,
 	500,
 	1001
-], zo = 1001, Bo = 50 / 1001, Vo = 250 / 1001, Ho = (e, t) => e <= t * Bo ? "safe" : e <= t * Vo ? "warn" : "danger", Uo = 500 / 1001, Wo = (e, t) => e > t * Uo, Go = (e, t) => e > t * Vo, Ko = (e) => e === "safe" ? "Safe zone" : e === "warn" ? "High leverage" : "Danger zone", qo = (e) => e === "safe" ? "🌿" : e === "warn" ? "⚡️" : "🔥", Jo = (e) => e === "safe" ? "A good place to start. You'll feel the market without getting rekt." : e === "warn" ? "Liquidation triggers around a 1% move." : "1% move against you liquidates. Only risk what you can afford to lose.", Yo = () => /* @__PURE__ */ U("svg", {
+], Zo = 1001, Qo = 50 / 1001, $o = 250 / 1001, es = (e, t) => e <= t * Qo ? "safe" : e <= t * $o ? "warn" : "danger", ts = 500 / 1001, ns = (e, t) => e > t * ts, rs = (e, t) => e > t * $o, is = (e) => e === "safe" ? "Safe zone" : e === "warn" ? "High leverage" : "Danger zone", as = (e) => e === "safe" ? "🌿" : e === "warn" ? "⚡️" : "🔥", os = (e) => e === "safe" ? "A good place to start. You'll feel the market without getting rekt." : e === "warn" ? "Liquidation triggers around a 1% move." : "1% move against you liquidates. Only risk what you can afford to lose.", ss = () => /* @__PURE__ */ U("svg", {
 	width: "24",
 	height: "24",
 	viewBox: "0 0 24 24",
@@ -5732,7 +6066,7 @@ var la = B.div`
 		d: "M10.9629 8.57864L6.79069 12.7509C6.58302 12.9586 6.33844 13.0634 6.05694 13.0654C5.77544 13.0674 5.5251 12.9628 5.30594 12.7516C5.1026 12.5403 5.00194 12.2939 5.00394 12.0124C5.00594 11.7309 5.1111 11.4861 5.31944 11.2781L11.2714 5.33339C11.3736 5.23139 11.4873 5.15456 11.6124 5.10289C11.7376 5.05122 11.8683 5.02539 12.0044 5.02539C12.1406 5.02539 12.2713 5.05122 12.3964 5.10289C12.5216 5.15456 12.6319 5.22797 12.7272 5.32314L18.6829 11.2791C18.8983 11.4945 19.0059 11.7367 19.0059 12.0059C19.0059 12.2751 18.9023 12.5153 18.6949 12.7266C18.4758 12.9378 18.225 13.0434 17.9427 13.0434C17.6604 13.0434 17.4164 12.9378 17.2107 12.7266L13.0379 8.57864V18.3664C13.0379 18.6571 12.9383 18.9025 12.7389 19.1026C12.5394 19.303 12.295 19.4031 12.0057 19.4031C11.7164 19.4031 11.4702 19.303 11.2672 19.1026C11.0644 18.9025 10.9629 18.6571 10.9629 18.3664V8.57864Z",
 		fill: "currentColor"
 	})
-}), Xo = () => /* @__PURE__ */ U("svg", {
+}), cs = () => /* @__PURE__ */ U("svg", {
 	width: "24",
 	height: "24",
 	viewBox: "0 0 24 24",
@@ -5742,7 +6076,7 @@ var la = B.div`
 		d: "M10.9997 5V16.17L6.11973 11.29C5.72973 10.9 5.08973 10.9 4.69973 11.29C4.30973 11.68 4.30973 12.31 4.69973 12.7L11.2897 19.29C11.6797 19.68 12.3097 19.68 12.6997 19.29L19.2897 12.7C19.6797 12.31 19.6797 11.68 19.2897 11.29C18.8997 10.9 18.2697 10.9 17.8797 11.29L12.9997 16.17V5C12.9997 4.45 12.5497 4 11.9997 4C11.4497 4 10.9997 4.45 10.9997 5Z",
 		fill: "currentColor"
 	})
-}), Zo = () => /* @__PURE__ */ U("svg", {
+}), ls = () => /* @__PURE__ */ U("svg", {
 	width: "16",
 	height: "16",
 	viewBox: "0 0 16 16",
@@ -5753,7 +6087,7 @@ var la = B.div`
 		d: "M7.99636 11.2602C8.18224 11.2602 8.3393 11.197 8.46752 11.0705C8.59563 10.944 8.65969 10.7872 8.65969 10.6003V7.86018C8.65969 7.67318 8.5968 7.51645 8.47102 7.39001C8.34524 7.26357 8.18936 7.20034 8.00336 7.20034C7.81747 7.20034 7.66041 7.26357 7.53219 7.39001C7.40408 7.51645 7.34002 7.67318 7.34002 7.86018V10.6003C7.34002 10.7872 7.40291 10.944 7.52869 11.0705C7.65447 11.197 7.81036 11.2602 7.99636 11.2602ZM7.99636 6.08001C8.18791 6.08001 8.34969 6.01523 8.48169 5.88568C8.61358 5.75601 8.67952 5.5954 8.67952 5.40384C8.67952 5.21229 8.61474 5.05051 8.48519 4.91851C8.35552 4.78662 8.19491 4.72068 8.00336 4.72068C7.8118 4.72068 7.65002 4.78546 7.51802 4.91501C7.38613 5.04468 7.32019 5.20529 7.32019 5.39684C7.32019 5.5884 7.38497 5.75018 7.51452 5.88218C7.64419 6.01407 7.8048 6.08001 7.99636 6.08001ZM8.00452 14.5358C7.10241 14.5358 6.25452 14.3657 5.46086 14.0255C4.66708 13.6853 3.97263 13.2177 3.37752 12.6227C2.78252 12.0276 2.31491 11.3334 1.97469 10.5402C1.63447 9.74696 1.46436 8.89779 1.46436 7.99268C1.46436 7.08768 1.63447 6.24112 1.97469 5.45301C2.31491 4.66479 2.78252 3.97312 3.37752 3.37801C3.97263 2.78301 4.6668 2.3154 5.46002 1.97518C6.25324 1.63495 7.10241 1.46484 8.00752 1.46484C8.91252 1.46484 9.75908 1.63495 10.5472 1.97518C11.3354 2.3154 12.0271 2.78301 12.6222 3.37801C13.2172 3.97312 13.6848 4.66601 14.025 5.45668C14.3652 6.24734 14.5354 7.09368 14.5354 7.99568C14.5354 8.89779 14.3652 9.74568 14.025 10.5393C13.6848 11.3331 13.2172 12.0276 12.6222 12.6227C12.0271 13.2177 11.3342 13.6853 10.5435 14.0255C9.75286 14.3657 8.90652 14.5358 8.00452 14.5358ZM7.99986 13.1525C9.43363 13.1525 10.6508 12.6523 11.6514 11.6518C12.6518 10.6513 13.152 9.43412 13.152 8.00034C13.152 6.56657 12.6518 5.3494 11.6514 4.34884C10.6508 3.3484 9.43363 2.84818 7.99986 2.84818C6.56608 2.84818 5.34891 3.3484 4.34836 4.34884C3.34791 5.3494 2.84769 6.56657 2.84769 8.00034C2.84769 9.43412 3.34791 10.6513 4.34836 11.6518C5.34891 12.6523 6.56608 13.1525 7.99986 13.1525Z",
 		fill: "currentColor"
 	})
-}), Qo = () => /* @__PURE__ */ U("svg", {
+}), us = () => /* @__PURE__ */ U("svg", {
 	width: "16",
 	height: "16",
 	viewBox: "0 0 16 16",
@@ -5763,7 +6097,7 @@ var la = B.div`
 		d: "M7.63537 9.36302L5.17504 6.90152C5.13704 6.86352 5.10854 6.82279 5.08954 6.77935C5.07054 6.73591 5.06104 6.69207 5.06104 6.64785C5.06104 6.55941 5.0932 6.48074 5.15753 6.41185C5.22187 6.34285 5.30565 6.30835 5.40887 6.30835H10.5909C10.6941 6.30835 10.7779 6.34368 10.8422 6.41435C10.9065 6.4849 10.9387 6.56552 10.9387 6.65618C10.9387 6.67263 10.9007 6.75418 10.8247 6.90085L8.36437 9.36302C8.31459 9.41279 8.25726 9.45013 8.19237 9.47502C8.12759 9.49991 8.06342 9.51235 7.99987 9.51235C7.93631 9.51235 7.87215 9.49991 7.80737 9.47502C7.74248 9.45013 7.68515 9.41279 7.63537 9.36302Z",
 		fill: "currentColor"
 	})
-}), $o = () => /* @__PURE__ */ U("svg", {
+}), ds = () => /* @__PURE__ */ U("svg", {
 	width: "16",
 	height: "16",
 	viewBox: "0 0 16 16",
@@ -5774,7 +6108,7 @@ var la = B.div`
 		d: "M7.36802 8.63184V10.6C7.36802 10.779 7.42824 10.9291 7.54869 11.0502C7.66913 11.1713 7.81836 11.2318 7.99636 11.2318C8.17436 11.2318 8.32474 11.1713 8.44752 11.0502C8.5703 10.9291 8.63169 10.779 8.63169 10.6V8.63184H10.5999C10.7789 8.63184 10.9289 8.57162 11.05 8.45117C11.1711 8.33073 11.2317 8.18151 11.2317 8.00351C11.2317 7.82551 11.1711 7.67512 11.05 7.55234C10.9289 7.42956 10.7789 7.36818 10.5999 7.36818H8.63169V5.40001C8.63169 5.22101 8.57147 5.07095 8.45102 4.94984C8.33058 4.82873 8.18136 4.76818 8.00336 4.76818C7.82536 4.76818 7.67497 4.82873 7.55219 4.94984C7.42941 5.07095 7.36802 5.22101 7.36802 5.40001V7.36818H5.39986C5.22086 7.36818 5.0708 7.4284 4.94969 7.54884C4.82858 7.66929 4.76802 7.81851 4.76802 7.99651C4.76802 8.17451 4.82858 8.3249 4.94969 8.44767C5.0708 8.57045 5.22086 8.63184 5.39986 8.63184H7.36802ZM8.00452 14.5355C7.10241 14.5355 6.25452 14.3654 5.46086 14.0252C4.66708 13.685 3.97263 13.2173 3.37752 12.6223C2.78252 12.0272 2.31491 11.3331 1.97469 10.5398C1.63447 9.74662 1.46436 8.89745 1.46436 7.99234C1.46436 7.08734 1.63447 6.24079 1.97469 5.45267C2.31491 4.66445 2.78252 3.97279 3.37752 3.37767C3.97263 2.78267 4.6668 2.31506 5.46002 1.97484C6.25324 1.63462 7.10241 1.46451 8.00752 1.46451C8.91252 1.46451 9.75908 1.63462 10.5472 1.97484C11.3354 2.31506 12.0271 2.78267 12.6222 3.37767C13.2172 3.97279 13.6848 4.66567 14.025 5.45634C14.3652 6.24701 14.5354 7.09334 14.5354 7.99534C14.5354 8.89745 14.3652 9.74534 14.025 10.539C13.6848 11.3328 13.2172 12.0272 12.6222 12.6223C12.0271 13.2173 11.3342 13.685 10.5435 14.0252C9.75286 14.3654 8.90652 14.5355 8.00452 14.5355ZM7.99986 13.1522C9.43363 13.1522 10.6508 12.652 11.6514 11.6515C12.6518 10.651 13.152 9.43379 13.152 8.00001C13.152 6.56623 12.6518 5.34906 11.6514 4.34851C10.6508 3.34806 9.43363 2.84784 7.99986 2.84784C6.56608 2.84784 5.34891 3.34806 4.34836 4.34851C3.34791 5.34906 2.84769 6.56623 2.84769 8.00001C2.84769 9.43379 3.34791 10.651 4.34836 11.6515C5.34891 12.652 6.56608 13.1522 7.99986 13.1522Z",
 		fill: "currentColor"
 	})
-}), es = () => /* @__PURE__ */ U("svg", {
+}), fs = () => /* @__PURE__ */ U("svg", {
 	width: "18",
 	height: "18",
 	viewBox: "0 0 18 18",
@@ -5784,7 +6118,7 @@ var la = B.div`
 		d: "M4.10361 15.4524C3.67261 15.4524 3.30549 15.3008 3.00224 14.9975C2.69899 14.6943 2.54736 14.3272 2.54736 13.8962V4.1038C2.54736 3.6728 2.69899 3.30567 3.00224 3.00242C3.30549 2.69917 3.67261 2.54755 4.10361 2.54755H13.896C14.327 2.54755 14.6941 2.69917 14.9974 3.00242C15.3006 3.30567 15.4522 3.6728 15.4522 4.1038H9.4588C8.72668 4.1038 8.10111 4.3633 7.58211 4.8823C7.06311 5.4013 6.80361 6.02686 6.80361 6.75898V11.25C6.80361 11.9821 7.06311 12.6062 7.58211 13.1222C8.10111 13.6382 8.72668 13.8962 9.4588 13.8962H15.4522C15.4522 14.3309 15.3006 14.699 14.9974 15.0004C14.6941 15.3017 14.327 15.4524 13.896 15.4524H4.10361ZM9.4588 12.6C9.09055 12.6 8.77199 12.467 8.50311 12.2012C8.23424 11.9353 8.0998 11.6182 8.0998 11.25V6.75898C8.0998 6.39073 8.23424 6.07217 8.50311 5.8033C8.77199 5.53442 9.09055 5.39998 9.4588 5.39998H14.9932C15.3615 5.39998 15.6801 5.53442 15.9489 5.8033C16.2178 6.07217 16.3522 6.39073 16.3522 6.75898V11.25C16.3522 11.6182 16.2178 11.9353 15.9489 12.2012C15.6801 12.467 15.3615 12.6 14.9932 12.6H9.4588ZM12.1498 10.125C12.4623 10.125 12.7279 10.0156 12.9467 9.79686C13.1654 9.57811 13.2748 9.31248 13.2748 8.99998C13.2748 8.68748 13.1654 8.42186 12.9467 8.20311C12.7279 7.98436 12.4623 7.87498 12.1498 7.87498C11.8373 7.87498 11.5717 7.98436 11.3529 8.20311C11.1342 8.42186 11.0248 8.68748 11.0248 8.99998C11.0248 9.31248 11.1342 9.57811 11.3529 9.79686C11.5717 10.0156 11.8373 10.125 12.1498 10.125Z",
 		fill: "currentColor"
 	})
-}), ts = B(G)`
+}), ps = B(K)`
   display: flex;
   width: 506px;
   flex-shrink: 0;
@@ -5822,7 +6156,7 @@ var la = B.div`
       flex: 0 0 auto;
     }
   }
-`, ns = B.div`
+`, ms = B.div`
   display: flex;
   flex: 1 0 0;
   flex-direction: column;
@@ -5836,7 +6170,7 @@ var la = B.div`
   @media (max-width: 575.98px) {
     padding: 16px;
   }
-`, rs = B.div`
+`, hs = B.div`
   display: inline-flex;
   flex-direction: column;
   align-self: stretch;
@@ -5845,7 +6179,7 @@ var la = B.div`
   border: 0;
   background: transparent;
   border-radius: 0;
-`, is = B.div`
+`, gs = B.div`
   display: flex;
   width: 458px;
   height: 77px;
@@ -5862,7 +6196,7 @@ var la = B.div`
   @media (max-width: 967.98px) {
     width: auto;
   }
-`, as = B.div`
+`, _s = B.div`
   display: flex;
   flex-direction: column;
   align-self: stretch;
@@ -5919,24 +6253,24 @@ B(E)`
   font-size: 12px;
   color: ${({ theme: e, $positive: t }) => t ? e.colors.success : e.colors.failure};
 `;
-var os = B.div`
+var vs = B.div`
   align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: 16px;
-`, ss = B.div`
+`, ys = B.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`, cs = B(E)`
+`, bs = B(E)`
   align-items: center;
   justify-content: space-between;
-`, ls = B(r).attrs({ fontSize: "12px" })`
+`, xs = B(r).attrs({ fontSize: "12px" })`
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.secondary};
   text-transform: uppercase;
   letter-spacing: 0.36px;
-`, us = B.button`
+`, Ss = B.button`
   display: flex;
   align-items: center;
   gap: 4px;
@@ -5950,7 +6284,7 @@ var os = B.div`
   &:hover {
     filter: brightness(0.98);
   }
-`, ds = B.span`
+`, Cs = B.span`
   overflow: hidden;
   color: ${({ theme: e }) => e.colors.textSubtle};
   text-align: right;
@@ -5964,7 +6298,7 @@ var os = B.div`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
-`, fs = B.label`
+`, ws = B.label`
   display: flex;
   min-width: 296px;
   padding: 16px;
@@ -5983,20 +6317,20 @@ var os = B.div`
       0 0 0 1px #7645D9,
       0 0 0 4px rgba(118, 69, 217, 0.20);
   }
-`, ps = B.div`
+`, Ts = B.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   align-self: stretch;
-`, ms = B.span`
+`, Es = B.span`
   align-self: stretch;
   color: ${({ theme: e }) => e.colors.failure};
   font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
   font-feature-settings: 'liga' off;
-`, hs = B.span`
+`, Ds = B.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -6010,11 +6344,11 @@ var os = B.div`
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
-`, gs = B.span`
+`, Os = B.span`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-`, _s = B.input`
+`, ks = B.input`
   width: 90px;
   border: 0;
   background: transparent;
@@ -6044,7 +6378,7 @@ var os = B.div`
     font-size: 32px;
     letter-spacing: -0.32px;
   }
-`, vs = B.button`
+`, As = B.button`
   display: flex;
   align-items: flex-end;
   padding: 0;
@@ -6056,7 +6390,7 @@ var os = B.div`
     margin-left: -11px;
   }
   color: ${({ theme: e }) => e.colors.text};
-`, ys = B.span`
+`, js = B.span`
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -6079,7 +6413,7 @@ var os = B.div`
     display: block;
     background: #fff;
   }
-`, bs = B.span`
+`, Ms = B.span`
   display: flex;
   width: 16px;
   height: 16px;
@@ -6095,10 +6429,10 @@ var os = B.div`
   background: ${({ theme: e }) => e.colors.card};
   color: ${({ theme: e }) => e.colors.textSubtle};
   flex-shrink: 0;
-`, xs = B.span`
+`, Ns = B.span`
   position: relative;
   display: inline-flex;
-`, Ss = B.div`
+`, Ps = B.div`
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
@@ -6111,7 +6445,7 @@ var os = B.div`
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.card};
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-`, Cs = B.button`
+`, Fs = B.button`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -6128,7 +6462,7 @@ var os = B.div`
   &:hover {
     background: ${({ theme: e }) => e.colors.input};
   }
-`, ws = B.span`
+`, Is = B.span`
   width: 24px;
   height: 24px;
   border-radius: 999px;
@@ -6153,12 +6487,12 @@ B.span`
   font-size: 14px;
   font-weight: 600;
 `;
-var Ts = B(E)`
+var Ls = B(E)`
   display: flex;
   align-items: center;
   gap: 8px;
   align-self: flex-end;
-`, Es = B.button`
+`, Rs = B.button`
   border: 0;
   background: transparent;
   padding: 0;
@@ -6174,14 +6508,14 @@ var Ts = B(E)`
   &:hover {
     filter: brightness(1.1);
   }
-`, Ds = B.span`
+`, zs = B.span`
   width: 1px;
   height: 16px;
   background: ${({ theme: e }) => e.colors.cardBorder};
-`, Os = B(E)`
+`, Bs = B(E)`
   justify-content: space-between;
   align-items: center;
-`, ks = B.span`
+`, Vs = B.span`
   color: ${({ theme: e }) => e.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -6196,19 +6530,19 @@ var Ts = B(E)`
     font-size: 32px;
     letter-spacing: -0.32px;
   }
-`, As = {
+`, Hs = {
 	safe: "#31D0AA",
 	warn: "#FFB237",
 	danger: "#ED4B9E"
-}, js = B.span`
+}, Us = B.span`
   display: flex;
   padding: 2px 5px;
   justify-content: center;
   align-items: center;
   gap: 4px;
   border-radius: 999px;
-  background: ${({ $zone: e }) => As[e]};
-`, Ms = B.span`
+  background: ${({ $zone: e }) => Hs[e]};
+`, Ws = B.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -6225,7 +6559,7 @@ var Ts = B(E)`
   html.dark & {
     color: #000;
   }
-`, Ns = B.span`
+`, Gs = B.span`
   display: inline-flex;
   align-items: center;
   color: #FFF;
@@ -6234,14 +6568,14 @@ var Ts = B(E)`
   html.dark & {
     color: #000;
   }
-`, Ps = B.div`
+`, Ks = B.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
   gap: 16px;
   margin-top: 16px;
-`, Fs = B.div`
+`, qs = B.div`
   position: relative;
   height: 21px;
   flex-shrink: 0;
@@ -6259,7 +6593,7 @@ var Ts = B(E)`
   @media (min-width: 968px) and (max-width: 1199.98px) {
     height: 16px;
   }
-`, Is = B.span`
+`, Js = B.span`
   position: absolute;
   top: ${({ $variant: e }) => e === "triple" ? "-15px" : "-10px"};
   left: ${({ $fillPct: e, $variant: t }) => t === "triple" ? `calc(${e}% - 22px)` : t === "double" ? `calc(${e}% - 20.7px)` : `calc(${e}% - 19px)`};
@@ -6273,7 +6607,7 @@ var Ts = B(E)`
   touch-action: none;
   cursor: grab;
   &:active { cursor: grabbing; }
-`, Ls = () => /* @__PURE__ */ W("svg", {
+`, Ys = () => /* @__PURE__ */ W("svg", {
 	width: "38",
 	height: "39",
 	viewBox: "0 0 38 39",
@@ -6303,7 +6637,7 @@ var Ts = B(E)`
 			fill: "#FAD658"
 		})
 	]
-}), Rs = () => /* @__PURE__ */ W("svg", {
+}), Xs = () => /* @__PURE__ */ W("svg", {
 	width: "42",
 	height: "43",
 	viewBox: "0 0 42 43",
@@ -6347,7 +6681,7 @@ var Ts = B(E)`
 			fill: "#FAD658"
 		})
 	]
-}), zs = () => /* @__PURE__ */ W("svg", {
+}), Zs = () => /* @__PURE__ */ W("svg", {
 	width: "44",
 	height: "48",
 	viewBox: "0 0 44 48",
@@ -6405,7 +6739,7 @@ var Ts = B(E)`
 			fill: "#FAD658"
 		})
 	]
-}), Bs = B.input`
+}), Qs = B.input`
   position: absolute;
   inset: -4px 0;
   width: 100%;
@@ -6413,7 +6747,7 @@ var Ts = B(E)`
   opacity: 0;
   cursor: pointer;
   margin: 0;
-`, Vs = B(E)`
+`, $s = B(E)`
   display: flex;
   align-items: center;
   align-self: stretch;
@@ -6421,7 +6755,7 @@ var Ts = B(E)`
   border: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
-`, Hs = B.button`
+`, ec = B.button`
   display: flex;
   padding: 8px;
   justify-content: center;
@@ -6438,7 +6772,7 @@ var Ts = B(E)`
   &:hover {
     color: ${({ $active: e, theme: t }) => e ? t.colors.invertedContrast : t.colors.text};
   }
-`, Us = B.div`
+`, tc = B.div`
   display: flex;
   padding: 8px;
   align-items: center;
@@ -6453,7 +6787,7 @@ var Ts = B(E)`
       0 0 0 1px ${({ theme: e }) => e.colors.secondary},
       0 0 0 4px rgba(118, 69, 217, 0.20);
   }
-`, Ws = B.input`
+`, nc = B.input`
   flex: 1;
   width: 100%;
   border: 0;
@@ -6469,7 +6803,7 @@ var Ts = B(E)`
     -webkit-appearance: none;
     margin: 0;
   }
-`, Gs = B.span`
+`, rc = B.span`
   font-size: 13px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
@@ -6482,7 +6816,7 @@ B.div`
   border-radius: 16px;
   overflow: hidden;
 `;
-var Ks = B.div`
+var ic = B.div`
   display: flex;
   width: 458px;
   padding: 16px;
@@ -6500,24 +6834,24 @@ var Ks = B.div`
   @media (max-width: 1199.98px) {
     width: auto;
   }
-`, qs = B(E)`
+`, ac = B(E)`
   align-items: center;
   justify-content: space-between;
   align-self: stretch;
-`, Js = B.span`
+`, oc = B.span`
   font-size: 12px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.textSubtle};
   text-transform: uppercase;
   letter-spacing: 0.24px;
-`, Ys = B.span`
+`, sc = B.span`
   font-size: 12px;
   font-weight: 600;
   color: ${({ theme: e, $danger: t }) => t ? e.colors.failure : e.colors.text};
   text-transform: uppercase;
   letter-spacing: 0.24px;
   font-variant-numeric: tabular-nums;
-`, Xs = B.button`
+`, cc = B.button`
   display: flex;
   padding: 8px;
   justify-content: center;
@@ -6559,16 +6893,16 @@ var Ks = B.div`
     cursor: not-allowed;
     opacity: 0.6;
   }
-`, Zs = B.span`
+`, lc = B.span`
   display: flex;
   padding: 0 8px;
   justify-content: center;
   align-items: center;
   gap: 8px;
-`, Qs = B(E)`
+`, uc = B(E)`
   align-self: stretch;
   gap: 8px;
-`, $s = B(i)`
+`, dc = B(i)`
   display: flex;
   padding: 11px 12px 13px 12px;
   justify-content: center;
@@ -6589,7 +6923,7 @@ var Ks = B.div`
   &:hover {
     filter: brightness(1.08);
   }
-`, ec = B.div`
+`, fc = B.div`
   align-self: stretch;
   display: flex;
   flex-direction: column;
@@ -6604,7 +6938,7 @@ var Ks = B.div`
   @media (max-width: 575.98px) {
     padding: 16px;
   }
-`, tc = B(E)`
+`, pc = B(E)`
   display: flex;
   padding: 16px;
   justify-content: space-between;
@@ -6616,7 +6950,7 @@ var Ks = B.div`
   border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-radius: 24px;
-`, nc = B.span`
+`, mc = B.span`
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -6631,7 +6965,7 @@ var Ks = B.div`
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
-`, rc = B.span`
+`, hc = B.span`
   color: ${({ theme: e }) => e.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -6648,7 +6982,7 @@ var Ks = B.div`
     line-height: 150%;
     letter-spacing: -0.24px;
   }
-`, ic = ({ selected: e, options: t, onSelect: n, onClickFallback: r }) => {
+`, gc = ({ selected: e, options: t, onSelect: n, onClickFallback: r }) => {
 	let [i, a] = L(!1), o = I(null);
 	M(() => {
 		if (!i) return;
@@ -6662,23 +6996,23 @@ var Ks = B.div`
 		};
 	}, [i]);
 	let s = !!t && t.length > 1, c = t?.find((t) => t.code === e);
-	return /* @__PURE__ */ W(xs, {
+	return /* @__PURE__ */ W(Ns, {
 		ref: o,
-		children: [/* @__PURE__ */ W(vs, {
+		children: [/* @__PURE__ */ W(As, {
 			type: "button",
 			onClick: () => {
 				s ? a((e) => !e) : r?.();
 			},
 			"aria-label": "Choose bet denomination",
-			children: [/* @__PURE__ */ U(ys, { children: c?.logoUrl ? /* @__PURE__ */ U("img", {
+			children: [/* @__PURE__ */ U(js, { children: c?.logoUrl ? /* @__PURE__ */ U("img", {
 				src: c.logoUrl,
 				alt: e,
 				loading: "lazy",
 				decoding: "async"
-			}) : e }), /* @__PURE__ */ U(bs, { children: /* @__PURE__ */ U(Qo, {}) })]
-		}), s && i ? /* @__PURE__ */ U(Ss, {
+			}) : e }), /* @__PURE__ */ U(Ms, { children: /* @__PURE__ */ U(us, {}) })]
+		}), s && i ? /* @__PURE__ */ U(Ps, {
 			role: "menu",
-			children: t.map((t) => /* @__PURE__ */ W(Cs, {
+			children: t.map((t) => /* @__PURE__ */ W(Fs, {
 				type: "button",
 				role: "menuitemradio",
 				"aria-checked": t.code === e,
@@ -6686,7 +7020,7 @@ var Ks = B.div`
 				onClick: () => {
 					n?.(t.code), a(!1);
 				},
-				children: [/* @__PURE__ */ U(ws, {
+				children: [/* @__PURE__ */ U(Is, {
 					$color: t.color,
 					children: t.logoUrl ? /* @__PURE__ */ U("img", {
 						src: t.logoUrl,
@@ -6698,10 +7032,10 @@ var Ks = B.div`
 			}, t.code))
 		}) : null]
 	});
-}, ac = ({ symbol: e, baseAsset: t, pair: n, price: r, pricePnlPct: i, onSymbolClick: a, bet: o, onBetChange: s, betError: c, leverage: l, onLeverageChange: u, maxLeverage: d = zo, presets: f = Ro, quoteAsset: p, onQuoteAssetClick: m, assetOptions: h, onAssetChange: g, fundBalanceText: _, onTopUpFund: v, onPercentClick: y, estimatedEntry: b, liqIfLong: x, marginRequired: S, openingFee: C, canSubmit: w, isSubmittingUp: E = !1, isSubmittingDown: D = !1, onUp: k, onDown: A, onDeposit: j, onWithdraw: M, unrealizedPnl: N }) => {
-	let P = Math.min(100, Math.max(0, l / d * 100)), F = Ho(l, d), I = Wo(l, d), L = Go(l, d), R = E || D, z = !w || R, B = !w || R, { targetRef: V, tooltip: H } = T(Jo(F), { placement: "top" }), ee = O.useRef(null), G = O.useCallback((e) => {
+}, _c = ({ symbol: e, baseAsset: t, pair: n, price: r, pricePnlPct: i, onSymbolClick: a, bet: o, onBetChange: s, betError: c, leverage: l, onLeverageChange: u, maxLeverage: d = Zo, presets: f = Xo, quoteAsset: p, onQuoteAssetClick: m, assetOptions: h, onAssetChange: g, fundBalanceText: _, onTopUpFund: v, onPercentClick: y, estimatedEntry: b, liqIfLong: x, marginRequired: S, openingFee: C, canSubmit: w, isSubmittingUp: E = !1, isSubmittingDown: D = !1, onUp: k, onDown: A, onDeposit: j, onWithdraw: M, unrealizedPnl: N }) => {
+	let P = Math.min(100, Math.max(0, l / d * 100)), F = es(l, d), I = ns(l, d), L = rs(l, d), R = E || D, z = !w || R, B = !w || R, { targetRef: V, tooltip: H } = T(os(F), { placement: "top" }), G = O.useRef(null), K = O.useCallback((e) => {
 		e.preventDefault(), e.stopPropagation();
-		let t = e.currentTarget, n = ee.current;
+		let t = e.currentTarget, n = G.current;
 		if (!n) return;
 		t.setPointerCapture(e.pointerId);
 		let r = n.getBoundingClientRect(), i = (e) => {
@@ -6712,107 +7046,107 @@ var Ks = B.div`
 		};
 		t.addEventListener("pointermove", a), t.addEventListener("pointerup", o), t.addEventListener("pointercancel", o);
 	}, [d, u]);
-	return /* @__PURE__ */ W(ts, {
+	return /* @__PURE__ */ W(ps, {
 		"aria-label": `Simple bet panel · ${n || e}`,
-		children: [/* @__PURE__ */ U(ns, { children: /* @__PURE__ */ W(as, { children: [/* @__PURE__ */ W(os, { children: [/* @__PURE__ */ W(ss, { children: [
-			/* @__PURE__ */ W(cs, { children: [/* @__PURE__ */ U(ls, { children: "My Perp Fund" }), /* @__PURE__ */ W(us, {
+		children: [/* @__PURE__ */ U(ms, { children: /* @__PURE__ */ W(_s, { children: [/* @__PURE__ */ W(vs, { children: [/* @__PURE__ */ W(ys, { children: [
+			/* @__PURE__ */ W(bs, { children: [/* @__PURE__ */ U(xs, { children: "My Perp Fund" }), /* @__PURE__ */ W(Ss, {
 				type: "button",
 				onClick: v,
 				"aria-label": "Top up fund",
 				children: [
 					/* @__PURE__ */ U("span", {
 						style: { display: "inline-flex" },
-						children: /* @__PURE__ */ U(es, {})
+						children: /* @__PURE__ */ U(fs, {})
 					}),
-					/* @__PURE__ */ U(ds, { children: _ }),
+					/* @__PURE__ */ U(Cs, { children: _ }),
 					/* @__PURE__ */ U("span", {
 						style: { display: "inline-flex" },
-						children: /* @__PURE__ */ U($o, {})
+						children: /* @__PURE__ */ U(ds, {})
 					})
 				]
 			})] }),
-			/* @__PURE__ */ W(fs, { children: [/* @__PURE__ */ W(ps, { children: [/* @__PURE__ */ U(hs, { children: "My Bet" }), /* @__PURE__ */ W(gs, { children: [/* @__PURE__ */ U(_s, {
+			/* @__PURE__ */ W(ws, { children: [/* @__PURE__ */ W(Ts, { children: [/* @__PURE__ */ U(Ds, { children: "My Bet" }), /* @__PURE__ */ W(Os, { children: [/* @__PURE__ */ U(ks, {
 				type: "number",
 				inputMode: "decimal",
 				value: o,
 				onChange: (e) => s(e.target.value),
 				"aria-label": "Bet amount",
 				placeholder: "0"
-			}), /* @__PURE__ */ U(ic, {
+			}), /* @__PURE__ */ U(gc, {
 				selected: p,
 				options: h,
 				onSelect: g,
 				onClickFallback: m
-			})] })] }), c ? /* @__PURE__ */ U(ms, {
+			})] })] }), c ? /* @__PURE__ */ U(Es, {
 				role: "alert",
 				children: c
 			}) : null] }),
-			/* @__PURE__ */ W(Ts, { children: [
-				/* @__PURE__ */ U(Es, {
+			/* @__PURE__ */ W(Ls, { children: [
+				/* @__PURE__ */ U(Rs, {
 					type: "button",
 					onClick: () => y?.(.25),
 					children: "25%"
 				}),
-				/* @__PURE__ */ U(Ds, {}),
-				/* @__PURE__ */ U(Es, {
+				/* @__PURE__ */ U(zs, {}),
+				/* @__PURE__ */ U(Rs, {
 					type: "button",
 					onClick: () => y?.(.5),
 					children: "50%"
 				}),
-				/* @__PURE__ */ U(Ds, {}),
-				/* @__PURE__ */ U(Es, {
+				/* @__PURE__ */ U(zs, {}),
+				/* @__PURE__ */ U(Rs, {
 					type: "button",
 					onClick: () => y?.(1),
 					children: "MAX"
 				})
 			] })
-		] }), /* @__PURE__ */ W(ss, { children: [
-			/* @__PURE__ */ U(ls, { children: "Leverage" }),
-			/* @__PURE__ */ W(Os, { children: [/* @__PURE__ */ W(ks, { children: [l, "x"] }), /* @__PURE__ */ W(js, {
+		] }), /* @__PURE__ */ W(ys, { children: [
+			/* @__PURE__ */ U(xs, { children: "Leverage" }),
+			/* @__PURE__ */ W(Bs, { children: [/* @__PURE__ */ W(Vs, { children: [l, "x"] }), /* @__PURE__ */ W(Us, {
 				$zone: F,
 				children: [
-					qo(F) ? /* @__PURE__ */ U(Ms, {
+					as(F) ? /* @__PURE__ */ U(Ws, {
 						as: "span",
 						"aria-hidden": !0,
-						children: qo(F)
+						children: as(F)
 					}) : null,
-					/* @__PURE__ */ U(Ms, { children: Ko(F) }),
-					/* @__PURE__ */ U(Ns, {
+					/* @__PURE__ */ U(Ws, { children: is(F) }),
+					/* @__PURE__ */ U(Gs, {
 						ref: V,
-						"aria-label": `${Ko(F)} explanation`,
-						children: /* @__PURE__ */ U(Zo, {})
+						"aria-label": `${is(F)} explanation`,
+						children: /* @__PURE__ */ U(ls, {})
 					}),
 					H
 				]
 			})] }),
-			/* @__PURE__ */ W(Ps, { children: [/* @__PURE__ */ W(Fs, {
-				ref: ee,
+			/* @__PURE__ */ W(Ks, { children: [/* @__PURE__ */ W(qs, {
+				ref: G,
 				$fillPct: P,
 				$zone: F,
 				"aria-hidden": !0,
-				children: [/* @__PURE__ */ U(Bs, {
+				children: [/* @__PURE__ */ U(Qs, {
 					type: "range",
 					min: 1,
 					max: d,
 					value: l,
 					onChange: (e) => u(Number(e.target.value)),
 					"aria-label": "Leverage"
-				}), /* @__PURE__ */ U(Is, {
+				}), /* @__PURE__ */ U(Js, {
 					$fillPct: P,
 					$variant: I ? "triple" : L ? "double" : "single",
-					onPointerDown: G,
-					children: U(I ? zs : L ? Rs : Ls, {})
+					onPointerDown: K,
+					children: U(I ? Zs : L ? Xs : Ys, {})
 				})]
-			}), /* @__PURE__ */ W(Vs, {
+			}), /* @__PURE__ */ W($s, {
 				role: "tablist",
-				children: [/* @__PURE__ */ W(Us, { children: [/* @__PURE__ */ U(Ws, {
+				children: [/* @__PURE__ */ W(tc, { children: [/* @__PURE__ */ U(nc, {
 					type: "number",
 					min: 1,
 					max: d,
 					value: l,
 					onChange: (e) => u(Math.max(1, Math.min(d, Number(e.target.value) || 1))),
 					"aria-label": "Custom leverage"
-				}), /* @__PURE__ */ U(Gs, { children: "x" })] }), f.map((e) => /* @__PURE__ */ W(Hs, {
+				}), /* @__PURE__ */ U(rc, { children: "x" })] }), f.map((e) => /* @__PURE__ */ W(ec, {
 					type: "button",
 					role: "tab",
 					"aria-selected": l === e,
@@ -6821,41 +7155,41 @@ var Ks = B.div`
 					children: [e, "x"]
 				}, e))]
 			})] })
-		] })] }), /* @__PURE__ */ W(rs, { children: [o && o !== "0" ? /* @__PURE__ */ W(Ks, { children: [
-			/* @__PURE__ */ W(qs, { children: [/* @__PURE__ */ U(Js, { children: "Estimated Entry" }), /* @__PURE__ */ U(Ys, { children: b })] }),
-			/* @__PURE__ */ W(qs, { children: [/* @__PURE__ */ U(Js, { children: "Liquidation if long" }), /* @__PURE__ */ U(Ys, {
+		] })] }), /* @__PURE__ */ W(hs, { children: [o && o !== "0" ? /* @__PURE__ */ W(ic, { children: [
+			/* @__PURE__ */ W(ac, { children: [/* @__PURE__ */ U(oc, { children: "Estimated Entry" }), /* @__PURE__ */ U(sc, { children: b })] }),
+			/* @__PURE__ */ W(ac, { children: [/* @__PURE__ */ U(oc, { children: "Liquidation if long" }), /* @__PURE__ */ U(sc, {
 				$danger: !0,
 				children: x
 			})] }),
-			/* @__PURE__ */ W(qs, { children: [/* @__PURE__ */ U(Js, { children: "Margin required" }), /* @__PURE__ */ U(Ys, { children: S })] }),
-			/* @__PURE__ */ W(qs, { children: [/* @__PURE__ */ U(Js, { children: "Opening fee" }), /* @__PURE__ */ U(Ys, { children: C })] })
-		] }) : null, /* @__PURE__ */ W(is, { children: [/* @__PURE__ */ U(Xs, {
+			/* @__PURE__ */ W(ac, { children: [/* @__PURE__ */ U(oc, { children: "Margin required" }), /* @__PURE__ */ U(sc, { children: S })] }),
+			/* @__PURE__ */ W(ac, { children: [/* @__PURE__ */ U(oc, { children: "Opening fee" }), /* @__PURE__ */ U(sc, { children: C })] })
+		] }) : null, /* @__PURE__ */ W(gs, { children: [/* @__PURE__ */ U(cc, {
 			type: "button",
 			$variant: "up",
 			disabled: z,
 			onClick: k,
 			"aria-busy": E,
-			children: /* @__PURE__ */ W(Zs, { children: [/* @__PURE__ */ U(Yo, {}), E ? "..." : "UP"] })
-		}), /* @__PURE__ */ U(Xs, {
+			children: /* @__PURE__ */ W(lc, { children: [/* @__PURE__ */ U(ss, {}), E ? "..." : "UP"] })
+		}), /* @__PURE__ */ U(cc, {
 			type: "button",
 			$variant: "down",
 			disabled: B,
 			onClick: A,
 			"aria-busy": D,
-			children: /* @__PURE__ */ W(Zs, { children: [/* @__PURE__ */ U(Xo, {}), D ? "..." : "DOWN"] })
-		})] })] })] }) }), /* @__PURE__ */ W(ec, { children: [/* @__PURE__ */ W(Qs, { children: [/* @__PURE__ */ U($s, {
+			children: /* @__PURE__ */ W(lc, { children: [/* @__PURE__ */ U(cs, {}), D ? "..." : "DOWN"] })
+		})] })] })] }) }), /* @__PURE__ */ W(fc, { children: [/* @__PURE__ */ W(uc, { children: [/* @__PURE__ */ U(dc, {
 			$variant: "primary",
 			onClick: j,
 			type: "button",
 			children: "Deposit"
-		}), /* @__PURE__ */ U($s, {
+		}), /* @__PURE__ */ U(dc, {
 			$variant: "secondary",
 			onClick: M,
 			type: "button",
 			children: "Withdraw"
-		})] }), /* @__PURE__ */ W(tc, { children: [/* @__PURE__ */ U(nc, { children: "Unrealized PnL" }), /* @__PURE__ */ U(rc, { children: N })] })] })]
+		})] }), /* @__PURE__ */ W(pc, { children: [/* @__PURE__ */ U(mc, { children: "Unrealized PnL" }), /* @__PURE__ */ U(hc, { children: N })] })] })]
 	});
-}, oc = B.div`
+}, vc = B.div`
   display: flex;
   /* Fluid — the consumer's column owns the width. Original 1058px was
      hardcoded for the storybook canvas and made the card overflow / look
@@ -6878,7 +7212,7 @@ var Ks = B.div`
     padding: 16px;
     gap: 8px;
   }
-`, sc = B.button`
+`, yc = B.button`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -6894,7 +7228,7 @@ var Ks = B.div`
   @media (max-width: 575.98px) {
     flex: 1;
   }
-`, cc = B.span`
+`, bc = B.span`
   width: 64px;
   height: 64px;
   border-radius: 999px;
@@ -6912,7 +7246,7 @@ var Ks = B.div`
     height: 40px;
     font-size: 14px;
   }
-`, lc = B.span`
+`, xc = B.span`
   display: inline-flex;
   width: 64px;
   height: 64px;
@@ -6940,7 +7274,7 @@ B.span`
   align-items: center;
   color: ${({ theme: e }) => e.colors.textSubtle};
 `;
-var uc = B.div`
+var Sc = B.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -6954,11 +7288,11 @@ var uc = B.div`
       flex: 1;
     }
   }
-`, dc = B.span`
+`, Cc = B.span`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`, fc = B.span`
+`, wc = B.span`
   display: flex;
   height: 24px;
   padding: 2px 2px 2px 8px;
@@ -6977,7 +7311,7 @@ var uc = B.div`
     border: 0;
     background: transparent;
   }
-`, pc = B.span`
+`, Tc = B.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -6995,7 +7329,7 @@ var uc = B.div`
     font-size: 20px;
     letter-spacing: -0.2px;
   }
-`, mc = B.span`
+`, Ec = B.span`
   display: flex;
   width: 20px;
   align-self: stretch;
@@ -7006,7 +7340,7 @@ var uc = B.div`
   @media (max-width: 575.98px) {
     display: none;
   }
-`, hc = B.span`
+`, Dc = B.span`
   display: none;
 
   @media (max-width: 575.98px) {
@@ -7023,11 +7357,11 @@ var uc = B.div`
     color: ${({ theme: e }) => e.colors.textSubtle};
     flex-shrink: 0;
   }
-`, gc = B.span`
+`, Oc = B.span`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`, _c = B.span`
+`, kc = B.span`
   font-size: 32px;
   font-weight: 600;
   letter-spacing: -0.32px;
@@ -7043,7 +7377,7 @@ var uc = B.div`
     letter-spacing: -0.2px;
     color: ${({ theme: e }) => e.colors.text};
   }
-`, vc = B.span`
+`, Ac = B.span`
   display: flex;
   padding: 0 6px;
   justify-content: center;
@@ -7061,11 +7395,11 @@ var uc = B.div`
   @media (max-width: 575.98px) {
     display: none;
   }
-`, yc = B.span`
+`, jc = B.span`
   display: inline-flex;
   align-items: center;
   color: ${({ $positive: e }) => e ? "#129E7D" : "#ED4B9E"};
-`, bc = B.div`
+`, Mc = B.div`
   display: flex;
   align-items: center;
   flex: 0 1 auto;
@@ -7073,12 +7407,12 @@ var uc = B.div`
   overflow: hidden;
   position: relative;
   justify-content: flex-start;
-`, xc = B(E)`
+`, Nc = B(E)`
   align-items: center;
   gap: 24px;
   height: 56px;
   flex-shrink: 0;
-`, Sc = B.span`
+`, Pc = B.span`
   position: absolute;
   right: 0;
   top: 50%;
@@ -7094,7 +7428,7 @@ var uc = B.div`
   pointer-events: none;
   opacity: ${({ $visible: e }) => e ? 1 : 0};
   transition: opacity 0.15s;
-`, Cc = B.div`
+`, Fc = B.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -7111,7 +7445,7 @@ var uc = B.div`
   @media (max-width: 575.98px) {
     display: none;
   }
-`, wc = B.span`
+`, Ic = B.span`
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
 
@@ -7124,7 +7458,7 @@ var uc = B.div`
     font-weight: 400;
     line-height: 150%;
   }
-`, Tc = B.span`
+`, Lc = B.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
@@ -7139,7 +7473,7 @@ var uc = B.div`
     line-height: 150%;
     letter-spacing: -0.2px;
   }
-`, Ec = () => /* @__PURE__ */ U("svg", {
+`, Rc = () => /* @__PURE__ */ U("svg", {
 	width: "12",
 	height: "12",
 	viewBox: "0 0 12 12",
@@ -7149,7 +7483,7 @@ var uc = B.div`
 		d: "M1.90301 9.83956C1.65374 9.83956 1.47213 9.73331 1.35818 9.52081C1.24423 9.30831 1.25374 9.0988 1.3867 8.89228L5.49051 2.73574C5.61516 2.5553 5.78491 2.46509 5.99977 2.46509C6.21462 2.46509 6.38437 2.5553 6.50901 2.73574L10.6128 8.89228C10.7458 9.0988 10.7553 9.30831 10.6414 9.52081C10.5274 9.73331 10.3458 9.83956 10.0965 9.83956H1.90301Z",
 		fill: "currentColor"
 	})
-}), Dc = () => /* @__PURE__ */ U("svg", {
+}), zc = () => /* @__PURE__ */ U("svg", {
 	width: "12",
 	height: "12",
 	viewBox: "0 0 12 12",
@@ -7159,7 +7493,7 @@ var uc = B.div`
 		d: "M1.90301 2.16044C1.65374 2.16044 1.47213 2.26669 1.35818 2.47919C1.24423 2.69169 1.25374 2.9012 1.3867 3.10772L5.49051 9.26426C5.61516 9.4447 5.78491 9.53491 5.99977 9.53491C6.21462 9.53491 6.38437 9.4447 6.50901 9.26426L10.6128 3.10772C10.7458 2.9012 10.7553 2.69169 10.6414 2.47919C10.5274 2.26669 10.3458 2.16044 10.0965 2.16044H1.90301Z",
 		fill: "currentColor"
 	})
-}), Oc = () => /* @__PURE__ */ U("svg", {
+}), Bc = () => /* @__PURE__ */ U("svg", {
 	width: "20",
 	height: "20",
 	viewBox: "0 0 20 20",
@@ -7169,7 +7503,7 @@ var uc = B.div`
 		d: "M7.25878 9.75835L9.41712 11.9167C9.74212 12.2417 10.2671 12.2417 10.5921 11.9167L12.7504 9.75835C13.2754 9.23335 12.9004 8.33335 12.1588 8.33335H7.84212C7.10045 8.33335 6.73378 9.23335 7.25878 9.75835Z",
 		fill: "currentColor"
 	})
-}), kc = B.div`
+}), Vc = B.div`
   position: fixed;
   inset: 0;
   display: flex;
@@ -7177,7 +7511,7 @@ var uc = B.div`
   justify-content: center;
   background: rgba(40, 13, 95, 0.60);
   z-index: 1000;
-`, Ac = B.div`
+`, Hc = B.div`
   display: flex;
   width: 697px;
   flex-direction: column;
@@ -7193,12 +7527,12 @@ var uc = B.div`
     0 4px 8px 0 rgba(0, 0, 0, 0.16);
   padding: 16px;
   gap: 16px;
-`, jc = B.div`
+`, Uc = B.div`
   display: flex;
   align-items: center;
   gap: 16px;
   align-self: stretch;
-`, Mc = B.button`
+`, Wc = B.button`
   border: 0;
   background: transparent;
   padding: 4px 0;
@@ -7208,7 +7542,7 @@ var uc = B.div`
   color: ${({ $active: e, theme: t }) => e ? t.colors.secondary : t.colors.textSubtle};
   cursor: pointer;
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, Nc = B.label`
+`, Gc = B.label`
   display: flex;
   padding: 7px 8px 9px 16px;
   align-items: flex-start;
@@ -7221,7 +7555,7 @@ var uc = B.div`
   border-left: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Pc = B.input`
+`, Kc = B.input`
   flex: 1;
   border: 0;
   background: transparent;
@@ -7230,13 +7564,13 @@ var uc = B.div`
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.text};
   &::placeholder { color: ${({ theme: e }) => e.colors.textSubtle}; }
-`, Fc = B.div`
+`, qc = B.div`
   display: grid;
   grid-template-columns: 24px 1fr 1fr 1fr 1fr;
   align-items: center;
   align-self: stretch;
   row-gap: 4px;
-`, Ic = B.div`
+`, Jc = B.div`
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -7251,30 +7585,30 @@ var uc = B.div`
   &:nth-child(3),
   &:nth-child(4),
   &:nth-child(5) { justify-content: flex-end; }
-`, Lc = B.button`
+`, Yc = B.button`
   display: contents;
   border: 0;
   background: transparent;
   cursor: pointer;
   font-family: inherit;
   text-align: left;
-`, Rc = B.div`
+`, Xc = B.div`
   padding: 12px 12px;
   font-family: Kanit;
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
   font-variant-numeric: tabular-nums;
-  ${Lc}:hover & { background: ${({ theme: e }) => e.colors.cardSecondary}; }
-`, zc = B(Rc)`
+  ${Yc}:hover & { background: ${({ theme: e }) => e.colors.cardSecondary}; }
+`, Zc = B(Xc)`
   padding-left: 8px;
   padding-right: 0;
   color: #F0B90B;
-`, Bc = B(Rc)`
+`, Qc = B(Xc)`
   display: inline-flex;
   align-items: center;
   gap: 12px;
-`, Vc = B.span`
+`, $c = B.span`
   width: 28px;
   height: 28px;
   border-radius: 999px;
@@ -7286,19 +7620,19 @@ var uc = B.div`
   font-size: 12px;
   font-weight: 700;
   flex-shrink: 0;
-`, Hc = B(Rc)`
+`, el = B(Xc)`
   text-align: right;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
-`, Uc = B.span`
+`, tl = B.span`
   display: inline-flex;
   align-items: center;
   gap: 2px;
   color: ${({ theme: e, $up: t }) => t ? e.colors.success : e.colors.failure};
   font-weight: 600;
-`, Wc = [
+`, nl = [
 	{
 		symbol: "BTC",
 		lastPrice: "$590.75",
@@ -7323,48 +7657,48 @@ var uc = B.div`
 		color: "#627EEA",
 		starred: !0
 	}
-], Gc = ({ isOpen: e, onClose: t }) => e ? /* @__PURE__ */ U(kc, {
+], rl = ({ isOpen: e, onClose: t }) => e ? /* @__PURE__ */ U(Vc, {
 	onClick: t,
-	children: /* @__PURE__ */ W(Ac, {
+	children: /* @__PURE__ */ W(Hc, {
 		onClick: (e) => e.stopPropagation(),
 		children: [
-			/* @__PURE__ */ W(jc, { children: [/* @__PURE__ */ U(Mc, {
+			/* @__PURE__ */ W(Uc, { children: [/* @__PURE__ */ U(Wc, {
 				type: "button",
 				$active: !0,
 				children: "Favorites"
-			}), /* @__PURE__ */ U(Mc, {
+			}), /* @__PURE__ */ U(Wc, {
 				type: "button",
 				children: "All markets"
 			})] }),
-			/* @__PURE__ */ W(Nc, { children: [/* @__PURE__ */ U("svg", {
+			/* @__PURE__ */ W(Gc, { children: [/* @__PURE__ */ U("svg", {
 				width: "20",
 				height: "20",
 				viewBox: "0 0 24 24",
 				fill: "currentColor",
 				"aria-hidden": !0,
 				children: /* @__PURE__ */ U("path", { d: "M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" })
-			}), /* @__PURE__ */ U(Pc, {
+			}), /* @__PURE__ */ U(Kc, {
 				type: "text",
 				placeholder: "All tokens"
 			})] }),
-			/* @__PURE__ */ W(Fc, {
+			/* @__PURE__ */ W(qc, {
 				role: "table",
 				children: [
-					/* @__PURE__ */ U(Ic, { children: "SYMBOLS" }),
-					/* @__PURE__ */ U(Ic, {}),
-					/* @__PURE__ */ U(Ic, { children: "LAST PRICE" }),
-					/* @__PURE__ */ U(Ic, { children: "1D CHANGE" }),
-					/* @__PURE__ */ U(Ic, { children: "1D VOLUME (USDT)" }),
-					Wc.map((e) => /* @__PURE__ */ W(Lc, {
+					/* @__PURE__ */ U(Jc, { children: "SYMBOLS" }),
+					/* @__PURE__ */ U(Jc, {}),
+					/* @__PURE__ */ U(Jc, { children: "LAST PRICE" }),
+					/* @__PURE__ */ U(Jc, { children: "1D CHANGE" }),
+					/* @__PURE__ */ U(Jc, { children: "1D VOLUME (USDT)" }),
+					nl.map((e) => /* @__PURE__ */ W(Yc, {
 						type: "button",
 						children: [
-							/* @__PURE__ */ U(zc, { children: "★" }),
-							/* @__PURE__ */ W(Bc, { children: [/* @__PURE__ */ U(Vc, {
+							/* @__PURE__ */ U(Zc, { children: "★" }),
+							/* @__PURE__ */ W(Qc, { children: [/* @__PURE__ */ U($c, {
 								$color: e.color,
 								children: e.symbol.slice(0, 1)
 							}), /* @__PURE__ */ U("span", { children: e.symbol })] }),
-							/* @__PURE__ */ U(Hc, { children: e.lastPrice }),
-							/* @__PURE__ */ U(Hc, { children: /* @__PURE__ */ W(Uc, {
+							/* @__PURE__ */ U(el, { children: e.lastPrice }),
+							/* @__PURE__ */ U(el, { children: /* @__PURE__ */ W(tl, {
 								$up: e.change >= 0,
 								children: [
 									e.change >= 0 ? "▲" : "▼",
@@ -7373,14 +7707,14 @@ var uc = B.div`
 									"%"
 								]
 							}) }),
-							/* @__PURE__ */ U(Hc, { children: e.volume })
+							/* @__PURE__ */ U(el, { children: e.volume })
 						]
 					}, e.symbol))
 				]
 			})
 		]
 	})
-}) : null, Kc = ({ baseAsset: e, pair: t, price: n, pricePnlPct: r, volume24h: i, openInterest: a, fundingRate: o, nextFunding: s, onSymbolClick: c, renderTokenIcon: l }) => {
+}) : null, il = ({ baseAsset: e, pair: t, price: n, pricePnlPct: r, volume24h: i, openInterest: a, fundingRate: o, nextFunding: s, onSymbolClick: c, renderTokenIcon: l }) => {
 	let u = r >= 0, d = l?.(), f = I(null), p = I(null), [m, h] = L(!1), [g, _] = L(!1);
 	return M(() => {
 		let e = f.current, t = p.current;
@@ -7389,55 +7723,55 @@ var uc = B.div`
 		n();
 		let r = new ResizeObserver(n);
 		return r.observe(e), r.observe(t), () => r.disconnect();
-	}, []), /* @__PURE__ */ W(oc, { children: [
-		/* @__PURE__ */ W(sc, {
+	}, []), /* @__PURE__ */ W(vc, { children: [
+		/* @__PURE__ */ W(yc, {
 			type: "button",
 			onClick: () => {
 				c?.(), _(!0);
 			},
 			"aria-label": `Change market · ${t}`,
-			children: [d == null ? /* @__PURE__ */ U(cc, { children: e }) : /* @__PURE__ */ U(lc, { children: d }), /* @__PURE__ */ W(uc, { children: [
-				/* @__PURE__ */ U(dc, { children: /* @__PURE__ */ W(fc, { children: [/* @__PURE__ */ U(pc, { children: t }), /* @__PURE__ */ U(mc, {
+			children: [d == null ? /* @__PURE__ */ U(bc, { children: e }) : /* @__PURE__ */ U(xc, { children: d }), /* @__PURE__ */ W(Sc, { children: [
+				/* @__PURE__ */ U(Cc, { children: /* @__PURE__ */ W(wc, { children: [/* @__PURE__ */ U(Tc, { children: t }), /* @__PURE__ */ U(Ec, {
 					"aria-hidden": !0,
-					children: /* @__PURE__ */ U(Oc, {})
+					children: /* @__PURE__ */ U(Bc, {})
 				})] }) }),
-				/* @__PURE__ */ W(gc, { children: [/* @__PURE__ */ U(_c, { children: n }), /* @__PURE__ */ W(vc, {
+				/* @__PURE__ */ W(Oc, { children: [/* @__PURE__ */ U(kc, { children: n }), /* @__PURE__ */ W(Ac, {
 					$positive: u,
 					children: [
-						/* @__PURE__ */ U(yc, {
+						/* @__PURE__ */ U(jc, {
 							$positive: u,
-							children: U(u ? Ec : Dc, {})
+							children: U(u ? Rc : zc, {})
 						}),
 						r.toFixed(2),
 						"%"
 					]
 				})] }),
-				/* @__PURE__ */ U(hc, {
+				/* @__PURE__ */ U(Dc, {
 					"aria-hidden": !0,
-					children: /* @__PURE__ */ U(Oc, {})
+					children: /* @__PURE__ */ U(Bc, {})
 				})
 			] })]
 		}),
-		/* @__PURE__ */ W(bc, {
+		/* @__PURE__ */ W(Mc, {
 			ref: f,
-			children: [/* @__PURE__ */ W(xc, {
+			children: [/* @__PURE__ */ W(Nc, {
 				ref: p,
 				children: [
-					/* @__PURE__ */ W(Cc, { children: [/* @__PURE__ */ U(wc, { children: "24h Volume" }), /* @__PURE__ */ U(Tc, { children: i })] }),
-					/* @__PURE__ */ W(Cc, {
+					/* @__PURE__ */ W(Fc, { children: [/* @__PURE__ */ U(Ic, { children: "24h Volume" }), /* @__PURE__ */ U(Lc, { children: i })] }),
+					/* @__PURE__ */ W(Fc, {
 						$hideOnLaptop: !0,
-						children: [/* @__PURE__ */ U(wc, { children: "Open Interest" }), /* @__PURE__ */ U(Tc, { children: a })]
+						children: [/* @__PURE__ */ U(Ic, { children: "Open Interest" }), /* @__PURE__ */ U(Lc, { children: a })]
 					}),
-					/* @__PURE__ */ W(Cc, {
+					/* @__PURE__ */ W(Fc, {
 						$hideOnLaptop: !0,
-						children: [/* @__PURE__ */ U(wc, { children: "Funding Rate" }), /* @__PURE__ */ U(Tc, { children: o })]
+						children: [/* @__PURE__ */ U(Ic, { children: "Funding Rate" }), /* @__PURE__ */ U(Lc, { children: o })]
 					}),
-					/* @__PURE__ */ W(Cc, {
+					/* @__PURE__ */ W(Fc, {
 						$hideOnLaptop: !0,
-						children: [/* @__PURE__ */ U(wc, { children: "Next Funding" }), /* @__PURE__ */ U(Tc, { children: s })]
+						children: [/* @__PURE__ */ U(Ic, { children: "Next Funding" }), /* @__PURE__ */ U(Lc, { children: s })]
 					})
 				]
-			}), /* @__PURE__ */ U(Sc, {
+			}), /* @__PURE__ */ U(Pc, {
 				$visible: m,
 				"aria-hidden": !0,
 				children: /* @__PURE__ */ U("svg", {
@@ -7449,12 +7783,12 @@ var uc = B.div`
 				})
 			})]
 		}),
-		/* @__PURE__ */ U(Gc, {
+		/* @__PURE__ */ U(rl, {
 			isOpen: g,
 			onClose: () => _(!1)
 		})
 	] });
-}, qc = B(G)`
+}, al = B(K)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -7475,11 +7809,11 @@ var uc = B.div`
     flex-direction: column;
     gap: 12px;
   }
-`, Jc = B.div`
+`, ol = B.div`
   display: inline-flex;
   align-items: center;
   gap: 24px;
-`, Yc = B.button`
+`, sl = B.button`
   border: 0;
   background: transparent;
   font-family: inherit;
@@ -7488,21 +7822,21 @@ var uc = B.div`
   font-weight: ${({ $active: e }) => e ? 700 : 400};
   color: ${({ $active: e, theme: t }) => e ? t.colors.primary : t.colors.textSubtle};
   cursor: pointer;
-`, Xc = B.div`
+`, cl = B.div`
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
-`, Zc = B.div`
+`, ll = B.div`
   flex: 1;
   position: relative;
   display: grid;
   grid-template-columns: 1fr 40px;
   gap: 8px;
-`, Qc = B.div`
+`, ul = B.div`
   position: relative;
   overflow: visible;
-`, $c = B.div`
+`, dl = B.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -7511,13 +7845,13 @@ var uc = B.div`
   text-align: left;
   padding-top: 6px;
   padding-bottom: 24px;
-`, el = B.div`
+`, fl = B.div`
   display: flex;
   justify-content: space-between;
   font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   padding-top: 8px;
-`, tl = B.span`
+`, pl = B.span`
   position: absolute;
   display: inline-flex;
   align-items: center;
@@ -7529,26 +7863,26 @@ var uc = B.div`
   font-family: 'Kanit', sans-serif;
   font-weight: 600;
   pointer-events: none;
-`, nl = 1e3, rl = 360, il = 20, al = 70;
-function ol(e) {
+`, ml = 1e3, hl = 360, gl = 20, _l = 70;
+function vl(e) {
 	if (e.length < 2) return null;
-	let t = Math.min(...e.map((e) => e.price)), n = Math.max(...e.map((e) => e.price)) - t || 1, r = e.map((t, n) => n / (e.length - 1) * nl), i = e.map((e) => il + (1 - (e.price - t) / n) * (rl - il - al)), a = `M ${r[0].toFixed(2)} ${i[0].toFixed(2)}`;
+	let t = Math.min(...e.map((e) => e.price)), n = Math.max(...e.map((e) => e.price)) - t || 1, r = e.map((t, n) => n / (e.length - 1) * ml), i = e.map((e) => gl + (1 - (e.price - t) / n) * (hl - gl - _l)), a = `M ${r[0].toFixed(2)} ${i[0].toFixed(2)}`;
 	for (let e = 0; e < r.length - 1; e++) {
 		let t = r[e - 1] ?? r[e], n = i[e - 1] ?? i[e], o = r[e], s = i[e], c = r[e + 1], l = i[e + 1], u = r[e + 2] ?? r[e + 1], d = i[e + 2] ?? i[e + 1], f = o + (c - t) / 6, p = s + (l - n) / 6, m = c - (u - o) / 6, h = l - (d - s) / 6;
 		a += ` C ${f.toFixed(2)} ${p.toFixed(2)}, ${m.toFixed(2)} ${h.toFixed(2)}, ${c.toFixed(2)} ${l.toFixed(2)}`;
 	}
-	let o = `${a} L ${nl} ${rl} L 0 ${rl} Z`, s = i[i.length - 1];
+	let o = `${a} L ${ml} ${hl} L 0 ${hl} Z`, s = i[i.length - 1];
 	return {
 		line: a,
 		area: o,
 		endY: s
 	};
 }
-var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n", cl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n  L 1000 360\n  L 0 360\n  Z\n", ll = 200, ul = ({ timeframe: e, timeframes: t, onTimeframeChange: n, points: r, currentPriceLabel: i, yTicks: a, xTicks: o }) => {
-	let s = V(), c = `simple-chart-fill-${N().replace(/:/g, "")}`, l = s?.colors?.primary ?? "#1FC7D4", u = F(() => ol(r), [r]), d = u?.line ?? sl, f = u?.area ?? cl, p = u?.endY ?? ll;
-	return /* @__PURE__ */ W(qc, { children: [/* @__PURE__ */ U(Jc, {
+var yl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n", bl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 145\n  C 420 120, 470 110, 510 130\n  C 560 150, 590 195, 660 230\n  C 720 260, 770 280, 830 250\n  C 880 230, 920 195, 960 200\n  L 1000 200\n  L 1000 360\n  L 0 360\n  Z\n", xl = 200, Sl = ({ timeframe: e, timeframes: t, onTimeframeChange: n, points: r, currentPriceLabel: i, yTicks: a, xTicks: o }) => {
+	let s = V(), c = `simple-chart-fill-${N().replace(/:/g, "")}`, l = s?.colors?.primary ?? "#1FC7D4", u = F(() => vl(r), [r]), d = u?.line ?? yl, f = u?.area ?? bl, p = u?.endY ?? xl;
+	return /* @__PURE__ */ W(al, { children: [/* @__PURE__ */ U(ol, {
 		role: "tablist",
-		children: t.map((t) => /* @__PURE__ */ U(Yc, {
+		children: t.map((t) => /* @__PURE__ */ U(sl, {
 			type: "button",
 			role: "tab",
 			"aria-selected": e === t,
@@ -7556,8 +7890,8 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			onClick: () => n(t),
 			children: t
 		}, t))
-	}), /* @__PURE__ */ W(Xc, { children: [/* @__PURE__ */ W(Zc, { children: [/* @__PURE__ */ W(Qc, { children: [/* @__PURE__ */ W("svg", {
-		viewBox: `0 0 ${nl} ${rl}`,
+	}), /* @__PURE__ */ W(cl, { children: [/* @__PURE__ */ W(ll, { children: [/* @__PURE__ */ W(ul, { children: [/* @__PURE__ */ W("svg", {
+		viewBox: `0 0 ${ml} ${hl}`,
 		preserveAspectRatio: "none",
 		style: {
 			width: "100%",
@@ -7595,7 +7929,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ U("line", {
 				x1: "0",
 				y1: p,
-				x2: nl - 10,
+				x2: ml - 10,
 				y2: p,
 				stroke: l,
 				strokeWidth: "1",
@@ -7603,20 +7937,20 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				opacity: "0.7"
 			})
 		]
-	}), /* @__PURE__ */ U(tl, {
+	}), /* @__PURE__ */ U(pl, {
 		style: {
 			right: -8,
-			top: `calc(${p}/${rl} * 100% - 14px)`
+			top: `calc(${p}/${hl} * 100% - 14px)`
 		},
 		children: i
-	})] }), /* @__PURE__ */ U($c, {
+	})] }), /* @__PURE__ */ U(dl, {
 		"aria-hidden": !0,
 		children: a.map((e, t) => /* @__PURE__ */ U("span", { children: e }, `${e}-${t}`))
-	})] }), /* @__PURE__ */ U(el, {
+	})] }), /* @__PURE__ */ U(fl, {
 		"aria-hidden": !0,
 		children: o.map((e, t) => /* @__PURE__ */ U("span", { children: e }, `${e}-${t}`))
 	})] })] });
-}, dl = B(G)`
+}, Cl = B(K)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -7629,7 +7963,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     background: transparent;
     padding: 0;
   }
-`, fl = B.div`
+`, wl = B.div`
   display: flex;
   align-items: center;
   gap: 4px;
@@ -7637,7 +7971,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   padding: 0;
   border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   align-self: stretch;
-`, pl = B.button`
+`, Tl = B.button`
   display: flex;
   padding: ${({ $active: e }) => e ? "12px 12px 12px 16px" : "12px 12px"};
   justify-content: center;
@@ -7654,7 +7988,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-weight: ${({ $active: e }) => e ? 600 : 400};
   color: ${({ $active: e, theme: t }) => e ? t.colors.secondary : t.colors.textSubtle};
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, ml = B.div`
+`, El = B.div`
   display: grid;
   grid-template-columns: 180px 1fr 1fr 1fr 1fr 1fr 1fr 56px;
   align-items: center;
@@ -7666,7 +8000,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   @media (max-width: 967.98px) {
     display: none;
   }
-`, hl = B.div`
+`, Dl = B.div`
   display: none;
 
   @media (max-width: 967.98px) {
@@ -7675,7 +8009,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     gap: 12px;
     padding: 16px;
   }
-`, gl = B.div`
+`, Ol = B.div`
   display: flex;
   flex-direction: column;
   align-self: stretch;
@@ -7687,11 +8021,11 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.cardSecondary};
   gap: 16px;
-`, _l = B.div`
+`, kl = B.div`
   display: flex;
   align-items: center;
   align-self: stretch;
-`, vl = B.span`
+`, Al = B.span`
   display: inline-flex;
   width: 40px;
   height: 40px;
@@ -7704,11 +8038,11 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-size: 14px;
   flex-shrink: 0;
   margin-right: 12px;
-`, yl = B.div`
+`, jl = B.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-`, bl = B.span`
+`, Ml = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -7716,7 +8050,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-`, xl = B.span`
+`, Nl = B.span`
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -7732,7 +8066,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   html.dark & {
     color: ${({ $direction: e }) => e === "up" ? "#3DDBB5" : "#ED4B9E"};
   }
-`, Sl = B.span`
+`, Pl = B.span`
   color: ${({ $sign: e, theme: t }) => e === "positive" ? "#129E7D" : e === "negative" ? "#ED4B9E" : t.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -7746,22 +8080,22 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   html.dark & {
     color: ${({ $sign: e, theme: t }) => e === "positive" ? "#3DDBB5" : e === "negative" ? "#ED4B9E" : t.colors.text};
   }
-`, Cl = B.span`
+`, Fl = B.span`
   display: block;
   height: 1px;
   align-self: stretch;
   background: ${({ theme: e }) => e.colors.cardBorder};
-`, wl = B.div`
+`, Il = B.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-self: stretch;
-`, Tl = B.div`
+`, Ll = B.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   align-self: stretch;
-`, El = B.span`
+`, Rl = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -7769,7 +8103,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-style: normal;
   font-weight: 400;
   line-height: 150%;
-`, Dl = B.span`
+`, zl = B.span`
   color: ${({ $danger: e, $safe: t, theme: n }) => t ? "#129E7D" : e ? "#ED4B9E" : n.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -7779,22 +8113,22 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-weight: 600;
   line-height: 150%;
   font-variant-numeric: tabular-nums;
-`, Ol = B.div`
+`, Bl = B.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-self: stretch;
-`, kl = B.div`
+`, Vl = B.div`
   height: 12px;
   align-self: stretch;
   border-radius: 999px;
   background: ${({ theme: e }) => e.colors.input};
   overflow: hidden;
-`, Al = B.div`
+`, Hl = B.div`
   height: 100%;
   width: ${({ $pct: e }) => `${Math.max(0, Math.min(100, e))}%`};
   background: ${({ $status: e, theme: t }) => e === "safe" ? t.colors.success : e === "warn" ? t.colors.warning : t.colors.failure};
-`, jl = B.button`
+`, Ul = B.button`
   display: flex;
   height: 48px;
   padding: 12px;
@@ -7813,13 +8147,13 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-weight: 600;
   cursor: pointer;
   &:hover { background: #FFF0F9; }
-`, Ml = B.div`
+`, Wl = B.div`
   display: contents;
 
   @media (min-width: 968px) and (max-width: 1199.98px) {
     display: none;
   }
-`, Nl = B.div`
+`, Gl = B.div`
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr 1fr;
   align-items: center;
@@ -7839,7 +8173,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   align-items: center;
   gap: 4px;
   justify-content: ${({ $align: e }) => e === "right" ? "flex-end" : "flex-start"};
-`, Pl = () => /* @__PURE__ */ W("svg", {
+`, Kl = () => /* @__PURE__ */ W("svg", {
 	width: "14",
 	height: "14",
 	viewBox: "0 0 14 14",
@@ -7852,7 +8186,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 		d: "M5.23333 7.59979C5.01857 7.59979 4.83608 7.52464 4.68588 7.37433C4.53557 7.22412 4.46042 7.04163 4.46042 6.82687V3.84298L3.68808 4.61531C3.54274 4.76075 3.36511 4.83348 3.15521 4.83348C2.94531 4.83348 2.76282 4.76075 2.60775 4.61531C2.45258 4.46568 2.375 4.28456 2.375 4.07193C2.375 3.85931 2.44981 3.67541 2.59944 3.52025L4.68485 1.43483C4.75972 1.36007 4.84488 1.30363 4.94035 1.26552C5.03592 1.2275 5.13358 1.2085 5.23333 1.2085C5.33308 1.2085 5.43074 1.2275 5.52631 1.26552C5.62178 1.30363 5.70695 1.36007 5.78181 1.43483L7.8735 3.53483C8.02312 3.69 8.09692 3.87146 8.09488 4.07922C8.09274 4.28699 8.01408 4.46568 7.85892 4.61531C7.70929 4.76075 7.52924 4.8345 7.31875 4.83654C7.10826 4.83868 6.92821 4.76493 6.77858 4.61531L6.00625 3.84298V6.82687C6.00625 7.04163 5.9311 7.22412 5.78079 7.37433C5.63058 7.52464 5.4481 7.59979 5.23333 7.59979Z",
 		fill: "#BDC2C4"
 	})]
-}), Fl = B.button`
+}), ql = B.button`
   display: flex;
   padding: 1px 2px 3px 2px;
   align-items: flex-start;
@@ -7877,7 +8211,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   line-height: 150%;
   text-align: right;
   font-variant-numeric: tabular-nums;
-`, Il = B.div`
+`, Jl = B.div`
   display: flex;
   align-items: center;
   gap: 12px;
@@ -7894,7 +8228,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
     object-fit: contain;
     display: block;
   }
-`, Ll = B.span`
+`, Yl = B.span`
   display: inline-flex;
   width: 40px;
   height: 40px;
@@ -7905,11 +8239,11 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   color: #fff;
   font-weight: 700;
   font-size: 14px;
-`, Rl = B.div`
+`, Xl = B.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
-`, zl = B.span`
+`, Zl = B.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -7922,7 +8256,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-`, Bl = B.span`
+`, Ql = B.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
@@ -7942,7 +8276,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   html.dark & {
     color: ${({ $direction: e }) => e === "up" ? "#3DDBB5" : "#ED4B9E"};
   }
-`, Vl = B($)`
+`, $l = B($)`
   color: ${({ $sign: e, theme: t }) => e === "positive" ? "#129E7D" : e === "negative" ? "#ED4B9E" : t.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -7956,24 +8290,24 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   html.dark & {
     color: ${({ $sign: e, theme: t }) => e === "positive" ? "#3DDBB5" : e === "negative" ? "#ED4B9E" : t.colors.text};
   }
-`, Hl = B($)`
+`, eu = B($)`
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-`, Ul = B.div`
+`, tu = B.div`
   flex: 1;
   height: 6px;
   border-radius: 999px;
   background: ${({ theme: e }) => e.colors.input};
   overflow: hidden;
   max-width: 94px;
-`, Wl = B.div`
+`, nu = B.div`
   height: 100%;
   width: ${({ $pct: e }) => `${Math.max(0, Math.min(100, e))}%`};
   background: ${({ $status: e, theme: t }) => e === "safe" ? t.colors.success : e === "warn" ? t.colors.warning : t.colors.failure};
   border-radius: 999px;
-`, Gl = B.button`
+`, ru = B.button`
   display: flex;
   width: 32px;
   height: 32px;
@@ -7996,7 +8330,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   html.dark & {
     background: #3E1C39;
   }
-`, Kl = B.div`
+`, iu = B.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -8004,24 +8338,24 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   padding: 16px;
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-size: 14px;
-`, ql = B.span`
+`, au = B.span`
   color: ${({ $side: e, theme: t }) => e === "BUY" ? t.colors.success : t.colors.failure};
   font-weight: 600;
-`, Jl = {
+`, ou = {
 	BNB: "#F0B90B",
 	BTC: "#F7931A",
 	ETH: "#627EEA",
 	USDC: "#2775CA",
 	USDT: "#26A17B",
 	CAKE: "#23CAD5"
-}, Yl = (e) => Jl[e.toUpperCase()] ?? "#7A6EAA", Xl = (e) => e === "up" ? "Up" : "Down", Zl = () => /* @__PURE__ */ U("svg", {
+}, su = (e) => ou[e.toUpperCase()] ?? "#7A6EAA", cu = (e) => e === "up" ? "Up" : "Down", lu = () => /* @__PURE__ */ U("svg", {
 	width: "18",
 	height: "18",
 	viewBox: "0 0 24 24",
 	fill: "currentColor",
 	"aria-hidden": !0,
 	children: /* @__PURE__ */ U("path", { d: "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" })
-}), Ql = () => /* @__PURE__ */ U("svg", {
+}), uu = () => /* @__PURE__ */ U("svg", {
 	width: "16",
 	height: "16",
 	viewBox: "0 0 16 16",
@@ -8031,12 +8365,12 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 		d: "M7.368 8.632V10.6c0 .179.06.329.18.45.121.121.27.182.448.182.179 0 .329-.061.452-.182.123-.121.184-.271.184-.45V8.632h1.968c.179 0 .329-.06.45-.18.121-.121.182-.27.182-.448 0-.178-.061-.329-.182-.452-.121-.123-.271-.184-.45-.184H8.632V5.4c0-.179-.06-.329-.18-.45-.121-.121-.27-.182-.448-.182-.178 0-.329.061-.452.182-.123.121-.184.271-.184.45v1.968H5.4c-.179 0-.329.06-.45.18-.121.12-.182.27-.182.448 0 .178.061.329.182.452.121.123.271.184.45.184h1.968ZM8.005 14.535c-.902 0-1.75-.17-2.544-.51a6.553 6.553 0 0 1-2.083-1.402 6.563 6.563 0 0 1-1.398-2.084 6.535 6.535 0 0 1-.51-2.547c0-.905.17-1.751.51-2.539a6.55 6.55 0 0 1 1.398-2.078 6.544 6.544 0 0 1 2.083-1.398 6.535 6.535 0 0 1 2.547-.51c.905 0 1.752.17 2.54.51a6.55 6.55 0 0 1 2.075 1.398 6.582 6.582 0 0 1 1.4 2.082c.34.79.51 1.637.51 2.539 0 .902-.17 1.75-.51 2.543a6.582 6.582 0 0 1-1.4 2.083 6.55 6.55 0 0 1-2.079 1.402 6.535 6.535 0 0 1-2.539.51Zm-.005-1.383c1.434 0 2.651-.5 3.652-1.5 1-1.001 1.5-2.218 1.5-3.652 0-1.434-.5-2.651-1.5-3.652-1.001-1-2.218-1.5-3.652-1.5-1.434 0-2.651.5-3.652 1.5-1 1.001-1.5 2.218-1.5 3.652 0 1.434.5 2.651 1.5 3.652 1.001 1 2.218 1.5 3.652 1.5Z",
 		fill: "currentColor"
 	})
-}), $l = B($)`
+}), du = B($)`
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
-`, eu = B.button`
+`, fu = B.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -8049,11 +8383,11 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   cursor: pointer;
   border-radius: 6px;
   &:hover { color: ${({ theme: e }) => e.colors.text}; }
-`, tu = ({ tab: e, onTabChange: t, positions: n, openOrders: r, historyEmpty: i = !0, onClosePosition: a, renderTokenIcon: o }) => /* @__PURE__ */ W(dl, { children: [
-	/* @__PURE__ */ W(fl, {
+`, pu = ({ tab: e, onTabChange: t, positions: n, openOrders: r, historyEmpty: i = !0, onClosePosition: a, renderTokenIcon: o }) => /* @__PURE__ */ W(Cl, { children: [
+	/* @__PURE__ */ W(wl, {
 		role: "tablist",
 		children: [
-			/* @__PURE__ */ U(pl, {
+			/* @__PURE__ */ U(Tl, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "positions",
@@ -8061,7 +8395,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				onClick: () => t("positions"),
 				children: "Positions"
 			}),
-			/* @__PURE__ */ U(pl, {
+			/* @__PURE__ */ U(Tl, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "orders",
@@ -8069,7 +8403,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 				onClick: () => t("orders"),
 				children: "Open Orders"
 			}),
-			/* @__PURE__ */ U(pl, {
+			/* @__PURE__ */ U(Tl, {
 				type: "button",
 				role: "tab",
 				"aria-selected": e === "history",
@@ -8079,125 +8413,125 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			})
 		]
 	}),
-	e === "positions" && n.length > 0 && /* @__PURE__ */ U(hl, { children: n.map((e) => /* @__PURE__ */ W(gl, { children: [
-		/* @__PURE__ */ W(_l, { children: [
-			o?.(e) ?? /* @__PURE__ */ U(vl, {
-				$color: e.iconColor ?? Yl(e.symbol),
+	e === "positions" && n.length > 0 && /* @__PURE__ */ U(Dl, { children: n.map((e) => /* @__PURE__ */ W(Ol, { children: [
+		/* @__PURE__ */ W(kl, { children: [
+			o?.(e) ?? /* @__PURE__ */ U(Al, {
+				$color: e.iconColor ?? su(e.symbol),
 				children: e.symbol.slice(0, 1)
 			}),
-			/* @__PURE__ */ W(yl, { children: [/* @__PURE__ */ U(bl, { children: e.symbol }), /* @__PURE__ */ W(xl, {
+			/* @__PURE__ */ W(jl, { children: [/* @__PURE__ */ U(Ml, { children: e.symbol }), /* @__PURE__ */ W(Nl, {
 				$direction: e.direction,
-				children: [Xl(e.direction), e.leverageText ? ` · ${e.leverageText}` : ""]
+				children: [cu(e.direction), e.leverageText ? ` · ${e.leverageText}` : ""]
 			})] }),
-			/* @__PURE__ */ U(Sl, {
+			/* @__PURE__ */ U(Pl, {
 				$sign: e.pnlSign,
 				children: e.unrealizedPnl
 			})
 		] }),
-		/* @__PURE__ */ U(Cl, {}),
-		/* @__PURE__ */ W(wl, { children: [
-			/* @__PURE__ */ W(Tl, { children: [/* @__PURE__ */ U(El, { children: "Entry Price" }), /* @__PURE__ */ U(Dl, { children: e.entryPrice })] }),
-			/* @__PURE__ */ W(Tl, { children: [/* @__PURE__ */ U(El, { children: "Liq Price" }), /* @__PURE__ */ U(Dl, { children: e.liqPrice })] }),
-			/* @__PURE__ */ W(Ol, { children: [/* @__PURE__ */ W(Tl, { children: [/* @__PURE__ */ U(El, { children: "Distance to Liq" }), /* @__PURE__ */ U(Dl, {
+		/* @__PURE__ */ U(Fl, {}),
+		/* @__PURE__ */ W(Il, { children: [
+			/* @__PURE__ */ W(Ll, { children: [/* @__PURE__ */ U(Rl, { children: "Entry Price" }), /* @__PURE__ */ U(zl, { children: e.entryPrice })] }),
+			/* @__PURE__ */ W(Ll, { children: [/* @__PURE__ */ U(Rl, { children: "Liq Price" }), /* @__PURE__ */ U(zl, { children: e.liqPrice })] }),
+			/* @__PURE__ */ W(Bl, { children: [/* @__PURE__ */ W(Ll, { children: [/* @__PURE__ */ U(Rl, { children: "Distance to Liq" }), /* @__PURE__ */ U(zl, {
 				$safe: e.liqStatus === "safe",
 				$danger: e.liqStatus === "danger",
 				children: e.liqStatusLabel
-			})] }), /* @__PURE__ */ U(kl, { children: /* @__PURE__ */ U(Al, {
+			})] }), /* @__PURE__ */ U(Vl, { children: /* @__PURE__ */ U(Hl, {
 				$pct: e.liqDistancePct,
 				$status: e.liqStatus
 			}) })] })
 		] }),
-		/* @__PURE__ */ U(jl, {
+		/* @__PURE__ */ U(Ul, {
 			type: "button",
 			onClick: () => a(e.id),
 			children: "Close"
 		})
 	] }, `tablet-${e.id}`)) }),
-	e === "positions" && (n.length === 0 ? /* @__PURE__ */ U(Kl, { children: "No open positions" }) : /* @__PURE__ */ W(ml, {
+	e === "positions" && (n.length === 0 ? /* @__PURE__ */ U(iu, { children: "No open positions" }) : /* @__PURE__ */ W(El, {
 		role: "table",
 		children: [
 			/* @__PURE__ */ U(Q, { children: "Token" }),
 			/* @__PURE__ */ W(Q, {
 				$align: "right",
-				children: ["Unrealized PnL", /* @__PURE__ */ U(Fl, {
+				children: ["Unrealized PnL", /* @__PURE__ */ U(ql, {
 					type: "button",
 					"aria-label": "Sort by unrealized PnL",
-					children: /* @__PURE__ */ U(Pl, {})
+					children: /* @__PURE__ */ U(Kl, {})
 				})]
 			}),
-			/* @__PURE__ */ W(Ml, { children: [/* @__PURE__ */ W(Q, {
+			/* @__PURE__ */ W(Wl, { children: [/* @__PURE__ */ W(Q, {
 				$align: "right",
-				children: ["Initial Margin", /* @__PURE__ */ U(Fl, {
+				children: ["Initial Margin", /* @__PURE__ */ U(ql, {
 					type: "button",
 					"aria-label": "Sort by initial margin",
-					children: /* @__PURE__ */ U(Pl, {})
+					children: /* @__PURE__ */ U(Kl, {})
 				})]
 			}), /* @__PURE__ */ W(Q, {
 				$align: "right",
-				children: ["Size (USD)", /* @__PURE__ */ U(Fl, {
+				children: ["Size (USD)", /* @__PURE__ */ U(ql, {
 					type: "button",
 					"aria-label": "Sort by size",
-					children: /* @__PURE__ */ U(Pl, {})
+					children: /* @__PURE__ */ U(Kl, {})
 				})]
 			})] }),
 			/* @__PURE__ */ W(Q, {
 				$align: "right",
-				children: ["Entry Price", /* @__PURE__ */ U(Fl, {
+				children: ["Entry Price", /* @__PURE__ */ U(ql, {
 					type: "button",
 					"aria-label": "Sort by entry price",
-					children: /* @__PURE__ */ U(Pl, {})
+					children: /* @__PURE__ */ U(Kl, {})
 				})]
 			}),
 			/* @__PURE__ */ W(Q, {
 				$align: "right",
-				children: ["Liq. Price", /* @__PURE__ */ U(Fl, {
+				children: ["Liq. Price", /* @__PURE__ */ U(ql, {
 					type: "button",
 					"aria-label": "Sort by liq. price",
-					children: /* @__PURE__ */ U(Pl, {})
+					children: /* @__PURE__ */ U(Kl, {})
 				})]
 			}),
-			/* @__PURE__ */ U(Ml, { children: /* @__PURE__ */ W(Q, {
+			/* @__PURE__ */ U(Wl, { children: /* @__PURE__ */ W(Q, {
 				$align: "right",
-				children: ["Distance to Liq", /* @__PURE__ */ U(Fl, {
+				children: ["Distance to Liq", /* @__PURE__ */ U(ql, {
 					type: "button",
 					"aria-label": "Sort by distance to liq",
-					children: /* @__PURE__ */ U(Pl, {})
+					children: /* @__PURE__ */ U(Kl, {})
 				})]
 			}) }),
 			/* @__PURE__ */ U(Q, {}),
 			n.map((e) => /* @__PURE__ */ W(O.Fragment, { children: [
-				/* @__PURE__ */ W(Il, { children: [o?.(e) ?? /* @__PURE__ */ U(Ll, {
-					$color: e.iconColor ?? Yl(e.symbol),
+				/* @__PURE__ */ W(Jl, { children: [o?.(e) ?? /* @__PURE__ */ U(Yl, {
+					$color: e.iconColor ?? su(e.symbol),
 					children: e.symbol.slice(0, 1)
-				}), /* @__PURE__ */ W(Rl, { children: [/* @__PURE__ */ U(zl, { children: e.symbol }), /* @__PURE__ */ W(Bl, {
+				}), /* @__PURE__ */ W(Xl, { children: [/* @__PURE__ */ U(Zl, { children: e.symbol }), /* @__PURE__ */ W(Ql, {
 					$direction: e.direction,
-					children: [Xl(e.direction), e.leverageText ? ` | ${e.leverageText}` : ""]
+					children: [cu(e.direction), e.leverageText ? ` | ${e.leverageText}` : ""]
 				})] })] }),
-				/* @__PURE__ */ U(Vl, {
+				/* @__PURE__ */ U($l, {
 					$sign: e.pnlSign,
 					children: e.unrealizedPnl
 				}),
-				/* @__PURE__ */ W(Ml, { children: [/* @__PURE__ */ W($l, { children: [e.initialMargin, /* @__PURE__ */ U(eu, {
+				/* @__PURE__ */ W(Wl, { children: [/* @__PURE__ */ W(du, { children: [e.initialMargin, /* @__PURE__ */ U(fu, {
 					type: "button",
 					"aria-label": "Add margin",
-					children: /* @__PURE__ */ U(Ql, {})
+					children: /* @__PURE__ */ U(uu, {})
 				})] }), /* @__PURE__ */ U($, { children: e.sizeUsd })] }),
 				/* @__PURE__ */ U($, { children: e.entryPrice }),
 				/* @__PURE__ */ U($, { children: e.liqPrice }),
-				/* @__PURE__ */ U(Ml, { children: /* @__PURE__ */ W(Hl, { children: [/* @__PURE__ */ U(Ul, { children: /* @__PURE__ */ U(Wl, {
+				/* @__PURE__ */ U(Wl, { children: /* @__PURE__ */ W(eu, { children: [/* @__PURE__ */ U(tu, { children: /* @__PURE__ */ U(nu, {
 					$pct: e.liqDistancePct,
 					$status: e.liqStatus
 				}) }), /* @__PURE__ */ U("span", { children: e.liqStatusLabel })] }) }),
-				/* @__PURE__ */ U(Gl, {
+				/* @__PURE__ */ U(ru, {
 					type: "button",
 					"aria-label": "Close position",
 					onClick: () => a(e.id),
-					children: /* @__PURE__ */ U(Zl, {})
+					children: /* @__PURE__ */ U(lu, {})
 				})
 			] }, e.id))
 		]
 	})),
-	e === "orders" && (r.length === 0 ? /* @__PURE__ */ U(Kl, { children: "No open orders" }) : /* @__PURE__ */ W(Nl, {
+	e === "orders" && (r.length === 0 ? /* @__PURE__ */ U(iu, { children: "No open orders" }) : /* @__PURE__ */ W(Gl, {
 		role: "table",
 		children: [
 			/* @__PURE__ */ U(Q, { children: "Symbol" }),
@@ -8209,7 +8543,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			/* @__PURE__ */ U(Q, { children: "Status" }),
 			r.map((e) => /* @__PURE__ */ W(O.Fragment, { children: [
 				/* @__PURE__ */ U($, { children: e.symbol }),
-				/* @__PURE__ */ U($, { children: /* @__PURE__ */ U(ql, {
+				/* @__PURE__ */ U($, { children: /* @__PURE__ */ U(au, {
 					$side: e.side,
 					children: e.side
 				}) }),
@@ -8221,8 +8555,8 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			] }, e.id))
 		]
 	})),
-	e === "history" && /* @__PURE__ */ U(Kl, { children: "No transaction history" })
-] }), nu = { buckets: {
+	e === "history" && /* @__PURE__ */ U(iu, { children: "No transaction history" })
+] }), mu = { buckets: {
 	spot: {
 		key: "spot",
 		label: "Spot Balance",
@@ -8355,7 +8689,7 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 			}
 		]
 	}
-} }, ru = {
+} }, hu = {
 	overview: "Overview",
 	spotLabel: "Spot",
 	perpLabel: "Perp",
@@ -8374,43 +8708,43 @@ var sl = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 		all: "over your lifetime"
 	},
 	bucketEmptyMessage: (e) => `No assets in ${e.label}`
-}, iu = (e) => `${e < 0 ? "-" : ""}$${Math.abs(e).toLocaleString("en-US", {
+}, gu = (e) => `${e < 0 ? "-" : ""}$${Math.abs(e).toLocaleString("en-US", {
 	minimumFractionDigits: 2,
 	maximumFractionDigits: 2
-})}`, au = (e) => {
+})}`, _u = (e) => {
 	let t = e < 0 ? "-" : "", n = Math.abs(e), r = n % 1 != 0;
 	return `${t}$${n.toLocaleString("en-US", {
 		minimumFractionDigits: r ? 2 : 0,
 		maximumFractionDigits: 2
 	})}`;
-}, ou = (e) => {
+}, vu = (e) => {
 	let [t, n = "00"] = Math.abs(e).toFixed(2).split(".");
 	return {
 		whole: `${e < 0 ? "-" : ""}$${Number(t).toLocaleString("en-US")}`,
 		dec: `.${n}`
 	};
 };
-function su(e, t, n) {
+function yu(e, t, n) {
 	let [r, i] = L(n);
 	return [e === void 0 ? r : e, (n) => {
 		e === void 0 && i(n), t?.(n);
 	}];
 }
-var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
+var bu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
 	width: e,
 	height: e,
 	viewBox: "0 0 12 12",
 	fill: "currentColor",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ U("path", { d: "M6 3l4.5 6h-9z" })
-}), lu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
+}), xu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
 	width: e,
 	height: e,
 	viewBox: "0 0 12 12",
 	fill: "currentColor",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ U("path", { d: "M6 9L1.5 3h9z" })
-}), uu = ({ size: e = 20 }) => /* @__PURE__ */ U("svg", {
+}), Su = ({ size: e = 20 }) => /* @__PURE__ */ U("svg", {
 	width: e,
 	height: e,
 	viewBox: "0 0 20 20",
@@ -8420,14 +8754,14 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
 		d: "M9.75832 12.7417L11.9167 10.5833C12.2417 10.2583 12.2417 9.73332 11.9167 9.40832L9.75832 7.24999C9.23332 6.72499 8.33332 7.09999 8.33332 7.84165V12.1583C8.33332 12.9 9.23332 13.2667 9.75832 12.7417Z",
 		fill: "currentColor"
 	})
-}), du = ({ size: e = 16 }) => /* @__PURE__ */ U("svg", {
+}), Cu = ({ size: e = 16 }) => /* @__PURE__ */ U("svg", {
 	width: e,
 	height: e,
 	viewBox: "0 0 24 24",
 	fill: "currentColor",
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ U("path", { d: "M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" })
-}), fu = ({ size: e = 16 }) => /* @__PURE__ */ U("svg", {
+}), wu = ({ size: e = 16 }) => /* @__PURE__ */ U("svg", {
 	width: e,
 	height: e,
 	viewBox: "0 0 24 24",
@@ -8436,7 +8770,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
 		fill: "#F0B90B",
 		d: "M12 2 7.4 6.6 9 8.2 12 5.2 15 8.2l1.6-1.6L12 2zm-7 7L3.4 10.6 5 12.2 6.6 10.6 5 9zm14 0-1.6 1.6L19 12.2l1.6-1.6L19 9zM7.4 13.4 5.8 15 12 21.2 18.2 15l-1.6-1.6L12 18l-4.6-4.6zm4.6-2L10.4 13 12 14.6 13.6 13 12 11.4z"
 	})
-}), pu = B.span`
+}), Tu = B.span`
   display: flex;
   width: 36px;
   height: 36px;
@@ -8453,18 +8787,18 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-`, mu = () => /* @__PURE__ */ U(pu, {
+`, Eu = () => /* @__PURE__ */ U(Tu, {
 	$variant: "spot",
 	"aria-hidden": !0,
 	children: "💸"
-}), hu = () => /* @__PURE__ */ U(pu, {
+}), Du = () => /* @__PURE__ */ U(Tu, {
 	$variant: "perp",
 	"aria-hidden": !0,
 	children: "🔮"
-}), gu = z`
+}), Ou = z`
   0% { background-position: -200px 0; }
   100% { background-position: 200px 0; }
-`, _u = B.span`
+`, ku = B.span`
   display: inline-block;
   width: ${({ $w: e }) => e ?? "64px"};
   height: ${({ $h: e }) => e ?? "14px"};
@@ -8476,9 +8810,9 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
     ${({ theme: e }) => e.colors.input} 100%
   );
   background-size: 400px 100%;
-  animation: ${gu} 1.4s ease-in-out infinite;
+  animation: ${Ou} 1.4s ease-in-out infinite;
   vertical-align: middle;
-`, vu = B.div`
+`, Au = B.div`
   width: ${({ $w: e }) => e ?? "100%"};
   height: ${({ $h: e }) => e ?? "14px"};
   border-radius: ${({ $br: e }) => e ?? "6px"};
@@ -8489,8 +8823,8 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
     ${({ theme: e }) => e.colors.input} 100%
   );
   background-size: 400px 100%;
-  animation: ${gu} 1.4s ease-in-out infinite;
-`, yu = B(E)`
+  animation: ${Ou} 1.4s ease-in-out infinite;
+`, ju = B(E)`
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -8503,7 +8837,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   font-size: 14px;
   font-weight: 400;
   line-height: 150%;
-`, bu = B.section`
+`, Mu = B.section`
   display: flex;
   width: 400px;
   flex-direction: column;
@@ -8526,11 +8860,11 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
           border-left: 1px solid ${t.colors.cardBorder};
           background: ${t.colors.card};
         `}
-`, xu = B(E)`
+`, Nu = B(E)`
   align-items: center;
   justify-content: space-between;
   width: 100%;
-`, Su = B.button`
+`, Pu = B.button`
   display: inline-flex;
   align-items: center;
   padding: 8px;
@@ -8547,12 +8881,12 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   &:hover {
     filter: brightness(0.98);
   }
-`, Cu = B.span`
+`, Fu = B.span`
   display: inline-flex;
   align-items: center;
   margin-right: -13px;
   padding-right: 13px;
-`, wu = B.span`
+`, Iu = B.span`
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -8566,22 +8900,22 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
     z-index: 2;
     margin-right: -13px;
   ` : "\n    background: #121212;\n    z-index: 1;\n    color: #F0B90B;\n  "}
-`, Tu = B.span`
+`, Lu = B.span`
   display: grid;
   grid-template-columns: 9px 9px;
   grid-template-rows: 9px 9px;
   gap: 1px;
-`, Eu = B.span`
+`, Ru = B.span`
   width: 9px;
   height: 9px;
   border-radius: 3px;
   display: block;
   background: ${({ $color: e }) => e};
-`, Du = B(E)`
+`, zu = B(E)`
   align-items: center;
   gap: 16px;
   width: 100%;
-`, Ou = B.button`
+`, Bu = B.button`
   border: 0;
   background: transparent;
   padding: 4px 0;
@@ -8595,15 +8929,15 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   &:hover {
     color: ${({ $active: e, $muted: t, theme: n }) => t ? n.colors.textDisabled : e ? n.colors.secondary : n.colors.text};
   }
-`, ku = B(E)`
+`, Vu = B(E)`
   flex-direction: column;
   gap: 8px;
   width: 100%;
-`, Au = B(E)`
+`, Hu = B(E)`
   justify-content: space-between;
   align-items: flex-start;
   align-self: stretch;
-`, ju = B.span`
+`, Uu = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -8612,7 +8946,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
-`, Mu = B.div`
+`, Wu = B.div`
   display: flex;
   align-items: flex-start;
   gap: 2px;
@@ -8627,7 +8961,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
     background: #372F47;
     box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
   }
-`, Nu = B.button`
+`, Gu = B.button`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8655,11 +8989,11 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
             min-width: 0;
           ` : ""}
   }
-`, Pu = B(E)`
+`, Ku = B(E)`
   align-items: center;
   gap: 4px;
   width: 100%;
-`, Fu = B.span`
+`, qu = B.span`
   font-family: 'Kanit', sans-serif;
   font-size: 32px;
   font-weight: 600;
@@ -8667,21 +9001,21 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   letter-spacing: -0.32px;
   display: inline-flex;
   align-items: baseline;
-`, Iu = B.span`
+`, Ju = B.span`
   color: ${({ theme: e }) => e.colors.text};
-`, Lu = B.span`
+`, Yu = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Ru = B(E)`
+`, Xu = B(E)`
   align-items: center;
   gap: 4px;
   font-size: 12px;
   line-height: 1.4;
-`, zu = B.span`
+`, Zu = B.span`
   color: ${({ $up: e }) => e ? "var(--pcs-colors-positive60)" : "var(--pcs-colors-failure)"};
   font-weight: 600;
-`, Bu = B.span`
+`, Qu = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Vu = B.span`
+`, $u = B.span`
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -8696,7 +9030,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   & svg {
     color: ${({ $up: e }) => e ? "var(--pcs-colors-positive60)" : "var(--pcs-colors-failure)"};
   }
-`, Hu = B.span`
+`, ed = B.span`
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -8708,7 +9042,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   & svg {
     color: ${({ $up: e }) => e ? "var(--pcs-colors-positive60)" : "var(--pcs-colors-failure)"};
   }
-`, Uu = B.div`
+`, td = B.div`
   display: flex;
   flex-direction: column;
   align-self: stretch;
@@ -8722,7 +9056,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   & > *:not(:last-child) {
     border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   }
-`, Wu = B.div`
+`, nd = B.div`
   align-self: stretch;
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
@@ -8731,7 +9065,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-`, Gu = B.div`
+`, rd = B.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -8741,7 +9075,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   padding: 16px;
   overflow: hidden;
   background: transparent;
-`, Ku = B.div`
+`, id = B.div`
   position: relative;
   display: flex;
   padding: 16px;
@@ -8750,32 +9084,32 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   gap: 16px;
   align-self: stretch;
   background: transparent;
-`, qu = B(E)`
+`, ad = B(E)`
   align-items: center;
   gap: 8px;
   align-self: stretch;
-`, Ju = B.div`
+`, od = B.div`
   width: 40px;
   height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-`, Yu = B(E)`
+`, sd = B(E)`
   flex: 1 0 0;
   min-width: 0;
   flex-direction: column;
   line-height: 1.5;
-`, Xu = B.div`
+`, cd = B.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-`, Zu = B.div`
+`, ld = B.div`
   display: inline-flex;
   align-items: center;
   gap: 7px;
-`, Qu = B.button`
+`, ud = B.button`
   display: flex;
   width: 24px;
   height: 24px;
@@ -8799,11 +9133,11 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
     cursor: default;
     opacity: 0.6;
   }
-`, $u = B(E)`
+`, dd = B(E)`
   align-items: center;
   gap: 8px;
   align-self: stretch;
-`, ed = B.button`
+`, fd = B.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -8817,7 +9151,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   &:hover {
     color: ${({ theme: e }) => e.colors.secondary};
   }
-`, td = B.span`
+`, pd = B.span`
   flex: 1 0 0;
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
@@ -8827,7 +9161,7 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
-`, nd = B.div`
+`, md = B.div`
   display: flex;
   align-items: center;
   align-self: stretch;
@@ -8836,39 +9170,39 @@ var cu = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   border-radius: 999px;
   border: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   background: ${({ theme: e }) => e.colors.input};
-`, rd = B.span`
+`, hd = B.span`
   display: block;
   height: 12px;
   flex: 1 0 0;
   min-width: 1px;
   border-radius: 99px 0 0 99px;
   background: linear-gradient(180deg, #53DEE9 0%, #1FC7D4 100%);
-`, id = B.span`
+`, gd = B.span`
   display: block;
   height: 12px;
   width: 83px;
   background: linear-gradient(180deg, #8051D6 0%, #492286 100%);
-`, ad = B(E)`
+`, _d = B(E)`
   align-items: center;
   gap: 16px;
-`, od = B.span`
+`, vd = B.span`
   display: inline-flex;
   align-items: center;
   gap: 8px;
   font-size: 12px;
   line-height: 1.5;
-`, sd = B.span`
+`, yd = B.span`
   width: 12px;
   height: 12px;
   border-radius: 4px;
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ $kind: e, theme: t }) => e === "spot" ? t.colors.primary : t.colors.secondary};
-`, cd = B.span`
+`, bd = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-weight: 600;
   letter-spacing: 0.12px;
   margin-right: -4px;
-`, ld = B.span`
+`, xd = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-weight: 600;
   letter-spacing: 0.12px;
@@ -8908,7 +9242,7 @@ B.div`
   line-height: 1.5;
   min-width: 0;
 `;
-var ud = B.div`
+var Sd = B.div`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -8916,7 +9250,7 @@ var ud = B.div`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-`, dd = B.div`
+`, Cd = B.div`
   font-size: 12px;
   font-weight: 400;
   color: ${({ theme: e }) => e.colors.textSubtle};
@@ -8932,13 +9266,13 @@ B.div`
   align-items: center;
   gap: 7px;
 `;
-var fd = B.span`
+var wd = B.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
   line-height: 1.5;
   white-space: nowrap;
-`, pd = B.button`
+`, Td = B.button`
   display: flex;
   width: 24px;
   height: 24px;
@@ -8962,7 +9296,7 @@ var fd = B.span`
     cursor: default;
     opacity: 0.6;
   }
-`, md = B.span`
+`, Ed = B.span`
   display: flex;
   flex: 1 0 0;
   align-self: stretch;
@@ -8970,23 +9304,23 @@ var fd = B.span`
   align-items: center;
   transition: transform 0.2s ease;
   transform: ${({ $expanded: e }) => e ? "rotate(180deg)" : "none"};
-`, hd = B(E)`
+`, Dd = B(E)`
   align-items: center;
   gap: 8px;
   width: 100%;
-`, gd = B.div`
+`, Od = B.div`
   flex: 1;
   height: 12px;
   border-radius: 999px;
   background: ${({ theme: e }) => e.colors.input};
   border: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
   overflow: hidden;
-`, _d = B.div`
+`, kd = B.div`
   height: 100%;
   border-radius: 99px;
   width: ${({ $pct: e }) => e}%;
   background: ${({ $kind: e, theme: t }) => e === "spot" ? "linear-gradient(180deg, #53DEE9 0%, #1FC7D4 100%)" : t.colors.secondary};
-`, vd = B.span`
+`, Ad = B.span`
   font-size: 12px;
   font-weight: 400;
   color: ${({ theme: e }) => e.colors.textSubtle};
@@ -9000,7 +9334,7 @@ B.div`
   width: 100%;
   background: ${({ theme: e }) => e.colors.cardBorder};
 `;
-var yd = B.p`
+var jd = B.p`
   margin: 0;
   align-self: stretch;
   color: ${({ theme: e }) => e.colors.textSubtle};
@@ -9011,7 +9345,7 @@ var yd = B.p`
   font-weight: 400;
   line-height: 150%;
   letter-spacing: 0.12px;
-`, bd = B.label`
+`, Md = B.label`
   display: flex;
   padding: 8px;
   flex-direction: column;
@@ -9026,35 +9360,35 @@ var yd = B.p`
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.cardSecondary};
   cursor: pointer;
-`, xd = B.div`
+`, Nd = B.div`
   display: flex;
   align-items: center;
   gap: 8px;
-`, Sd = B.span`
+`, Pd = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
   font-weight: 400;
   line-height: 150%;
-`, Cd = B.span`
+`, Fd = B.span`
   display: inline-flex;
   align-items: center;
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, wd = B(E)`
+`, Id = B(E)`
   flex-direction: column;
   align-self: stretch;
-`, Td = B(E)`
+`, Ld = B(E)`
   gap: 8px;
   align-items: center;
   padding: 10px 8px;
   border-radius: 16px;
-`, Ed = B.span`
+`, Rd = B.span`
   position: relative;
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-`, Dd = B.span`
+`, zd = B.span`
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -9068,7 +9402,7 @@ var yd = B.p`
   border: 1px solid rgba(8, 6, 11, 0.1);
   box-sizing: border-box;
   background: ${({ $color: e }) => e};
-`, Od = B.span`
+`, Bd = B.span`
   position: absolute;
   right: -4px;
   bottom: -4px;
@@ -9079,46 +9413,46 @@ var yd = B.p`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-`, kd = B(E)`
+`, Vd = B(E)`
   flex: 1 0 0;
   min-width: 0;
   flex-direction: column;
-`, Ad = B(E)`
+`, Hd = B(E)`
   gap: 4px;
   align-items: baseline;
-`, jd = B.span`
+`, Ud = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 16px;
   font-weight: 600;
   line-height: 150%;
-`, Md = B.span`
+`, Wd = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
   font-weight: 400;
   line-height: 150%;
-`, Nd = B.div`
+`, Gd = B.div`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
   font-weight: 600;
   line-height: 150%;
-`, Pd = B(E)`
+`, Kd = B(E)`
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
-`, Fd = B.span`
+`, qd = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 16px;
   font-weight: 600;
   line-height: 150%;
-`, Id = B.div`
+`, Jd = B.div`
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -9127,24 +9461,24 @@ var yd = B.p`
   font-size: 14px;
   font-weight: 600;
   line-height: 150%;
-`, Ld = B.span`
+`, Yd = B.span`
   color: ${({ $side: e }) => e === "long" ? "var(--pcs-colors-positive60)" : "var(--pcs-colors-failure)"};
-`, Rd = B.span`
+`, Xd = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, zd = B.span`
+`, Zd = B.span`
   color: ${({ theme: e }) => e.colors.textSubtle};
-`, Bd = B.span`
+`, Qd = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 16px;
   font-weight: 600;
   line-height: 150%;
-`, Vd = B(E)`
+`, $d = B(E)`
   flex-direction: column;
   align-self: stretch;
   gap: 8px;
-`, Hd = B.div`
+`, ef = B.div`
   display: flex;
   flex-direction: column;
   align-self: stretch;
@@ -9155,27 +9489,27 @@ var yd = B.p`
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   background: ${({ theme: e }) => e.colors.cardSecondary};
   overflow: hidden;
-`, Ud = B(E)`
+`, tf = B(E)`
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
   align-self: stretch;
-`, Wd = B.div`
+`, nf = B.div`
   height: 1px;
   background: ${({ theme: e }) => e.colors.cardBorder};
   align-self: stretch;
-`, Gd = B.span`
+`, rf = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
   font-weight: 600;
   line-height: 150%;
-`, Kd = B.div`
+`, af = B.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
-`, qd = B.span`
+`, of = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -9183,19 +9517,19 @@ var yd = B.p`
   font-weight: 600;
   line-height: 150%;
   font-variant-numeric: tabular-nums;
-`, Jd = B(E)`
+`, sf = B(E)`
   flex-direction: column;
   align-self: stretch;
   gap: 12px;
   padding: 0 16px 16px;
-  ${bd} {
+  ${Md} {
     margin-top: 4px;
   }
-`, Yd = B(E)`
+`, cf = B(E)`
   align-self: stretch;
   align-items: center;
   gap: 8px;
-`, Xd = B.button`
+`, lf = B.button`
   display: flex;
   padding: 11px 12px 13px 12px;
   justify-content: center;
@@ -9225,7 +9559,7 @@ var yd = B.p`
     cursor: not-allowed;
     opacity: 0.5;
   }
-`, Zd = B.button`
+`, uf = B.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -9244,19 +9578,19 @@ var yd = B.p`
     filter: brightness(1.15);
   }
 `;
-function Qd({ value: e, lg: t }) {
+function df({ value: e, lg: t }) {
 	let n = e >= 0;
-	return /* @__PURE__ */ W(Vu, {
+	return /* @__PURE__ */ W($u, {
 		$up: n,
 		$size: t ? "lg" : "sm",
-		children: [U(n ? cu : lu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(e).toFixed(2), "%"] })]
+		children: [U(n ? bu : xu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(e).toFixed(2), "%"] })]
 	});
 }
-function $d({ value: e, onChange: t, options: n, muted: r }) {
-	return /* @__PURE__ */ U(Mu, {
+function ff({ value: e, onChange: t, options: n, muted: r }) {
+	return /* @__PURE__ */ U(Wu, {
 		role: "tablist",
 		$muted: r,
-		children: n.map((n) => /* @__PURE__ */ U(Nu, {
+		children: n.map((n) => /* @__PURE__ */ U(Gu, {
 			type: "button",
 			role: "tab",
 			"aria-selected": e === n.value,
@@ -9266,57 +9600,57 @@ function $d({ value: e, onChange: t, options: n, muted: r }) {
 		}, n.value))
 	});
 }
-function ef({ symbol: e, color: t }) {
-	return /* @__PURE__ */ U(Dd, {
+function pf({ symbol: e, color: t }) {
+	return /* @__PURE__ */ U(zd, {
 		$color: t,
 		children: e.slice(0, 1)
 	});
 }
-function tf({ p: e, renderTokenIcon: t }) {
+function mf({ p: e, renderTokenIcon: t }) {
 	let n = e.pnlPct >= 0;
-	return /* @__PURE__ */ W(Td, { children: [
-		/* @__PURE__ */ U(Ed, { children: t ? t({
+	return /* @__PURE__ */ W(Ld, { children: [
+		/* @__PURE__ */ U(Rd, { children: t ? t({
 			symbol: e.symbol,
 			color: e.color
-		}) : /* @__PURE__ */ U(ef, {
+		}) : /* @__PURE__ */ U(pf, {
 			symbol: e.symbol,
 			color: e.color
 		}) }),
-		/* @__PURE__ */ W(kd, { children: [/* @__PURE__ */ U(jd, { children: e.symbol }), /* @__PURE__ */ W(Id, { children: [
-			/* @__PURE__ */ U(Ld, {
+		/* @__PURE__ */ W(Vd, { children: [/* @__PURE__ */ U(Ud, { children: e.symbol }), /* @__PURE__ */ W(Jd, { children: [
+			/* @__PURE__ */ U(Yd, {
 				$side: e.side.toLowerCase(),
 				children: e.side
 			}),
-			/* @__PURE__ */ U(Rd, { children: "•" }),
-			/* @__PURE__ */ U(zd, { children: e.leverage })
+			/* @__PURE__ */ U(Xd, { children: "•" }),
+			/* @__PURE__ */ U(Zd, { children: e.leverage })
 		] })] }),
-		/* @__PURE__ */ W(Pd, { children: [/* @__PURE__ */ W(Bd, { children: [e.pnlUsd >= 0 ? "+" : "-", iu(Math.abs(e.pnlUsd))] }), /* @__PURE__ */ W(Vu, {
+		/* @__PURE__ */ W(Kd, { children: [/* @__PURE__ */ W(Qd, { children: [e.pnlUsd >= 0 ? "+" : "-", gu(Math.abs(e.pnlUsd))] }), /* @__PURE__ */ W($u, {
 			$up: n,
 			$size: "md",
-			children: [U(n ? cu : lu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(e.pnlPct).toFixed(1), "%"] })]
+			children: [U(n ? bu : xu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(e.pnlPct).toFixed(1), "%"] })]
 		})] })
 	] });
 }
-function nf({ tk: e, renderTokenIcon: t, showPnl: n = !0 }) {
+function hf({ tk: e, renderTokenIcon: t, showPnl: n = !0 }) {
 	let r = e.pnl >= 0;
-	return /* @__PURE__ */ W(Td, { children: [
-		/* @__PURE__ */ U(Ed, { children: t ? t({
+	return /* @__PURE__ */ W(Ld, { children: [
+		/* @__PURE__ */ U(Rd, { children: t ? t({
 			symbol: e.symbol,
 			color: e.color,
 			network: e.network
-		}) : /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(ef, {
+		}) : /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(pf, {
 			symbol: e.symbol,
 			color: e.color
-		}), /* @__PURE__ */ U(Od, { children: /* @__PURE__ */ U(fu, { size: 11 }) })] }) }),
-		/* @__PURE__ */ W(kd, { children: [/* @__PURE__ */ W(Ad, { children: [/* @__PURE__ */ U(jd, { children: e.symbol }), /* @__PURE__ */ U(Md, { children: e.name })] }), /* @__PURE__ */ U(Nd, { children: e.amount })] }),
-		/* @__PURE__ */ W(Pd, { children: [/* @__PURE__ */ U(Fd, { children: au(e.value) }), n && /* @__PURE__ */ W(Vu, {
+		}), /* @__PURE__ */ U(Bd, { children: /* @__PURE__ */ U(wu, { size: 11 }) })] }) }),
+		/* @__PURE__ */ W(Vd, { children: [/* @__PURE__ */ W(Hd, { children: [/* @__PURE__ */ U(Ud, { children: e.symbol }), /* @__PURE__ */ U(Wd, { children: e.name })] }), /* @__PURE__ */ U(Gd, { children: e.amount })] }),
+		/* @__PURE__ */ W(Kd, { children: [/* @__PURE__ */ U(qd, { children: _u(e.value) }), n && /* @__PURE__ */ W($u, {
 			$up: r,
 			$size: "md",
-			children: [U(r ? cu : lu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(e.pnl).toFixed(1), "%"] })]
+			children: [U(r ? bu : xu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(e.pnl).toFixed(1), "%"] })]
 		})] })
 	] });
 }
-var rf = (e) => [
+var gf = (e) => [
 	{
 		key: "send",
 		label: "Send",
@@ -9333,7 +9667,7 @@ var rf = (e) => [
 		primary: !0,
 		onClick: () => e?.("swap")
 	}
-], af = (e) => [{
+], _f = (e) => [{
 	key: "deposit",
 	label: "Deposit",
 	primary: !0,
@@ -9343,8 +9677,8 @@ var rf = (e) => [
 	label: "Withdraw",
 	onClick: () => e?.("withdraw")
 }];
-function of({ actions: e }) {
-	return /* @__PURE__ */ U(Yd, { children: e.map((e) => /* @__PURE__ */ U(Xd, {
+function vf({ actions: e }) {
+	return /* @__PURE__ */ U(cf, { children: e.map((e) => /* @__PURE__ */ U(lf, {
 		type: "button",
 		$primary: e.primary,
 		disabled: e.disabled,
@@ -9352,44 +9686,44 @@ function of({ actions: e }) {
 		children: e.label
 	}, e.key)) });
 }
-function sf({ bucket: e, timeframe: t, onOpen: n, showPnl: r }) {
+function yf({ bucket: e, timeframe: t, onOpen: n, showPnl: r }) {
 	let i = e.state ?? "data", a = e.pnl?.[t] ?? 0;
-	if (i === "loading") return /* @__PURE__ */ U(Ku, { children: /* @__PURE__ */ W(qu, { children: [
-		/* @__PURE__ */ U(Ju, {
+	if (i === "loading") return /* @__PURE__ */ U(id, { children: /* @__PURE__ */ W(ad, { children: [
+		/* @__PURE__ */ U(od, {
 			"aria-hidden": !0,
-			children: e.key === "spot" ? /* @__PURE__ */ U(mu, {}) : /* @__PURE__ */ U(hu, {})
+			children: e.key === "spot" ? /* @__PURE__ */ U(Eu, {}) : /* @__PURE__ */ U(Du, {})
 		}),
-		/* @__PURE__ */ W(Yu, { children: [/* @__PURE__ */ U(ud, { children: e.label }), /* @__PURE__ */ U(dd, { children: e.sublabel })] }),
-		/* @__PURE__ */ W(Xu, { children: [/* @__PURE__ */ U(Zu, { children: /* @__PURE__ */ U(_u, {
+		/* @__PURE__ */ W(sd, { children: [/* @__PURE__ */ U(Sd, { children: e.label }), /* @__PURE__ */ U(Cd, { children: e.sublabel })] }),
+		/* @__PURE__ */ W(cd, { children: [/* @__PURE__ */ U(ld, { children: /* @__PURE__ */ U(ku, {
 			$w: "72px",
 			$h: "14px"
-		}) }), /* @__PURE__ */ U(Qu, {
+		}) }), /* @__PURE__ */ U(ud, {
 			type: "button",
 			disabled: !0,
 			"aria-label": `Loading ${e.label}`,
-			children: /* @__PURE__ */ U(md, { children: /* @__PURE__ */ U(uu, {}) })
+			children: /* @__PURE__ */ U(Ed, { children: /* @__PURE__ */ U(Su, {}) })
 		})] })
 	] }) });
 	let o = i === "data" ? e.amount ?? 0 : 0;
-	return /* @__PURE__ */ U(Ku, { children: /* @__PURE__ */ W(qu, { children: [
-		/* @__PURE__ */ U(Ju, {
+	return /* @__PURE__ */ U(id, { children: /* @__PURE__ */ W(ad, { children: [
+		/* @__PURE__ */ U(od, {
 			"aria-hidden": !0,
-			children: e.key === "spot" ? /* @__PURE__ */ U(mu, {}) : /* @__PURE__ */ U(hu, {})
+			children: e.key === "spot" ? /* @__PURE__ */ U(Eu, {}) : /* @__PURE__ */ U(Du, {})
 		}),
-		/* @__PURE__ */ W(Yu, { children: [/* @__PURE__ */ U(ud, { children: e.label }), /* @__PURE__ */ U(dd, { children: e.sublabel })] }),
-		/* @__PURE__ */ W(Xu, { children: [/* @__PURE__ */ W(Zu, { children: [/* @__PURE__ */ U(fd, { children: iu(o) }), i === "data" && r && e.pnl && /* @__PURE__ */ W(Hu, {
+		/* @__PURE__ */ W(sd, { children: [/* @__PURE__ */ U(Sd, { children: e.label }), /* @__PURE__ */ U(Cd, { children: e.sublabel })] }),
+		/* @__PURE__ */ W(cd, { children: [/* @__PURE__ */ W(ld, { children: [/* @__PURE__ */ U(wd, { children: gu(o) }), i === "data" && r && e.pnl && /* @__PURE__ */ W(ed, {
 			$up: a >= 0,
-			children: [U(a >= 0 ? cu : lu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(a).toFixed(2), "%"] })]
-		})] }), /* @__PURE__ */ U(Qu, {
+			children: [U(a >= 0 ? bu : xu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(a).toFixed(2), "%"] })]
+		})] }), /* @__PURE__ */ U(ud, {
 			type: "button",
 			"aria-label": `Open ${e.label}`,
 			onClick: n,
-			children: /* @__PURE__ */ U(md, { children: /* @__PURE__ */ U(uu, {}) })
+			children: /* @__PURE__ */ U(Ed, { children: /* @__PURE__ */ U(Su, {}) })
 		})] })
 	] }) });
 }
-function cf({ bucket: e, pct: t, timeframe: n, onTfChange: r, tfOptions: i, onBack: a, hideSmall: o, setHideSmall: s, hideSmallThreshold: c, onSpotAction: u, onPerpAction: d, onBridge: f, showPnl: p, showTimeframe: m, showBridge: h, labels: g, renderTokenIcon: v }) {
-	let [b, x] = L(null), S = e.state ?? "data", w = e.pnl?.[n] ?? 0, T = S === "data" ? e.amount ?? 0 : 0, D = w / 100 * T, O = g.pnlSuffix[n], k = e.tokens && o ? e.tokens.filter((e) => e.value >= c) : e.tokens, A = e.balanceTokens && o ? e.balanceTokens.filter((e) => e.value >= c) : e.balanceTokens, j = e.positions && o ? e.positions.filter((e) => Math.abs(e.pnlUsd) >= c) : e.positions, M = e.key === "spot", N = F(() => e.actions ? e.actions : M ? rf(u) : af(d), [
+function bf({ bucket: e, pct: t, timeframe: n, onTfChange: r, tfOptions: i, onBack: a, hideSmall: o, setHideSmall: s, hideSmallThreshold: c, onSpotAction: u, onPerpAction: d, onBridge: f, showPnl: p, showTimeframe: m, showBridge: h, labels: g, renderTokenIcon: v }) {
+	let [b, x] = L(null), S = e.state ?? "data", w = e.pnl?.[n] ?? 0, T = S === "data" ? e.amount ?? 0 : 0, D = w / 100 * T, O = g.pnlSuffix[n], k = e.tokens && o ? e.tokens.filter((e) => e.value >= c) : e.tokens, A = e.balanceTokens && o ? e.balanceTokens.filter((e) => e.value >= c) : e.balanceTokens, j = e.positions && o ? e.positions.filter((e) => Math.abs(e.pnlUsd) >= c) : e.positions, M = e.key === "spot", N = F(() => e.actions ? e.actions : M ? gf(u) : _f(d), [
 		e.actions,
 		M,
 		u,
@@ -9401,8 +9735,8 @@ function cf({ bucket: e, pct: t, timeframe: n, onTfChange: r, tfOptions: i, onBa
 		unrealizedPnlPct: 0
 	}, I = S === "loading", R = S === "empty";
 	return /* @__PURE__ */ W(H, { children: [
-		/* @__PURE__ */ W($u, { children: [
-			/* @__PURE__ */ U(ed, {
+		/* @__PURE__ */ W(dd, { children: [
+			/* @__PURE__ */ U(fd, {
 				type: "button",
 				onClick: a,
 				"aria-label": "Back",
@@ -9411,58 +9745,58 @@ function cf({ bucket: e, pct: t, timeframe: n, onTfChange: r, tfOptions: i, onBa
 					height: 20
 				})
 			}),
-			/* @__PURE__ */ U(td, { children: e.label }),
-			m && /* @__PURE__ */ U($d, {
+			/* @__PURE__ */ U(pd, { children: e.label }),
+			m && /* @__PURE__ */ U(ff, {
 				value: n,
 				onChange: r,
 				options: i,
 				muted: I || R
 			})
 		] }),
-		/* @__PURE__ */ W(Vd, { children: [
-			/* @__PURE__ */ W(ku, { children: [/* @__PURE__ */ U(Pu, { children: I ? /* @__PURE__ */ U(vu, {
+		/* @__PURE__ */ W($d, { children: [
+			/* @__PURE__ */ W(Vu, { children: [/* @__PURE__ */ U(Ku, { children: I ? /* @__PURE__ */ U(Au, {
 				$w: "160px",
 				$h: "32px",
 				$br: "8px"
-			}) : /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(Fu, { children: [/* @__PURE__ */ U(Iu, { children: iu(T).split(".")[0] }), /* @__PURE__ */ W(Lu, { children: [".", iu(T).split(".")[1] ?? "00"] })] }), p && S === "data" && e.pnl && /* @__PURE__ */ U(Qd, {
+			}) : /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(qu, { children: [/* @__PURE__ */ U(Ju, { children: gu(T).split(".")[0] }), /* @__PURE__ */ W(Yu, { children: [".", gu(T).split(".")[1] ?? "00"] })] }), p && S === "data" && e.pnl && /* @__PURE__ */ U(df, {
 				value: w,
 				lg: !0
-			})] }) }), !I && p && S === "data" && e.pnl && /* @__PURE__ */ U(Ru, { children: M ? /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(zu, {
+			})] }) }), !I && p && S === "data" && e.pnl && /* @__PURE__ */ U(Xu, { children: M ? /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(Zu, {
 				$up: w >= 0,
-				children: [w >= 0 ? "+" : "-", iu(Math.abs(D)).replace("-", "")]
-			}), /* @__PURE__ */ U(Bu, { children: ` ${O}` })] }) : /* @__PURE__ */ U(Bu, { children: e.sublabel }) })] }),
-			/* @__PURE__ */ W(hd, { children: [/* @__PURE__ */ U(gd, { children: /* @__PURE__ */ U(_d, {
+				children: [w >= 0 ? "+" : "-", gu(Math.abs(D)).replace("-", "")]
+			}), /* @__PURE__ */ U(Qu, { children: ` ${O}` })] }) : /* @__PURE__ */ U(Qu, { children: e.sublabel }) })] }),
+			/* @__PURE__ */ W(Dd, { children: [/* @__PURE__ */ U(Od, { children: /* @__PURE__ */ U(kd, {
 				$pct: S === "data" ? t : 0,
 				$kind: e.key
-			}) }), /* @__PURE__ */ W(vd, { children: [(S === "data" ? t : 0).toFixed(0), "%"] })] }),
-			e.description && /* @__PURE__ */ U(yd, { children: e.description })
+			}) }), /* @__PURE__ */ W(Ad, { children: [(S === "data" ? t : 0).toFixed(0), "%"] })] }),
+			e.description && /* @__PURE__ */ U(jd, { children: e.description })
 		] }),
 		I && /* @__PURE__ */ W(E, {
 			flexDirection: "column",
 			alignSelf: "stretch",
 			gap: "12px",
 			children: [
-				/* @__PURE__ */ U(vu, {
+				/* @__PURE__ */ U(Au, {
 					$h: "48px",
 					$br: "16px"
 				}),
-				/* @__PURE__ */ U(vu, {
+				/* @__PURE__ */ U(Au, {
 					$h: "48px",
 					$br: "16px"
 				}),
-				/* @__PURE__ */ U(vu, {
+				/* @__PURE__ */ U(Au, {
 					$h: "48px",
 					$br: "12px"
 				})
 			]
 		}),
-		R && /* @__PURE__ */ U(yu, { children: e.emptyContent ?? g.bucketEmptyMessage({ label: e.label }) }),
+		R && /* @__PURE__ */ U(ju, { children: e.emptyContent ?? g.bucketEmptyMessage({ label: e.label }) }),
 		S === "data" && M && /* @__PURE__ */ W(H, { children: [
-			/* @__PURE__ */ U(bd, { children: /* @__PURE__ */ W(xd, { children: [
-				/* @__PURE__ */ U(Sd, { children: g.hideSmallBalances }),
-				/* @__PURE__ */ U(Cd, {
+			/* @__PURE__ */ U(Md, { children: /* @__PURE__ */ W(Nd, { children: [
+				/* @__PURE__ */ U(Pd, { children: g.hideSmallBalances }),
+				/* @__PURE__ */ U(Fd, {
 					"aria-hidden": !0,
-					children: /* @__PURE__ */ U(du, { size: 16 })
+					children: /* @__PURE__ */ U(Cu, { size: 16 })
 				}),
 				/* @__PURE__ */ U(l, {
 					scale: "sm",
@@ -9470,26 +9804,26 @@ function cf({ bucket: e, pct: t, timeframe: n, onTfChange: r, tfOptions: i, onBa
 					onChange: (e) => s(e.target.checked)
 				})
 			] }) }),
-			/* @__PURE__ */ U(wd, { children: k?.map((e, t) => /* @__PURE__ */ U(nf, {
+			/* @__PURE__ */ U(Id, { children: k?.map((e, t) => /* @__PURE__ */ U(hf, {
 				tk: e,
 				renderTokenIcon: v,
 				showPnl: p
 			}, e.symbol + t)) }),
-			/* @__PURE__ */ U(of, { actions: N })
+			/* @__PURE__ */ U(vf, { actions: N })
 		] }),
-		S === "data" && !M && /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(Hd, { children: [
-			/* @__PURE__ */ W(Ud, { children: [/* @__PURE__ */ U(Gd, { children: "Balance" }), /* @__PURE__ */ W(Kd, { children: [
-				/* @__PURE__ */ U(qd, { children: iu(P.balance) }),
-				p && /* @__PURE__ */ W(Hu, {
+		S === "data" && !M && /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(ef, { children: [
+			/* @__PURE__ */ W(tf, { children: [/* @__PURE__ */ U(rf, { children: "Balance" }), /* @__PURE__ */ W(af, { children: [
+				/* @__PURE__ */ U(of, { children: gu(P.balance) }),
+				p && /* @__PURE__ */ W(ed, {
 					$up: P.balancePnlPct >= 0,
-					children: [P.balancePnlPct >= 0 ? /* @__PURE__ */ U(cu, { size: 12 }) : /* @__PURE__ */ U(lu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(P.balancePnlPct).toFixed(2), "%"] })]
+					children: [P.balancePnlPct >= 0 ? /* @__PURE__ */ U(bu, { size: 12 }) : /* @__PURE__ */ U(xu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(P.balancePnlPct).toFixed(2), "%"] })]
 				}),
-				/* @__PURE__ */ U(pd, {
+				/* @__PURE__ */ U(Td, {
 					type: "button",
 					"aria-label": b === "balance" ? "Collapse Balance" : "Expand Balance",
 					"aria-expanded": b === "balance",
 					onClick: () => x((e) => e === "balance" ? null : "balance"),
-					children: /* @__PURE__ */ U(md, {
+					children: /* @__PURE__ */ U(Ed, {
 						$expanded: b === "balance",
 						children: /* @__PURE__ */ U(C, {
 							width: 20,
@@ -9498,24 +9832,24 @@ function cf({ bucket: e, pct: t, timeframe: n, onTfChange: r, tfOptions: i, onBa
 					})
 				})
 			] })] }),
-			b === "balance" && /* @__PURE__ */ W(Jd, { children: [/* @__PURE__ */ U(Wd, {}), /* @__PURE__ */ U(wd, { children: (A || []).map((e, t) => /* @__PURE__ */ U(nf, {
+			b === "balance" && /* @__PURE__ */ W(sf, { children: [/* @__PURE__ */ U(nf, {}), /* @__PURE__ */ U(Id, { children: (A || []).map((e, t) => /* @__PURE__ */ U(hf, {
 				tk: e,
 				renderTokenIcon: v,
 				showPnl: p
 			}, e.symbol + t)) })] }),
-			/* @__PURE__ */ U(Wd, {}),
-			/* @__PURE__ */ W(Ud, { children: [/* @__PURE__ */ U(Gd, { children: "Unrealized PnL" }), /* @__PURE__ */ W(Kd, { children: [
-				/* @__PURE__ */ U(qd, { children: P.unrealizedPnl.toFixed(2) }),
-				p && /* @__PURE__ */ W(Hu, {
+			/* @__PURE__ */ U(nf, {}),
+			/* @__PURE__ */ W(tf, { children: [/* @__PURE__ */ U(rf, { children: "Unrealized PnL" }), /* @__PURE__ */ W(af, { children: [
+				/* @__PURE__ */ U(of, { children: P.unrealizedPnl.toFixed(2) }),
+				p && /* @__PURE__ */ W(ed, {
 					$up: P.unrealizedPnlPct >= 0,
-					children: [P.unrealizedPnlPct >= 0 ? /* @__PURE__ */ U(cu, { size: 12 }) : /* @__PURE__ */ U(lu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(P.unrealizedPnlPct).toFixed(2), "%"] })]
+					children: [P.unrealizedPnlPct >= 0 ? /* @__PURE__ */ U(bu, { size: 12 }) : /* @__PURE__ */ U(xu, { size: 12 }), /* @__PURE__ */ W("span", { children: [Math.abs(P.unrealizedPnlPct).toFixed(2), "%"] })]
 				}),
-				/* @__PURE__ */ U(pd, {
+				/* @__PURE__ */ U(Td, {
 					type: "button",
 					"aria-label": b === "pnl" ? "Collapse Unrealized PnL" : "Expand Unrealized PnL",
 					"aria-expanded": b === "pnl",
 					onClick: () => x((e) => e === "pnl" ? null : "pnl"),
-					children: /* @__PURE__ */ U(md, {
+					children: /* @__PURE__ */ U(Ed, {
 						$expanded: b === "pnl",
 						children: /* @__PURE__ */ U(C, {
 							width: 20,
@@ -9524,12 +9858,12 @@ function cf({ bucket: e, pct: t, timeframe: n, onTfChange: r, tfOptions: i, onBa
 					})
 				})
 			] })] }),
-			b === "pnl" && /* @__PURE__ */ W(Jd, { children: [/* @__PURE__ */ U(Wd, {}), /* @__PURE__ */ U(wd, { children: (j || []).map((e, t) => /* @__PURE__ */ U(tf, {
+			b === "pnl" && /* @__PURE__ */ W(sf, { children: [/* @__PURE__ */ U(nf, {}), /* @__PURE__ */ U(Id, { children: (j || []).map((e, t) => /* @__PURE__ */ U(mf, {
 				p: e,
 				renderTokenIcon: v
 			}, e.symbol + t)) })] })
-		] }), /* @__PURE__ */ U(of, { actions: N })] }),
-		h && /* @__PURE__ */ W(Zd, {
+		] }), /* @__PURE__ */ U(vf, { actions: N })] }),
+		h && /* @__PURE__ */ W(uf, {
 			type: "button",
 			onClick: f,
 			children: [g.bridgeCrypto, /* @__PURE__ */ U(y, {
@@ -9539,58 +9873,58 @@ function cf({ bucket: e, pct: t, timeframe: n, onTfChange: r, tfOptions: i, onBa
 		})
 	] });
 }
-function lf() {
-	return /* @__PURE__ */ W(Su, {
+function xf() {
+	return /* @__PURE__ */ W(Pu, {
 		type: "button",
 		"aria-label": "Wallet — all chains",
-		children: [/* @__PURE__ */ W(Cu, { children: [/* @__PURE__ */ U(wu, {
+		children: [/* @__PURE__ */ W(Fu, { children: [/* @__PURE__ */ U(Iu, {
 			$variant: "light",
-			children: /* @__PURE__ */ W(Tu, { children: [
-				/* @__PURE__ */ U(Eu, { $color: "#F0B90B" }),
-				/* @__PURE__ */ U(Eu, { $color: "#627EEA" }),
-				/* @__PURE__ */ U(Eu, { $color: "#46557A" }),
-				/* @__PURE__ */ U(Eu, { $color: "#0052FF" })
+			children: /* @__PURE__ */ W(Lu, { children: [
+				/* @__PURE__ */ U(Ru, { $color: "#F0B90B" }),
+				/* @__PURE__ */ U(Ru, { $color: "#627EEA" }),
+				/* @__PURE__ */ U(Ru, { $color: "#46557A" }),
+				/* @__PURE__ */ U(Ru, { $color: "#0052FF" })
 			] })
-		}), /* @__PURE__ */ U(wu, {
+		}), /* @__PURE__ */ U(Iu, {
 			$variant: "dark",
-			children: /* @__PURE__ */ U(fu, {})
+			children: /* @__PURE__ */ U(wu, {})
 		})] }), /* @__PURE__ */ U(s, {
 			width: 20,
 			height: 20
 		})]
 	});
 }
-function uf() {
-	return /* @__PURE__ */ W(Su, {
+function Sf() {
+	return /* @__PURE__ */ W(Pu, {
 		type: "button",
 		"aria-label": "Select chain",
-		children: [/* @__PURE__ */ U(wu, {
+		children: [/* @__PURE__ */ U(Iu, {
 			$variant: "dark",
-			children: /* @__PURE__ */ U(fu, {})
+			children: /* @__PURE__ */ U(wu, {})
 		}), /* @__PURE__ */ U(s, {
 			width: 20,
 			height: 20
 		})]
 	});
 }
-function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r = "assets", initialTimeframe: i = "24h", initialExpanded: a = null, tab: o, onTabChange: s, timeframe: c, onTimeframeChange: l, expanded: u, onExpandedChange: d, hideSmall: f, onHideSmallChange: p, hideSmallThreshold: m = 1, walletChip: h, chainChip: g, hideHeader: _ = !1, embedded: v = !1, visibleTabs: b = [
+function Cf({ data: e = mu, variant: t = "data", emptyContent: n, initialTab: r = "assets", initialTimeframe: i = "24h", initialExpanded: a = null, tab: o, onTabChange: s, timeframe: c, onTimeframeChange: l, expanded: u, onExpandedChange: d, hideSmall: f, onHideSmallChange: p, hideSmallThreshold: m = 1, walletChip: h, chainChip: g, hideHeader: _ = !1, embedded: v = !1, visibleTabs: b = [
 	"assets",
 	"tx",
 	"gift"
 ], tabContent: x, heroTitle: S, showTimeframe: C = !0, showPnl: w = !0, showBridge: T = !1, renderTokenIcon: D, labels: O, onBridge: k, onSpotAction: A, onPerpAction: j }) {
-	let [M, N] = su(o, s, r), [P, I] = su(c, l, i), [L, R] = su(u, d, a), [z, B] = su(f, p, !1), V = F(() => ({
-		...ru,
+	let [M, N] = yu(o, s, r), [P, I] = yu(c, l, i), [L, R] = yu(u, d, a), [z, B] = yu(f, p, !1), V = F(() => ({
+		...hu,
 		...O,
 		tabs: {
-			...ru.tabs,
+			...hu.tabs,
 			...O?.tabs
 		},
 		pnlSuffix: {
-			...ru.pnlSuffix,
+			...hu.pnlSuffix,
 			...O?.pnlSuffix
 		},
-		bucketEmptyMessage: O?.bucketEmptyMessage ?? ru.bucketEmptyMessage
-	}), [O]), ee = S ?? O?.heroTitle ?? "My Wallet", G = F(() => {
+		bucketEmptyMessage: O?.bucketEmptyMessage ?? hu.bucketEmptyMessage
+	}), [O]), G = S ?? O?.heroTitle ?? "My Wallet", K = F(() => {
 		let t = e.buckets.spot.state ?? "data", n = e.buckets.perp.state ?? "data", r = t === "data" ? e.buckets.spot.amount ?? 0 : 0, i = n === "data" ? e.buckets.perp.amount ?? 0 : 0, a = r + i, o = a === 0 ? 1 : a;
 		return {
 			spot: r,
@@ -9599,15 +9933,15 @@ function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r 
 			spotPct: r / o * 100,
 			perpPct: i / o * 100
 		};
-	}, [e]), K = F(() => {
-		if (G.total === 0) return 0;
+	}, [e]), q = F(() => {
+		if (K.total === 0) return 0;
 		let t = e.buckets.spot.pnl?.[P] ?? 0, n = e.buckets.perp.pnl?.[P] ?? 0;
-		return (t * G.spot + n * G.perp) / G.total;
+		return (t * K.spot + n * K.perp) / K.total;
 	}, [
 		e,
 		P,
-		G
-	]), te = G.total * (K / 100), q = V.pnlSuffix[P], ne = ou(G.total), re = [
+		K
+	]), ee = K.total * (q / 100), J = V.pnlSuffix[P], te = vu(K.total), ne = [
 		{
 			value: "24h",
 			label: "24H"
@@ -9620,7 +9954,7 @@ function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r 
 			value: "all",
 			label: "All"
 		}
-	], ie = [
+	], re = [
 		{
 			value: "assets",
 			label: V.tabs.assets
@@ -9635,16 +9969,16 @@ function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r 
 		}
 	].filter((e) => b.includes(e.value));
 	if (t === "data" && L !== null && M === "assets" && !x?.assets) {
-		let t = L === "spot" ? e.buckets.spot : e.buckets.perp, n = L === "spot" ? G.spotPct : G.perpPct;
-		return /* @__PURE__ */ U(bu, {
+		let t = L === "spot" ? e.buckets.spot : e.buckets.perp, n = L === "spot" ? K.spotPct : K.perpPct;
+		return /* @__PURE__ */ U(Mu, {
 			"aria-label": "Wallet",
 			$embedded: v,
-			children: /* @__PURE__ */ U(cf, {
+			children: /* @__PURE__ */ U(bf, {
 				bucket: t,
 				pct: n,
 				timeframe: P,
 				onTfChange: I,
-				tfOptions: re,
+				tfOptions: ne,
 				onBack: () => R(null),
 				hideSmall: z,
 				setHideSmall: B,
@@ -9660,9 +9994,9 @@ function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r 
 			})
 		});
 	}
-	let J = () => _ ? null : /* @__PURE__ */ W(xu, { children: [h ?? /* @__PURE__ */ U(lf, {}), g ?? /* @__PURE__ */ U(uf, {})] }), Y = () => ie.length === 0 ? null : /* @__PURE__ */ U(Du, {
+	let Y = () => _ ? null : /* @__PURE__ */ W(Nu, { children: [h ?? /* @__PURE__ */ U(xf, {}), g ?? /* @__PURE__ */ U(Sf, {})] }), ie = () => re.length === 0 ? null : /* @__PURE__ */ U(zu, {
 		role: "tablist",
-		children: ie.map((e) => /* @__PURE__ */ U(Ou, {
+		children: re.map((e) => /* @__PURE__ */ U(Bu, {
 			type: "button",
 			role: "tab",
 			"aria-selected": M === e.value,
@@ -9671,92 +10005,92 @@ function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r 
 			onClick: () => N(e.value),
 			children: e.label
 		}, e.value))
-	}), ae = (e, n) => /* @__PURE__ */ W(ku, { children: [
-		/* @__PURE__ */ W(Au, { children: [/* @__PURE__ */ U(ju, { children: ee }), C && /* @__PURE__ */ U($d, {
+	}), ae = (e, n) => /* @__PURE__ */ W(Vu, { children: [
+		/* @__PURE__ */ W(Hu, { children: [/* @__PURE__ */ U(Uu, { children: G }), C && /* @__PURE__ */ U(ff, {
 			value: P,
 			onChange: I,
-			options: re,
+			options: ne,
 			muted: n
 		})] }),
-		/* @__PURE__ */ U(Pu, { children: n ? /* @__PURE__ */ U(vu, {
+		/* @__PURE__ */ U(Ku, { children: n ? /* @__PURE__ */ U(Au, {
 			$w: "180px",
 			$h: "32px",
 			$br: "8px"
-		}) : /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(Fu, { children: [/* @__PURE__ */ U(Iu, { children: e.whole }), /* @__PURE__ */ U(Lu, { children: e.dec })] }), w && t === "data" && /* @__PURE__ */ U(Qd, {
-			value: K,
+		}) : /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(qu, { children: [/* @__PURE__ */ U(Ju, { children: e.whole }), /* @__PURE__ */ U(Yu, { children: e.dec })] }), w && t === "data" && /* @__PURE__ */ U(df, {
+			value: q,
 			lg: !0
 		})] }) }),
-		!n && w && t === "data" && /* @__PURE__ */ W(Ru, { children: [/* @__PURE__ */ W(zu, {
-			$up: K >= 0,
-			children: [K >= 0 ? "+" : "-", iu(Math.abs(te)).replace("-", "")]
-		}), /* @__PURE__ */ U(Bu, { children: ` ${q}` })] })
+		!n && w && t === "data" && /* @__PURE__ */ W(Xu, { children: [/* @__PURE__ */ W(Zu, {
+			$up: q >= 0,
+			children: [q >= 0 ? "+" : "-", gu(Math.abs(ee)).replace("-", "")]
+		}), /* @__PURE__ */ U(Qu, { children: ` ${J}` })] })
 	] });
 	if (t === "loading") {
-		let t = ou(0);
-		return /* @__PURE__ */ W(bu, {
+		let t = vu(0);
+		return /* @__PURE__ */ W(Mu, {
 			"aria-label": "Wallet",
 			"aria-busy": "true",
 			$embedded: v,
 			children: [
-				J(),
 				Y(),
+				ie(),
 				ae(t, !0),
-				/* @__PURE__ */ W(Uu, { children: [
-					/* @__PURE__ */ W(Gu, { children: [
-						/* @__PURE__ */ U(Wu, { children: V.overview }),
-						/* @__PURE__ */ U(vu, {
+				/* @__PURE__ */ W(td, { children: [
+					/* @__PURE__ */ W(rd, { children: [
+						/* @__PURE__ */ U(nd, { children: V.overview }),
+						/* @__PURE__ */ U(Au, {
 							$h: "12px",
 							$br: "999px"
 						}),
 						/* @__PURE__ */ W(E, {
 							gap: "16px",
-							children: [/* @__PURE__ */ U(_u, {
+							children: [/* @__PURE__ */ U(ku, {
 								$w: "60px",
 								$h: "14px"
-							}), /* @__PURE__ */ U(_u, {
+							}), /* @__PURE__ */ U(ku, {
 								$w: "60px",
 								$h: "14px"
 							})]
 						})
 					] }),
-					/* @__PURE__ */ U(Ku, { children: /* @__PURE__ */ W(qu, { children: [
-						/* @__PURE__ */ U(Ju, {
+					/* @__PURE__ */ U(id, { children: /* @__PURE__ */ W(ad, { children: [
+						/* @__PURE__ */ U(od, {
 							"aria-hidden": !0,
-							children: /* @__PURE__ */ U(mu, {})
+							children: /* @__PURE__ */ U(Eu, {})
 						}),
-						/* @__PURE__ */ W(Yu, { children: [/* @__PURE__ */ U(ud, { children: e.buckets.spot.label }), /* @__PURE__ */ U(dd, { children: e.buckets.spot.sublabel })] }),
-						/* @__PURE__ */ U(Xu, { children: /* @__PURE__ */ U(_u, {
+						/* @__PURE__ */ W(sd, { children: [/* @__PURE__ */ U(Sd, { children: e.buckets.spot.label }), /* @__PURE__ */ U(Cd, { children: e.buckets.spot.sublabel })] }),
+						/* @__PURE__ */ U(cd, { children: /* @__PURE__ */ U(ku, {
 							$w: "72px",
 							$h: "14px"
 						}) })
 					] }) }),
-					/* @__PURE__ */ U(Ku, { children: /* @__PURE__ */ W(qu, { children: [
-						/* @__PURE__ */ U(Ju, {
+					/* @__PURE__ */ U(id, { children: /* @__PURE__ */ W(ad, { children: [
+						/* @__PURE__ */ U(od, {
 							"aria-hidden": !0,
-							children: /* @__PURE__ */ U(hu, {})
+							children: /* @__PURE__ */ U(Du, {})
 						}),
-						/* @__PURE__ */ W(Yu, { children: [/* @__PURE__ */ U(ud, { children: e.buckets.perp.label }), /* @__PURE__ */ U(dd, { children: e.buckets.perp.sublabel })] }),
-						/* @__PURE__ */ U(Xu, { children: /* @__PURE__ */ U(_u, {
+						/* @__PURE__ */ W(sd, { children: [/* @__PURE__ */ U(Sd, { children: e.buckets.perp.label }), /* @__PURE__ */ U(Cd, { children: e.buckets.perp.sublabel })] }),
+						/* @__PURE__ */ U(cd, { children: /* @__PURE__ */ U(ku, {
 							$w: "72px",
 							$h: "14px"
 						}) })
 					] }) })
 				] }),
-				/* @__PURE__ */ W(Yd, { children: [
-					/* @__PURE__ */ U(vu, {
+				/* @__PURE__ */ W(cf, { children: [
+					/* @__PURE__ */ U(Au, {
 						$h: "44px",
 						$br: "12px"
 					}),
-					/* @__PURE__ */ U(vu, {
+					/* @__PURE__ */ U(Au, {
 						$h: "44px",
 						$br: "12px"
 					}),
-					/* @__PURE__ */ U(vu, {
+					/* @__PURE__ */ U(Au, {
 						$h: "44px",
 						$br: "12px"
 					})
 				] }),
-				T && /* @__PURE__ */ W(Zd, {
+				T && /* @__PURE__ */ W(uf, {
 					type: "button",
 					disabled: !0,
 					"aria-disabled": "true",
@@ -9769,16 +10103,16 @@ function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r 
 		});
 	}
 	if (t === "empty") {
-		let e = ou(0);
-		return /* @__PURE__ */ W(bu, {
+		let e = vu(0);
+		return /* @__PURE__ */ W(Mu, {
 			"aria-label": "Wallet",
 			$embedded: v,
 			children: [
-				J(),
 				Y(),
+				ie(),
 				ae(e, !1),
-				/* @__PURE__ */ U(yu, { children: n ?? V.emptyMessage }),
-				T && /* @__PURE__ */ W(Zd, {
+				/* @__PURE__ */ U(ju, { children: n ?? V.emptyMessage }),
+				T && /* @__PURE__ */ W(uf, {
 					type: "button",
 					onClick: k,
 					children: [V.bridgeCrypto, /* @__PURE__ */ U(y, {
@@ -9790,41 +10124,41 @@ function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r 
 		});
 	}
 	let oe = M === "assets" ? x?.assets : x?.[M === "tx" ? "transactions" : "gift"];
-	return /* @__PURE__ */ W(bu, {
+	return /* @__PURE__ */ W(Mu, {
 		"aria-label": "Wallet",
 		$embedded: v,
 		children: [
-			J(),
 			Y(),
-			ae(ne, !1),
-			oe || /* @__PURE__ */ W(Uu, { children: [
-				/* @__PURE__ */ W(Gu, { children: [
-					/* @__PURE__ */ U(Wu, { children: V.overview }),
-					/* @__PURE__ */ W(nd, { children: [/* @__PURE__ */ U(rd, {}), /* @__PURE__ */ U(id, {})] }),
-					/* @__PURE__ */ W(ad, { children: [/* @__PURE__ */ W(od, { children: [
-						/* @__PURE__ */ U(sd, { $kind: "spot" }),
-						/* @__PURE__ */ U(cd, { children: V.spotLabel }),
-						/* @__PURE__ */ W(ld, { children: [G.spotPct.toFixed(0), "%"] })
-					] }), /* @__PURE__ */ W(od, { children: [
-						/* @__PURE__ */ U(sd, { $kind: "perp" }),
-						/* @__PURE__ */ U(cd, { children: V.perpLabel }),
-						/* @__PURE__ */ W(ld, { children: [G.perpPct.toFixed(0), "%"] })
+			ie(),
+			ae(te, !1),
+			oe || /* @__PURE__ */ W(td, { children: [
+				/* @__PURE__ */ W(rd, { children: [
+					/* @__PURE__ */ U(nd, { children: V.overview }),
+					/* @__PURE__ */ W(md, { children: [/* @__PURE__ */ U(hd, {}), /* @__PURE__ */ U(gd, {})] }),
+					/* @__PURE__ */ W(_d, { children: [/* @__PURE__ */ W(vd, { children: [
+						/* @__PURE__ */ U(yd, { $kind: "spot" }),
+						/* @__PURE__ */ U(bd, { children: V.spotLabel }),
+						/* @__PURE__ */ W(xd, { children: [K.spotPct.toFixed(0), "%"] })
+					] }), /* @__PURE__ */ W(vd, { children: [
+						/* @__PURE__ */ U(yd, { $kind: "perp" }),
+						/* @__PURE__ */ U(bd, { children: V.perpLabel }),
+						/* @__PURE__ */ W(xd, { children: [K.perpPct.toFixed(0), "%"] })
 					] })] })
 				] }),
-				/* @__PURE__ */ U(sf, {
+				/* @__PURE__ */ U(yf, {
 					bucket: e.buckets.spot,
 					timeframe: P,
 					onOpen: () => R("spot"),
 					showPnl: w
 				}),
-				/* @__PURE__ */ U(sf, {
+				/* @__PURE__ */ U(yf, {
 					bucket: e.buckets.perp,
 					timeframe: P,
 					onOpen: () => R("perp"),
 					showPnl: w
 				})
 			] }),
-			T && /* @__PURE__ */ W(Zd, {
+			T && /* @__PURE__ */ W(uf, {
 				type: "button",
 				onClick: k,
 				children: [V.bridgeCrypto, /* @__PURE__ */ U(y, {
@@ -9836,6 +10170,6 @@ function df({ data: e = nu, variant: t = "data", emptyContent: n, initialTab: r 
 	});
 }
 //#endregion
-export { he as AccountPanel, Oe as AssetModeButton, Te as AssetModeModal, ia as BookTradesPanel, $i as ChartPanel, Fo as DepositModal, Lo as EnableTradingModal, be as LeverageModal, Ht as MarketsDropdown, wr as OrderBook, yt as OrderConfirmModal, lo as OrderForm, Ve as PerpsErrorMessage, G as PerpsPanel, Gr as PositionsPanel, Le as RecentTrades, ac as SimpleBetPanel, ul as SimpleChartCard, tu as SimplePositionsCard, Kc as SimpleTickerCard, pn as SymbolHeader, Hi as TpSlModal, q as UnderlineTab, ne as UnderlineTabs, df as WalletPanel, ct as WithdrawModal };
+export { he as AccountPanel, Oe as AssetModeButton, Te as AssetModeModal, la as BookTradesPanel, ia as ChartPanel, qo as DepositModal, Yo as EnableTradingModal, be as LeverageModal, Ht as MarketsDropdown, kr as OrderBook, yt as OrderConfirmModal, So as OrderForm, Ve as PerpsErrorMessage, K as PerpsPanel, Xr as PositionsPanel, Le as RecentTrades, _c as SimpleBetPanel, Sl as SimpleChartCard, pu as SimplePositionsCard, il as SimpleTickerCard, vn as SymbolHeader, qi as TpSlModal, J as UnderlineTab, te as UnderlineTabs, Cf as WalletPanel, ct as WithdrawModal };
 
 //# sourceMappingURL=widgets.js.map
