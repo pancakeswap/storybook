@@ -28,6 +28,9 @@ export type { AssetMode, AssetModeModalProps } from './AssetModeModal'
 export { AssetModeButton } from './AssetModeButton'
 export type { AssetModeButtonProps } from './AssetModeButton'
 
+export { MarginModeModal } from './MarginModeModal'
+export type { MarginModeModalProps } from './MarginModeModal'
+
 export { RecentTrades } from './RecentTrades'
 export type { RecentTradeRow, RecentTradesProps } from './RecentTrades'
 
