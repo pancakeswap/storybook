@@ -587,6 +587,21 @@ const InputTight = styled(Input)`
   font-variant-numeric: tabular-nums;
 `
 
+// Wrap the separated-number hook in a tiny component so the hook itself
+// is always at the top of a child render — the parent (`OrderForm`) only
+// mounts these when `draft.tpSlEnabled` is true, but the hook lives
+// inside the child's render so React's per-component hook count stays
+// constant. Inlining the hook directly in conditional JSX trips
+// React error #310 ("Rendered more hooks than during the previous
+// render"). PAN-11810.
+const TpSlNumberInput: React.FC<{
+  rawValue: string
+  onRawChange: (raw: string) => void
+}> = ({ rawValue, onRawChange }) => {
+  const bindings = useSeparatedNumberInput(rawValue, onRawChange)
+  return <InputTight {...bindings} placeholder="0.00" inputMode="decimal" />
+}
+
 const LeverageRow = styled.div`
   padding: 4px 0;
 `
@@ -1552,21 +1567,13 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
                 <Text fontSize="12px" color="textSubtle" mb="4px">
                   {t('Trigger Price')}
                 </Text>
-                <InputTight
-                  {...useSeparatedNumberInput(draft.takeProfitPrice, handleTpPriceChange)}
-                  placeholder="0.00"
-                  inputMode="decimal"
-                />
+                <TpSlNumberInput rawValue={draft.takeProfitPrice} onRawChange={handleTpPriceChange} />
               </Box>
               <Box style={{ flex: 1 }}>
                 <Text fontSize="12px" color="textSubtle" mb="4px">
                   {t('PnL (USDT)')}
                 </Text>
-                <InputTight
-                  {...useSeparatedNumberInput(draft.takeProfitPnl ?? '', handleTpPnlChange)}
-                  placeholder="0.00"
-                  inputMode="decimal"
-                />
+                <TpSlNumberInput rawValue={draft.takeProfitPnl ?? ''} onRawChange={handleTpPnlChange} />
               </Box>
             </TpSlInputs>
           </Box>
@@ -1587,21 +1594,13 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
                 <Text fontSize="12px" color="textSubtle" mb="4px">
                   {t('Trigger Price')}
                 </Text>
-                <InputTight
-                  {...useSeparatedNumberInput(draft.stopLossPrice, handleSlPriceChange)}
-                  placeholder="0.00"
-                  inputMode="decimal"
-                />
+                <TpSlNumberInput rawValue={draft.stopLossPrice} onRawChange={handleSlPriceChange} />
               </Box>
               <Box style={{ flex: 1 }}>
                 <Text fontSize="12px" color="textSubtle" mb="4px">
                   {t('PnL (USDT)')}
                 </Text>
-                <InputTight
-                  {...useSeparatedNumberInput(draft.stopLossPnl ?? '', handleSlPnlChange)}
-                  placeholder="0.00"
-                  inputMode="decimal"
-                />
+                <TpSlNumberInput rawValue={draft.stopLossPnl ?? ''} onRawChange={handleSlPnlChange} />
               </Box>
             </TpSlInputs>
           </Box>
