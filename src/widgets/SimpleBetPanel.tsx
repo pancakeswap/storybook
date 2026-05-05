@@ -93,35 +93,46 @@ export interface SimpleBetPanelProps {
 const DEFAULT_PRESETS = [50, 250, 500, 1001] as const
 const DEFAULT_MAX_LEVERAGE = 1001
 
-type Zone = 'safe' | 'warn' | 'danger'
+type Zone = 'safe' | 'caution' | 'warn' | 'danger'
 
 /**
- * Zones are proportional to max leverage so a symbol capped at 100x still
- * renders meaningful safe/warn/danger boundaries. Original mapping was
- * 50 / 250 / 1001 → ~5% / ~25% / 100% — preserved here as ratios.
+ * Zones now use absolute leverage thresholds (per Figma spec) rather
+ * than ratios of maxLeverage. A 100×-cap symbol just won't reach the
+ * higher tiers — caution still kicks in at 25× regardless.
+ *   0–24x   → safe      (positive green)
+ *   25–99x  → caution   (primary teal)
+ *   100–499 → warn      (warning amber)
+ *   500x+   → danger    (destructive pink)
  */
-const SAFE_RATIO = 50 / 1001
-const WARN_RATIO = 250 / 1001
-const zoneFromLeverage = (lev: number, max: number): Zone => {
-  if (lev <= max * SAFE_RATIO) return 'safe'
-  if (lev <= max * WARN_RATIO) return 'warn'
+const zoneFromLeverage = (lev: number): Zone => {
+  if (lev <= 24) return 'safe'
+  if (lev <= 99) return 'caution'
+  if (lev <= 499) return 'warn'
   return 'danger'
 }
-const DEGEN_RATIO = 500 / 1001
-const isDegen = (lev: number, max: number) => lev > max * DEGEN_RATIO
-const isDouble = (lev: number, max: number) => lev > max * WARN_RATIO
+const isDegen = (lev: number) => lev >= 500
+const isDouble = (lev: number) => lev >= 100
 
 const zoneLabel = (z: Zone) =>
-  z === 'safe' ? 'Safe zone' : z === 'warn' ? 'High leverage' : 'Danger zone'
+  z === 'safe'
+    ? 'Gentle leverage'
+    : z === 'caution'
+      ? 'Amplified risk'
+      : z === 'warn'
+        ? 'High leverage'
+        : 'High-intensity leverage'
 
-const zoneEmoji = (z: Zone) => (z === 'safe' ? '🌿' : z === 'warn' ? '⚡️' : '🔥')
+const zoneEmoji = (z: Zone) =>
+  z === 'safe' ? '🌿' : z === 'caution' ? '❗' : z === 'warn' ? '🔥' : '🔥'
 
 const zoneTooltip = (z: Zone) =>
   z === 'safe'
     ? "A good place to start. You'll feel the market without getting rekt."
-    : z === 'warn'
-      ? 'Liquidation triggers around a 1% move.'
-      : '1% move against you liquidates. Only risk what you can afford to lose.'
+    : z === 'caution'
+      ? 'Moves against you are magnified. Keep an eye on liquidation price.'
+      : z === 'warn'
+        ? 'Liquidation triggers around a 1% move. Set a stop loss.'
+        : '1% move against you liquidates. Only risk what you can afford to lose.'
 
 // Branded UP/DOWN arrows — kept inline because there's no 1:1 primitive.
 const UpArrow: React.FC = () => (
@@ -681,6 +692,7 @@ const LevValue = styled.span`
 
 const ZONE_BG: Record<Zone, string> = {
   safe: '#31D0AA',
+  caution: '#1FC7D4',
   warn: '#FFB237',
   danger: '#ED4B9E',
 }
@@ -1244,9 +1256,9 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   unrealizedPnl,
 }) => {
   const fillPct = Math.min(100, Math.max(0, (leverage / maxLeverage) * 100))
-  const zone = zoneFromLeverage(leverage, maxLeverage)
-  const degen = isDegen(leverage, maxLeverage)
-  const double = isDouble(leverage, maxLeverage)
+  const zone = zoneFromLeverage(leverage)
+  const degen = isDegen(leverage)
+  const double = isDouble(leverage)
   const submitting = isSubmittingUp || isSubmittingDown
   const upDisabled = !canSubmit || submitting
   const downDisabled = !canSubmit || submitting
