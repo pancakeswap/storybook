@@ -6311,7 +6311,23 @@ var Pa = B.div`
 						/* @__PURE__ */ W(os, { children: [/* @__PURE__ */ U(qo, {
 							color: "textSubtle",
 							children: M("Tx hash")
-						}), /* @__PURE__ */ W(r, {
+						}), D.explorerUrl ? /* @__PURE__ */ U("a", {
+							href: D.explorerUrl,
+							target: "_blank",
+							rel: "noopener noreferrer",
+							style: { textDecoration: "underline" },
+							children: /* @__PURE__ */ W(r, {
+								fontSize: "14px",
+								bold: !0,
+								color: "primary",
+								style: { fontVariantNumeric: "tabular-nums" },
+								children: [
+									D.hash.slice(0, 10),
+									"…",
+									D.hash.slice(-8)
+								]
+							})
+						}) : /* @__PURE__ */ W(r, {
 							fontSize: "14px",
 							bold: !0,
 							style: { fontVariantNumeric: "tabular-nums" },
@@ -6377,7 +6393,23 @@ var Pa = B.div`
 						fontSize: "14px",
 						color: "textSubtle",
 						children: M("Tx hash")
-					}), /* @__PURE__ */ W(r, {
+					}), D.explorerUrl ? /* @__PURE__ */ U("a", {
+						href: D.explorerUrl,
+						target: "_blank",
+						rel: "noopener noreferrer",
+						style: { textDecoration: "underline" },
+						children: /* @__PURE__ */ W(r, {
+							fontSize: "14px",
+							bold: !0,
+							color: "primary",
+							style: { fontVariantNumeric: "tabular-nums" },
+							children: [
+								D.hash.slice(0, 10),
+								"…",
+								D.hash.slice(-8)
+							]
+						})
+					}) : /* @__PURE__ */ W(r, {
 						fontSize: "14px",
 						bold: !0,
 						style: { fontVariantNumeric: "tabular-nums" },

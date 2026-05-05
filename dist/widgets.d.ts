@@ -242,6 +242,12 @@ export declare interface DepositReceipt {
     assetSymbol: string;
     /** Pre-truncated source address for the success screen. */
     sourceAddress?: string;
+    /**
+     * Block-explorer URL for the tx. Consumer builds it from chain context
+     * (BSC scan, Solana explorer, etc.). When supplied, the truncated hash
+     * is rendered as a link.
+     */
+    explorerUrl?: string;
 }
 
 export declare type DepositStep = 'select' | 'amount' | 'checking' | 'success' | 'failed';
