@@ -1143,6 +1143,12 @@ export declare interface PositionsPanelProps {
     /** Share-to-social callback for a trade row (optional). */
     onShareTrade?: (trade: TradeHistoryRow) => void;
     /**
+     * Fires when the user clicks the share-arrow icon in a position row's
+     * PNL cell. Consumer typically opens {@link SharePnlModal} with the
+     * position snapshot. Hidden when undefined.
+     */
+    onSharePnl?: (position: PositionRow) => void;
+    /**
      * Hook-like function called inside each position row to get the live
      * mark price for that symbol. MUST obey the rules of hooks (always
      * called at the top of the row component). Consumer typically passes
@@ -1194,9 +1200,18 @@ export declare interface PositionsPanelProps {
      * count rather than `positions.length`.
      */
     positionsCount?: number;
-    /** Mobile filter row — "Hide other symbols" checkbox state. */
+    /**
+     * "Hide other symbols" filter — wired on both desktop (right side of
+     * the tabs row) and mobile (filter strip below the tabs).
+     */
     hideOtherSymbols?: boolean;
     onHideOtherSymbolsChange?: (next: boolean) => void;
+    /**
+     * Desktop-only: invoked when the user clicks "Close All" in the top
+     * tabs row. Consumer is responsible for confirmation + the bulk close.
+     * Hidden when the callback isn't provided.
+     */
+    onCloseAll?: () => void;
     /** Mobile filter row — instrument filter button label (default `All instruments`). */
     instrumentFilterLabel?: string;
     /** Mobile filter row — invoked when the instrument-filter button is clicked. */
@@ -1468,6 +1483,14 @@ export declare interface UnderlineTabsProps {
      * tight groups like the Positions panel's tab row.
      */
     fullWidth?: boolean;
+    /**
+     * Suppress the bottom border on the tabs row. Useful when the parent
+     * wraps the tabs in its own header strip that owns the divider — e.g.
+     * Positions Panel's desktop header where right-side controls share the
+     * same baseline.
+     */
+    noBorder?: boolean;
+    className?: string;
 }
 
 export { WalletData }

@@ -12799,7 +12799,8 @@ var Pg = mg, Fg = gg, Ig = Sg, Lg = wg, Rg = Mg, zg = /* @__PURE__ */ B(((e, t) 
 	t.exports = c;
 })), Wg = () => typeof window < "u" && ("ontouchstart" in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0), Gg = L(Lg)`
   display: flex;
-  width: 200px;
+  width: ${({ $oneLine: e }) => e ? "max-content" : "200px"};
+  max-width: ${({ $oneLine: e }) => e ? "min(360px, calc(100vw - 32px))" : "none"};
   padding: 16px;
   flex-direction: column;
   justify-content: center;
@@ -12818,6 +12819,7 @@ var Pg = mg, Fg = gg, Ig = Sg, Lg = wg, Rg = Mg, zg = /* @__PURE__ */ B(((e, t) 
     0 1px 2px 0 rgba(0, 0, 0, 0.08),
     0 4px 8px 0 rgba(0, 0, 0, 0.16);
   word-wrap: break-word;
+  white-space: ${({ $oneLine: e }) => e ? "nowrap" : "normal"};
 
   html.dark & {
     background: #FFFFFF;
@@ -12825,7 +12827,7 @@ var Pg = mg, Fg = gg, Ig = Sg, Lg = wg, Rg = Mg, zg = /* @__PURE__ */ B(((e, t) 
   }
 
   & > * {
-    align-self: stretch;
+    align-self: ${({ $oneLine: e }) => e ? "auto" : "stretch"};
   }
 `, Kg = L(Rg)`
   fill: #08060B;
@@ -12844,76 +12846,77 @@ var Pg = mg, Fg = gg, Ig = Sg, Lg = wg, Rg = Mg, zg = /* @__PURE__ */ B(((e, t) 
 		align: n ?? "center"
 	};
 }, Yg = (e) => e == null ? 10 : typeof e == "number" ? e : e[1] ?? 10, Xg = (e) => e == null || typeof e == "number" ? 0 : e[0] ?? 0, Zg = (e, t) => {
-	let { placement: n = "auto", trigger: r, tooltipPadding: i = 16, tooltipOffset: a = [0, 10], hideTimeout: o = 100, manualVisible: s = !1, avoidToStopPropagation: c = !1, isInPortal: l = !0 } = t ?? {}, u = r ?? (Wg() ? "click" : "hover"), [d, f] = I(null), [p, m] = I(s), h = F(null);
-	h.current = d, N(() => {
-		m(s);
+	let { placement: n = "auto", trigger: r, tooltipPadding: i = 16, tooltipOffset: a = [0, 10], hideTimeout: o = 100, manualVisible: s = !1, avoidToStopPropagation: c = !1, isInPortal: l = !0, oneLine: u = !1 } = t ?? {}, d = r ?? (Wg() ? "click" : "hover"), [f, p] = I(null), [m, h] = I(s), g = F(null);
+	g.current = f, N(() => {
+		h(s);
 	}, [s]);
-	let g = P(() => (0, qg.default)(() => {
-		m(!1);
+	let _ = P(() => (0, qg.default)(() => {
+		h(!1);
 	}, o), [o]);
-	N(() => () => g.cancel(), [g]);
-	let _ = j((e) => {
+	N(() => () => _.cancel(), [_]);
+	let v = j((e) => {
 		c || (e.stopPropagation(), e.preventDefault());
-	}, [c]), v = j((e) => {
-		m(!0), u === "hover" && g.cancel(), _(e);
+	}, [c]), y = j((e) => {
+		h(!0), d === "hover" && _.cancel(), v(e);
 	}, [
-		u,
-		g,
-		_
-	]), y = j((e) => {
-		s || (_(e), u === "hover" ? g() : m(!1));
+		d,
+		_,
+		v
+	]), b = j((e) => {
+		s || (v(e), d === "hover" ? _() : h(!1));
 	}, [
 		s,
-		u,
-		g,
-		_
-	]), b = j((e) => {
-		_(e), m((e) => !e);
-	}, [_]);
+		d,
+		_,
+		v
+	]), x = j((e) => {
+		v(e), h((e) => !e);
+	}, [v]);
 	N(() => {
-		if (!d || u !== "hover" || s) return;
-		let e = (e) => v(e), t = (e) => y(e);
-		return d.addEventListener("mouseenter", e), d.addEventListener("mouseleave", t), () => {
-			d.removeEventListener("mouseenter", e), d.removeEventListener("mouseleave", t);
+		if (!f || d !== "hover" || s) return;
+		let e = (e) => y(e), t = (e) => b(e);
+		return f.addEventListener("mouseenter", e), f.addEventListener("mouseleave", t), () => {
+			f.removeEventListener("mouseenter", e), f.removeEventListener("mouseleave", t);
 		};
 	}, [
+		f,
 		d,
-		u,
 		s,
-		v,
-		y
-	]), N(() => {
-		if (!d || u !== "click") return;
-		let e = (e) => b(e);
-		return d.addEventListener("click", e), () => d.removeEventListener("click", e);
-	}, [
-		d,
-		u,
+		y,
 		b
 	]), N(() => {
-		if (!d || u !== "focus") return;
-		let e = (e) => v(e), t = (e) => y(e);
-		return d.addEventListener("focus", e), d.addEventListener("blur", t), () => {
-			d.removeEventListener("focus", e), d.removeEventListener("blur", t);
+		if (!f || d !== "click") return;
+		let e = (e) => x(e);
+		return f.addEventListener("click", e), () => f.removeEventListener("click", e);
+	}, [
+		f,
+		d,
+		x
+	]), N(() => {
+		if (!f || d !== "focus") return;
+		let e = (e) => y(e), t = (e) => b(e);
+		return f.addEventListener("focus", e), f.addEventListener("blur", t), () => {
+			f.removeEventListener("focus", e), f.removeEventListener("blur", t);
 		};
 	}, [
+		f,
 		d,
-		u,
-		v,
-		y
+		y,
+		b
 	]);
-	let { side: x, align: S } = Jg(n), C = Yg(a), w = Xg(a), T = typeof i == "number" ? i : {
+	let { side: S, align: C } = Jg(n), w = Yg(a), T = Xg(a), ee = typeof i == "number" ? i : {
 		top: 0,
 		right: 0,
 		bottom: 0,
 		left: 0,
 		...i
-	}, ee = l ? Zu() : null, E = p ? /* @__PURE__ */ z(Gg, {
-		side: x,
-		align: S,
-		sideOffset: C,
-		alignOffset: w,
-		collisionPadding: T,
+	}, E = l ? Zu() : null, te = m ? /* @__PURE__ */ z(Gg, {
+		$oneLine: u,
+		side: S,
+		align: C,
+		sideOffset: w,
+		alignOffset: T,
+		collisionPadding: ee,
 		avoidCollisions: !0,
 		onOpenAutoFocus: (e) => e.preventDefault(),
 		children: [e, /* @__PURE__ */ R(Kg, {
@@ -12922,21 +12925,21 @@ var Pg = mg, Fg = gg, Ig = Sg, Lg = wg, Rg = Mg, zg = /* @__PURE__ */ B(((e, t) 
 		})]
 	}) : null;
 	return {
-		targetRef: f,
+		targetRef: p,
 		tooltip: /* @__PURE__ */ z(Pg, {
-			open: p,
-			onOpenChange: m,
+			open: m,
+			onOpenChange: h,
 			modal: !1,
-			children: [/* @__PURE__ */ R(Fg, { virtualRef: h }), l && ee ? /* @__PURE__ */ R(Ig, {
-				container: ee,
-				children: E
-			}) : E]
+			children: [/* @__PURE__ */ R(Fg, { virtualRef: g }), l && E ? /* @__PURE__ */ R(Ig, {
+				container: E,
+				children: te
+			}) : te]
 		}),
-		tooltipVisible: p,
+		tooltipVisible: m,
 		forceUpdate: null
 	};
 };
 //#endregion
 export { no as $, sa as $i, pr as $n, di as $r, xn as $t, es as A, Ia as Aa, Bi as Ai, Jn as An, Ur as Ar, en as At, Lo as B, Wa as Ba, Ji as Bi, co as Bn, Qr as Br, un as Bt, kc as C, ka as Ca, Ni as Ci, Wn as Cn, Ir as Cr, qt as Ct, gs as D, Na as Da, Ii as Di, Kn as Dn, Br as Dr, Zt as Dt, vs as E, Ma as Ea, Ya as Ei, Gn as En, zr as Er, Xt as Et, Uo as F, Va as Fa, Wi as Fi, $n as Fn, qr as Fr, on as Ft, To as G, Ja as Ga, $i as Gi, ar as Gn, ri as Gr, hn as Gt, No as H, Ga as Ha, _o as Hi, lo as Hn, ti as Hr, dn as Ht, Ho as I, Ha as Ia, Gi as Ii, go as In, Jr as Ir, sn as It, wt as J, qe as Ja, na as Ji, lr as Jn, oi as Jr, gn as Jt, Co as K, pt as Ka, ea as Ki, cr as Kn, ii as Kr, mn as Kt, Bo as L, Ua as La, Ki as Li, er as Ln, Yr as Lr, cn as Lt, Jo as M, za as Ma, Vi as Mi, Zn as Mn, Gr as Mr, nn as Mt, Go as N, Ba as Na, Hi as Ni, Xa as Nn, oo as Nr, rn as Nt, ls as O, Pa as Oa, Li as Oi, qn as On, Vr as Or, Qt as Ot, Wo as P, La as Pa, Ui as Pi, Qn as Pn, Kr as Pr, an as Pt, Tt as Q, ia as Qi, mr as Qn, ui as Qr, bn as Qt, zo as R, fo as Ra, qi as Ri, tr as Rn, Zr as Rr, ao as Rt, Qc as S, Oa as Sa, ji as Si, Un as Sn, Fr as Sr, Gt as St, Dc as T, ja as Ta, Fi as Ti, so as Tn, Rr as Tr, Yt as Tt, ko as U, Ka as Ua, Zi as Ui, ir as Un, $r as Ur, to as Ut, Po as V, So as Va, Xi as Vi, rr as Vn, ei as Vr, fn as Vt, Z as W, qa as Wa, Qi as Wi, or as Wn, ni as Wr, eo as Wt, xo as X, Oe as Xa, aa as Xi, dr as Xn, ci as Xr, vn as Xt, Ct as Y, Ke as Ya, ra as Yi, ur as Yn, si as Yr, _n as Yt, Et as Z, oa as Zi, fr as Zn, li as Zr, yn as Zt, ed as _, wa as _a, Di as _i, po as _n, jr as _r, Ht as _t, xd as a, ma as aa, hi as ai, Dn as an, xr as ar, Mt as at, dl as b, Ea as ba, Ai as bi, Bn as bn, Za as br, Wt as bt, yd as c, ga as ca, vi as ci, On as cn, Cr as cr, Ft as ct, ld as d, ba as da, xi as di, Mn as dn, Tr as dr, Qa as dt, ca as ea, fi as ei, Sn as en, hr as er, Dt as et, sd as f, ya as fa, Si as fi, Nn as fn, Er as fr, zt as ft, od as g, Ca as ga, Ei as gi, Ln as gn, Ar as gr, io as gt, ad as h, mo as ha, Ti as hi, In as hn, kr as hr, Vt as ht, wd as i, fa as ia, mi as ii, En as in, yr as ir, jt as it, Xo as j, Ra as ja, zi as ji, Xn as jn, Wr as jr, tn as jt, as as k, Fa as ka, Ri as ki, Yn as kn, Hr as kr, $t as kt, md as l, _a as la, yi as li, An as ln, yo as lr, It as lt, ud as m, ho as ma, wi as mi, Fn as mn, Or as mr, Bt as mt, Kg as n, ua as na, pi as ni, Cn as nn, gr as nr, kt as nt, bd as o, pa as oa, gi as oi, vo as on, br as or, Nt as ot, cd as p, xa as pa, Ci as pi, Pn as pn, Dr as pr, Rt as pt, Eo as q, Y as qa, ta as qi, sr as qn, ai as qr, pn as qt, Gg as r, da as ra, $a as ri, Tn as rn, vr as rr, At as rt, vd as s, ha as sa, _i as si, kn as sn, Sr as sr, Pt as st, Zg as t, la as ta, bo as ti, wn as tn, _r as tr, Ot as tt, hd as u, va as ua, bi as ui, jn as un, wr as ur, Lt as ut, du as v, Sa as va, ki as vi, Rn as vn, Mr as vr, Ut as vt, Oc as w, Aa as wa, Pi as wi, Hn as wn, Lr as wr, Jt as wt, ol as x, Da as xa, Mi as xi, Vn as xn, Pr as xr, Kt as xt, lu as y, Ta as ya, Oi as yi, zn as yn, Nr as yr, uo as yt, Ro as z, ro as za, Yi as zi, nr as zn, Xr as zr, ln as zt };
 
-//# sourceMappingURL=useTooltip-CEhVD15R.js.map
+//# sourceMappingURL=useTooltip-BrwfEjL8.js.map
