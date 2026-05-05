@@ -4722,6 +4722,9 @@ var Pa = B.div`
   font-style: normal;
   font-weight: 400;
   line-height: 150%;
+  html.dark & {
+    color: #B8ADD2;
+  }
 `, to = B.input`
   flex: 1;
   min-width: 0;
@@ -4735,10 +4738,16 @@ var Pa = B.div`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-  color: #7A6EAA;
+  color: #280D5F;
   font-variant-numeric: tabular-nums;
   &::placeholder {
     color: #7A6EAA;
+  }
+  html.dark & {
+    color: #F4EEFF;
+    &::placeholder {
+      color: #B8ADD2;
+    }
   }
 `, no = B(i).attrs({
 	variant: "text",
