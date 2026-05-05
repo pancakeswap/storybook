@@ -46,6 +46,12 @@ export interface DepositReceipt {
   assetSymbol: string
   /** Pre-truncated source address for the success screen. */
   sourceAddress?: string
+  /**
+   * Block-explorer URL for the tx. Consumer builds it from chain context
+   * (BSC scan, Solana explorer, etc.). When supplied, the truncated hash
+   * is rendered as a link.
+   */
+  explorerUrl?: string
 }
 
 export interface DepositModalProps {
@@ -658,9 +664,27 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                 </SummaryRow>
                 <SummaryRow>
                   <Pretitle color="textSubtle">{t('Tx hash')}</Pretitle>
-                  <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-                    {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
-                  </Text>
+                  {receipt.explorerUrl ? (
+                    <a
+                      href={receipt.explorerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'underline' }}
+                    >
+                      <Text
+                        fontSize="14px"
+                        bold
+                        color="primary"
+                        style={{ fontVariantNumeric: 'tabular-nums' }}
+                      >
+                        {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
+                      </Text>
+                    </a>
+                  ) : (
+                    <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
+                    </Text>
+                  )}
                 </SummaryRow>
                 <SummaryRow>
                   <Pretitle color="textSubtle">{t('Elapsed')}</Pretitle>
@@ -712,9 +736,27 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                   <Text fontSize="14px" color="textSubtle">
                     {t('Tx hash')}
                   </Text>
-                  <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-                    {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
-                  </Text>
+                  {receipt.explorerUrl ? (
+                    <a
+                      href={receipt.explorerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'underline' }}
+                    >
+                      <Text
+                        fontSize="14px"
+                        bold
+                        color="primary"
+                        style={{ fontVariantNumeric: 'tabular-nums' }}
+                      >
+                        {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
+                      </Text>
+                    </a>
+                  ) : (
+                    <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
+                    </Text>
+                  )}
                 </SummaryRow>
               </SummaryCard>
               <Flex style={{ gap: 8 }}>
