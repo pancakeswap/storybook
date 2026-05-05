@@ -46,11 +46,12 @@ export const PerpsPanel = styled(Card)`
  * trading UI.
  */
 
-const UnderlineTabsWrapper = styled.div<{ $fullWidth?: boolean }>`
+const UnderlineTabsWrapper = styled.div<{ $fullWidth?: boolean; $noBorder?: boolean }>`
   display: flex;
   gap: ${({ $fullWidth }) => ($fullWidth ? '0' : '16px')};
   padding: ${({ $fullWidth }) => ($fullWidth ? '0' : '0 12px')};
-  border-bottom: ${({ $fullWidth }) => ($fullWidth ? '0' : '1px solid')};
+  border-bottom: ${({ $fullWidth, $noBorder }) =>
+    $noBorder || $fullWidth ? '0' : '1px solid'};
   border-bottom-color: ${({ theme }) => theme.colors.cardBorder};
 `
 
@@ -104,6 +105,14 @@ export interface UnderlineTabsProps {
    * tight groups like the Positions panel's tab row.
    */
   fullWidth?: boolean
+  /**
+   * Suppress the bottom border on the tabs row. Useful when the parent
+   * wraps the tabs in its own header strip that owns the divider — e.g.
+   * Positions Panel's desktop header where right-side controls share the
+   * same baseline.
+   */
+  noBorder?: boolean
+  className?: string
 }
 
 /**
@@ -116,8 +125,10 @@ export const UnderlineTabs: React.FC<UnderlineTabsProps> = ({
   onItemClick,
   children,
   fullWidth = false,
+  noBorder = false,
+  className,
 }) => (
-  <UnderlineTabsWrapper $fullWidth={fullWidth}>
+  <UnderlineTabsWrapper $fullWidth={fullWidth} $noBorder={noBorder} className={className}>
     {Children.map(children, (child, index) => {
       if (!child || typeof child !== 'object') return child
       return cloneElement(child as ReactElement<UnderlineTabProps>, {

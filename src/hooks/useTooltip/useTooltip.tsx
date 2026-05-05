@@ -46,6 +46,7 @@ const useTooltip = (content: React.ReactNode, options?: TooltipOptions): Tooltip
     manualVisible = false,
     avoidToStopPropagation = false,
     isInPortal = true,
+    oneLine = false,
   } = options ?? {}
 
   // Default trigger: click on touch devices (no hover available), hover
@@ -171,6 +172,7 @@ const useTooltip = (content: React.ReactNode, options?: TooltipOptions): Tooltip
   const portalRoot = isInPortal ? getPortalRoot() : null
   const contentNode = visible ? (
     <StyledTooltipContent
+      $oneLine={oneLine}
       side={side}
       align={align}
       sideOffset={sideOffset}

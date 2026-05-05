@@ -55,6 +55,8 @@ export interface TooltipOptions {
   avoidToStopPropagation?: boolean
   /** Render the tooltip in `document.body` (default true). */
   isInPortal?: boolean
+  /** Hug the content on a single line instead of the default 200px column. */
+  oneLine?: boolean
 }
 
 export interface TooltipRefs {

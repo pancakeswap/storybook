@@ -14,9 +14,10 @@ import { styled } from 'styled-components'
  * on the `html.dark` class set by Storybook's theme toolbar / consumer
  * theme switcher.
  */
-export const StyledTooltipContent = styled(Popover.Content)`
+export const StyledTooltipContent = styled(Popover.Content)<{ $oneLine?: boolean }>`
   display: flex;
-  width: 200px;
+  width: ${({ $oneLine }) => ($oneLine ? 'max-content' : '200px')};
+  max-width: ${({ $oneLine }) => ($oneLine ? 'min(360px, calc(100vw - 32px))' : 'none')};
   padding: 16px;
   flex-direction: column;
   justify-content: center;
@@ -35,6 +36,7 @@ export const StyledTooltipContent = styled(Popover.Content)`
     0 1px 2px 0 rgba(0, 0, 0, 0.08),
     0 4px 8px 0 rgba(0, 0, 0, 0.16);
   word-wrap: break-word;
+  white-space: ${({ $oneLine }) => ($oneLine ? 'nowrap' : 'normal')};
 
   html.dark & {
     background: #FFFFFF;
@@ -42,7 +44,7 @@ export const StyledTooltipContent = styled(Popover.Content)`
   }
 
   & > * {
-    align-self: stretch;
+    align-self: ${({ $oneLine }) => ($oneLine ? 'auto' : 'stretch')};
   }
 `
 

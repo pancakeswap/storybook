@@ -8,6 +8,7 @@ import {
   ArrowForwardIcon,
   ChevronDownIcon,
 } from '../primitives/Icons'
+import { useTooltip } from '../hooks/useTooltip'
 
 /* ── Types ─────────────────────────────────────────────────── */
 
@@ -1066,6 +1067,7 @@ const HideSmallInfo = styled.span`
   display: inline-flex;
   align-items: center;
   color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: help;
 `
 
 const TkList = styled(Flex)`
@@ -1628,6 +1630,15 @@ function BucketDetail({
   const isLoading = state === 'loading'
   const isEmpty = state === 'empty'
 
+  // Hover tooltip on the "hide small balances" info circle. Uses the
+  // shared useTooltip hook so it picks up the global StyledTooltipContent
+  // styling (matches the leverage zone tags tooltip), with `oneLine` so
+  // the bubble hugs the short copy on a single line.
+  const { targetRef: hideSmallTipRef, tooltip: hideSmallTipNode } = useTooltip(
+    'Hides tokens worth less than $0.01',
+    { placement: 'top', oneLine: true },
+  )
+
   return (
     <>
       <DetailHeader>
@@ -1706,9 +1717,15 @@ function BucketDetail({
           <HideSmall>
             <HideSmallInner>
               <HideSmallLabel>{labels.hideSmallBalances}</HideSmallLabel>
-              <HideSmallInfo aria-hidden>
+              <HideSmallInfo
+                ref={hideSmallTipRef}
+                role="img"
+                aria-label="Hide small balances explanation"
+                onClick={(e) => e.preventDefault()}
+              >
                 <InfoCircle size={16} />
               </HideSmallInfo>
+              {hideSmallTipNode}
               <Checkbox
                 scale="sm"
                 checked={hideSmall}

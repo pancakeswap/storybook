@@ -3,9 +3,11 @@ import { createPortal } from 'react-dom'
 import { css, styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
+import { Checkbox } from '../primitives/Checkbox'
 import { Text } from '../primitives/Text'
 import { ChevronDownIcon, CloseIcon, HistoryIcon } from '../primitives/Icons'
 import { useMatchBreakpoints } from '../contexts'
+import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel, UnderlineTab, UnderlineTabs } from './primitives'
 
 export interface PositionRow {
@@ -122,6 +124,12 @@ export interface PositionsPanelProps {
   /** Share-to-social callback for a trade row (optional). */
   onShareTrade?: (trade: TradeHistoryRow) => void
   /**
+   * Fires when the user clicks the share-arrow icon in a position row's
+   * PNL cell. Consumer typically opens {@link SharePnlModal} with the
+   * position snapshot. Hidden when undefined.
+   */
+  onSharePnl?: (position: PositionRow) => void
+  /**
    * Hook-like function called inside each position row to get the live
    * mark price for that symbol. MUST obey the rules of hooks (always
    * called at the top of the row component). Consumer typically passes
@@ -175,9 +183,18 @@ export interface PositionsPanelProps {
    * count rather than `positions.length`.
    */
   positionsCount?: number
-  /** Mobile filter row — "Hide other symbols" checkbox state. */
+  /**
+   * "Hide other symbols" filter — wired on both desktop (right side of
+   * the tabs row) and mobile (filter strip below the tabs).
+   */
   hideOtherSymbols?: boolean
   onHideOtherSymbolsChange?: (next: boolean) => void
+  /**
+   * Desktop-only: invoked when the user clicks "Close All" in the top
+   * tabs row. Consumer is responsible for confirmation + the bulk close.
+   * Hidden when the callback isn't provided.
+   */
+  onCloseAll?: () => void
   /** Mobile filter row — instrument filter button label (default `All instruments`). */
   instrumentFilterLabel?: string
   /** Mobile filter row — invoked when the instrument-filter button is clicked. */
@@ -201,8 +218,34 @@ const Card = styled(PerpsPanel)`
 
 const Body = styled.div`
   padding: 8px 12px 12px;
+  /* Horizontal scroll appears once the table body is wider than the
+   * panel — at that point the trailing TP/SL + Close action group is
+   * pushed off-screen and the user can scroll right to reach it. The
+   * scrollbar styling matches Figma 76:12504: a 4px thin pill, sized
+   * down from the browser default (12–17px) so it sits unobtrusively
+   * at the bottom of the panel. */
   overflow-x: auto;
   flex: 1;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: ${({ theme }) => theme.colors.textSubtle} transparent;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+    /* appearance:none opts out of macOS overlay scrollbars (which
+     * auto-hide unless the cursor is moving over them). With our
+     * styled track and thumb the scrollbar paints inset, so users
+     * always see a clear "more content to the right" affordance when
+     * the table overflows. */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.textSubtle};
+    border-radius: 999px;
+  }
 `
 
 const Empty = styled(Flex)`
@@ -211,18 +254,25 @@ const Empty = styled(Flex)`
   min-height: 120px;
 `
 
+/*
+ * Positions table — desktop layout.
+ *
+ * Columns are fixed-width (per Figma 72:12961): Symbol(92) · Size(80) ·
+ * Entry(80) · Mark(80) · Margin(80) · Liq(80) · PNL(136) · TP/SL(136) ·
+ * Actions(auto). The 16px content gap between columns lives on the
+ * cells (8px each side) instead of `column-gap`, so the hover-active
+ * strip can paint every cell with no transparent slits in between.
+ */
 const PositionsTable = styled.div`
   display: grid;
-  grid-template-columns: repeat(8, minmax(min-content, 1fr)) auto;
-  /* Cells sit flush horizontally so the row-hover background reads as
-   * one continuous strip. Per-cell horizontal padding (applied below)
-   * keeps content from touching. */
+  grid-template-columns: 108px 96px 96px 96px 96px 96px 152px 152px auto;
   column-gap: 0;
-  row-gap: 6px;
+  /* Row gap is 0 so the active/hover bg of one row sits flush against
+   * the next row — matches the responsive Figma 75:12034 where the
+   * card-secondary bg of the active row directly touches the next
+   * row, with no visible breathing strip between them. */
+  row-gap: 0;
   font-variant-numeric: tabular-nums;
-  & > * {
-    padding: 16px 12px;
-  }
 `
 
 /* Wraps a row's cells with display:contents so the cells stay direct
@@ -231,10 +281,11 @@ const PositionsTable = styled.div`
 const RowGroup = styled.div`
   display: contents;
   /* Padding lives on the cells (RowGroup is display:contents so any
-   * padding set here would be dropped) — gives the hover strip visible
-   * breathing room around the content, matching the MarketsDropdown row. */
+   * padding set here would be dropped). 8px each side combines with the
+   * neighbour's 8px to produce the 16px content gap from Figma, while
+   * keeping the cells flush so the hover strip is unbroken. */
   & > * {
-    padding: 16px 12px;
+    padding: 8px;
     transition: background 0.12s;
   }
   &:hover > * {
@@ -251,21 +302,238 @@ const RowGroup = styled.div`
   }
 `
 
-const ActionCell = styled(Flex)`
-  gap: 6px;
+/* Header strip above the table body — same fixed-width column grid as
+ * PositionsTable. No outer horizontal padding so its columns line up
+ * exactly with the row cells (which get 8px each-side padding via
+ * RowGroup). The 8px each-side padding here lives on the children so
+ * we don't pollute the shared `Th` primitive used by other tables. */
+const PositionsHeaderRow = styled.div`
+  display: grid;
+  grid-template-columns: 108px 96px 96px 96px 96px 96px 152px 152px auto;
+  column-gap: 0;
   align-items: center;
+  padding: 8px 0;
+
+  & > * {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+`
+
+/* Wraps the tabs row + the right-side controls (Hide Other Symbols,
+ * Close All). Owns the bottom border so it spans the whole panel
+ * width even though the tabs primitive sits on the left. The
+ * `container-type: inline-size` declaration enables container queries
+ * inside — that's how TabsChevronOverlay decides to fade in when the
+ * panel is too narrow to fit all five tabs alongside the right
+ * controls (see comment on TabsChevronOverlay). */
+const TabsHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  padding-right: 12px;
+  gap: 12px;
+  container-type: inline-size;
+  container-name: positions-tabs-header;
+`
+
+/* Flex parent for the tabs primitive — clips overflow so the
+ * chevron-fade overlay can sit on top of the trailing tabs. `flex: 1`
+ * lets it shrink under HeaderRightControls; `min-width: 0` is the
+ * canonical "let me shrink even with non-shrinking children" trick.
+ *
+ * The inner UnderlineTabsWrapper is forced to keep its natural width
+ * (`flex-shrink: 0`) so it overflows TabsLeft cleanly — otherwise the
+ * wrapper would compress, hiding the overflow we want to detect via
+ * `scrollWidth > clientWidth`. */
+const TabsLeft = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+
+  & > *:not([data-overlay]) {
+    flex-shrink: 0;
+  }
+`
+
+/* 48px overlay anchored to TabsLeft's right edge. Becomes visible when
+ * the parent header container is narrower than 1024px — at that
+ * point the five tabs (~615px natural width) collide with the
+ * Hide-Other / Close-All controls (~290px) plus padding/gaps, leaving
+ * <2px of breathing room. The fade gradient masks the clipped tab so
+ * the cut doesn't read as a truncation glitch, and the chevron hints
+ * "more tabs to the right". Pointer-events disabled so clicks pass
+ * through to the underlying tab area.
+ *
+ * Container query (instead of JS measurement) because Storybook's
+ * iframe + Chromium occasionally throttle setInterval / batch
+ * ResizeObserver fires across iframe boundaries — leaving the JS
+ * state stuck. CSS responds to layout deterministically. */
+const TabsChevronOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    ${({ theme }) => theme.colors.backgroundAlt} 60%,
+    ${({ theme }) => theme.colors.backgroundAlt} 100%
+  );
+  color: ${({ theme }) => theme.colors.textSubtle};
+  opacity: 0;
+  transition: opacity 0.12s;
+
+  @container positions-tabs-header (max-width: 1024px) {
+    opacity: 1;
+  }
+`
+
+const HeaderRightControls = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+`
+
+/* "Hide Other Symbols" — Figma renders the label inline next to a 20px
+ * checkbox. Both elements sit on the same row, gap 8px. The label uses
+ * the primary60 (teal) color so it pulls slightly toward the action
+ * tone of the Close All affordance to its right. */
+const HideOtherChip = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #02919D;
+  font-feature-settings: 'liga' off;
+
+  html.dark & {
+    color: #48D0DB;
+  }
+`
+
+const CloseAllBtn = styled.button`
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #02919D;
+  font-feature-settings: 'liga' off;
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  html.dark & {
+    color: #48D0DB;
+  }
+`
+
+const ActionCell = styled(Flex)`
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+`
+
+/* Two-line stacked cell — used for symbol/side, size/unit, pnl/percent,
+ * tp/sl. The outer cell already gets row padding from RowGroup, so this
+ * is just a vertical flex with no padding of its own. */
+const StackCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  white-space: nowrap;
+`
+
+const StackSub = styled.span<{ $color?: string; $size?: string }>`
+  font-size: ${({ $size }) => $size ?? '12px'};
+  letter-spacing: 0.12px;
+  color: ${({ $color, theme }) => $color ?? theme.colors.textSubtle};
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+`
+
+/* "Buy 20x" badge — positive60 / negative60 text per side, 12px Kanit
+ * Regular. Sits inline with the leverage-tier indicator bars. */
+const SideLevText = styled.span<{ $up: boolean }>`
+  color: ${({ $up }) => ($up ? '#129E7D' : '#D8376C')};
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.12px;
+  font-feature-settings: 'liga' off;
+  white-space: nowrap;
+
+  html.dark & {
+    color: ${({ $up }) => ($up ? '#3DDBB5' : '#FFA3D0')};
+  }
+`
+
+/* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Per the
+ * design (Figma 72:12995 / 72:13051), the leftmost bar is always
+ * destructive (pink) and the remaining three are the primary fill
+ * color. The pink bar reads as a "this is a leveraged position"
+ * marker while the white bars echo the SymbolHeader-style direction
+ * indicator. */
+const LevBarRow = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding-top: 2px;
+`
+
+const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
+  width: 2px;
+  height: 8px;
+  background: ${({ $variant, theme }) =>
+    $variant === 'destructive' ? '#ED4B9E' : theme.colors.text};
 `
 
 const TpSlCell = styled.div`
-  font-size: 14px;
-  line-height: 1.2;
   display: flex;
   flex-direction: column;
   gap: 0;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.text};
+  white-space: nowrap;
 `
 
 /** Small leverage chip rendered next to a position's symbol — purple
- *  text on the tertiary surface (mirrors SymbolHeader's old LevPill). */
+ *  text on the tertiary surface (mirrors SymbolHeader's old LevPill).
+ *  Kept for downstream consumers; not used in the new desktop layout. */
 const LevBadge = styled.span`
   display: inline-flex;
   align-items: center;
@@ -278,6 +546,17 @@ const LevBadge = styled.span`
   line-height: 1.4;
   letter-spacing: 0;
   flex-shrink: 0;
+`
+
+/* Header column-help anchor — picks up the inherited textSubtle color
+ * and lets the shared useTooltip hook drive the popover. cursor:help so
+ * the affordance reads as informational (no underline / button shape). */
+const HeaderHelp = styled.span`
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  color: inherit;
+  margin-left: 4px;
 `
 
 const TpSlValue = styled.span<{ $kind: 'tp' | 'sl' }>`
@@ -374,13 +653,30 @@ const ShareBtn = styled.button`
   justify-content: center;
   width: 21px;
   height: 21px;
-  color: ${({ theme }) => theme.colors.textSubtle};
-  &:hover { color: ${({ theme }) => theme.colors.text}; }
+  color: ${({ theme }) => theme.colors.text};
+  transition: opacity 0.12s;
+  &:hover:not(:disabled) {
+    opacity: 0.7;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `
 
-const Th = styled(Text).attrs({ fontSize: '10px', color: 'textSubtle' })`
+/* Column header label — Figma 72:12968 etc. 12px Kanit SemiBold, 60%
+ * opacity on textSubtle, uppercase, 0.12px tracking, 14px line-height.
+ * Sticky-anchored so when the body of the history tables scrolls the
+ * row of labels stays pinned at the top. */
+const Th = styled(Text).attrs({ fontSize: '12px', color: 'textSubtle' })`
+  font-family: Kanit;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.12px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
   /* Anchor the header row when the history tables overflow + scroll.
      position: sticky is a no-op when the parent doesn't scroll, so
      this is also safe on the Positions / Open Orders tables (which
@@ -393,6 +689,9 @@ const Th = styled(Text).attrs({ fontSize: '10px', color: 'textSubtle' })`
 
 const Td = styled(Text).attrs({ fontSize: '14px' })`
   font-variant-numeric: tabular-nums;
+  font-family: Kanit;
+  line-height: 1.5;
+  white-space: nowrap;
 `
 
 const identity = (s: string) => s
@@ -409,9 +708,10 @@ const PositionTableRow: React.FC<{
   computeLiqPrice?: PositionsPanelProps['computeLiqPrice']
   onClose: (p: PositionRow) => void
   onEditTpSl: (p: PositionRow, markPrice: number) => void
+  onShare?: (p: PositionRow) => void
   closingSymbol?: string | null
   t: (key: string) => string
-}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, closingSymbol, t }) => {
+}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, onShare, closingSymbol, t }) => {
   const theme = useTheme()
   const markPrice = useMarkPriceForSymbol?.(p.symbol)
   const side: 'BUY' | 'SELL' = p.positionAmt >= 0 ? 'BUY' : 'SELL'
@@ -431,54 +731,236 @@ const PositionTableRow: React.FC<{
 
   const isClosing = closingSymbol === p.symbol
 
+  // Notional value (= |size| × entryPrice) used as a stand-in for "Size" /
+  // "Margin" while the consumer hasn't wired richer values. Margin is
+  // displayed as notional ÷ leverage with a USDT suffix.
+  const sizeBase = Math.abs(p.positionAmt)
+  const notional = Number.isFinite(p.entryPrice) ? sizeBase * p.entryPrice : NaN
+  const margin =
+    Number.isFinite(notional) && p.leverage > 0 ? notional / p.leverage : NaN
+
+  // Live uPnL %: gain / margin × 100. Falls back to '—' when we can't
+  // compute either side. Matches the ROE% the design hints at next to
+  // the absolute PNL value.
+  const pnlPct =
+    Number.isFinite(livePnl) && Number.isFinite(margin) && margin > 0
+      ? (livePnl / margin) * 100
+      : NaN
+
+  const pnlUp = Number.isFinite(livePnl) ? livePnl >= 0 : true
+  const pnlColor = pnlUp ? theme.colors.success : theme.colors.failure
+
+  const fmtPrice = (v: number) =>
+    v.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 1 })
+
   return (
     <>
-      <Td as="div" bold>
-        <Flex alignItems="center" style={{ gap: 6 }}>
-          <span>{p.symbol}</span>
-          <LevBadge>{p.leverage}x</LevBadge>
+      {/* Symbol cell — symbol name on top, side+lev pill + tier bars below */}
+      <StackCell>
+        <span>{p.symbol}</span>
+        <StackSub>
+          <SideLevText $up={side === 'BUY'}>
+            {side === 'BUY' ? t('Buy') : t('Sell')} {p.leverage}x
+          </SideLevText>
+          <LevBarRow aria-hidden>
+            {[0, 1, 2, 3].map((i) => (
+              <LevBar key={i} $variant={i === 0 ? 'destructive' : 'fill'} />
+            ))}
+          </LevBarRow>
+        </StackSub>
+      </StackCell>
+
+      {/* Size cell — base amount on top, USDT settle below */}
+      <StackCell>
+        <span>{Number.isFinite(sizeBase) ? sizeBase : '—'}</span>
+        <StackSub>USDT</StackSub>
+      </StackCell>
+
+      <Td as="div">
+        {Number.isFinite(p.entryPrice) ? fmtPrice(p.entryPrice) : '—'}
+      </Td>
+      <Td as="div">
+        {markPrice !== undefined && Number.isFinite(markPrice) ? fmtPrice(markPrice) : '—'}
+      </Td>
+      <Td as="div">
+        {Number.isFinite(margin) ? `${margin.toFixed(2)} USDT` : '—'}
+      </Td>
+      <Td as="div">{Number.isFinite(liq) ? fmtPrice(liq as number) : '—'}</Td>
+
+      {/* PNL (ROE%) cell — abs uPnL + share trigger on top, ROE % below */}
+      <StackCell>
+        <Flex alignItems="center" style={{ gap: 8 }}>
+          <span style={{ color: pnlColor }}>
+            {Number.isFinite(livePnl)
+              ? `${livePnl >= 0 ? '+' : ''}${livePnl.toFixed(2)} USDT`
+              : '—'}
+          </span>
+          <ShareBtn
+            type="button"
+            aria-label={t('Share position')}
+            onClick={() => onShare?.(p)}
+            disabled={!onShare}
+          >
+            <ShareGlyph />
+          </ShareBtn>
         </Flex>
-      </Td>
-      <Td style={{ color: side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
-        {p.positionAmt}
-      </Td>
-      <Td>{Number.isFinite(p.entryPrice) ? p.entryPrice.toFixed(2) : '—'}</Td>
-      <Td>{markPrice !== undefined && Number.isFinite(markPrice) ? markPrice.toFixed(2) : '—'}</Td>
-      <Td>{p.leverage}x</Td>
-      <Td>{liq ? liq.toFixed(2) : '—'}</Td>
-      <Td style={{ color: livePnl >= 0 ? theme.colors.success : theme.colors.failure }}>
-        {Number.isFinite(livePnl) ? livePnl.toFixed(4) : '—'}
-      </Td>
+        <span style={{ color: pnlColor, fontSize: 14, lineHeight: 1.5 }}>
+          {Number.isFinite(pnlPct)
+            ? `${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`
+            : '—'}
+        </span>
+      </StackCell>
+
+      {/* TP/SL cell — two muted lines, dashes when not set */}
       <TpSlCell>
-        <TpSlValue $kind="tp">
-          {t('TP')}: {p.tpStopPrice ? Number(p.tpStopPrice).toFixed(2) : '—'}
-        </TpSlValue>
-        <TpSlValue $kind="sl">
-          {t('SL')}: {p.slStopPrice ? Number(p.slStopPrice).toFixed(2) : '—'}
-        </TpSlValue>
+        <span>{p.tpStopPrice ? fmtPrice(Number(p.tpStopPrice)) : '--'}</span>
+        <span>{p.slStopPrice ? fmtPrice(Number(p.slStopPrice)) : '--'}</span>
       </TpSlCell>
+
       <ActionCell>
-        <Button
-          scale="xs"
-          variant="tertiary"
+        <TpSlChip
+          type="button"
           onClick={() => onEditTpSl(p, markPrice ?? NaN)}
           disabled={!Number.isFinite(p.positionAmt) || p.positionAmt === 0}
         >
-          {t('TP/SL')}
-        </Button>
-        <Button
-          scale="xs"
-          variant="secondary"
+          {t('TP / SL')}
+        </TpSlChip>
+        <CloseChip
+          type="button"
           onClick={() => onClose(p)}
           disabled={isClosing || !Number.isFinite(p.positionAmt) || p.positionAmt === 0}
-          isLoading={isClosing}
         >
-          {t('Close')}
-        </Button>
+          {isClosing ? '…' : t('Close')}
+        </CloseChip>
       </ActionCell>
     </>
   )
 }
+
+/* Three-node "share network" glyph, sized 21×21 to fill its slot in the
+ * PNL (ROE%) cell. Single-color so it picks up the surrounding text
+ * color via currentColor. */
+const ShareGlyph = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 21 21"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M14.5833 13.3927C14.0661 13.3927 13.6033 13.6035 13.2494 13.9338L8.39708 11.0172C8.43111 10.8555 8.45833 10.6939 8.45833 10.5252C8.45833 10.3565 8.43111 10.1949 8.39708 10.0332L13.195 7.14466C13.5625 7.49607 14.0457 7.71394 14.5833 7.71394C15.7131 7.71394 16.625 6.77217 16.625 5.6055C16.625 4.43884 15.7131 3.49707 14.5833 3.49707C13.4536 3.49707 12.5417 4.43884 12.5417 5.6055C12.5417 5.77418 12.5689 5.93583 12.6029 6.09747L7.805 8.98603C7.4375 8.63462 6.95431 8.41675 6.41667 8.41675C5.28694 8.41675 4.375 9.35852 4.375 10.5252C4.375 11.6918 5.28694 12.6336 6.41667 12.6336C6.95431 12.6336 7.4375 12.4157 7.805 12.0643L12.6506 14.988C12.6165 15.1356 12.5961 15.2902 12.5961 15.4449C12.5961 16.5764 13.4876 17.4971 14.5833 17.4971C15.679 17.4971 16.5706 16.5764 16.5706 15.4449C16.5706 14.3133 15.679 13.3927 14.5833 13.3927Z"
+      fill="currentColor"
+    />
+  </svg>
+)
+
+/* Chevron-forward glyph for the tabs-overflow indicator. 21×21 to
+ * match the Figma 75:12323 slot. */
+const ChevronForwardGlyph = () => (
+  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" aria-hidden="true">
+    <path
+      d="M7.875 4.375L13.7813 10.5L7.875 16.625"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+/* Help / question-mark glyph used in the PNL (ROE%) column header.
+ * Stroked outline matches the lightweight 14×14 icon in Figma. */
+const HelpGlyph = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9.25" stroke="currentColor" strokeWidth="1.5" />
+    <path
+      d="M9.5 9.5a2.5 2.5 0 015 0c0 1.4-1 1.9-1.7 2.4-.5.4-.8.7-.8 1.3v.4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <circle cx="12" cy="17" r="0.9" fill="currentColor" />
+  </svg>
+)
+
+/* TP/SL action chip — Figma 72:13294. Tertiary surface with a 2px
+ * inset bottom edge, primary60 label, 12px Kanit SemiBold. Built local
+ * to avoid bending the shared Button primitive — the trading-row chip
+ * is dimensionally smaller (h ≈ 24px) than any of Button's scales.
+ *
+ * Fixed `min-width` so the chip stays the same size across rows even
+ * when its label renders through a translator (e.g. localized "TP/SL"
+ * variants) — the parent ActionCell otherwise lets each row's chip
+ * shrink to its own content. */
+const TpSlChip = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 3px 8px 5px;
+  border-radius: 8px;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  background: ${({ theme }) => theme.colors.tertiary};
+  color: #02919D;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.12px;
+  cursor: pointer;
+  transition: opacity 0.12s, transform 0.04s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+    border-bottom-width: 1px;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  html.dark & {
+    color: #48D0DB;
+  }
+`
+
+/* Outlined Close button — Figma 72:13213. 2px primary stroke, no fill,
+ * primary60 label. Same dimensions as TpSlChip so the pair lines up. */
+const CloseChip = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 2px solid ${({ theme }) => theme.colors.primary};
+  background: transparent;
+  color: #02919D;
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.12px;
+  cursor: pointer;
+  transition: opacity 0.12s, background 0.12s;
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.primary}1A;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  html.dark & {
+    color: #48D0DB;
+  }
+`
 
 /**
  * Bottom-panel tabs: Positions / Open Orders / History. Stateless apart
@@ -517,31 +999,77 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   onCancelOrder,
   closingSymbol = null,
   cancellingOrderId = null,
+  hideOtherSymbols = false,
+  onHideOtherSymbolsChange,
+  onCloseAll,
+  onSharePnl,
   t = identity,
 }) => {
   const theme = useTheme()
   const tabOrder: PositionsPanelTab[] = ['positions', 'orders', 'history', 'trades', 'transactions']
   const activeIndex = tabOrder.indexOf(tab)
 
+  // Help-icon tooltip on the PNL (ROE%) column header. One-line variant
+  // because the copy is short — keeps the bubble tight around the text.
+  const { targetRef: pnlHelpRef, tooltip: pnlHelpNode } = useTooltip(
+    t('Return on equity — uPnL ÷ initial margin.'),
+    { placement: 'top', oneLine: true },
+  )
+
+  // Tabs-overflow chevron is driven by a CSS container query on
+  // TabsHeader (see TabsChevronOverlay). No JS measurement needed.
+
   return (
     <Card>
-      <UnderlineTabs activeIndex={activeIndex} onItemClick={(i) => onTabChange(tabOrder[i])}>
-        <UnderlineTab>
-          {t('Positions')} ({positions.length})
-        </UnderlineTab>
-        <UnderlineTab>
-          {t('Open Orders')} ({openOrders.length})
-        </UnderlineTab>
-        <UnderlineTab>
-          {t('Order History')} ({orderHistory.length})
-        </UnderlineTab>
-        <UnderlineTab>
-          {t('Trade History')} ({tradeHistory.length})
-        </UnderlineTab>
-        <UnderlineTab>
-          {t('Transaction History')} ({transactionHistory.length})
-        </UnderlineTab>
-      </UnderlineTabs>
+      <TabsHeader>
+        <TabsLeft>
+          <UnderlineTabs
+            activeIndex={activeIndex}
+            onItemClick={(i) => onTabChange(tabOrder[i])}
+            noBorder
+          >
+            <UnderlineTab>
+              {t('Positions')} ({positions.length})
+            </UnderlineTab>
+            <UnderlineTab>
+              {t('Open Orders')} ({openOrders.length})
+            </UnderlineTab>
+            <UnderlineTab>
+              {t('Order History')} ({orderHistory.length})
+            </UnderlineTab>
+            <UnderlineTab>
+              {t('Trade History')} ({tradeHistory.length})
+            </UnderlineTab>
+            <UnderlineTab>
+              {t('Transaction History')} ({transactionHistory.length})
+            </UnderlineTab>
+          </UnderlineTabs>
+          <TabsChevronOverlay data-overlay aria-hidden>
+            <ChevronForwardGlyph />
+          </TabsChevronOverlay>
+        </TabsLeft>
+        {tab === 'positions' && (
+          <HeaderRightControls>
+            <HideOtherChip>
+              <Checkbox
+                scale="sm"
+                checked={hideOtherSymbols}
+                onChange={(e) => onHideOtherSymbolsChange?.(e.target.checked)}
+              />
+              <span>{t('Hide Other Symbols')}</span>
+            </HideOtherChip>
+            {onCloseAll && (
+              <CloseAllBtn
+                type="button"
+                onClick={onCloseAll}
+                disabled={positions.length === 0}
+              >
+                {t('Close All')}
+              </CloseAllBtn>
+            )}
+          </HeaderRightControls>
+        )}
+      </TabsHeader>
 
       <Body>
         {tab === 'positions' &&
@@ -552,30 +1080,41 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
               </Text>
             </Empty>
           ) : (
-            <PositionsTable>
-              <Th>{t('Symbol')}</Th>
-              <Th>{t('Size')}</Th>
-              <Th>{t('Entry')}</Th>
-              <Th>{t('Mark')}</Th>
-              <Th>{t('Lev')}</Th>
-              <Th>{t('Liq')}</Th>
-              <Th>{t('uPnL')}</Th>
-              <Th>{t('TP/SL')}</Th>
-              <Th />
-              {positions.map((p) => (
-                <RowGroup key={p.id}>
-                  <PositionTableRow
-                    p={p}
-                    useMarkPriceForSymbol={useMarkPriceForSymbol}
-                    computeLiqPrice={computeLiqPrice}
-                    onClose={onClosePosition}
-                    onEditTpSl={onEditTpSl}
-                    closingSymbol={closingSymbol}
-                    t={t}
-                  />
-                </RowGroup>
-              ))}
-            </PositionsTable>
+            <>
+              <PositionsHeaderRow>
+                <Th>{t('Symbol')}</Th>
+                <Th>{t('Size')}</Th>
+                <Th>{t('Entry Price')}</Th>
+                <Th>{t('Mark Price')}</Th>
+                <Th>{t('Margin')}</Th>
+                <Th>{t('Liq Price')}</Th>
+                <Th>
+                  {t('PNL (ROE%)')}
+                  <HeaderHelp ref={pnlHelpRef} aria-label={t('PNL ROE% explanation')}>
+                    <HelpGlyph />
+                  </HeaderHelp>
+                  {pnlHelpNode}
+                </Th>
+                <Th>{t('TP/SL')}</Th>
+                <Th />
+              </PositionsHeaderRow>
+              <PositionsTable>
+                {positions.map((p) => (
+                  <RowGroup key={p.id}>
+                    <PositionTableRow
+                      p={p}
+                      useMarkPriceForSymbol={useMarkPriceForSymbol}
+                      computeLiqPrice={computeLiqPrice}
+                      onClose={onClosePosition}
+                      onEditTpSl={onEditTpSl}
+                      onShare={onSharePnl}
+                      closingSymbol={closingSymbol}
+                      t={t}
+                    />
+                  </RowGroup>
+                ))}
+              </PositionsTable>
+            </>
           ))}
 
         {tab === 'orders' &&
