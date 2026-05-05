@@ -516,7 +516,7 @@ const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
   width: 2px;
   height: 8px;
   background: ${({ $variant, theme }) =>
-    $variant === 'destructive' ? '#ED4B9E' : theme.colors.text};
+    $variant === 'destructive' ? theme.colors.failure : theme.colors.text};
 `
 
 const TpSlCell = styled.div`

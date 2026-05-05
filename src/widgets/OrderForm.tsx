@@ -250,7 +250,7 @@ const ModeButton = styled.button`
   border: 0;
   border-bottom: 2px solid rgba(0, 0, 0, 0.10);
   border-radius: 12px;
-  background: #EFF4F5;
+  background: ${({ theme }) => theme.colors.tertiary};
   color: #02919D;
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -266,10 +266,6 @@ const ModeButton = styled.button`
   &:active:not(:disabled) {
     border-bottom-width: 0;
     padding-bottom: 7px;
-  }
-
-  html.dark & {
-    background: #353547;
   }
 `
 
@@ -304,8 +300,8 @@ const SizeField = styled.div`
   align-items: center;
   align-self: stretch;
   border-radius: 16px;
-  border: 1px solid #D7CAEC;
-  background: #EEEAF4;
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  background: ${({ theme }) => theme.colors.input};
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
   gap: 8px;
   transition: box-shadow 0.12s;
@@ -313,17 +309,6 @@ const SizeField = styled.div`
     box-shadow:
       0 0 0 1px #7645D9,
       0 0 0 4px rgba(118, 69, 217, 0.20);
-  }
-
-  html.dark & {
-    border-color: #55496E;
-    background: #372F47;
-    box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
-    &:focus-within {
-      box-shadow:
-        0 0 0 1px #7645D9,
-        0 0 0 4px rgba(118, 69, 217, 0.20);
-    }
   }
 `
 
@@ -451,13 +436,21 @@ const ReduceOnlyTooltip = styled.div`
   }
 `
 
+const UnitPickerChevronWrap = styled.span`
+  display: inline-flex;
+  flex-shrink: 0;
+  color: ${({ theme }) => theme.colors.textSubtle};
+`
+
 const UnitPickerChevron = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden style={{ flexShrink: 0, aspectRatio: '1 / 1' }}>
-    <path
-      d="M2.72261 3.10042C2.52319 3.10042 2.3779 3.18542 2.28674 3.35542C2.19558 3.52542 2.20318 3.69303 2.30956 3.85825L5.59261 8.78348C5.69232 8.92783 5.82812 9 6.00001 9C6.17189 9 6.30769 8.92783 6.40741 8.78348L9.69046 3.85825C9.79683 3.69303 9.80444 3.52542 9.71328 3.35542C9.62212 3.18542 9.47683 3.10042 9.27741 3.10042H2.72261Z"
-      fill="#B8ADD2"
-    />
-  </svg>
+  <UnitPickerChevronWrap>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden style={{ flexShrink: 0, aspectRatio: '1 / 1' }}>
+      <path
+        d="M2.72261 3.10042C2.52319 3.10042 2.3779 3.18542 2.28674 3.35542C2.19558 3.52542 2.20318 3.69303 2.30956 3.85825L5.59261 8.78348C5.69232 8.92783 5.82812 9 6.00001 9C6.17189 9 6.30769 8.92783 6.40741 8.78348L9.69046 3.85825C9.79683 3.69303 9.80444 3.52542 9.71328 3.35542C9.62212 3.18542 9.47683 3.10042 9.27741 3.10042H2.72261Z"
+        fill="currentColor"
+      />
+    </svg>
+  </UnitPickerChevronWrap>
 )
 
 const PriceInputRow = styled.div`
@@ -469,8 +462,8 @@ const PriceInputRow = styled.div`
   align-items: center;
   align-self: stretch;
   border-radius: 16px;
-  border: 1px solid #D7CAEC;
-  background: #EEEAF4;
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  background: ${({ theme }) => theme.colors.input};
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
   gap: 8px;
   transition: box-shadow 0.12s;
@@ -478,17 +471,6 @@ const PriceInputRow = styled.div`
     box-shadow:
       0 0 0 1px #7645D9,
       0 0 0 4px rgba(118, 69, 217, 0.20);
-  }
-
-  html.dark & {
-    border-color: #55496E;
-    background: #372F47;
-    box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
-    &:focus-within {
-      box-shadow:
-        0 0 0 1px #7645D9,
-        0 0 0 4px rgba(118, 69, 217, 0.20);
-    }
   }
 `
 
@@ -505,10 +487,10 @@ const PriceInput = styled.input`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-  color: #7A6EAA;
+  color: ${({ theme }) => theme.colors.textSubtle};
   font-variant-numeric: tabular-nums;
   &::placeholder {
-    color: #7A6EAA;
+    color: ${({ theme }) => theme.colors.textSubtle};
   }
 `
 
