@@ -330,16 +330,13 @@ const SizeField = styled.div`
 const SizeLabel = styled.span`
   pointer-events: none;
   flex-shrink: 0;
-  color: #7A6EAA;
+  color: ${({ theme }) => theme.colors.textSubtle};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
   line-height: 150%;
-  html.dark & {
-    color: #B8ADD2;
-  }
 `
 
 const SizeInput = styled.input`
@@ -355,16 +352,10 @@ const SizeInput = styled.input`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-  color: #280D5F;
+  color: ${({ theme }) => theme.colors.text};
   font-variant-numeric: tabular-nums;
   &::placeholder {
-    color: #7A6EAA;
-  }
-  html.dark & {
-    color: #F4EEFF;
-    &::placeholder {
-      color: #B8ADD2;
-    }
+    color: ${({ theme }) => theme.colors.textSubtle};
   }
 `
 
