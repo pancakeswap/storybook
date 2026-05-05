@@ -4715,16 +4715,13 @@ var Pa = B.div`
 `, eo = B.span`
   pointer-events: none;
   flex-shrink: 0;
-  color: #7A6EAA;
+  color: ${({ theme: e }) => e.colors.textSubtle};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
   line-height: 150%;
-  html.dark & {
-    color: #B8ADD2;
-  }
 `, to = B.input`
   flex: 1;
   min-width: 0;
@@ -4738,16 +4735,10 @@ var Pa = B.div`
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-  color: #280D5F;
+  color: ${({ theme: e }) => e.colors.text};
   font-variant-numeric: tabular-nums;
   &::placeholder {
-    color: #7A6EAA;
-  }
-  html.dark & {
-    color: #F4EEFF;
-    &::placeholder {
-      color: #B8ADD2;
-    }
+    color: ${({ theme: e }) => e.colors.textSubtle};
   }
 `, no = B(i).attrs({
 	variant: "text",
