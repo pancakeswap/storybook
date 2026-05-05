@@ -7,6 +7,8 @@ import { AssetModeModalProps } from './AssetModeModal';
 import { Bucket } from './WalletPanel';
 import { default as default_2 } from 'react';
 import { IStyledComponent } from 'styled-components';
+import { MarginModeModal } from './MarginModeModal';
+import { MarginModeModalProps } from './MarginModeModal';
 import { PerpStatsData } from './WalletPanel';
 import { ResponsiveValue } from 'styled-system';
 import { SimpleBetPanel } from './SimpleBetPanel';
@@ -379,6 +381,10 @@ export declare interface LeverageModalProps {
 }
 
 export declare type MarginMode = 'CROSS' | 'ISOLATED';
+
+export { MarginModeModal }
+
+export { MarginModeModalProps }
 
 export declare interface MarketRow {
     /** Full venue symbol, e.g. 'BTCUSDT'. */
