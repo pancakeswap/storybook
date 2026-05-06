@@ -838,14 +838,30 @@ const DesktopOrderBook: React.FC<OrderBookProps> = ({
 
   const stepOptions = useMemo(() => getStepOptions(tickSize, lastPrice), [tickSize, lastPrice])
 
-  // Persisted step may not be offered on the current symbol. Snap to the
-  // finest decimal option (native tickSize).
+  // Snap the persisted step to a sensible default on each symbol change.
+  // Two cases:
+  //  1. The persisted value isn't in this symbol's options at all
+  //     (e.g. "100" carried over to ASTERUSDT) — fall back to tickSize.
+  //  2. The persisted value is offered but is unusably coarse for the
+  //     new price — e.g. "0.1" persisted from BTCUSDT collapses
+  //     ASTERUSDT (~$0.67) to 2-3 visible buckets (PAN-11848).
+  //     Snap when the bucket would span more than 0.5% of price; user
+  //     manual selections (which don't change tickSize) still stick.
+  const prevTickSizeRef = useRef<number | undefined>(undefined)
   useEffect(() => {
     if (stepOptions.length === 0) return
     if (!stepOptions.includes(priceStep)) {
       onPriceStepChange(stepOptions[stepOptions.length - 1])
+      prevTickSizeRef.current = tickSize
+      return
     }
-  }, [stepOptions, priceStep, onPriceStepChange])
+    if (prevTickSizeRef.current !== tickSize) {
+      prevTickSizeRef.current = tickSize
+      if (lastPrice > 0 && Number(priceStep) > lastPrice * 0.005) {
+        onPriceStepChange(stepOptions[stepOptions.length - 1])
+      }
+    }
+  }, [stepOptions, priceStep, onPriceStepChange, lastPrice, tickSize])
 
   const rows = useMemo(() => {
     // `priceStep` is an absolute value like "0.01" / "1" / "100". Aggregator
