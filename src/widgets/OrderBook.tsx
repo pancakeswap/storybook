@@ -318,14 +318,19 @@ const aggregateLevels = (
 
 /**
  * Aster's own dropdown-option algorithm: offer integer steps
- * [100, 50, 10, 1] when `price > step × 10`, plus decimal steps down
+ * [1, 10, 50, 100] when `price > step × 10`, plus decimal steps down
  * to the native tickSize. Consumers don't need to compute this — we
  * derive it from `tickSize + lastPrice` at render time.
  *
- *   BTCUSDT   tickSize=0.1,    price=78000 → ["100","50","10","1","0.1"]
- *   ASTERUSDT tickSize=0.0001, price=0.67  → ["0.1","0.01","0.001","0.0001"]
+ * Returned in ASCENDING order (smallest first) so the dropdown reads
+ * fine→coarse and `stepOptions[0]` is always the symbol's native
+ * tickSize — which the snap-on-symbol-change logic uses as the
+ * default since the finest step shows the most depth rows.
+ *
+ *   BTCUSDT   tickSize=0.1,    price=78000 → ["0.1","1","10","50","100"]
+ *   ASTERUSDT tickSize=0.0001, price=0.67  → ["0.0001","0.001","0.01","0.1"]
  */
-const INTEGER_LEVELS = [100, 50, 10, 1] as const
+const INTEGER_LEVELS = [1, 10, 50, 100] as const
 
 const decimalStep = (n: number): string => (n === 0 ? '1' : `0.${'0'.repeat(n - 1)}1`)
 
@@ -336,9 +341,9 @@ const getDecimals = (tickSize: number): number => {
 
 const getStepOptions = (tickSize: number, lastPrice: number): string[] => {
   const opts: string[] = []
-  for (const l of INTEGER_LEVELS) if (lastPrice > l * 10) opts.push(String(l))
   const decimals = getDecimals(tickSize)
-  for (let i = 1; i <= decimals; i++) opts.push(decimalStep(i))
+  for (let i = decimals; i >= 1; i--) opts.push(decimalStep(i))
+  for (const l of INTEGER_LEVELS) if (lastPrice > l * 10) opts.push(String(l))
   return opts
 }
 
@@ -848,30 +853,27 @@ const DesktopOrderBook: React.FC<OrderBookProps> = ({
 
   const stepOptions = useMemo(() => getStepOptions(tickSize, lastPrice), [tickSize, lastPrice])
 
-  // Snap the persisted step to a sensible default on each symbol change.
-  // Two cases:
-  //  1. The persisted value isn't in this symbol's options at all
-  //     (e.g. "100" carried over to ASTERUSDT) — fall back to tickSize.
-  //  2. The persisted value is offered but is unusably coarse for the
-  //     new price — e.g. "0.1" persisted from BTCUSDT collapses
-  //     ASTERUSDT (~$0.67) to 2-3 visible buckets (PAN-11848).
-  //     Snap when the bucket would span more than 0.5% of price; user
-  //     manual selections (which don't change tickSize) still stick.
+  // Snap to the smallest (finest, native-tickSize) option on every
+  // symbol change. PAN-11848: switching from BTCUSDT to ASTERUSDT
+  // shouldn't carry over BTC's persisted "0.1" step — the same number
+  // means "show every level" on BTC but collapses ASTERUSDT (~$0.67)
+  // into 2-3 buckets. Defaulting to `stepOptions[0]` (the smallest =
+  // tickSize) keeps the most price rows visible on every symbol.
+  // Manual user selections persist within the same symbol since
+  // tickSize stays the same.
   const prevTickSizeRef = useRef<number | undefined>(undefined)
   useEffect(() => {
     if (stepOptions.length === 0) return
     if (!stepOptions.includes(priceStep)) {
-      onPriceStepChange(stepOptions[stepOptions.length - 1])
+      onPriceStepChange(stepOptions[0])
       prevTickSizeRef.current = tickSize
       return
     }
     if (prevTickSizeRef.current !== tickSize) {
       prevTickSizeRef.current = tickSize
-      if (lastPrice > 0 && Number(priceStep) > lastPrice * 0.005) {
-        onPriceStepChange(stepOptions[stepOptions.length - 1])
-      }
+      onPriceStepChange(stepOptions[0])
     }
-  }, [stepOptions, priceStep, onPriceStepChange, lastPrice, tickSize])
+  }, [stepOptions, priceStep, onPriceStepChange, tickSize])
 
   const rows = useMemo(() => {
     // `priceStep` is an absolute value like "0.01" / "1" / "100". Aggregator
