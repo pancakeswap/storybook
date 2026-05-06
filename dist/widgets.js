@@ -2943,23 +2943,23 @@ var G = B(e)`
 	let { isMobile: t } = h();
 	return U(t ? _i : yi, { ...e });
 }, yi = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, lastPrice: o = 0, lastPriceDirection: s = "flat", markPrice: c, view: l, onViewChange: u, priceStep: d, onPriceStepChange: f, sizeUnit: p, onSizeUnitChange: m, hidden: h, embedded: g, t: _ = Xr }) => {
-	let v = V(), y = p === "QUOTE" ? r : n, b = F(() => Wr(i, o), [i, o]), x = I(void 0);
+	let v = V(), y = p === "QUOTE" ? r : n, { targetRef: b, tooltip: x } = T(_("The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes."), { placement: "top" }), S = F(() => Wr(i, o), [i, o]), C = I(void 0);
 	M(() => {
-		if (b.length !== 0) {
-			if (!b.includes(d)) {
-				f(b[b.length - 1]), x.current = i;
+		if (S.length !== 0) {
+			if (!S.includes(d)) {
+				f(S[S.length - 1]), C.current = i;
 				return;
 			}
-			x.current !== i && (x.current = i, o > 0 && Number(d) > o * .005 && f(b[b.length - 1]));
+			C.current !== i && (C.current = i, o > 0 && Number(d) > o * .005 && f(S[S.length - 1]));
 		}
 	}, [
-		b,
+		S,
 		d,
 		f,
 		o,
 		i
 	]);
-	let S = F(() => {
+	let w = F(() => {
 		let n = Math.max(i, Number(d) || i), r = Math.max(1, Math.round(n / i)), o = Br(e, "ask", i, r, a), s = Br(t, "bid", i, r, a), c = br * 2;
 		return {
 			asks: o.slice(0, c).reverse(),
@@ -2971,7 +2971,7 @@ var G = B(e)`
 		d,
 		i,
 		a
-	]), C = (e) => {
+	]), E = (e) => {
 		let t = 0;
 		return e.map(([e, n]) => {
 			let r = Number(n), i = Number(e), a = p === "QUOTE" ? r * i : r;
@@ -2981,13 +2981,13 @@ var G = B(e)`
 				total: t
 			};
 		});
-	}, w = F(() => C([...S.asks].reverse()).reverse(), [S.asks, p]), T = F(() => C(S.bids), [S.bids, p]), E = F(() => {
-		let e = w[0]?.total ?? 0, t = T[T.length - 1]?.total ?? 0;
+	}, D = F(() => E([...w.asks].reverse()).reverse(), [w.asks, p]), O = F(() => E(w.bids), [w.bids, p]), k = F(() => {
+		let e = D[0]?.total ?? 0, t = O[O.length - 1]?.total ?? 0;
 		return Math.max(e, t, 1);
-	}, [w, T]), D = (e, t) => {
+	}, [D, O]), A = (e, t) => {
 		let n = e === "bid" ? v.colors.success : v.colors.failure, r = Math.max(0, Math.min(100, t * 100)).toFixed(2);
 		return { background: `linear-gradient(to right, ${`color-mix(in srgb, ${n} 30%, transparent)`} 0%, ${`color-mix(in srgb, ${n} 10%, transparent)`} ${r}%, transparent ${r}%, transparent 100%)` };
-	}, O = (e) => p === "QUOTE" ? e >= 1e6 ? `${(e / 1e6).toFixed(2)}M` : e >= 1e3 ? `${(e / 1e3).toFixed(2)}K` : e.toFixed(2) : e.toFixed(3), k = /* @__PURE__ */ W(H, { children: [
+	}, j = (e) => p === "QUOTE" ? e >= 1e6 ? `${(e / 1e6).toFixed(2)}M` : e >= 1e3 ? `${(e / 1e3).toFixed(2)}K` : e.toFixed(2) : e.toFixed(3), N = /* @__PURE__ */ W(H, { children: [
 		/* @__PURE__ */ W(Sr, { children: [/* @__PURE__ */ W(Cr, { children: [
 			/* @__PURE__ */ U(wr, {
 				title: _("Both"),
@@ -3022,7 +3022,7 @@ var G = B(e)`
 			})
 		] }), /* @__PURE__ */ W(kr, { children: [/* @__PURE__ */ U(Kr, {
 			label: d,
-			items: b.map((e) => ({
+			items: S.map((e) => ({
 				value: e,
 				label: e
 			})),
@@ -3069,9 +3069,9 @@ var G = B(e)`
 		/* @__PURE__ */ W(jr, { children: [
 			l !== "bids" && /* @__PURE__ */ U(Mr, {
 				$size: l === "asks" ? "full" : "half",
-				children: w.slice(l === "asks" ? 0 : Math.max(0, w.length - br)).map((e) => /* @__PURE__ */ W(Nr, {
+				children: D.slice(l === "asks" ? 0 : Math.max(0, D.length - br)).map((e) => /* @__PURE__ */ W(Nr, {
 					$side: "ask",
-					style: D("ask", e.total / E),
+					style: A("ask", e.total / k),
 					children: [
 						/* @__PURE__ */ U(Pr, {
 							$side: "ask",
@@ -3079,11 +3079,11 @@ var G = B(e)`
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "center",
-							children: O(Number(e.qty))
+							children: j(Number(e.qty))
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "right",
-							children: O(e.total)
+							children: j(e.total)
 						})
 					]
 				}, `a-${e.price}`))
@@ -3098,16 +3098,16 @@ var G = B(e)`
 						s === "up" && /* @__PURE__ */ U(Rr, { $direction: "up" }),
 						s === "down" && /* @__PURE__ */ U(Rr, { $direction: "down" })
 					]
-				}), c !== void 0 && /* @__PURE__ */ U(zr, {
-					title: _("Mark price"),
+				}), c !== void 0 && /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(zr, {
+					ref: b,
 					children: c.toFixed(a)
-				})]
+				}), x] })]
 			}),
 			l !== "asks" && /* @__PURE__ */ U(Mr, {
 				$size: l === "bids" ? "full" : "half",
-				children: T.slice(0, l === "bids" ? br * 2 : br).map((e) => /* @__PURE__ */ W(Nr, {
+				children: O.slice(0, l === "bids" ? br * 2 : br).map((e) => /* @__PURE__ */ W(Nr, {
 					$side: "bid",
-					style: D("bid", e.total / E),
+					style: A("bid", e.total / k),
 					children: [
 						/* @__PURE__ */ U(Pr, {
 							$side: "bid",
@@ -3115,11 +3115,11 @@ var G = B(e)`
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "center",
-							children: O(Number(e.qty))
+							children: j(Number(e.qty))
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "right",
-							children: O(e.total)
+							children: j(e.total)
 						})
 					]
 				}, `b-${e.price}`))
@@ -3128,10 +3128,10 @@ var G = B(e)`
 	] });
 	return g ? /* @__PURE__ */ U("div", {
 		style: h ? { display: "none" } : { display: "contents" },
-		children: k
+		children: N
 	}) : /* @__PURE__ */ U(G, {
 		style: h ? { display: "none" } : void 0,
-		children: k
+		children: N
 	});
 }, bi = B(G)`
   flex: 1;
