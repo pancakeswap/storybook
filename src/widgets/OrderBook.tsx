@@ -27,6 +27,17 @@ export interface OrderBookProps {
   pricePrecision?: number
   /** Last traded price — drives which aggregation step options are offered. */
   lastPrice?: number
+  /**
+   * Direction of the most recent tick relative to the prior one. Drives the
+   * color and arrow shown on the desktop mid-row. `'flat'` (or unset) renders
+   * the last price in the neutral text color with no arrow.
+   */
+  lastPriceDirection?: 'up' | 'down' | 'flat'
+  /**
+   * Mark price shown beside the last price on the desktop mid-row. Optional —
+   * if omitted the mid-row falls back to last price only.
+   */
+  markPrice?: number
 
   // ── Controlled view-state (consumer persists in its store) ────
   view: OrderBookView
@@ -222,30 +233,55 @@ const Cell = styled.span<{ $align?: 'center' | 'right' }>`
   text-align: ${({ $align }) => $align ?? 'right'};
 `
 
-const Spread = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+/**
+ * Mid-row between asks and bids. Aster's design shows the last trade
+ * price (large, colored by tick direction) on the left and the mark
+ * price (smaller, dotted underline) on the right — replacing the
+ * older "Spread / abs / pct" row, which the QA team flagged as
+ * uninformative because % rounded to "0.000%" for most majors.
+ */
+const MidRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 4px 16px;
-  gap: 4px;
+  gap: 8px;
   background: ${({ theme }) => theme.colors.input};
-  font-size: 14px;
-  font-weight: 400;
   font-variant-numeric: tabular-nums;
-  color: ${({ theme }) => theme.colors.text};
   flex-shrink: 0;
 `
 
-const SpreadLabel = styled.span`
-  color: ${({ theme }) => theme.colors.textSubtle};
+const LastPrice = styled.span<{ $direction: 'up' | 'down' | 'flat' }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: ${({ $direction, theme }) =>
+    $direction === 'up'
+      ? theme.colors.success
+      : $direction === 'down'
+      ? theme.colors.failure
+      : theme.colors.text};
 `
 
-const SpreadValue = styled.span`
-  text-align: center;
+const DirectionArrow = styled.span<{ $direction: 'up' | 'down' }>`
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  ${({ $direction, theme }) =>
+    $direction === 'up'
+      ? `border-bottom: 5px solid ${theme.colors.success};`
+      : `border-top: 5px solid ${theme.colors.failure};`}
 `
 
-const SpreadPct = styled.span`
-  text-align: right;
+const MarkPriceText = styled.span`
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.textSubtle};
+  border-bottom: 1px dotted ${({ theme }) => theme.colors.textSubtle};
+  cursor: help;
 `
 
 /**
@@ -785,6 +821,8 @@ const DesktopOrderBook: React.FC<OrderBookProps> = ({
   tickSize,
   pricePrecision = 2,
   lastPrice = 0,
+  lastPriceDirection = 'flat',
+  markPrice,
   view,
   onViewChange,
   priceStep,
@@ -820,11 +858,7 @@ const DesktopOrderBook: React.FC<OrderBookProps> = ({
     const maxRows = MAX_VISIBLE_ROWS * 2
     const slicedAsks = aggAsks.slice(0, maxRows).reverse()
     const slicedBids = aggBids.slice(0, maxRows)
-    const bestAsk = asks[0] ? Number(asks[0][0]) : undefined
-    const bestBid = bids[0] ? Number(bids[0][0]) : undefined
-    const spread = bestAsk && bestBid ? bestAsk - bestBid : undefined
-    const spreadPct = bestAsk && bestBid ? ((bestAsk - bestBid) / bestAsk) * 100 : undefined
-    return { asks: slicedAsks, bids: slicedBids, spread, spreadPct }
+    return { asks: slicedAsks, bids: slicedBids }
   }, [asks, bids, priceStep, tickSize, pricePrecision])
 
   // qty is always the base amount. For QUOTE display we convert per-level at
@@ -959,11 +993,16 @@ const DesktopOrderBook: React.FC<OrderBookProps> = ({
           </Half>
         )}
         {view === 'both' && (
-          <Spread role="row" aria-label={t('Spread')}>
-            <SpreadLabel>{t('Spread')}</SpreadLabel>
-            <SpreadValue>{rows.spread !== undefined ? rows.spread.toFixed(2) : '—'}</SpreadValue>
-            <SpreadPct>{rows.spreadPct !== undefined ? `${rows.spreadPct.toFixed(3)}%` : ''}</SpreadPct>
-          </Spread>
+          <MidRow role="row" aria-label={t('Last price')}>
+            <LastPrice $direction={lastPriceDirection}>
+              {lastPrice ? lastPrice.toFixed(pricePrecision) : '—'}
+              {lastPriceDirection === 'up' && <DirectionArrow $direction="up" />}
+              {lastPriceDirection === 'down' && <DirectionArrow $direction="down" />}
+            </LastPrice>
+            {markPrice !== undefined && (
+              <MarkPriceText title={t('Mark price')}>{markPrice.toFixed(pricePrecision)}</MarkPriceText>
+            )}
+          </MidRow>
         )}
         {view !== 'asks' && (
           <Half $size={view === 'bids' ? 'full' : 'half'}>
