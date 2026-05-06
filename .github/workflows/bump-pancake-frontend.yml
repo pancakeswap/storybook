@@ -29,7 +29,7 @@ on:
   # pancake-frontend race with a human push, etc.).
   workflow_dispatch:
 
-# Read-only here; the cross-repo write happens via PCS_BOT_TOKEN below.
+# Read-only here; the cross-repo write happens via DEPLOY_WHEN_STORYBOOK_UPDATE below.
 permissions:
   contents: read
 
@@ -66,12 +66,13 @@ jobs:
         with:
           repository: pancakeswap/pancake-frontend
           ref: feat/perps-aster
-          # PCS_BOT_TOKEN must be set in this repo's secrets and grant
-          # contents:write on pancakeswap/pancake-frontend. The token is
-          # already used on the pancake-frontend side; copy the same
-          # value into this repo with:
-          #   gh secret set PCS_BOT_TOKEN -R pancakeswap/storybook
-          token: ${{ secrets.PCS_BOT_TOKEN }}
+          # DEPLOY_WHEN_STORYBOOK_UPDATE: fine-grained PAT scoped to
+          # pancakeswap/pancake-frontend with `Contents: Read and write`.
+          # Set via:
+          #   gh secret set DEPLOY_WHEN_STORYBOOK_UPDATE -R pancakeswap/storybook
+          # Calendar-remind to rotate before the PAT expires; without it
+          # the bumper silently fails on every dist push.
+          token: ${{ secrets.DEPLOY_WHEN_STORYBOOK_UPDATE }}
           # We need `git pull --rebase` later, so depth must be > 1.
           fetch-depth: 0
 
