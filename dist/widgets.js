@@ -2943,15 +2943,23 @@ var G = B(e)`
 	let { isMobile: t } = h();
 	return U(t ? _i : yi, { ...e });
 }, yi = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, lastPrice: o = 0, lastPriceDirection: s = "flat", markPrice: c, view: l, onViewChange: u, priceStep: d, onPriceStepChange: f, sizeUnit: p, onSizeUnitChange: m, hidden: h, embedded: g, t: _ = Xr }) => {
-	let v = V(), y = p === "QUOTE" ? r : n, b = F(() => Wr(i, o), [i, o]);
+	let v = V(), y = p === "QUOTE" ? r : n, b = F(() => Wr(i, o), [i, o]), x = I(void 0);
 	M(() => {
-		b.length !== 0 && (b.includes(d) || f(b[b.length - 1]));
+		if (b.length !== 0) {
+			if (!b.includes(d)) {
+				f(b[b.length - 1]), x.current = i;
+				return;
+			}
+			x.current !== i && (x.current = i, o > 0 && Number(d) > o * .005 && f(b[b.length - 1]));
+		}
 	}, [
 		b,
 		d,
-		f
+		f,
+		o,
+		i
 	]);
-	let x = F(() => {
+	let S = F(() => {
 		let n = Math.max(i, Number(d) || i), r = Math.max(1, Math.round(n / i)), o = Br(e, "ask", i, r, a), s = Br(t, "bid", i, r, a), c = br * 2;
 		return {
 			asks: o.slice(0, c).reverse(),
@@ -2963,7 +2971,7 @@ var G = B(e)`
 		d,
 		i,
 		a
-	]), S = (e) => {
+	]), C = (e) => {
 		let t = 0;
 		return e.map(([e, n]) => {
 			let r = Number(n), i = Number(e), a = p === "QUOTE" ? r * i : r;
@@ -2973,13 +2981,13 @@ var G = B(e)`
 				total: t
 			};
 		});
-	}, C = F(() => S([...x.asks].reverse()).reverse(), [x.asks, p]), w = F(() => S(x.bids), [x.bids, p]), T = F(() => {
-		let e = C[0]?.total ?? 0, t = w[w.length - 1]?.total ?? 0;
+	}, w = F(() => C([...S.asks].reverse()).reverse(), [S.asks, p]), T = F(() => C(S.bids), [S.bids, p]), E = F(() => {
+		let e = w[0]?.total ?? 0, t = T[T.length - 1]?.total ?? 0;
 		return Math.max(e, t, 1);
-	}, [C, w]), E = (e, t) => {
+	}, [w, T]), D = (e, t) => {
 		let n = e === "bid" ? v.colors.success : v.colors.failure, r = Math.max(0, Math.min(100, t * 100)).toFixed(2);
 		return { background: `linear-gradient(to right, ${`color-mix(in srgb, ${n} 30%, transparent)`} 0%, ${`color-mix(in srgb, ${n} 10%, transparent)`} ${r}%, transparent ${r}%, transparent 100%)` };
-	}, D = (e) => p === "QUOTE" ? e >= 1e6 ? `${(e / 1e6).toFixed(2)}M` : e >= 1e3 ? `${(e / 1e3).toFixed(2)}K` : e.toFixed(2) : e.toFixed(3), O = /* @__PURE__ */ W(H, { children: [
+	}, O = (e) => p === "QUOTE" ? e >= 1e6 ? `${(e / 1e6).toFixed(2)}M` : e >= 1e3 ? `${(e / 1e3).toFixed(2)}K` : e.toFixed(2) : e.toFixed(3), k = /* @__PURE__ */ W(H, { children: [
 		/* @__PURE__ */ W(Sr, { children: [/* @__PURE__ */ W(Cr, { children: [
 			/* @__PURE__ */ U(wr, {
 				title: _("Both"),
@@ -3061,9 +3069,9 @@ var G = B(e)`
 		/* @__PURE__ */ W(jr, { children: [
 			l !== "bids" && /* @__PURE__ */ U(Mr, {
 				$size: l === "asks" ? "full" : "half",
-				children: C.slice(l === "asks" ? 0 : Math.max(0, C.length - br)).map((e) => /* @__PURE__ */ W(Nr, {
+				children: w.slice(l === "asks" ? 0 : Math.max(0, w.length - br)).map((e) => /* @__PURE__ */ W(Nr, {
 					$side: "ask",
-					style: E("ask", e.total / T),
+					style: D("ask", e.total / E),
 					children: [
 						/* @__PURE__ */ U(Pr, {
 							$side: "ask",
@@ -3071,11 +3079,11 @@ var G = B(e)`
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "center",
-							children: D(Number(e.qty))
+							children: O(Number(e.qty))
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "right",
-							children: D(e.total)
+							children: O(e.total)
 						})
 					]
 				}, `a-${e.price}`))
@@ -3097,9 +3105,9 @@ var G = B(e)`
 			}),
 			l !== "asks" && /* @__PURE__ */ U(Mr, {
 				$size: l === "bids" ? "full" : "half",
-				children: w.slice(0, l === "bids" ? br * 2 : br).map((e) => /* @__PURE__ */ W(Nr, {
+				children: T.slice(0, l === "bids" ? br * 2 : br).map((e) => /* @__PURE__ */ W(Nr, {
 					$side: "bid",
-					style: E("bid", e.total / T),
+					style: D("bid", e.total / E),
 					children: [
 						/* @__PURE__ */ U(Pr, {
 							$side: "bid",
@@ -3107,11 +3115,11 @@ var G = B(e)`
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "center",
-							children: D(Number(e.qty))
+							children: O(Number(e.qty))
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "right",
-							children: D(e.total)
+							children: O(e.total)
 						})
 					]
 				}, `b-${e.price}`))
@@ -3120,10 +3128,10 @@ var G = B(e)`
 	] });
 	return g ? /* @__PURE__ */ U("div", {
 		style: h ? { display: "none" } : { display: "contents" },
-		children: O
+		children: k
 	}) : /* @__PURE__ */ U(G, {
 		style: h ? { display: "none" } : void 0,
-		children: O
+		children: k
 	});
 }, bi = B(G)`
   flex: 1;
