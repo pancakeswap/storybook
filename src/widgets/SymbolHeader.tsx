@@ -27,6 +27,12 @@ export interface SymbolHeaderProps {
   // ── Live stats (raw strings; widget formats) ──────────────────
   /** Last traded price (unformatted). */
   lastPrice?: string
+  /**
+   * Direction of the most recent tick — drives the color of the last-price
+   * display. `'flat'` (or unset) keeps the neutral text color so a fresh
+   * mount or paused stream doesn't flash green/red without a real signal.
+   */
+  lastPriceDirection?: 'up' | 'down' | 'flat'
   markPrice?: string
   indexPrice?: string
   /** Signed fraction funding rate (e.g. "0.0001" = 0.01%). */
@@ -168,25 +174,21 @@ const PairName = styled(Text)`
   line-height: 1.5;
 `
 
-const LevPill = styled.span`
-  font-size: 12px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: ${({ theme }) => theme.colors.tertiary};
-  color: ${({ theme }) => theme.colors.secondary};
-  flex-shrink: 0;
-`
-
-const Price = styled.div`
+const Price = styled.div<{ $direction?: 'up' | 'down' | 'flat' }>`
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.2px;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ $direction, theme }) =>
+    $direction === 'up'
+      ? theme.colors.success
+      : $direction === 'down'
+      ? theme.colors.failure
+      : theme.colors.text};
   white-space: nowrap;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
+  transition: color 0.15s ease;
 `
 
 const Stats = styled(Flex)`
@@ -377,8 +379,8 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   symbol,
   pairLabel,
   logoUrl,
-  leverage,
   lastPrice,
+  lastPriceDirection = 'flat',
   markPrice,
   indexPrice,
   fundingRate,
@@ -448,9 +450,9 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
       window.removeEventListener('mousedown', onDown)
       window.removeEventListener('keydown', onKey)
     }
-  }, [open])
+  }, [open, setOpen])
 
-  const close = useCallback(() => setOpen(false), [])
+  const close = useCallback(() => setOpen(false), [setOpen])
 
   const fundingNegative = Number(fundingRate) < 0
   const change24hNegative = Number(change24h) < 0
@@ -519,7 +521,9 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
           )
         : null}
 
-      <Price aria-label={`Last price: ${lastPrice ?? ''}`}>{lastPrice ?? '—'}</Price>
+      <Price aria-label={`Last price: ${lastPrice ?? ''}`} $direction={lastPriceDirection}>
+        {lastPrice ?? '—'}
+      </Price>
 
       <Stats role="list">
         <Stat role="listitem">
@@ -780,7 +784,7 @@ const MobileSymbolHeader: React.FC<SymbolHeaderProps> = ({
       window.removeEventListener('mousedown', onDown)
       window.removeEventListener('keydown', onKey)
     }
-  }, [open])
+  }, [open, setOpen])
 
   const close = useCallback(() => setOpen(false), [setOpen])
   const change24hNegative = Number(change24h) < 0
