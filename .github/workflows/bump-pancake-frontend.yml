@@ -1,0 +1,158 @@
+name: Bump pancake-frontend
+
+# Why this exists:
+# When `Rebuild dist` commits a new dist/ on feat/perps-simple3, the
+# downstream pancake-frontend pin in `apps/web/package.json` is stale —
+# pancake-frontend feat/perps-aster builds against a tarball that's one
+# step behind. This workflow auto-bumps the pin so devs don't have to do
+# the chore-bump dance after every storybook src change.
+#
+# Scope: feat/perps-simple3 → feat/perps-aster ONLY. Other branches (main,
+# develop, etc.) are out of scope until we agree on a wider pinning model.
+#
+# Pre-launch posture: direct push to feat/perps-aster. Before going live,
+# flip to peter-evans/create-pull-request so a human reviews the lockfile
+# delta — a normal bump is ~10 lines, but a peer-dep refresh can spike to
+# 200+, and we want a gate before that lands on a release branch.
+
+on:
+  push:
+    branches:
+      - feat/perps-simple3
+    # Only the rebuild-dist bot's commits touch dist/ (the husky pre-commit
+    # hook refuses dist/ from humans). So this paths filter catches exactly
+    # the post-rebuild push.
+    paths:
+      - 'dist/**'
+  # Manual fallback so we can re-bump pancake-frontend without forcing a
+  # storybook re-push. Useful when the bumper itself failed (token expired,
+  # pancake-frontend race with a human push, etc.).
+  workflow_dispatch:
+
+# Read-only here; the cross-repo write happens via PCS_BOT_TOKEN below.
+permissions:
+  contents: read
+
+# Avoid stacking redundant bumps: the latest dist push always wins. If two
+# rebuild-dist runs land back-to-back, the second cancels the first.
+concurrency:
+  group: bump-pancake-frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+
+    # Belt-and-braces: only act on the rebuild-dist bot's push. A human
+    # accidentally committing dist/ (--no-verify bypass) wouldn't represent
+    # a "new build" worth bumping. workflow_dispatch sets actor to the
+    # human triggering it, so allow that path explicitly.
+    if: github.event_name == 'workflow_dispatch' || github.actor == 'github-actions[bot]'
+
+    steps:
+      - name: Resolve target storybook SHA
+        id: storybook
+        env:
+          # For push events github.sha is the dist-rebuild commit. For
+          # workflow_dispatch it's the branch HEAD at dispatch time. Both
+          # are the right thing to pin to.
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          echo "sha=${TARGET_SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$(echo "${TARGET_SHA}" | cut -c1-7)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout pancake-frontend feat/perps-aster
+        uses: actions/checkout@v4
+        with:
+          repository: pancakeswap/pancake-frontend
+          ref: feat/perps-aster
+          # PCS_BOT_TOKEN must be set in this repo's secrets and grant
+          # contents:write on pancakeswap/pancake-frontend. The token is
+          # already used on the pancake-frontend side; copy the same
+          # value into this repo with:
+          #   gh secret set PCS_BOT_TOKEN -R pancakeswap/storybook
+          token: ${{ secrets.PCS_BOT_TOKEN }}
+          # We need `git pull --rebase` later, so depth must be > 1.
+          fetch-depth: 0
+
+      - name: Check if pin is already up to date
+        id: check
+        env:
+          TARGET_SHA: ${{ steps.storybook.outputs.sha }}
+        run: |
+          # The pin is on a single line in apps/web/package.json:
+          #   "@pancakeswap/storybook": "github:pancakeswap/storybook#<sha>"
+          CURRENT=$(grep -oE 'github:pancakeswap/storybook#[a-f0-9]+' apps/web/package.json | grep -oE '[a-f0-9]+$' | head -n1)
+          echo "Current pin: ${CURRENT}"
+          echo "Target SHA:  ${TARGET_SHA}"
+          if [[ "${CURRENT}" == "${TARGET_SHA}" ]]; then
+            echo "Already at target SHA — nothing to bump."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "current=${CURRENT}" >> "$GITHUB_OUTPUT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: pnpm/action-setup@v4
+        if: steps.check.outputs.changed == 'true'
+        with:
+          # pancake-frontend's packageManager field pins pnpm 10.13.1, so
+          # the bump must use pnpm 10 to produce a lockfile pancake-
+          # frontend's CI accepts under --frozen-lockfile.
+          version: 10
+
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.changed == 'true'
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Bump pin in apps/web/package.json
+        if: steps.check.outputs.changed == 'true'
+        env:
+          CURRENT_SHA: ${{ steps.check.outputs.current }}
+          TARGET_SHA: ${{ steps.storybook.outputs.sha }}
+        run: |
+          # The pin is one well-formed JSON line; sed -i is safe.
+          sed -i "s|github:pancakeswap/storybook#${CURRENT_SHA}|github:pancakeswap/storybook#${TARGET_SHA}|" apps/web/package.json
+          # Verify the swap actually happened — fail loud if not.
+          grep -q "github:pancakeswap/storybook#${TARGET_SHA}" apps/web/package.json
+
+      - name: Refresh lockfile
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          # --no-frozen-lockfile because the storybook tarball SHA changed,
+          # which always alters the lockfile. Scope to the web app and its
+          # transitive workspace deps so we don't reinstall the entire
+          # monorepo (~3 min savings).
+          pnpm install --no-frozen-lockfile --filter web...
+
+      - name: Commit + push to feat/perps-aster
+        if: steps.check.outputs.changed == 'true'
+        env:
+          TARGET_SHA: ${{ steps.storybook.outputs.sha }}
+          SHORT_SHA: ${{ steps.storybook.outputs.short_sha }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/package.json pnpm-lock.yaml
+          # If pnpm install regenerated the lockfile to a no-op (rare but
+          # possible), skip — git commit on an empty index would fail.
+          if git diff --staged --quiet; then
+            echo "No staged changes after lockfile refresh — bailing out."
+            exit 0
+          fi
+          # --no-verify: pancake-frontend's husky pre-commit runs
+          # lint-staged formatters. They'd succeed on package.json, but
+          # bot commits should bypass human-facing hooks unconditionally.
+          git commit --no-verify -m "chore(perps): auto-bump @pancakeswap/storybook to ${SHORT_SHA}
+
+Auto-bumped by storybook .github/workflows/bump-pancake-frontend.yml
+after rebuild-dist on feat/perps-simple3 (commit ${TARGET_SHA}).
+
+Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          # Race guard: a human may have pushed to feat/perps-aster while
+          # we were running pnpm install (~3 min). Rebase on top instead
+          # of force-pushing — better to fail than to overwrite work.
+          git pull --rebase origin feat/perps-aster
+          git push origin feat/perps-aster
