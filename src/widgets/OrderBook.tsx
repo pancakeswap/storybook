@@ -4,6 +4,7 @@ import { styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { ChevronDownIcon } from '../primitives/Icons'
 import { useMatchBreakpoints } from '../contexts'
+import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel } from './primitives'
 
 export type OrderBookView = 'both' | 'bids' | 'asks'
@@ -836,6 +837,15 @@ const DesktopOrderBook: React.FC<OrderBookProps> = ({
   const theme = useTheme()
   const sizeUnitAsset = sizeUnit === 'QUOTE' ? quoteAsset : baseAsset
 
+  // Mark-price tooltip — same copy as the SymbolHeader's mark stat so
+  // users get a consistent explanation wherever the mark figure appears.
+  const { targetRef: markTipRef, tooltip: markTipNode } = useTooltip(
+    t(
+      'The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes.',
+    ),
+    { placement: 'top' },
+  )
+
   const stepOptions = useMemo(() => getStepOptions(tickSize, lastPrice), [tickSize, lastPrice])
 
   // Snap the persisted step to a sensible default on each symbol change.
@@ -1016,7 +1026,12 @@ const DesktopOrderBook: React.FC<OrderBookProps> = ({
               {lastPriceDirection === 'down' && <DirectionArrow $direction="down" />}
             </LastPrice>
             {markPrice !== undefined && (
-              <MarkPriceText title={t('Mark price')}>{markPrice.toFixed(pricePrecision)}</MarkPriceText>
+              <>
+                <MarkPriceText ref={markTipRef as React.RefObject<HTMLSpanElement>}>
+                  {markPrice.toFixed(pricePrecision)}
+                </MarkPriceText>
+                {markTipNode}
+              </>
             )}
           </MidRow>
         )}
