@@ -27,6 +27,11 @@ export interface PositionRow {
   /** Existing TP / SL trigger-order prices for this symbol, if any. */
   tpStopPrice?: string
   slStopPrice?: string
+  /** Per-position margin scheme. Rendered as a `(Cross)` / `(Isolated)`
+   *  tag under the Margin amount, matching Aster's positions table.
+   *  When omitted the tag is hidden — older consumers stay backward-
+   *  compatible. PAN-11866. */
+  marginType?: 'CROSS' | 'ISOLATED'
 }
 
 export interface OpenOrderRow {
@@ -767,9 +772,12 @@ const PositionTableRow: React.FC<{
       <Td as="div">
         {markPrice !== undefined && Number.isFinite(markPrice) ? fmtPrice(markPrice) : '—'}
       </Td>
-      <Td as="div">
-        {Number.isFinite(margin) ? `${margin.toFixed(2)} USDT` : '—'}
-      </Td>
+      <StackCell>
+        <span>{Number.isFinite(margin) ? `${margin.toFixed(2)} USDT` : '—'}</span>
+        {p.marginType ? (
+          <StackSub>{p.marginType === 'ISOLATED' ? `(${t('Isolated')})` : `(${t('Cross')})`}</StackSub>
+        ) : null}
+      </StackCell>
       <Td as="div">{Number.isFinite(liq) ? fmtPrice(liq as number) : '—'}</Td>
 
       {/* PNL (ROE%) cell — abs uPnL + share trigger on top, ROE % below */}
@@ -1818,6 +1826,7 @@ const MobilePositionCard: React.FC<{
         <MobileCardSymbol>{p.symbol}</MobileCardSymbol>
         <MobileCardSide $side={side}>
           {side === 'BUY' ? t('Long') : t('Short')} · {p.leverage}x
+          {p.marginType ? ` · ${p.marginType === 'ISOLATED' ? t('Isolated') : t('Cross')}` : ''}
         </MobileCardSide>
         <MobileCardSpacer />
         <MobileCardPnl $up={livePnl >= 0}>
