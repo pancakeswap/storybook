@@ -10370,43 +10370,7 @@ var Ud = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   color: ${({ theme: e }) => e.colors.text};
   font-weight: 600;
   letter-spacing: 0.12px;
-`;
-B.div`
-  display: flex;
-  padding: 16px;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  align-self: stretch;
-  border-radius: 16px;
-  border-top: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-  border-right: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-  border-bottom: 2px solid ${({ theme: e }) => e.colors.cardBorder};
-  border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-  background: ${({ theme: e }) => e.colors.cardSecondary};
-`, B(E)`
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-`, B.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-`, B.div`
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: #F3EEFF;
-  border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-  flex-shrink: 0;
-`, B(E)`
-  flex-direction: column;
-  line-height: 1.5;
-  min-width: 0;
-`;
-var Kf = B.div`
+`, Kf = B.div`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -10419,18 +10383,7 @@ var Kf = B.div`
   font-weight: 400;
   color: ${({ theme: e }) => e.colors.textSubtle};
   letter-spacing: 0.12px;
-`;
-B.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-`, B.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-`;
-var Jf = B.span`
+`, Jf = B.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme: e }) => e.colors.text};
@@ -10492,13 +10445,7 @@ var Jf = B.span`
   line-height: 1.5;
   min-width: 30px;
   text-align: right;
-`;
-B.div`
-  height: 1px;
-  width: 100%;
-  background: ${({ theme: e }) => e.colors.cardBorder};
-`;
-var tp = B.p`
+`, tp = B.p`
   margin: 0;
   align-self: stretch;
   color: ${({ theme: e }) => e.colors.textSubtle};
@@ -10610,6 +10557,11 @@ var tp = B.p`
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
+  /* PAN-11806: the value column was getting clipped by the popover's
+   * right edge on long amounts (e.g. \$1,098.96…). Mark this column as
+   * non-shrinkable so the row layout reserves enough room for it,
+   * forcing the flexible TkMeta in the middle to truncate first. */
+  flex-shrink: 0;
 `, _p = B.span`
   color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
