@@ -61,7 +61,39 @@ jobs:
           echo "sha=${TARGET_SHA}" >> "$GITHUB_OUTPUT"
           echo "short_sha=$(echo "${TARGET_SHA}" | cut -c1-7)" >> "$GITHUB_OUTPUT"
 
+      - name: Verify HEAD is a CI dist-rebuild commit
+        id: verify
+        env:
+          TARGET_SHA: ${{ steps.storybook.outputs.sha }}
+          # gh CLI auto-uses GITHUB_TOKEN; this token can read storybook
+          # (own repo). No DEPLOY_WHEN_STORYBOOK_UPDATE needed here.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The rebuild-dist bot's commits have a stable shape:
+          #   commit.committer.name == 'github-actions[bot]'
+          #   commit.message starts with 'ci: rebuild dist'
+          # Any other shape (human src push, merge, force-push, manual
+          # --no-verify dist commit) means the published dist/ may not
+          # match src yet. Skip — the next bot rebuild will retrigger us.
+          #
+          # We check committer (not author) because git lets you forge
+          # author names freely; committer is set by whoever's pushing
+          # and matches the actual actor for bot commits.
+          COMMIT=$(gh api "repos/${{ github.repository }}/commits/${TARGET_SHA}")
+          COMMITTER=$(echo "$COMMIT" | jq -r '.commit.committer.name')
+          # First line only — `commit.message` includes the full body.
+          MESSAGE=$(echo "$COMMIT" | jq -r '.commit.message' | head -n1)
+          echo "HEAD committer: ${COMMITTER}"
+          echo "HEAD subject:   ${MESSAGE}"
+          if [[ "${COMMITTER}" == "github-actions[bot]" && "${MESSAGE}" == "ci: rebuild dist"* ]]; then
+            echo "is_rebuild=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_rebuild=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::HEAD ${TARGET_SHA:0:7} is not a CI dist-rebuild commit — skipping bump. The next rebuild-dist run will retrigger this workflow."
+          fi
+
       - name: Checkout pancake-frontend feat/perps-aster
+        if: steps.verify.outputs.is_rebuild == 'true'
         uses: actions/checkout@v4
         with:
           repository: pancakeswap/pancake-frontend
@@ -78,6 +110,7 @@ jobs:
 
       - name: Check if pin is already up to date
         id: check
+        if: steps.verify.outputs.is_rebuild == 'true'
         env:
           TARGET_SHA: ${{ steps.storybook.outputs.sha }}
         run: |
@@ -95,7 +128,7 @@ jobs:
           fi
 
       - uses: pnpm/action-setup@v4
-        if: steps.check.outputs.changed == 'true'
+        if: steps.verify.outputs.is_rebuild == 'true' && steps.check.outputs.changed == 'true'
         with:
           # pancake-frontend's packageManager field pins pnpm 10.13.1, so
           # the bump must use pnpm 10 to produce a lockfile pancake-
@@ -103,13 +136,13 @@ jobs:
           version: 10
 
       - uses: actions/setup-node@v4
-        if: steps.check.outputs.changed == 'true'
+        if: steps.verify.outputs.is_rebuild == 'true' && steps.check.outputs.changed == 'true'
         with:
           node-version: 20
           cache: pnpm
 
       - name: Bump pin in apps/web/package.json
-        if: steps.check.outputs.changed == 'true'
+        if: steps.verify.outputs.is_rebuild == 'true' && steps.check.outputs.changed == 'true'
         env:
           CURRENT_SHA: ${{ steps.check.outputs.current }}
           TARGET_SHA: ${{ steps.storybook.outputs.sha }}
@@ -120,7 +153,7 @@ jobs:
           grep -q "github:pancakeswap/storybook#${TARGET_SHA}" apps/web/package.json
 
       - name: Refresh lockfile
-        if: steps.check.outputs.changed == 'true'
+        if: steps.verify.outputs.is_rebuild == 'true' && steps.check.outputs.changed == 'true'
         run: |
           # --no-frozen-lockfile because the storybook tarball SHA changed,
           # which always alters the lockfile. Scope to the web app and its
@@ -129,7 +162,7 @@ jobs:
           pnpm install --no-frozen-lockfile --filter web...
 
       - name: Commit + push to feat/perps-aster
-        if: steps.check.outputs.changed == 'true'
+        if: steps.verify.outputs.is_rebuild == 'true' && steps.check.outputs.changed == 'true'
         env:
           TARGET_SHA: ${{ steps.storybook.outputs.sha }}
           SHORT_SHA: ${{ steps.storybook.outputs.short_sha }}
