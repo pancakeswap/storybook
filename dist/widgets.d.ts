@@ -1472,6 +1472,18 @@ export declare interface TpSlModalProps {
      * pass the symbol's actual `pricePrecision` for finer-grained tokens.
      */
     pricePrecision?: number;
+    /** Existing TP trigger price for this position, or undefined if none set. */
+    initialTpPrice?: number | string;
+    /** Existing SL trigger price for this position, or undefined if none set. */
+    initialSlPrice?: number | string;
+    /**
+     * Cancel the existing TP order for this position. Rendered as a
+     * "Cancel" link beside the Take Profit section header when an existing
+     * TP is in place. Omit to hide the affordance.
+     */
+    onCancelTpOrder?: () => Promise<void> | void;
+    /** Cancel the existing SL order for this position. */
+    onCancelSlOrder?: () => Promise<void> | void;
     onConfirm: (intent: TpSlIntent) => Promise<void> | void;
     onClose: () => void;
     /** Translator. */
