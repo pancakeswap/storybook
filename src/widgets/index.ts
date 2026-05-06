@@ -108,6 +108,7 @@ export type {
   SimplePositionsCardProps,
   SimplePositionRow,
   SimpleOpenOrderRow,
+  SimpleHistoryRow,
   SimplePositionsTab,
   SimplePositionDirection,
   SimplePositionLiqStatus,

@@ -1,5 +1,5 @@
 import React from 'react'
-import { styled } from 'styled-components'
+import { css, styled } from 'styled-components'
 import { PerpsPanel } from './primitives'
 
 /**
@@ -25,10 +25,6 @@ export interface SimplePositionRow {
   leverageText?: string
   unrealizedPnl: string
   pnlSign: 'positive' | 'negative' | 'zero'
-  /** Pre-formatted initial margin (e.g. "0.01692 BNB"). */
-  initialMargin: string
-  /** Pre-formatted USD size (e.g. "208.1"). */
-  sizeUsd: string
   entryPrice: string
   liqPrice: string
   liqDistancePct: number
@@ -36,15 +32,40 @@ export interface SimplePositionRow {
   liqStatusLabel: string
 }
 
+export interface SimpleHistoryRow {
+  id: string
+  symbol: string
+  iconColor?: string
+  direction: SimplePositionDirection
+  /** Pre-formatted leverage label, e.g. "100X". */
+  leverageText?: string
+  /** Pre-formatted execution price, e.g. "$649.98". */
+  price: string
+  /** Pre-formatted base-asset quantity, e.g. "1.982". */
+  quantity: string
+  /** Fee amount (pre-formatted with sign), e.g. "-0.11412". */
+  fee: string
+  /** Currency the fee is denominated in (rendered semibold). */
+  feeCurrency?: string
+  /** Realized profit amount (pre-formatted with sign), e.g. "+200.091". */
+  realizedProfit: string
+  /** Drives the realized-profit color (green / pink / neutral). */
+  realizedProfitSign: 'positive' | 'negative' | 'zero'
+  /** Currency the profit is denominated in (rendered semibold). */
+  realizedProfitCurrency?: string
+  /** Pre-formatted timestamp, e.g. "2026-05-05". */
+  time: string
+}
+
 export interface SimpleOpenOrderRow {
   id: string
   symbol: string
+  iconColor?: string
   side: 'BUY' | 'SELL'
   type: string
   price: string
   origQty: string
   executedQty: string
-  status: string
 }
 
 export interface SimplePositionsCardProps {
@@ -52,14 +73,20 @@ export interface SimplePositionsCardProps {
   onTabChange: (tab: SimplePositionsTab) => void
   positions: readonly SimplePositionRow[]
   openOrders: readonly SimpleOpenOrderRow[]
+  history: readonly SimpleHistoryRow[]
   /**
-   * Whether the History tab content is empty (placeholder until the Aster
-   * history shape is finalised). When true, render a "no history yet"
-   * message; when false, render the same message until consumers wire
-   * history data.
+   * When set, replaces every tab's body with a centered "connect wallet"
+   * message. Tabs remain interactive but all three render the same
+   * placeholder. Pass an i18n-translated string from the consumer.
    */
-  historyEmpty?: boolean
+  disconnectedMessage?: string
   onClosePosition: (id: string) => void
+  onCancelOrder: (id: string) => void
+  /**
+   * When provided, renders a small share-PnL affordance next to the
+   * unrealized PnL value. Omit to hide the icon entirely.
+   */
+  onSharePnl?: (id: string) => void
   /**
    * Optional row icon renderer; defaults to a colored letter chip from the
    * row's `iconColor` or a sensible per-symbol fallback.
@@ -113,18 +140,67 @@ const Tab = styled.button<{ $active?: boolean }>`
   &:hover { color: ${({ theme }) => theme.colors.text}; }
 `
 
-const PositionsTable = styled.div`
-  display: grid;
-  grid-template-columns: 180px 1fr 1fr 1fr 1fr 1fr 1fr 56px;
-  align-items: center;
+/* Wrapper that lets the desktop/laptop grid scroll horizontally when the
+   parent container is narrower than the table's natural width. Prevents
+   the close button from getting clipped at constrained widths and keeps
+   sort headers reachable. Hidden on tablet — that breakpoint switches to
+   the stacked-card layout below. */
+const TableScroll = styled.div`
+  width: 100%;
+  overflow-x: auto;
 
-  @media (min-width: 968px) and (max-width: 1199.98px) {
-    grid-template-columns: 180px 1fr 1fr 1fr 56px;
+  /* Force a non-overlay, layout-reserved scrollbar so the track is always
+     visible at the bottom — matches the Figma design that draws a
+     persistent purple scrollbar. The 8px horizontal track margin keeps
+     the scrollbar visually inset from the card edges without padding the
+     table itself, so row hover backgrounds can extend edge-to-edge. */
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: ${({ theme }) => theme.colors.input};
+    border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+    border-radius: 16px;
+    margin: 0 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.textSubtle};
+    border-radius: 8px;
   }
 
   @media (max-width: 967.98px) {
     display: none;
   }
+`
+
+const PositionsTable = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 64px;
+  min-width: 794px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    grid-template-columns: 1fr 1fr 1fr 1fr 162px 64px;
+  }
+`
+
+/* A single logical row that re-uses the parent table's column tracks via
+   CSS subgrid. Letting each row be its own grid container is what enables
+   the row-level :hover state — direct grid children can't catch hover
+   for "the whole row", but a subgrid wrapper can. */
+const TableRow = styled.div<{ $isHeader?: boolean }>`
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  align-items: center;
+
+  ${({ $isHeader, theme }) =>
+    !$isHeader &&
+    css`
+      &:hover {
+        background: ${theme.colors.cardSecondary};
+      }
+    `}
 `
 
 /* Tablet-only stacked card per position. Shows the same data as the
@@ -320,18 +396,59 @@ const TabletPositionCloseBtn = styled.button`
   &:hover { background: #FFF0F9; }
 `
 
-const HideOnLaptop = styled.div`
-  display: contents;
+const OrdersTable = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 64px;
+  min-width: 794px;
 
-  @media (min-width: 968px) and (max-width: 1199.98px) {
+  @media (max-width: 967.98px) {
     display: none;
   }
 `
 
-const OrdersTable = styled.div`
-  display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr 1fr 1fr;
+const TabletOrdersList = styled.div`
+  display: none;
+
+  @media (max-width: 967.98px) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+`
+
+const TabletOrderHeader = styled(TabletPositionHeader)``
+
+const TabletOrderSideBadge = styled.span<{ $side: 'BUY' | 'SELL' }>`
+  display: inline-flex;
   align-items: center;
+  margin-left: auto;
+  color: ${({ $side, theme }) => ($side === 'BUY' ? theme.colors.success : theme.colors.failure)};
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`
+
+const TabletOrderCancelBtn = styled(TabletPositionCloseBtn)``
+
+const HistoryTable = styled.div`
+  display: grid;
+  grid-template-columns: 190px 1fr 1fr 1fr 1fr 1fr;
+  min-width: 794px;
+
+  @media (max-width: 967.98px) {
+    display: none;
+  }
+`
+
+const TabletHistoryList = styled(TabletOrdersList)``
+
+/* Currency suffix shown next to fee / realized-profit values in semibold,
+   per Figma 86:30657 ("-0.11412 USDT" with "USDT" emphasised). */
+const CurrencyUnit = styled.span`
+  font-weight: 600;
 `
 
 const Th = styled.div<{ $align?: 'left' | 'right' }>`
@@ -395,6 +512,31 @@ const Td = styled.div`
   line-height: 150%;
   text-align: right;
   font-variant-numeric: tabular-nums;
+`
+
+/* Fee values are always rendered in the pink "destructive" color since
+   they represent a cost (consistent across positive rebates too — the
+   product treats fees as a single visual category). */
+const FeeCell = styled(Td)`
+  color: #ED4B9E;
+`
+
+const RealizedProfitCell = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
+  color: ${({ $sign, theme }) =>
+    $sign === 'positive'
+      ? '#129E7D'
+      : $sign === 'negative'
+        ? '#ED4B9E'
+        : theme.colors.text};
+
+  html.dark & {
+    color: ${({ $sign, theme }) =>
+      $sign === 'positive'
+        ? '#3DDBB5'
+        : $sign === 'negative'
+          ? '#ED4B9E'
+          : theme.colors.text};
+  }
 `
 
 const TokenCell = styled.div`
@@ -472,7 +614,15 @@ const DirectionLabel = styled.span<{ $direction: SimplePositionDirection }>`
   }
 `
 
-const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
+const PnlCell = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 16px;
+`
+
+const PnlValue = styled.span<{ $sign: 'positive' | 'negative' | 'zero' }>`
   color: ${({ $sign, theme }) =>
     $sign === 'positive'
       ? '#129E7D'
@@ -487,6 +637,8 @@ const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
   font-weight: 600;
   line-height: 150%;
   letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 
   html.dark & {
     color: ${({ $sign, theme }) =>
@@ -498,6 +650,21 @@ const Pnl = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
   }
 `
 
+const SharePnlBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: pointer;
+  border-radius: 4px;
+  &:hover { color: ${({ theme }) => theme.colors.text}; }
+`
+
 const LiqDistance = styled(Td)`
   display: flex;
   align-items: center;
@@ -506,12 +673,14 @@ const LiqDistance = styled(Td)`
 `
 
 const LiqTrack = styled.div`
-  flex: 1;
+  position: relative;
+  width: 100px;
   height: 6px;
   border-radius: 999px;
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
   overflow: hidden;
-  max-width: 94px;
+  box-shadow: inset 0 2px 0 -1px rgba(0, 0, 0, 0.06);
 `
 
 const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
@@ -519,7 +688,7 @@ const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
   width: ${({ $pct }) => `${Math.max(0, Math.min(100, $pct))}%`};
   background: ${({ $status, theme }) =>
     $status === 'safe'
-      ? theme.colors.success
+      ? 'linear-gradient(to right, #34C49E, #6FBF81)'
       : $status === 'warn'
         ? theme.colors.warning
         : theme.colors.failure};
@@ -535,7 +704,7 @@ const CloseBtn = styled.button`
   align-items: center;
   gap: 16px;
   aspect-ratio: 1 / 1;
-  margin: 16px 10px;
+  margin: 16px;
   border-radius: 8px;
   border-top: 1px solid #ED4B9E;
   border-right: 1px solid #ED4B9E;
@@ -559,6 +728,23 @@ const Empty = styled.div`
   padding: 16px;
   color: ${({ theme }) => theme.colors.textSubtle};
   font-size: 14px;
+`
+
+/* Disconnected-wallet placeholder. Sits in place of any tab's body and
+   matches Figma 85:30426: 48px vertical padding, centered text in
+   theme.colors.textSubtle. */
+const DisconnectedBlock = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  padding: 48px 16px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+  text-align: center;
 `
 
 const SideText = styled.span<{ $side: 'BUY' | 'SELL' }>`
@@ -589,36 +775,11 @@ const CloseIcon: React.FC = () => (
   </svg>
 )
 
-const PlusCircleIcon: React.FC = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path
-      d="M7.368 8.632V10.6c0 .179.06.329.18.45.121.121.27.182.448.182.179 0 .329-.061.452-.182.123-.121.184-.271.184-.45V8.632h1.968c.179 0 .329-.06.45-.18.121-.121.182-.27.182-.448 0-.178-.061-.329-.182-.452-.121-.123-.271-.184-.45-.184H8.632V5.4c0-.179-.06-.329-.18-.45-.121-.121-.27-.182-.448-.182-.178 0-.329.061-.452.182-.123.121-.184.271-.184.45v1.968H5.4c-.179 0-.329.06-.45.18-.121.12-.182.27-.182.448 0 .178.061.329.182.452.121.123.271.184.45.184h1.968ZM8.005 14.535c-.902 0-1.75-.17-2.544-.51a6.553 6.553 0 0 1-2.083-1.402 6.563 6.563 0 0 1-1.398-2.084 6.535 6.535 0 0 1-.51-2.547c0-.905.17-1.751.51-2.539a6.55 6.55 0 0 1 1.398-2.078 6.544 6.544 0 0 1 2.083-1.398 6.535 6.535 0 0 1 2.547-.51c.905 0 1.752.17 2.54.51a6.55 6.55 0 0 1 2.075 1.398 6.582 6.582 0 0 1 1.4 2.082c.34.79.51 1.637.51 2.539 0 .902-.17 1.75-.51 2.543a6.582 6.582 0 0 1-1.4 2.083 6.55 6.55 0 0 1-2.079 1.402 6.535 6.535 0 0 1-2.539.51Zm-.005-1.383c1.434 0 2.651-.5 3.652-1.5 1-1.001 1.5-2.218 1.5-3.652 0-1.434-.5-2.651-1.5-3.652-1.001-1-2.218-1.5-3.652-1.5-1.434 0-2.651.5-3.652 1.5-1 1.001-1.5 2.218-1.5 3.652 0 1.434.5 2.651 1.5 3.652 1.001 1 2.218 1.5 3.652 1.5Z"
-      fill="currentColor"
-    />
+const ShareGlyph: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M18 16.1162C17.24 16.1162 16.56 16.4162 16.04 16.8862L8.91 12.7362C8.96 12.5062 9 12.2762 9 12.0362C9 11.7962 8.96 11.5662 8.91 11.3362L15.96 7.22619C16.5 7.72619 17.21 8.03619 18 8.03619C19.66 8.03619 21 6.69619 21 5.03619C21 3.37619 19.66 2.03619 18 2.03619C16.34 2.03619 15 3.37619 15 5.03619C15 5.27619 15.04 5.50619 15.09 5.73619L8.04 9.84619C7.5 9.34619 6.79 9.03619 6 9.03619C4.34 9.03619 3 10.3762 3 12.0362C3 13.6962 4.34 15.0362 6 15.0362C6.79 15.0362 7.5 14.7262 8.04 14.2262L15.16 18.3862C15.11 18.5962 15.08 18.8162 15.08 19.0362C15.08 20.6462 16.39 21.9562 18 21.9562C19.61 21.9562 20.92 20.6462 20.92 19.0362C20.92 17.4262 19.61 16.1162 18 16.1162Z" />
   </svg>
 )
-
-const MarginCell = styled(Td)`
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-`
-
-const MarginAddBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: ${({ theme }) => theme.colors.textSubtle};
-  cursor: pointer;
-  border-radius: 6px;
-  &:hover { color: ${({ theme }) => theme.colors.text}; }
-`
 
 // ── Component ───────────────────────────────────────────────────
 
@@ -627,8 +788,11 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
   onTabChange,
   positions,
   openOrders,
-  historyEmpty = true,
+  history,
+  disconnectedMessage,
   onClosePosition,
+  onCancelOrder,
+  onSharePnl,
   renderTokenIcon,
 }) => {
   return (
@@ -663,6 +827,10 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
         </Tab>
       </TabsRow>
 
+      {disconnectedMessage ? (
+        <DisconnectedBlock>{disconnectedMessage}</DisconnectedBlock>
+      ) : (
+        <>
       {tab === 'positions' && positions.length > 0 && (
         <TabletPositionsList>
           {positions.map((row) => (
@@ -716,39 +884,30 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
         (positions.length === 0 ? (
           <Empty>No open positions</Empty>
         ) : (
+          <TableScroll>
           <PositionsTable role="table">
-            <Th>Token</Th>
-            <Th $align="right">
-              Unrealized PnL
-              <SortBtn type="button" aria-label="Sort by unrealized PnL"><SortGlyph /></SortBtn>
-            </Th>
-            <HideOnLaptop>
+            <TableRow $isHeader role="row">
+              <Th>Token</Th>
               <Th $align="right">
-                Initial Margin
-                <SortBtn type="button" aria-label="Sort by initial margin"><SortGlyph /></SortBtn>
+                Unrealized PnL
+                <SortBtn type="button" aria-label="Sort by unrealized PnL"><SortGlyph /></SortBtn>
               </Th>
               <Th $align="right">
-                Size (USD)
-                <SortBtn type="button" aria-label="Sort by size"><SortGlyph /></SortBtn>
+                Entry Price
+                <SortBtn type="button" aria-label="Sort by entry price"><SortGlyph /></SortBtn>
               </Th>
-            </HideOnLaptop>
-            <Th $align="right">
-              Entry Price
-              <SortBtn type="button" aria-label="Sort by entry price"><SortGlyph /></SortBtn>
-            </Th>
-            <Th $align="right">
-              Liq. Price
-              <SortBtn type="button" aria-label="Sort by liq. price"><SortGlyph /></SortBtn>
-            </Th>
-            <HideOnLaptop>
+              <Th $align="right">
+                Liq. Price
+                <SortBtn type="button" aria-label="Sort by liq. price"><SortGlyph /></SortBtn>
+              </Th>
               <Th $align="right">
                 Distance to Liq
                 <SortBtn type="button" aria-label="Sort by distance to liq"><SortGlyph /></SortBtn>
               </Th>
-            </HideOnLaptop>
-            <Th />
+              <Th />
+            </TableRow>
             {positions.map((row) => (
-              <React.Fragment key={row.id}>
+              <TableRow key={row.id} role="row">
                 <TokenCell>
                   {/* Returning null/undefined from `renderTokenIcon` defers
                       to the default colored-letter chip — lets consumers
@@ -768,26 +927,26 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
                     </DirectionLabel>
                   </TokenMeta>
                 </TokenCell>
-                <Pnl $sign={row.pnlSign}>{row.unrealizedPnl}</Pnl>
-                <HideOnLaptop>
-                  <MarginCell>
-                    {row.initialMargin}
-                    <MarginAddBtn type="button" aria-label="Add margin">
-                      <PlusCircleIcon />
-                    </MarginAddBtn>
-                  </MarginCell>
-                  <Td>{row.sizeUsd}</Td>
-                </HideOnLaptop>
+                <PnlCell>
+                  <PnlValue $sign={row.pnlSign}>{row.unrealizedPnl}</PnlValue>
+                  {onSharePnl && (
+                    <SharePnlBtn
+                      type="button"
+                      aria-label="Share PnL"
+                      onClick={() => onSharePnl(row.id)}
+                    >
+                      <ShareGlyph />
+                    </SharePnlBtn>
+                  )}
+                </PnlCell>
                 <Td>{row.entryPrice}</Td>
                 <Td>{row.liqPrice}</Td>
-                <HideOnLaptop>
-                  <LiqDistance>
-                    <LiqTrack>
-                      <LiqFill $pct={row.liqDistancePct} $status={row.liqStatus} />
-                    </LiqTrack>
-                    <span>{row.liqStatusLabel}</span>
-                  </LiqDistance>
-                </HideOnLaptop>
+                <LiqDistance>
+                  <LiqTrack>
+                    <LiqFill $pct={row.liqDistancePct} $status={row.liqStatus} />
+                  </LiqTrack>
+                  <span>{row.liqStatusLabel}</span>
+                </LiqDistance>
                 <CloseBtn
                   type="button"
                   aria-label="Close position"
@@ -795,41 +954,247 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
                 >
                   <CloseIcon />
                 </CloseBtn>
-              </React.Fragment>
+              </TableRow>
             ))}
           </PositionsTable>
+          </TableScroll>
         ))}
+
+      {tab === 'orders' && openOrders.length > 0 && (
+        <TabletOrdersList>
+          {openOrders.map((o) => (
+            <TabletPositionCard key={`tablet-${o.id}`}>
+              <TabletOrderHeader>
+                <TabletPositionTokenIcon $color={o.iconColor ?? defaultIconColor(o.symbol)}>
+                  {o.symbol.slice(0, 1)}
+                </TabletPositionTokenIcon>
+                <TabletPositionMeta>
+                  <TabletPositionSymbol>{o.symbol}</TabletPositionSymbol>
+                </TabletPositionMeta>
+                <TabletOrderSideBadge $side={o.side}>
+                  {o.side === 'BUY' ? 'Buy' : 'Sell'}
+                </TabletOrderSideBadge>
+              </TabletOrderHeader>
+              <TabletPositionDivider />
+              <TabletPositionStats>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Type</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{o.type}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Price</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{o.price}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Size</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{o.origQty}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Filled</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{`${o.executedQty}/${o.origQty}`}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+              </TabletPositionStats>
+              <TabletOrderCancelBtn type="button" onClick={() => onCancelOrder(o.id)}>
+                Cancel
+              </TabletOrderCancelBtn>
+            </TabletPositionCard>
+          ))}
+        </TabletOrdersList>
+      )}
 
       {tab === 'orders' &&
         (openOrders.length === 0 ? (
           <Empty>No open orders</Empty>
         ) : (
+          <TableScroll>
           <OrdersTable role="table">
-            <Th>Symbol</Th>
-            <Th>Side</Th>
-            <Th>Type</Th>
-            <Th>Price</Th>
-            <Th>Size</Th>
-            <Th>Filled</Th>
-            <Th>Status</Th>
+            <TableRow $isHeader role="row">
+              <Th>Token</Th>
+              <Th $align="right">
+                Side
+                <SortBtn type="button" aria-label="Sort by side"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Type
+                <SortBtn type="button" aria-label="Sort by type"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Price
+                <SortBtn type="button" aria-label="Sort by price"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Size
+                <SortBtn type="button" aria-label="Sort by size"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Filled
+                <SortBtn type="button" aria-label="Sort by filled"><SortGlyph /></SortBtn>
+              </Th>
+              <Th />
+            </TableRow>
             {openOrders.map((o) => (
-              <React.Fragment key={o.id}>
-                <Td>{o.symbol}</Td>
+              <TableRow key={o.id} role="row">
+                <TokenCell>
+                  <TokenIcon $color={o.iconColor ?? defaultIconColor(o.symbol)}>
+                    {o.symbol.slice(0, 1)}
+                  </TokenIcon>
+                  <TokenMeta>
+                    <TokenSymbol>{o.symbol}</TokenSymbol>
+                  </TokenMeta>
+                </TokenCell>
                 <Td>
-                  <SideText $side={o.side}>{o.side}</SideText>
+                  <SideText $side={o.side}>{o.side === 'BUY' ? 'Buy' : 'Sell'}</SideText>
                 </Td>
                 <Td>{o.type}</Td>
                 <Td>{o.price}</Td>
                 <Td>{o.origQty}</Td>
-                <Td>{o.executedQty}</Td>
-                <Td>{o.status}</Td>
-              </React.Fragment>
+                <Td>{`${o.executedQty}/${o.origQty}`}</Td>
+                <CloseBtn
+                  type="button"
+                  aria-label="Cancel order"
+                  onClick={() => onCancelOrder(o.id)}
+                >
+                  <CloseIcon />
+                </CloseBtn>
+              </TableRow>
             ))}
           </OrdersTable>
+          </TableScroll>
         ))}
 
-      {tab === 'history' && (
-        <Empty>{historyEmpty ? 'No transaction history' : 'No transaction history'}</Empty>
+      {tab === 'history' && history.length > 0 && (
+        <TabletHistoryList>
+          {history.map((h) => (
+            <TabletPositionCard key={`tablet-${h.id}`}>
+              <TabletPositionHeader>
+                <TabletPositionTokenIcon $color={h.iconColor ?? defaultIconColor(h.symbol)}>
+                  {h.symbol.slice(0, 1)}
+                </TabletPositionTokenIcon>
+                <TabletPositionMeta>
+                  <TabletPositionSymbol>{h.symbol}</TabletPositionSymbol>
+                  <TabletPositionDirection $direction={h.direction}>
+                    {directionLabel(h.direction)}
+                    {h.leverageText ? ` · ${h.leverageText}` : ''}
+                  </TabletPositionDirection>
+                </TabletPositionMeta>
+              </TabletPositionHeader>
+              <TabletPositionDivider />
+              <TabletPositionStats>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Price</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{h.price}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Quantity</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{h.quantity}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Fee</TabletPositionStatLabel>
+                  <TabletPositionStatValue $danger>
+                    {h.fee}
+                    {h.feeCurrency && (
+                      <>
+                        {' '}
+                        <CurrencyUnit>{h.feeCurrency}</CurrencyUnit>
+                      </>
+                    )}
+                  </TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Realized Profit</TabletPositionStatLabel>
+                  <TabletPositionStatValue
+                    $safe={h.realizedProfitSign === 'positive'}
+                    $danger={h.realizedProfitSign === 'negative'}
+                  >
+                    {h.realizedProfit}
+                    {h.realizedProfitCurrency && (
+                      <>
+                        {' '}
+                        <CurrencyUnit>{h.realizedProfitCurrency}</CurrencyUnit>
+                      </>
+                    )}
+                  </TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Time</TabletPositionStatLabel>
+                  <TabletPositionStatValue>{h.time}</TabletPositionStatValue>
+                </TabletPositionStatRow>
+              </TabletPositionStats>
+            </TabletPositionCard>
+          ))}
+        </TabletHistoryList>
+      )}
+
+      {tab === 'history' &&
+        (history.length === 0 ? (
+          <Empty>No transaction history</Empty>
+        ) : (
+          <TableScroll>
+          <HistoryTable role="table">
+            <TableRow $isHeader role="row">
+              <Th>Token</Th>
+              <Th $align="right">
+                Price
+                <SortBtn type="button" aria-label="Sort by price"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Quantity
+                <SortBtn type="button" aria-label="Sort by quantity"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Fee
+                <SortBtn type="button" aria-label="Sort by fee"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Realized Profit
+                <SortBtn type="button" aria-label="Sort by realized profit"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Time
+                <SortBtn type="button" aria-label="Sort by time"><SortGlyph /></SortBtn>
+              </Th>
+            </TableRow>
+            {history.map((h) => (
+              <TableRow key={h.id} role="row">
+                <TokenCell>
+                  <TokenIcon $color={h.iconColor ?? defaultIconColor(h.symbol)}>
+                    {h.symbol.slice(0, 1)}
+                  </TokenIcon>
+                  <TokenMeta>
+                    <TokenSymbol>{h.symbol}</TokenSymbol>
+                    <DirectionLabel $direction={h.direction}>
+                      {directionLabel(h.direction)}
+                      {h.leverageText ? ` | ${h.leverageText}` : ''}
+                    </DirectionLabel>
+                  </TokenMeta>
+                </TokenCell>
+                <Td>{h.price}</Td>
+                <Td>{h.quantity}</Td>
+                <FeeCell>
+                  {h.fee}
+                  {h.feeCurrency && (
+                    <>
+                      {' '}
+                      <CurrencyUnit>{h.feeCurrency}</CurrencyUnit>
+                    </>
+                  )}
+                </FeeCell>
+                <RealizedProfitCell $sign={h.realizedProfitSign}>
+                  {h.realizedProfit}
+                  {h.realizedProfitCurrency && (
+                    <>
+                      {' '}
+                      <CurrencyUnit>{h.realizedProfitCurrency}</CurrencyUnit>
+                    </>
+                  )}
+                </RealizedProfitCell>
+                <Td>{h.time}</Td>
+              </TableRow>
+            ))}
+          </HistoryTable>
+          </TableScroll>
+        ))}
+        </>
       )}
     </Card>
   )

@@ -6,6 +6,8 @@ import { SimpleChartCard } from '../widgets/SimpleChartCard'
 import {
   SimplePositionsCard,
   type SimplePositionRow,
+  type SimpleOpenOrderRow,
+  type SimpleHistoryRow,
   type SimplePositionsTab,
 } from '../widgets/SimplePositionsCard'
 import {
@@ -44,13 +46,57 @@ const SAMPLE_POSITIONS: readonly SimplePositionRow[] = [
     leverageText: '100X',
     unrealizedPnl: '+$10.09',
     pnlSign: 'positive',
-    initialMargin: '0.01692 BNB',
-    sizeUsd: '208.1',
     entryPrice: '$649.98',
     liqPrice: '$637.00',
     liqDistancePct: 90,
     liqStatus: 'safe',
     liqStatusLabel: 'Safe',
+  },
+] as const
+
+const SAMPLE_OPEN_ORDERS: readonly SimpleOpenOrderRow[] = [
+  {
+    id: 'order-1',
+    symbol: 'BNB',
+    iconColor: '#F3BA2F',
+    side: 'BUY',
+    type: 'Limit',
+    price: '$649.98',
+    origQty: '0.1',
+    executedQty: '0',
+  },
+] as const
+
+const SAMPLE_HISTORY: readonly SimpleHistoryRow[] = [
+  {
+    id: 'history-1',
+    symbol: 'BNB',
+    iconColor: '#F3BA2F',
+    direction: 'up',
+    leverageText: '100X',
+    price: '$649.98',
+    quantity: '1.982',
+    fee: '-0.11412',
+    feeCurrency: 'USDT',
+    realizedProfit: '+200.091',
+    realizedProfitSign: 'positive',
+    realizedProfitCurrency: 'USDT',
+    time: '2026-05-05',
+  },
+  {
+    id: 'history-2',
+    symbol: 'BNB',
+    iconColor: '#F3BA2F',
+    direction: 'down',
+    leverageText: '50X',
+    price: '$651.42',
+    quantity: '0.815',
+    fee: '-0.04812',
+    feeCurrency: 'USDT',
+    realizedProfit: '-42.187',
+    realizedProfitSign: 'negative',
+    realizedProfitCurrency: 'USDT',
+    time: '2026-05-04',
   },
 ] as const
 
@@ -1230,9 +1276,10 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
               tab={positionsTab}
               onTabChange={setPositionsTab}
               positions={SAMPLE_POSITIONS}
-              openOrders={[]}
-              historyEmpty
+              openOrders={SAMPLE_OPEN_ORDERS}
+              history={SAMPLE_HISTORY}
               onClosePosition={() => undefined}
+              onCancelOrder={() => undefined}
             />
           </TabletPositionsWrapper>
         </LeftCol>
