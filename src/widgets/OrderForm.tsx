@@ -187,6 +187,7 @@ const SideToggle = styled(Flex)`
  * bouncy snap. Background color transitions on a separate (gentler)
  * timing so the slide and the recolor don't cross-blend muddily.
  */
+/* eslint-disable no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark */
 const SideIndicator = styled.span<{ $side: OrderSide }>`
   position: absolute;
   top: 0;
@@ -203,6 +204,7 @@ const SideIndicator = styled.span<{ $side: OrderSide }>`
   pointer-events: none;
   z-index: 0;
 `
+/* eslint-enable no-restricted-syntax */
 
 /* Active-press effect for Buy/Sell — drop the SideIndicator's bottom
    stroke while either toggle button is pressed so it reads as a tap. */
@@ -213,6 +215,7 @@ const SideToggleWrap = styled(SideToggle)`
   }
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const SideButton = styled.button<{ $active: boolean; $side: OrderSide }>`
   position: relative;
   z-index: 1;
@@ -240,7 +243,9 @@ const SideButton = styled.button<{ $active: boolean; $side: OrderSide }>`
     color: ${({ $active, theme }) => ($active ? '#000' : theme.colors.textSubtle)};
   }
 `
+/* eslint-enable no-restricted-syntax */
 
+/* eslint-disable no-restricted-syntax -- TODO(design): need info-teal token in uikit */
 const ModeButton = styled.button`
   display: flex;
   flex: 1 0 0;
@@ -268,6 +273,7 @@ const ModeButton = styled.button`
     padding-bottom: 7px;
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const ModeButtonLabel = styled.span`
   display: flex;
@@ -291,6 +297,7 @@ const AvblValue = styled(Flex)`
   font-variant-numeric: tabular-nums;
 `
 
+/* eslint-disable no-restricted-syntax -- brand primary, no theme variant */
 const SizeField = styled.div`
   position: relative;
   display: flex;
@@ -311,6 +318,7 @@ const SizeField = styled.div`
       0 0 0 4px rgba(118, 69, 217, 0.20);
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const SizeLabel = styled.span`
   pointer-events: none;
@@ -362,6 +370,7 @@ const DashedLabelWrap = styled.span`
   display: inline-flex;
 `
 
+// eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
 const DashedLabel = styled.span`
   display: flex;
   flex-direction: column;
@@ -379,6 +388,7 @@ const DashedLabel = styled.span`
  * Shadow strengthens from light to dark to keep readable elevation
  * against the darker page bg.
  */
+// eslint-disable-next-line no-restricted-syntax -- overlay scrim, intentional always-dark/always-light
 const ReduceOnlyTooltip = styled.div`
   position: absolute;
   bottom: calc(100% + 8px);
@@ -453,6 +463,7 @@ const UnitPickerChevron = () => (
   </UnitPickerChevronWrap>
 )
 
+/* eslint-disable no-restricted-syntax -- brand primary, no theme variant */
 const PriceInputRow = styled.div`
   position: relative;
   display: flex;
@@ -473,6 +484,7 @@ const PriceInputRow = styled.div`
       0 0 0 4px rgba(118, 69, 217, 0.20);
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const PriceInput = styled.input`
   flex: 1;
@@ -660,6 +672,7 @@ const SummaryGrid = styled.div`
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
 `
 
+// eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
 const SK = styled(Text).attrs({ fontSize: '14px', color: 'textSubtle' })`
   display: inline-flex;
   width: fit-content;

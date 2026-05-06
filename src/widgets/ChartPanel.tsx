@@ -104,6 +104,7 @@ const PlaceholderLine = styled.span`
   border-bottom: 2px solid color-mix(in srgb, var(--pcs-colors-primary) 50%, transparent);
 `
 
+// eslint-disable-next-line no-restricted-syntax -- on colored bg, contrast guarantee
 const PricePill = styled.span`
   position: absolute;
   right: 8px;

@@ -138,6 +138,7 @@ const StarBtn = styled.button`
   flex-shrink: 0;
 `
 
+// eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
 const CoinBadge = styled.span<{ $bg?: string }>`
   width: 24px;
   height: 24px;
@@ -246,6 +247,7 @@ const FundingTipAnchor = styled.span`
   display: inline-flex;
 `
 
+// eslint-disable-next-line no-restricted-syntax -- overlay scrim, intentional always-dark/always-light
 const FundingTipBubble = styled.div`
   position: fixed;
   transform: translateX(-50%);
@@ -289,10 +291,12 @@ const FundingTipRow = styled.div`
   gap: 8px;
 `
 
+/* eslint-disable no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark */
 const FundingTipDirSpan = styled.span<{ $color: 'long' | 'short' | 'plain' }>`
   color: ${({ $color }) =>
     $color === 'long' ? '#31D0AA' : $color === 'short' ? '#ED4B9E' : 'inherit'};
 `
+/* eslint-enable no-restricted-syntax */
 
 const FundingTipDesc = styled.p`
   margin: 0;
@@ -621,6 +625,7 @@ const MobileSymBtn = styled.div`
   }
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee + brand SVG illustration */
 const MobileCoinBadge = styled.span<{ $bg?: string }>`
   width: 28px;
   height: 28px;
@@ -635,6 +640,7 @@ const MobileCoinBadge = styled.span<{ $bg?: string }>`
   background: ${({ $bg }) => $bg ?? '#F7931A'};
   overflow: hidden;
 `
+/* eslint-enable no-restricted-syntax */
 
 const MobilePairText = styled.span`
   font-size: 18px;

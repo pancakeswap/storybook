@@ -2,10 +2,12 @@ import type { Variant } from "./types";
 
 const variants = {
   warning: {
+    // eslint-disable-next-line no-restricted-syntax -- variant theme table, alpha intentional
     backgroundColor: "#FFB23719",
     borderColor: "warning",
   },
   danger: {
+    // eslint-disable-next-line no-restricted-syntax -- variant theme table, alpha intentional
     backgroundColor: "#ED4B9E19",
     borderColor: "failure",
   },
@@ -18,11 +20,14 @@ const variants = {
     borderColor: "secondary",
   },
   secondary: {
+    // eslint-disable-next-line no-restricted-syntax -- variant theme table, alpha intentional
     backgroundColor: "#FFB23719",
     borderColor: "warning",
   },
   primary60: {
+    // eslint-disable-next-line no-restricted-syntax -- variant theme table, alpha intentional
     backgroundColor: "#EEFBFC",
+    // eslint-disable-next-line no-restricted-syntax -- variant theme table, alpha intentional
     borderColor: "#C1EDF0",
   },
   secondary60: {

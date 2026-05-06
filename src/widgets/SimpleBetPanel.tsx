@@ -319,6 +319,7 @@ const HeadLeft = styled.button`
   color: ${({ theme }) => theme.colors.text};
 `
 
+// eslint-disable-next-line no-restricted-syntax -- brand SVG illustration + on colored bg, contrast guarantee
 const TokenChip = styled.span`
   width: 32px;
   height: 32px;
@@ -421,6 +422,7 @@ const FundAmt = styled.span`
 `
 
 // Bet input field
+/* eslint-disable no-restricted-syntax -- brand primary, no theme variant */
 const BetField = styled.label`
   display: flex;
   min-width: 296px;
@@ -441,6 +443,7 @@ const BetField = styled.label`
       0 0 0 4px rgba(118, 69, 217, 0.20);
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const BetFieldRow = styled.div`
   display: flex;
@@ -534,6 +537,7 @@ const BetTokenButton = styled.button`
   color: ${({ theme }) => theme.colors.text};
 `
 
+// eslint-disable-next-line no-restricted-syntax -- brand SVG illustration + on colored bg, contrast guarantee
 const QuoteIcon = styled.span`
   width: 40px;
   height: 40px;
@@ -617,6 +621,7 @@ const AssetDropdownItem = styled.button<{ $selected?: boolean }>`
   }
 `
 
+/* eslint-disable no-restricted-syntax -- brand SVG illustration + on colored bg, contrast guarantee */
 const AssetItemChip = styled.span<{ $color?: string }>`
   width: 24px;
   height: 24px;
@@ -638,6 +643,7 @@ const AssetItemChip = styled.span<{ $color?: string }>`
     display: block;
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const QuoteSym = styled.span`
   font-size: 14px;
@@ -716,6 +722,7 @@ const ZonePill = styled.span<{ $zone: Zone }>`
   background: ${({ $zone }) => ZONE_BG[$zone]};
 `
 
+// eslint-disable-next-line no-restricted-syntax -- on colored bg, contrast guarantee
 const ZonePillText = styled.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -735,6 +742,7 @@ const ZonePillText = styled.span`
   }
 `
 
+// eslint-disable-next-line no-restricted-syntax -- on colored bg, contrast guarantee
 const ZoneTipAnchor = styled.span`
   display: inline-flex;
   align-items: center;
@@ -757,6 +765,7 @@ const LevBar = styled.div`
   margin-top: 8px;
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): replace with color-mix or new token */
 const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   position: relative;
   height: 21px;
@@ -776,6 +785,7 @@ const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
     height: 16px;
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' | 'triple' }>`
   position: absolute;
@@ -800,6 +810,7 @@ const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' |
   &:active { cursor: grabbing; }
 `
 
+/* eslint-disable no-restricted-syntax -- brand SVG illustration */
 const GrabberGlyph: React.FC = () => (
   <svg width="38" height="39" viewBox="0 0 38 39" fill="none" aria-hidden="true">
     <ellipse cx="19.0019" cy="19.6397" rx="19.0019" ry="18.5459" fill="#F9AF6C" />
@@ -829,6 +840,7 @@ const GrabberDegenGlyph: React.FC = () => (
     <rect x="21.8184" y="12" width="10.9091" height="10.9094" rx="2" fill="#FAD658" />
   </svg>
 )
+/* eslint-enable no-restricted-syntax */
 
 const LevRangeInput = styled.input`
   position: absolute;
@@ -987,6 +999,7 @@ const StatsValue = styled.span<{ $danger?: boolean }>`
 `
 
 // UP / DOWN buttons
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
   display: flex;
   padding: 8px;
@@ -1036,6 +1049,7 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
     color: ${({ theme }) => theme.colors.textDisabled};
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const DirectionButtonContent = styled.span`
   display: flex;

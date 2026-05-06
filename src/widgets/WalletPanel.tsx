@@ -150,6 +150,7 @@ export interface WalletPanelProps {
 
 /* ── Mock data ─────────────────────────────────────────────── */
 
+/* eslint-disable no-restricted-syntax -- brand SVG illustration */
 const DEFAULT_DATA: WalletData = {
   buckets: {
     spot: {
@@ -193,6 +194,7 @@ const DEFAULT_DATA: WalletData = {
     },
   },
 }
+/* eslint-enable no-restricted-syntax */
 
 const DEFAULT_LABELS: Required<Omit<WalletPanelLabels, 'heroTitle' | 'tabs' | 'pnlSuffix' | 'bucketEmptyMessage'>> & {
   tabs: Required<NonNullable<WalletPanelLabels['tabs']>>
@@ -288,6 +290,7 @@ const InfoCircle = ({ size = 16 }: { size?: number }) => (
 const BnbDiamond = ({ size = 16 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
     <path
+      // eslint-disable-next-line no-restricted-syntax -- brand SVG illustration
       fill="#F0B90B"
       d="M12 2 7.4 6.6 9 8.2 12 5.2 15 8.2l1.6-1.6L12 2zm-7 7L3.4 10.6 5 12.2 6.6 10.6 5 9zm14 0-1.6 1.6L19 12.2l1.6-1.6L19 9zM7.4 13.4 5.8 15 12 21.2 18.2 15l-1.6-1.6L12 18l-4.6-4.6zm4.6-2L10.4 13 12 14.6 13.6 13 12 11.4z"
     />
@@ -296,6 +299,7 @@ const BnbDiamond = ({ size = 16 }: { size?: number }) => (
 
 /* Bucket icon chips — 36×36 rounded squares with a single emoji glyph
    inside. Replaces the previous raster wallet.png / perps-chart.png. */
+/* eslint-disable no-restricted-syntax -- TODO(design): perps-variant tokens */
 const BucketIconChip = styled.span<{ $variant: 'spot' | 'perp' }>`
   display: flex;
   width: 36px;
@@ -319,6 +323,7 @@ const BucketIconChip = styled.span<{ $variant: 'spot' | 'perp' }>`
     background: ${({ $variant }) => ($variant === 'spot' ? '#27252B' : '#223537')};
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const SpotWalletGlyph = () => (
   <BucketIconChip $variant="spot" aria-hidden>
@@ -460,7 +465,8 @@ const ChipBadge = styled.span<{ $variant: 'light' | 'dark' }>`
     z-index: 2;
     margin-right: -13px;
   `
-      : `
+      : // eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
+        `
     background: #121212;
     z-index: 1;
     color: #F0B90B;
@@ -533,6 +539,7 @@ const HeroTitle = styled.span`
   letter-spacing: -0.2px;
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): missing dark/light counterpart */
 const TfRoot = styled.div<{ $muted?: boolean }>`
   display: flex;
   align-items: flex-start;
@@ -582,6 +589,7 @@ const TfButton = styled.button<{ $active: boolean }>`
         : ''}
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const HeroAmountRow = styled(Flex)`
   align-items: center;
@@ -811,6 +819,7 @@ const CompBar = styled.div`
   background: ${({ theme }) => theme.colors.input};
 `
 
+// eslint-disable-next-line no-restricted-syntax -- brand SVG illustration
 const CompSegSpot = styled.span`
   display: block;
   height: 12px;
@@ -820,6 +829,7 @@ const CompSegSpot = styled.span`
   background: linear-gradient(180deg, #53DEE9 0%, #1FC7D4 100%);
 `
 
+// eslint-disable-next-line no-restricted-syntax -- brand SVG illustration
 const CompSegPerp = styled.span`
   display: block;
   height: 12px;
@@ -890,6 +900,7 @@ const BucketLeft = styled.div`
   min-width: 0;
 `
 
+// eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
 const BucketIcon = styled.div`
   width: 36px;
   height: 36px;
@@ -994,6 +1005,7 @@ const Track = styled.div`
   overflow: hidden;
 `
 
+/* eslint-disable no-restricted-syntax -- brand SVG illustration */
 const TrackFill = styled.div<{ $pct: number; $kind: BucketKey }>`
   height: 100%;
   border-radius: 99px;
@@ -1001,6 +1013,7 @@ const TrackFill = styled.div<{ $pct: number; $kind: BucketKey }>`
   background: ${({ $kind, theme }) =>
     $kind === 'spot' ? 'linear-gradient(180deg, #53DEE9 0%, #1FC7D4 100%)' : theme.colors.secondary};
 `
+/* eslint-enable no-restricted-syntax */
 
 const TrackPct = styled.span`
   font-size: 12px;
@@ -1089,6 +1102,7 @@ const TkIcon = styled.span`
   height: 40px;
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const TokenCircleEl = styled.span<{ $color: string }>`
   width: 40px;
   height: 40px;
@@ -1104,7 +1118,9 @@ const TokenCircleEl = styled.span<{ $color: string }>`
   box-sizing: border-box;
   background: ${({ $color }) => $color};
 `
+/* eslint-enable no-restricted-syntax */
 
+// eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
 const TkNetwork = styled.span`
   position: absolute;
   right: -4px;

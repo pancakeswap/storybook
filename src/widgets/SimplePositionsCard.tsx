@@ -238,6 +238,7 @@ const TabletPositionHeader = styled.div`
   align-self: stretch;
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const TabletPositionTokenIcon = styled.span<{ $color: string }>`
   display: inline-flex;
   width: 40px;
@@ -252,6 +253,7 @@ const TabletPositionTokenIcon = styled.span<{ $color: string }>`
   flex-shrink: 0;
   margin-right: 12px;
 `
+/* eslint-enable no-restricted-syntax */
 
 const TabletPositionMeta = styled.div`
   display: flex;
@@ -269,6 +271,7 @@ const TabletPositionSymbol = styled.span`
   line-height: 150%;
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const TabletPositionDirection = styled.span<{ $direction: SimplePositionDirection }>`
   display: inline-flex;
   align-items: center;
@@ -304,6 +307,7 @@ const TabletPositionPnl = styled.span<{ $sign: 'positive' | 'negative' | 'zero' 
       $sign === 'positive' ? '#3DDBB5' : $sign === 'negative' ? '#ED4B9E' : theme.colors.text};
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const TabletPositionDivider = styled.span`
   display: block;
@@ -336,6 +340,7 @@ const TabletPositionStatLabel = styled.span`
   line-height: 150%;
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const TabletPositionStatValue = styled.span<{ $danger?: boolean; $safe?: boolean }>`
   color: ${({ $danger, $safe, theme }) =>
     $safe ? '#129E7D' : $danger ? '#ED4B9E' : theme.colors.text};
@@ -348,6 +353,7 @@ const TabletPositionStatValue = styled.span<{ $danger?: boolean; $safe?: boolean
   line-height: 150%;
   font-variant-numeric: tabular-nums;
 `
+/* eslint-enable no-restricted-syntax */
 
 const TabletPositionLiqBar = styled.div`
   display: flex;
@@ -375,6 +381,7 @@ const TabletPositionLiqFill = styled.div<{ $pct: number; $status: SimplePosition
         : theme.colors.failure};
 `
 
+// eslint-disable-next-line no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark
 const TabletPositionCloseBtn = styled.button`
   display: flex;
   height: 48px;
@@ -558,6 +565,7 @@ const TokenCell = styled.div`
   }
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const TokenIcon = styled.span<{ $color: string }>`
   display: inline-flex;
   width: 40px;
@@ -570,6 +578,7 @@ const TokenIcon = styled.span<{ $color: string }>`
   font-weight: 700;
   font-size: 14px;
 `
+/* eslint-enable no-restricted-syntax */
 
 const TokenMeta = styled.div`
   display: flex;
@@ -592,6 +601,7 @@ const TokenSymbol = styled.span`
   line-height: 150%;
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const DirectionLabel = styled.span<{ $direction: SimplePositionDirection }>`
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -649,6 +659,7 @@ const PnlValue = styled.span<{ $sign: 'positive' | 'negative' | 'zero' }>`
           : theme.colors.text};
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const SharePnlBtn = styled.button`
   display: inline-flex;
@@ -695,6 +706,7 @@ const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
   border-radius: 999px;
 `
 
+// eslint-disable-next-line no-restricted-syntax -- BUY/SELL brand semantic + TODO(design): replace with color-mix or new token
 const CloseBtn = styled.button`
   display: flex;
   width: 32px;

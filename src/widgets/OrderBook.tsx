@@ -208,11 +208,13 @@ const Row = styled.div<{ $side: 'bid' | 'ask' }>`
   }
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const Price = styled.span<{ $side: 'bid' | 'ask' }>`
   position: relative;
   z-index: 1;
   color: ${({ $side, theme }) => ($side === 'bid' ? '#129E7D' : theme.colors.failure)};
 `
+/* eslint-enable no-restricted-syntax */
 
 const Cell = styled.span<{ $align?: 'center' | 'right' }>`
   position: relative;
@@ -426,6 +428,7 @@ const MHeadSize = styled.span`
   gap: 2px;
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const MRow = styled.div<{ $side: 'bid' | 'ask' }>`
   position: relative;
   display: flex;
@@ -437,6 +440,7 @@ const MRow = styled.div<{ $side: 'bid' | 'ask' }>`
   font-variant-numeric: tabular-nums;
   color: ${({ $side, theme }) => ($side === 'bid' ? '#129E7D' : theme.colors.failure)};
 `
+/* eslint-enable no-restricted-syntax */
 
 const MBar = styled.span`
   position: absolute;

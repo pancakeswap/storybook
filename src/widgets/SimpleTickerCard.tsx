@@ -71,6 +71,7 @@ const Left = styled.button`
   }
 `
 
+// eslint-disable-next-line no-restricted-syntax -- brand SVG illustration + on colored bg, contrast guarantee
 const TokenChip = styled.span`
   width: 64px;
   height: 64px;
@@ -249,6 +250,7 @@ const Price = styled.span`
   }
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): replace with color-mix or new token */
 const Pnl = styled.span<{ $positive: boolean }>`
   display: flex;
   padding: 0 6px;
@@ -268,12 +270,15 @@ const Pnl = styled.span<{ $positive: boolean }>`
     display: none;
   }
 `
+/* eslint-enable no-restricted-syntax */
 
+/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const PnlTriangle = styled.span<{ $positive: boolean }>`
   display: inline-flex;
   align-items: center;
   color: ${({ $positive }) => ($positive ? '#129E7D' : '#ED4B9E')};
 `
+/* eslint-enable no-restricted-syntax */
 
 const StatsWrap = styled.div`
   display: flex;
@@ -511,6 +516,7 @@ const MarketCell = styled.div`
   ${MarketRow}:hover & { background: ${({ theme }) => theme.colors.cardSecondary}; }
 `
 
+// eslint-disable-next-line no-restricted-syntax -- brand SVG illustration
 const MarketStarCell = styled(MarketCell)`
   padding-left: 8px;
   padding-right: 0;
@@ -523,6 +529,7 @@ const MarketTokenCell = styled(MarketCell)`
   gap: 12px;
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const MarketTokenIcon = styled.span<{ $color: string }>`
   width: 28px;
   height: 28px;
@@ -536,6 +543,7 @@ const MarketTokenIcon = styled.span<{ $color: string }>`
   font-weight: 700;
   flex-shrink: 0;
 `
+/* eslint-enable no-restricted-syntax */
 
 const MarketRightCell = styled(MarketCell)`
   text-align: right;
@@ -562,11 +570,13 @@ interface MarketAsset {
   starred?: boolean
 }
 
+/* eslint-disable no-restricted-syntax -- brand SVG illustration */
 const MOCK_MARKETS: MarketAsset[] = [
   { symbol: 'BTC',  lastPrice: '$590.75',   change: -1.2, volume: '0.542 BNB',  color: '#F0B90B', starred: true },
   { symbol: 'CAKE', lastPrice: '$1.46',     change:  0.8, volume: '144.11 CAKE', color: '#23CAD5', starred: true },
   { symbol: 'ETH',  lastPrice: '$2,181.25', change: -0.6, volume: '0.206 ETH',  color: '#627EEA', starred: true },
 ]
+/* eslint-enable no-restricted-syntax */
 
 const MarketsDropdown: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   if (!isOpen) return null

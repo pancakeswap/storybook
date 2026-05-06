@@ -306,6 +306,7 @@ const CheckingStep = styled(Flex)<{ $state: 'done' | 'active' | 'pending' }>`
   opacity: ${({ $state }) => ($state === 'pending' ? 0.5 : 1)};
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const StepIndicator = styled.div<{ $state: 'done' | 'active' | 'pending' }>`
   width: 22px;
   height: 22px;
@@ -317,6 +318,7 @@ const StepIndicator = styled.div<{ $state: 'done' | 'active' | 'pending' }>`
     $state === 'done' ? theme.colors.success : theme.colors.input};
   color: ${({ $state, theme }) => ($state === 'done' ? '#fff' : theme.colors.text)};
 `
+/* eslint-enable no-restricted-syntax */
 
 const SuccessHeading = styled(Text).attrs({ fontSize: '32px', bold: true })`
   text-align: center;

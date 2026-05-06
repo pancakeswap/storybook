@@ -189,6 +189,7 @@ const Actions = styled.div`
 `
 
 /* "Copy image" — outlined primary, primary60 text. */
+/* eslint-disable no-restricted-syntax -- TODO(design): need info-teal token in uikit */
 const CopyBtn = styled.button`
   display: inline-flex;
   align-items: center;
@@ -219,9 +220,11 @@ const CopyBtn = styled.button`
     color: #48D0DB;
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 /* "share on X" — filled primary with the 2px bottom-inset shadow the
  * design system uses on filled CTAs. */
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const ShareXBtn = styled.button`
   display: inline-flex;
   align-items: center;
@@ -254,6 +257,7 @@ const ShareXBtn = styled.button`
     cursor: default;
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 // ── Inline glyphs ─────────────────────────────────────────────
 

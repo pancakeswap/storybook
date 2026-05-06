@@ -148,6 +148,7 @@ const Root = styled.div`
   }
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): missing dark/light counterpart */
 const Track = styled.span`
   position: absolute;
   left: 14px;
@@ -157,7 +158,9 @@ const Track = styled.span`
   background: ${({ theme }) => theme?.colors?.inputSecondary ?? 'var(--pcs-colors-input-secondary, #D7CAEC)'};
   pointer-events: none;
 `
+/* eslint-enable no-restricted-syntax */
 
+/* eslint-disable no-restricted-syntax -- brand primary, no theme variant */
 const Fill = styled.span`
   position: absolute;
   left: 14px;
@@ -167,6 +170,7 @@ const Fill = styled.span`
   pointer-events: none;
   transition: width 60ms linear;
 `
+/* eslint-enable no-restricted-syntax */
 
 const Back = styled.span`
   position: absolute;
