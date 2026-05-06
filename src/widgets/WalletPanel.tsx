@@ -871,51 +871,6 @@ const CompLegPct = styled.span`
   letter-spacing: 0.12px;
 `
 
-const BucketWrap = styled.div`
-  display: flex;
-  padding: 16px;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  align-self: stretch;
-  border-radius: 16px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  background: ${({ theme }) => theme.colors.cardSecondary};
-`
-
-const BucketTopRow = styled(Flex)`
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-`
-
-const BucketLeft = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-`
-
-// eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
-const BucketIcon = styled.div`
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: #F3EEFF;
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  flex-shrink: 0;
-`
-
-const BucketMeta = styled(Flex)`
-  flex-direction: column;
-  line-height: 1.5;
-  min-width: 0;
-`
-
 const BucketLabel = styled.div`
   color: ${({ theme }) => theme.colors.text};
   font-feature-settings: 'liga' off;
@@ -931,19 +886,6 @@ const BucketSub = styled.div`
   font-weight: 400;
   color: ${({ theme }) => theme.colors.textSubtle};
   letter-spacing: 0.12px;
-`
-
-const BucketRight = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-`
-
-const BucketAmountRow = styled.div`
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
 `
 
 const BucketAmount = styled.span`
@@ -1023,12 +965,6 @@ const TrackPct = styled.span`
   line-height: 1.5;
   min-width: 30px;
   text-align: right;
-`
-
-const Divider = styled.div`
-  height: 1px;
-  width: 100%;
-  background: ${({ theme }) => theme.colors.cardBorder};
 `
 
 const BucketDesc = styled.p`
@@ -1176,6 +1112,11 @@ const TkRight = styled(Flex)`
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
+  /* PAN-11806: the value column was getting clipped by the popover's
+   * right edge on long amounts (e.g. \$1,098.96…). Mark this column as
+   * non-shrinkable so the row layout reserves enough room for it,
+   * forcing the flexible TkMeta in the middle to truncate first. */
+  flex-shrink: 0;
 `
 
 const TkValue = styled.span`
