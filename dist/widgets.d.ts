@@ -1371,6 +1371,12 @@ export declare interface SymbolHeaderProps {
     leverage: number;
     /** Last traded price (unformatted). */
     lastPrice?: string;
+    /**
+     * Direction of the most recent tick — drives the color of the last-price
+     * display. `'flat'` (or unset) keeps the neutral text color so a fresh
+     * mount or paused stream doesn't flash green/red without a real signal.
+     */
+    lastPriceDirection?: 'up' | 'down' | 'flat';
     markPrice?: string;
     indexPrice?: string;
     /** Signed fraction funding rate (e.g. "0.0001" = 0.01%). */

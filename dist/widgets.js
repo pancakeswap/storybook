@@ -1855,25 +1855,16 @@ var G = B(e)`
   white-space: nowrap;
   padding: 0 8px;
   line-height: 1.5;
-`;
-B.span`
-  font-size: 12px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: ${({ theme: e }) => e.colors.tertiary};
-  color: ${({ theme: e }) => e.colors.secondary};
-  flex-shrink: 0;
-`;
-var Vn = B.div`
+`, Vn = B.div`
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.2px;
-  color: ${({ theme: e }) => e.colors.text};
+  color: ${({ $direction: e, theme: t }) => e === "up" ? t.colors.success : e === "down" ? t.colors.failure : t.colors.text};
   white-space: nowrap;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
+  transition: color 0.15s ease;
 `, Hn = B(E)`
   gap: 24px;
   align-items: flex-start;
@@ -1983,7 +1974,7 @@ var Vn = B.div`
 }), or = (e) => e, sr = (e) => {
 	let { isMobile: t } = h();
 	return U(t ? yr : cr, { ...e });
-}, cr = ({ symbol: e, pairLabel: t, logoUrl: n, leverage: r, lastPrice: i, markPrice: a, indexPrice: o, fundingRate: c, nextFundingTime: l, change24h: u, volume24h: d, favorited: f = !1, onToggleFavorite: p, renderMarketsDropdown: m, marketsOpen: h, onMarketsOpenChange: g, t: _ = or }) => {
+}, cr = ({ symbol: e, pairLabel: t, logoUrl: n, lastPrice: r, lastPriceDirection: i = "flat", markPrice: a, indexPrice: o, fundingRate: c, nextFundingTime: l, change24h: u, volume24h: d, favorited: f = !1, onToggleFavorite: p, renderMarketsDropdown: m, marketsOpen: h, onMarketsOpenChange: g, t: _ = or }) => {
 	let v = V(), y = h !== void 0, [b, x] = L(!1), S = y ? h : b, C = j((e) => {
 		let t = typeof e == "function" ? e(S) : e;
 		y || x(t), g?.(t);
@@ -2015,8 +2006,8 @@ var Vn = B.div`
 		return window.addEventListener("mousedown", e), window.addEventListener("keydown", t), () => {
 			window.removeEventListener("mousedown", e), window.removeEventListener("keydown", t);
 		};
-	}, [S]);
-	let k = j(() => C(!1), []), A = Number(c) < 0, N = Number(u) < 0, { targetRef: F, tooltip: R } = T(_("The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes."), { placement: "bottom" }), [z, B] = L(!1), [H, G] = L(null), K = I(null), te = (() => {
+	}, [S, C]);
+	let k = j(() => C(!1), [C]), A = Number(c) < 0, N = Number(u) < 0, { targetRef: F, tooltip: R } = T(_("The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes."), { placement: "bottom" }), [z, B] = L(!1), [H, G] = L(null), K = I(null), te = (() => {
 		let e = Number(c);
 		return Number.isFinite(e) ? e * 100 : null;
 	})(), q = te == null ? "—" : `${(te * 3 * 365).toFixed(4)}%`, ne = () => {
@@ -2068,8 +2059,9 @@ var Vn = B.div`
 				children: m(k)
 			}), document.body) : null,
 			/* @__PURE__ */ U(Vn, {
-				"aria-label": `Last price: ${i ?? ""}`,
-				children: i ?? "—"
+				"aria-label": `Last price: ${r ?? ""}`,
+				$direction: i,
+				children: r ?? "—"
 			}),
 			/* @__PURE__ */ W(Hn, {
 				role: "list",
@@ -2259,7 +2251,7 @@ var Vn = B.div`
 		return window.addEventListener("mousedown", e), window.addEventListener("keydown", t), () => {
 			window.removeEventListener("mousedown", e), window.removeEventListener("keydown", t);
 		};
-	}, [y]);
+	}, [y, b]);
 	let E = j(() => b(!1), [b]), D = Number(r) < 0, O = t.split(/[- ]/)[0] ?? t, k = !!d;
 	return /* @__PURE__ */ W(lr, {
 		"aria-label": `${e} ticker`,
