@@ -11,6 +11,9 @@ import { MarginModeModal } from './MarginModeModal';
 import { MarginModeModalProps } from './MarginModeModal';
 import { PerpStatsData } from './WalletPanel';
 import { ResponsiveValue } from 'styled-system';
+import { SharePnlModal } from './SharePnlModal';
+import { SharePnlModalProps } from './SharePnlModal';
+import { SharePnlTier } from './SharePnlModal';
 import { SimpleBetPanel } from './SimpleBetPanel';
 import { SimpleBetPanelProps } from './SimpleBetPanel';
 import { SimpleChartCard } from './SimpleChartCard';
@@ -26,6 +29,7 @@ import { SimplePositionsTab } from './SimplePositionsCard';
 import { SimpleTickerCard } from './SimpleTickerCard';
 import { SimpleTickerCardProps } from './SimpleTickerCard';
 import { Theme } from 'styled-system';
+import { tierFromPnlPct } from './SharePnlModal';
 import { TLengthStyledSystem } from 'styled-system';
 import { WalletData } from './WalletPanel';
 import { WalletPanel } from './WalletPanel';
@@ -1288,6 +1292,12 @@ export declare interface RecentTradesProps {
     embedded?: boolean;
 }
 
+export { SharePnlModal }
+
+export { SharePnlModalProps }
+
+export { SharePnlTier }
+
 export { SimpleBetPanel }
 
 export { SimpleBetPanelProps }
@@ -1390,6 +1400,8 @@ export declare interface SymbolHeaderProps {
     /** Translator. */
     t?: (key: string) => string;
 }
+
+export { tierFromPnlPct }
 
 export declare interface TpSlIntent {
     symbol: string;
