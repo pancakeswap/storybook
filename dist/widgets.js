@@ -3353,31 +3353,13 @@ var G = B(e)`
   line-height: 1.5;
   color: ${({ theme: e }) => e.colors.text};
   white-space: nowrap;
-`;
-B.span`
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: ${({ theme: e }) => e.colors.tertiary};
-  color: ${({ theme: e }) => e.colors.secondary};
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1.4;
-  letter-spacing: 0;
-  flex-shrink: 0;
-`;
-var zi = B.span`
+`, zi = B.span`
   display: inline-flex;
   align-items: center;
   cursor: help;
   color: inherit;
   margin-left: 4px;
-`;
-B.span`
-  color: ${({ $kind: e, theme: t }) => e === "tp" ? t.colors.success : t.colors.failure};
-`;
-var Bi = B.div`
+`, Bi = B.div`
   display: grid;
   grid-template-columns: repeat(7, minmax(min-content, 1fr)) auto;
   /* Match the Positions table spacing: zero column-gap so row hover
@@ -3724,11 +3706,22 @@ var Bi = B.div`
 		"data-overlay": !0,
 		"aria-hidden": !0,
 		children: /* @__PURE__ */ U(Zi, {})
-	})] }), e === "positions" && /* @__PURE__ */ W(ki, { children: [/* @__PURE__ */ W(Ai, { children: [/* @__PURE__ */ U(l, {
-		scale: "sm",
-		checked: v,
-		onChange: (e) => y?.(e.target.checked)
-	}), /* @__PURE__ */ U("span", { children: S("Hide Other Symbols") })] }), b && /* @__PURE__ */ U(ji, {
+	})] }), e === "positions" && /* @__PURE__ */ W(ki, { children: [/* @__PURE__ */ W(Ai, {
+		role: "button",
+		tabIndex: 0,
+		onClick: (e) => {
+			e.target.tagName !== "INPUT" && (e.preventDefault(), y?.(!v));
+		},
+		onKeyDown: (e) => {
+			(e.key === " " || e.key === "Enter") && (e.preventDefault(), y?.(!v));
+		},
+		children: [/* @__PURE__ */ U(l, {
+			scale: "sm",
+			checked: v,
+			onChange: (e) => y?.(e.target.checked),
+			onClick: (e) => e.stopPropagation()
+		}), /* @__PURE__ */ U("span", { children: S("Hide Other Symbols") })]
+	}), b && /* @__PURE__ */ U(ji, {
 		type: "button",
 		onClick: b,
 		disabled: n.length === 0,
