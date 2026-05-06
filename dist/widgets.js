@@ -4504,68 +4504,68 @@ var Ga = B(E)`
   justify-content: space-between;
   padding: 4px 0;
   font-size: 12px;
-`, Za = (e) => e, Qa = ({ isOpen: e, symbol: t, positionSide: n, qty: a, entryPrice: o, markPrice: s, onConfirm: c, onClose: l, t: u = Za }) => {
-	let d = V(), p = n === "LONG" ? 1 : -1, [m, h] = L(""), [_, v] = L(""), [y, b] = L(""), [x, C] = L(""), [w, T] = L(!1);
+`, Za = (e) => e, Qa = ({ isOpen: e, symbol: t, positionSide: n, qty: a, entryPrice: o, markPrice: s, quoteAsset: c = "USDT", pricePrecision: l = 4, onConfirm: u, onClose: d, t: p = Za }) => {
+	let m = V(), h = n === "LONG" ? 1 : -1, [_, v] = L(""), [y, b] = L(""), [x, C] = L(""), [w, T] = L(""), [D, O] = L(!1);
 	M(() => {
-		e || (h(""), v(""), b(""), C(""));
+		e || (v(""), b(""), C(""), T(""));
 	}, [e]);
-	let D = (e) => a > 0 ? o + p * e / a : NaN, O = (e) => a > 0 ? p * (e - o) * a : NaN, k = (e, t) => Number.isFinite(e) ? e.toFixed(t) : "", A = (e) => {
-		if (h(e), e === "") return v("");
+	let k = (e) => a > 0 ? o + h * e / a : NaN, A = (e) => a > 0 ? h * (e - o) * a : NaN, j = (e, t) => Number.isFinite(e) ? e.toFixed(t) : "", N = (e) => {
+		if (v(e), e === "") return b("");
 		let t = Number(e);
-		v(Number.isFinite(t) ? k(O(t), 4) : "");
-	}, j = (e) => {
-		let t = Ha(e);
-		if (v(t), t === "" || t === "-") return h("");
-		let n = Number(t);
-		h(Number.isFinite(n) ? k(D(n), 2) : "");
-	}, N = (e) => {
-		if (b(e), e === "") return C("");
-		let t = Number(e);
-		C(Number.isFinite(t) ? k(O(t), 4) : "");
+		b(Number.isFinite(t) ? j(A(t), 4) : "");
 	}, P = (e) => {
-		let t = Ua(e);
-		if (C(t), t === "" || t === "-") return b("");
+		let t = Ha(e);
+		if (b(t), t === "" || t === "-") return v("");
 		let n = Number(t);
-		b(Number.isFinite(n) ? k(D(n), 2) : "");
-	}, I = F(() => {
-		let e = Number(m), t = Number(y), r = m !== "" && Number.isFinite(e), i = y !== "" && Number.isFinite(t);
+		v(Number.isFinite(n) ? j(k(n), l) : "");
+	}, I = (e) => {
+		if (C(e), e === "") return T("");
+		let t = Number(e);
+		T(Number.isFinite(t) ? j(A(t), 4) : "");
+	}, R = (e) => {
+		let t = Ua(e);
+		if (T(t), t === "" || t === "-") return C("");
+		let n = Number(t);
+		C(Number.isFinite(n) ? j(k(n), l) : "");
+	}, z = F(() => {
+		let e = Number(_), t = Number(x), r = _ !== "" && Number.isFinite(e), i = x !== "" && Number.isFinite(t);
 		if (n === "LONG") {
-			if (r && e <= o) return u("Take Profit price must be above entry for a LONG position.");
-			if (i && t >= o) return u("Stop Loss price must be below entry for a LONG position.");
+			if (r && e <= o) return p("Take Profit price must be above entry for a LONG position.");
+			if (i && t >= o) return p("Stop Loss price must be below entry for a LONG position.");
 		} else {
-			if (r && e >= o) return u("Take Profit price must be below entry for a SHORT position.");
-			if (i && t <= o) return u("Stop Loss price must be above entry for a SHORT position.");
+			if (r && e >= o) return p("Take Profit price must be below entry for a SHORT position.");
+			if (i && t <= o) return p("Stop Loss price must be above entry for a SHORT position.");
 		}
 	}, [
-		m,
-		y,
+		_,
+		x,
 		n,
 		o,
-		u
-	]), R = !w && (m !== "" || y !== "") && !I, z = async () => {
-		if (R) {
-			T(!0);
+		p
+	]), B = !D && (_ !== "" || x !== "") && !z, H = async () => {
+		if (B) {
+			O(!0);
 			try {
-				await c({
+				await u({
 					symbol: t,
 					closeSide: n === "LONG" ? "SELL" : "BUY",
-					tpPrice: m,
-					slPrice: y,
+					tpPrice: _,
+					slPrice: x,
 					qty: String(a),
 					closePosition: !0
-				}), l();
+				}), d();
 			} finally {
-				T(!1);
+				O(!1);
 			}
 		}
 	};
 	return /* @__PURE__ */ U(S, {
 		isOpen: e,
-		onDismiss: l,
+		onDismiss: d,
 		closeOnOverlayClick: !0,
 		children: /* @__PURE__ */ U(g, {
-			title: u("Set TP / SL"),
-			onDismiss: l,
+			title: p("Set TP / SL"),
+			onDismiss: d,
 			children: /* @__PURE__ */ W(E, {
 				flexDirection: "column",
 				style: {
@@ -4577,11 +4577,11 @@ var Ga = B(E)`
 					/* @__PURE__ */ W(Xa, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						color: "textSubtle",
-						children: u("Symbol")
+						children: p("Symbol")
 					}), /* @__PURE__ */ W(r, {
 						fontSize: "14px",
 						bold: !0,
-						style: { color: n === "LONG" ? d.colors.success : d.colors.failure },
+						style: { color: n === "LONG" ? m.colors.success : m.colors.failure },
 						children: [
 							t,
 							" · ",
@@ -4591,40 +4591,45 @@ var Ga = B(E)`
 					/* @__PURE__ */ W(Xa, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						color: "textSubtle",
-						children: u("Entry")
+						children: p("Entry")
 					}), /* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						bold: !0,
 						style: { fontVariantNumeric: "tabular-nums" },
-						children: Number.isFinite(o) ? Va(o.toFixed(2)) : "—"
+						children: Number.isFinite(o) ? `${Va(o.toFixed(l))} ${c}` : "—"
 					})] }),
 					/* @__PURE__ */ W(Xa, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						color: "textSubtle",
-						children: u("Mark")
+						children: p("Mark")
 					}), /* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						bold: !0,
 						style: { fontVariantNumeric: "tabular-nums" },
-						children: Number.isFinite(s) ? Va(s.toFixed(2)) : "—"
+						children: Number.isFinite(s) ? `${Va(s.toFixed(l))} ${c}` : "—"
 					})] }),
 					/* @__PURE__ */ U(qa, {}),
 					/* @__PURE__ */ W(Ga, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						bold: !0,
-						color: d.colors.success,
-						children: u("Take Profit")
+						color: m.colors.success,
+						children: p("Take Profit")
 					}), /* @__PURE__ */ W(Ka, { children: [/* @__PURE__ */ W(f, {
 						style: { flex: 1 },
-						children: [/* @__PURE__ */ U(Ja, { children: u("Trigger Price") }), /* @__PURE__ */ U(Ya, {
-							...Wa(m, A),
+						children: [/* @__PURE__ */ U(Ja, { children: p("Trigger Price") }), /* @__PURE__ */ U(Ya, {
+							...Wa(_, N),
 							placeholder: "0.00",
 							inputMode: "decimal"
 						})]
 					}), /* @__PURE__ */ W(f, {
 						style: { flex: 1 },
-						children: [/* @__PURE__ */ U(Ja, { children: u("PnL (USDT)") }), /* @__PURE__ */ U(Ya, {
-							...Wa(_, j),
+						children: [/* @__PURE__ */ W(Ja, { children: [
+							p("PnL"),
+							" (",
+							c,
+							")"
+						] }), /* @__PURE__ */ U(Ya, {
+							...Wa(y, P),
 							placeholder: "0.00",
 							inputMode: "decimal"
 						})]
@@ -4632,34 +4637,39 @@ var Ga = B(E)`
 					/* @__PURE__ */ W(Ga, { children: [/* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						bold: !0,
-						color: d.colors.failure,
-						children: u("Stop Loss")
+						color: m.colors.failure,
+						children: p("Stop Loss")
 					}), /* @__PURE__ */ W(Ka, { children: [/* @__PURE__ */ W(f, {
 						style: { flex: 1 },
-						children: [/* @__PURE__ */ U(Ja, { children: u("Trigger Price") }), /* @__PURE__ */ U(Ya, {
-							...Wa(y, N),
+						children: [/* @__PURE__ */ U(Ja, { children: p("Trigger Price") }), /* @__PURE__ */ U(Ya, {
+							...Wa(x, I),
 							placeholder: "0.00",
 							inputMode: "decimal"
 						})]
 					}), /* @__PURE__ */ W(f, {
 						style: { flex: 1 },
-						children: [/* @__PURE__ */ U(Ja, { children: u("PnL (USDT)") }), /* @__PURE__ */ U(Ya, {
-							...Wa(x, P),
+						children: [/* @__PURE__ */ W(Ja, { children: [
+							p("PnL"),
+							" (",
+							c,
+							")"
+						] }), /* @__PURE__ */ U(Ya, {
+							...Wa(w, R),
 							placeholder: "0.00",
 							inputMode: "decimal"
 						})]
 					})] })] }),
-					I && /* @__PURE__ */ U(r, {
+					z && /* @__PURE__ */ U(r, {
 						fontSize: "14px",
 						color: "failure",
-						children: I
+						children: z
 					}),
 					/* @__PURE__ */ U(i, {
-						onClick: z,
-						disabled: !R,
-						isLoading: w,
+						onClick: H,
+						disabled: !B,
+						isLoading: D,
 						scale: "md",
-						children: u("Confirm")
+						children: p("Confirm")
 					})
 				]
 			})
