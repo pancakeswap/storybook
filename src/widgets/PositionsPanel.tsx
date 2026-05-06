@@ -537,21 +537,6 @@ const TpSlCell = styled.div`
 
 /** Small leverage chip rendered next to a position's symbol — purple
  *  text on the tertiary surface (mirrors SymbolHeader's old LevPill).
- *  Kept for downstream consumers; not used in the new desktop layout. */
-const LevBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: ${({ theme }) => theme.colors.tertiary};
-  color: ${({ theme }) => theme.colors.secondary};
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1.4;
-  letter-spacing: 0;
-  flex-shrink: 0;
-`
-
 /* Header column-help anchor — picks up the inherited textSubtle color
  * and lets the shared useTooltip hook drive the popover. cursor:help so
  * the affordance reads as informational (no underline / button shape). */
@@ -561,10 +546,6 @@ const HeaderHelp = styled.span`
   cursor: help;
   color: inherit;
   margin-left: 4px;
-`
-
-const TpSlValue = styled.span<{ $kind: 'tp' | 'sl' }>`
-  color: ${({ $kind, theme }) => ($kind === 'tp' ? theme.colors.success : theme.colors.failure)};
 `
 
 const OrdersTable = styled.div`
@@ -1058,11 +1039,35 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
         </TabsLeft>
         {tab === 'positions' && (
           <HeaderRightControls>
-            <HideOtherChip>
+            <HideOtherChip
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                // Forward to the controlled state directly. Earlier we
+                // relied solely on the implicit `<label><input>` click
+                // association, but a sibling absolutely-positioned
+                // overlay (TabsChevronOverlay) was visually adjacent to
+                // the chip and intercepted some pointer events on
+                // narrow containers — even though it set
+                // `pointer-events: none`. Hooking the toggle here makes
+                // the label click work regardless of DOM stacking.
+                // PAN-11854.
+                if ((e.target as HTMLElement).tagName === 'INPUT') return
+                e.preventDefault()
+                onHideOtherSymbolsChange?.(!hideOtherSymbols)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                  e.preventDefault()
+                  onHideOtherSymbolsChange?.(!hideOtherSymbols)
+                }
+              }}
+            >
               <Checkbox
                 scale="sm"
                 checked={hideOtherSymbols}
                 onChange={(e) => onHideOtherSymbolsChange?.(e.target.checked)}
+                onClick={(e) => e.stopPropagation()}
               />
               <span>{t('Hide Other Symbols')}</span>
             </HideOtherChip>
