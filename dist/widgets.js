@@ -2444,23 +2444,33 @@ var Vn = B.div`
   z-index: 1;
   text-align: ${({ $align: e }) => e ?? "right"};
 `, Ir = B.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 4px 16px;
-  gap: 4px;
+  gap: 8px;
   background: ${({ theme: e }) => e.colors.input};
-  font-size: 14px;
-  font-weight: 400;
   font-variant-numeric: tabular-nums;
-  color: ${({ theme: e }) => e.colors.text};
   flex-shrink: 0;
 `, Lr = B.span`
-  color: ${({ theme: e }) => e.colors.textSubtle};
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: ${({ $direction: e, theme: t }) => e === "up" ? t.colors.success : e === "down" ? t.colors.failure : t.colors.text};
 `, Rr = B.span`
-  text-align: center;
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  ${({ $direction: e, theme: t }) => e === "up" ? `border-bottom: 5px solid ${t.colors.success};` : `border-top: 5px solid ${t.colors.failure};`}
 `, zr = B.span`
-  text-align: right;
+  font-size: 14px;
   color: ${({ theme: e }) => e.colors.textSubtle};
+  border-bottom: 1px dotted ${({ theme: e }) => e.colors.textSubtle};
+  cursor: help;
 `, Br = (e, t, n, r, i) => {
 	if (r <= 1) return e;
 	let a = n * r, o = /* @__PURE__ */ new Map();
@@ -2940,88 +2950,86 @@ var Vn = B.div`
 }, vi = (e) => {
 	let { isMobile: t } = h();
 	return U(t ? _i : yi, { ...e });
-}, yi = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, lastPrice: o = 0, view: s, onViewChange: c, priceStep: l, onPriceStepChange: u, sizeUnit: d, onSizeUnitChange: f, hidden: p, embedded: m, t: h = Xr }) => {
-	let g = V(), _ = d === "QUOTE" ? r : n, v = F(() => Wr(i, o), [i, o]);
+}, yi = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, lastPrice: o = 0, lastPriceDirection: s = "flat", markPrice: c, view: l, onViewChange: u, priceStep: d, onPriceStepChange: f, sizeUnit: p, onSizeUnitChange: m, hidden: h, embedded: g, t: _ = Xr }) => {
+	let v = V(), y = p === "QUOTE" ? r : n, b = F(() => Wr(i, o), [i, o]);
 	M(() => {
-		v.length !== 0 && (v.includes(l) || u(v[v.length - 1]));
+		b.length !== 0 && (b.includes(d) || f(b[b.length - 1]));
 	}, [
-		v,
-		l,
-		u
+		b,
+		d,
+		f
 	]);
-	let y = F(() => {
-		let n = Math.max(i, Number(l) || i), r = Math.max(1, Math.round(n / i)), o = Br(e, "ask", i, r, a), s = Br(t, "bid", i, r, a), c = br * 2, u = o.slice(0, c).reverse(), d = s.slice(0, c), f = e[0] ? Number(e[0][0]) : void 0, p = t[0] ? Number(t[0][0]) : void 0;
+	let x = F(() => {
+		let n = Math.max(i, Number(d) || i), r = Math.max(1, Math.round(n / i)), o = Br(e, "ask", i, r, a), s = Br(t, "bid", i, r, a), c = br * 2;
 		return {
-			asks: u,
-			bids: d,
-			spread: f && p ? f - p : void 0,
-			spreadPct: f && p ? (f - p) / f * 100 : void 0
+			asks: o.slice(0, c).reverse(),
+			bids: s.slice(0, c)
 		};
 	}, [
 		e,
 		t,
-		l,
+		d,
 		i,
 		a
-	]), b = (e) => {
+	]), S = (e) => {
 		let t = 0;
 		return e.map(([e, n]) => {
-			let r = Number(n), i = Number(e), a = d === "QUOTE" ? r * i : r;
+			let r = Number(n), i = Number(e), a = p === "QUOTE" ? r * i : r;
 			return t += a, {
 				price: e,
 				qty: String(a),
 				total: t
 			};
 		});
-	}, x = F(() => b([...y.asks].reverse()).reverse(), [y.asks, d]), S = F(() => b(y.bids), [y.bids, d]), C = F(() => {
-		let e = x[0]?.total ?? 0, t = S[S.length - 1]?.total ?? 0;
+	}, C = F(() => S([...x.asks].reverse()).reverse(), [x.asks, p]), w = F(() => S(x.bids), [x.bids, p]), T = F(() => {
+		let e = C[0]?.total ?? 0, t = w[w.length - 1]?.total ?? 0;
 		return Math.max(e, t, 1);
-	}, [x, S]), w = (e, t) => {
-		let n = e === "bid" ? g.colors.success : g.colors.failure, r = Math.max(0, Math.min(100, t * 100)).toFixed(2);
+	}, [C, w]), E = (e, t) => {
+		let n = e === "bid" ? v.colors.success : v.colors.failure, r = Math.max(0, Math.min(100, t * 100)).toFixed(2);
 		return { background: `linear-gradient(to right, ${`color-mix(in srgb, ${n} 30%, transparent)`} 0%, ${`color-mix(in srgb, ${n} 10%, transparent)`} ${r}%, transparent ${r}%, transparent 100%)` };
-	}, T = (e) => d === "QUOTE" ? e >= 1e6 ? `${(e / 1e6).toFixed(2)}M` : e >= 1e3 ? `${(e / 1e3).toFixed(2)}K` : e.toFixed(2) : e.toFixed(3), E = /* @__PURE__ */ W(H, { children: [
+	}, D = (e) => p === "QUOTE" ? e >= 1e6 ? `${(e / 1e6).toFixed(2)}M` : e >= 1e3 ? `${(e / 1e3).toFixed(2)}K` : e.toFixed(2) : e.toFixed(3), O = /* @__PURE__ */ W(H, { children: [
 		/* @__PURE__ */ W(Sr, { children: [/* @__PURE__ */ W(Cr, { children: [
 			/* @__PURE__ */ U(wr, {
-				title: h("Both"),
-				$active: s === "both",
-				onClick: () => c("both"),
-				"aria-label": h("Both"),
+				title: _("Both"),
+				$active: l === "both",
+				onClick: () => u("both"),
+				"aria-label": _("Both"),
 				children: /* @__PURE__ */ U(qr, {
-					bidColor: g.colors.success,
-					askColor: g.colors.failure,
-					listColor: g.colors.textSubtle
+					bidColor: v.colors.success,
+					askColor: v.colors.failure,
+					listColor: v.colors.textSubtle
 				})
 			}),
 			/* @__PURE__ */ U(wr, {
-				title: h("Bids"),
-				$active: s === "bids",
-				onClick: () => c("bids"),
-				"aria-label": h("Bids"),
+				title: _("Bids"),
+				$active: l === "bids",
+				onClick: () => u("bids"),
+				"aria-label": _("Bids"),
 				children: /* @__PURE__ */ U(Jr, {
-					bidColor: g.colors.success,
-					listColor: g.colors.textSubtle
+					bidColor: v.colors.success,
+					listColor: v.colors.textSubtle
 				})
 			}),
 			/* @__PURE__ */ U(wr, {
-				title: h("Asks"),
-				$active: s === "asks",
-				onClick: () => c("asks"),
-				"aria-label": h("Asks"),
+				title: _("Asks"),
+				$active: l === "asks",
+				onClick: () => u("asks"),
+				"aria-label": _("Asks"),
 				children: /* @__PURE__ */ U(Yr, {
-					askColor: g.colors.failure,
-					listColor: g.colors.textSubtle
+					askColor: v.colors.failure,
+					listColor: v.colors.textSubtle
 				})
 			})
 		] }), /* @__PURE__ */ W(kr, { children: [/* @__PURE__ */ U(Kr, {
-			label: l,
-			items: v.map((e) => ({
+			label: d,
+			items: b.map((e) => ({
 				value: e,
 				label: e
 			})),
-			activeValue: l,
-			onSelect: u
+			activeValue: d,
+			onSelect: f
 		}), /* @__PURE__ */ U(Kr, {
-			label: _,
+			label: y,
 			items: [{
 				value: "BASE",
 				label: n
@@ -3029,12 +3037,12 @@ var Vn = B.div`
 				value: "QUOTE",
 				label: r
 			}],
-			activeValue: d,
-			onSelect: (e) => f(e)
+			activeValue: p,
+			onSelect: (e) => m(e)
 		})] })] }),
 		/* @__PURE__ */ W(Ar, { children: [
 			/* @__PURE__ */ W("span", { children: [
-				h("Price"),
+				_("Price"),
 				" (",
 				r,
 				")"
@@ -3042,28 +3050,28 @@ var Vn = B.div`
 			/* @__PURE__ */ W("span", {
 				style: { textAlign: "center" },
 				children: [
-					h("Amount"),
+					_("Amount"),
 					" (",
-					_,
+					y,
 					")"
 				]
 			}),
 			/* @__PURE__ */ W("span", {
 				style: { textAlign: "right" },
 				children: [
-					h("SUM"),
+					_("SUM"),
 					" (",
-					_,
+					y,
 					")"
 				]
 			})
 		] }),
 		/* @__PURE__ */ W(jr, { children: [
-			s !== "bids" && /* @__PURE__ */ U(Mr, {
-				$size: s === "asks" ? "full" : "half",
-				children: x.slice(s === "asks" ? 0 : Math.max(0, x.length - br)).map((e) => /* @__PURE__ */ W(Nr, {
+			l !== "bids" && /* @__PURE__ */ U(Mr, {
+				$size: l === "asks" ? "full" : "half",
+				children: C.slice(l === "asks" ? 0 : Math.max(0, C.length - br)).map((e) => /* @__PURE__ */ W(Nr, {
 					$side: "ask",
-					style: w("ask", e.total / C),
+					style: E("ask", e.total / T),
 					children: [
 						/* @__PURE__ */ U(Pr, {
 							$side: "ask",
@@ -3071,29 +3079,35 @@ var Vn = B.div`
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "center",
-							children: T(Number(e.qty))
+							children: D(Number(e.qty))
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "right",
-							children: T(e.total)
+							children: D(e.total)
 						})
 					]
 				}, `a-${e.price}`))
 			}),
-			s === "both" && /* @__PURE__ */ W(Ir, {
+			l === "both" && /* @__PURE__ */ W(Ir, {
 				role: "row",
-				"aria-label": h("Spread"),
-				children: [
-					/* @__PURE__ */ U(Lr, { children: h("Spread") }),
-					/* @__PURE__ */ U(Rr, { children: y.spread === void 0 ? "—" : y.spread.toFixed(2) }),
-					/* @__PURE__ */ U(zr, { children: y.spreadPct === void 0 ? "" : `${y.spreadPct.toFixed(3)}%` })
-				]
+				"aria-label": _("Last price"),
+				children: [/* @__PURE__ */ W(Lr, {
+					$direction: s,
+					children: [
+						o ? o.toFixed(a) : "—",
+						s === "up" && /* @__PURE__ */ U(Rr, { $direction: "up" }),
+						s === "down" && /* @__PURE__ */ U(Rr, { $direction: "down" })
+					]
+				}), c !== void 0 && /* @__PURE__ */ U(zr, {
+					title: _("Mark price"),
+					children: c.toFixed(a)
+				})]
 			}),
-			s !== "asks" && /* @__PURE__ */ U(Mr, {
-				$size: s === "bids" ? "full" : "half",
-				children: S.slice(0, s === "bids" ? br * 2 : br).map((e) => /* @__PURE__ */ W(Nr, {
+			l !== "asks" && /* @__PURE__ */ U(Mr, {
+				$size: l === "bids" ? "full" : "half",
+				children: w.slice(0, l === "bids" ? br * 2 : br).map((e) => /* @__PURE__ */ W(Nr, {
 					$side: "bid",
-					style: w("bid", e.total / C),
+					style: E("bid", e.total / T),
 					children: [
 						/* @__PURE__ */ U(Pr, {
 							$side: "bid",
@@ -3101,23 +3115,23 @@ var Vn = B.div`
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "center",
-							children: T(Number(e.qty))
+							children: D(Number(e.qty))
 						}),
 						/* @__PURE__ */ U(Fr, {
 							$align: "right",
-							children: T(e.total)
+							children: D(e.total)
 						})
 					]
 				}, `b-${e.price}`))
 			})
 		] })
 	] });
-	return m ? /* @__PURE__ */ U("div", {
-		style: p ? { display: "none" } : { display: "contents" },
-		children: E
+	return g ? /* @__PURE__ */ U("div", {
+		style: h ? { display: "none" } : { display: "contents" },
+		children: O
 	}) : /* @__PURE__ */ U(G, {
-		style: p ? { display: "none" } : void 0,
-		children: E
+		style: h ? { display: "none" } : void 0,
+		children: O
 	});
 }, bi = B(G)`
   flex: 1;

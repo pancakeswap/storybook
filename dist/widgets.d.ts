@@ -488,6 +488,17 @@ export declare interface OrderBookProps {
     pricePrecision?: number;
     /** Last traded price — drives which aggregation step options are offered. */
     lastPrice?: number;
+    /**
+     * Direction of the most recent tick relative to the prior one. Drives the
+     * color and arrow shown on the desktop mid-row. `'flat'` (or unset) renders
+     * the last price in the neutral text color with no arrow.
+     */
+    lastPriceDirection?: 'up' | 'down' | 'flat';
+    /**
+     * Mark price shown beside the last price on the desktop mid-row. Optional —
+     * if omitted the mid-row falls back to last price only.
+     */
+    markPrice?: number;
     view: OrderBookView;
     onViewChange: (v: OrderBookView) => void;
     priceStep: string;
