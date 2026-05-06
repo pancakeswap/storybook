@@ -45,6 +45,18 @@ export interface TpSlModalProps {
    * pass the symbol's actual `pricePrecision` for finer-grained tokens.
    */
   pricePrecision?: number
+  /** Existing TP trigger price for this position, or undefined if none set. */
+  initialTpPrice?: number | string
+  /** Existing SL trigger price for this position, or undefined if none set. */
+  initialSlPrice?: number | string
+  /**
+   * Cancel the existing TP order for this position. Rendered as a
+   * "Cancel" link beside the Take Profit section header when an existing
+   * TP is in place. Omit to hide the affordance.
+   */
+  onCancelTpOrder?: () => Promise<void> | void
+  /** Cancel the existing SL order for this position. */
+  onCancelSlOrder?: () => Promise<void> | void
   onConfirm: (intent: TpSlIntent) => Promise<void> | void
   onClose: () => void
   /** Translator. */
@@ -94,6 +106,20 @@ const InputTight = styled(Input)`
   }
 `
 
+const CancelLink = styled.button`
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.failure};
+  text-decoration: underline;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`
+
 const SummaryRow = styled(Flex)`
   justify-content: space-between;
   padding: 4px 0;
@@ -126,6 +152,10 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
   markPrice,
   quoteAsset = 'USDT',
   pricePrecision = 4,
+  initialTpPrice,
+  initialSlPrice,
+  onCancelTpOrder,
+  onCancelSlOrder,
   onConfirm,
   onClose,
   t = identity,
@@ -138,16 +168,35 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
   const [slPrice, setSlPrice] = useState('')
   const [slPnl, setSlPnl] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [cancellingTp, setCancellingTp] = useState(false)
+  const [cancellingSl, setCancellingSl] = useState(false)
 
-  // Reset drafts on close so re-opening starts clean.
+  // Pre-fill drafts from the existing TP/SL orders when the modal
+  // opens, so a user who clicks the TP/SL row to *update* (not create)
+  // sees their current trigger and PnL ready to edit. Reset to empty on
+  // close so the next open starts clean.
   useEffect(() => {
     if (!isOpen) {
       setTpPrice('')
       setTpPnl('')
       setSlPrice('')
       setSlPnl('')
+      return
     }
-  }, [isOpen])
+    const seedTp = initialTpPrice !== undefined && initialTpPrice !== '' ? String(initialTpPrice) : ''
+    const seedSl = initialSlPrice !== undefined && initialSlPrice !== '' ? String(initialSlPrice) : ''
+    setTpPrice(seedTp)
+    setSlPrice(seedSl)
+    if (qty > 0 && Number.isFinite(entryPrice)) {
+      const tpN = Number(seedTp)
+      const slN = Number(seedSl)
+      setTpPnl(seedTp && Number.isFinite(tpN) ? (dir * (tpN - entryPrice) * qty).toFixed(4) : '')
+      setSlPnl(seedSl && Number.isFinite(slN) ? (dir * (slN - entryPrice) * qty).toFixed(4) : '')
+    } else {
+      setTpPnl('')
+      setSlPnl('')
+    }
+  }, [isOpen, initialTpPrice, initialSlPrice, qty, entryPrice, dir])
 
   const priceFromPnl = (pnl: number) => (qty > 0 ? entryPrice + (dir * pnl) / qty : NaN)
   const pnlFromPrice = (price: number) => (qty > 0 ? dir * (price - entryPrice) * qty : NaN)
@@ -266,9 +315,30 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
           <Divider />
 
           <Section>
-            <Text fontSize="14px" bold color={theme.colors.success}>
-              {t('Take Profit')}
-            </Text>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Text fontSize="14px" bold color={theme.colors.success}>
+                {t('Take Profit')}
+              </Text>
+              {initialTpPrice && onCancelTpOrder && (
+                <CancelLink
+                  type="button"
+                  onClick={async () => {
+                    if (cancellingTp) return
+                    setCancellingTp(true)
+                    try {
+                      await onCancelTpOrder()
+                      setTpPrice('')
+                      setTpPnl('')
+                    } finally {
+                      setCancellingTp(false)
+                    }
+                  }}
+                  disabled={cancellingTp}
+                >
+                  {cancellingTp ? t('Cancelling…') : t('Cancel Order')}
+                </CancelLink>
+              )}
+            </Flex>
             <Row>
               <Box style={{ flex: 1 }}>
                 <FieldLabel>{t('Trigger Price')}</FieldLabel>
@@ -290,9 +360,30 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
           </Section>
 
           <Section>
-            <Text fontSize="14px" bold color={theme.colors.failure}>
-              {t('Stop Loss')}
-            </Text>
+            <Flex justifyContent="space-between" alignItems="center">
+              <Text fontSize="14px" bold color={theme.colors.failure}>
+                {t('Stop Loss')}
+              </Text>
+              {initialSlPrice && onCancelSlOrder && (
+                <CancelLink
+                  type="button"
+                  onClick={async () => {
+                    if (cancellingSl) return
+                    setCancellingSl(true)
+                    try {
+                      await onCancelSlOrder()
+                      setSlPrice('')
+                      setSlPnl('')
+                    } finally {
+                      setCancellingSl(false)
+                    }
+                  }}
+                  disabled={cancellingSl}
+                >
+                  {cancellingSl ? t('Cancelling…') : t('Cancel Order')}
+                </CancelLink>
+              )}
+            </Flex>
             <Row>
               <Box style={{ flex: 1 }}>
                 <FieldLabel>{t('Trigger Price')}</FieldLabel>
