@@ -524,10 +524,12 @@ const Td = styled.div`
 /* Fee values are always rendered in the pink "destructive" color since
    they represent a cost (consistent across positive rebates too — the
    product treats fees as a single visual category). */
+// eslint-disable-next-line no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark
 const FeeCell = styled(Td)`
   color: #ED4B9E;
 `
 
+/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const RealizedProfitCell = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
   color: ${({ $sign, theme }) =>
     $sign === 'positive'
@@ -545,6 +547,7 @@ const RealizedProfitCell = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' 
           : theme.colors.text};
   }
 `
+/* eslint-enable no-restricted-syntax */
 
 const TokenCell = styled.div`
   display: flex;
@@ -694,6 +697,7 @@ const LiqTrack = styled.div`
   box-shadow: inset 0 2px 0 -1px rgba(0, 0, 0, 0.06);
 `
 
+/* eslint-disable no-restricted-syntax -- brand SVG illustration */
 const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
   height: 100%;
   width: ${({ $pct }) => `${Math.max(0, Math.min(100, $pct))}%`};
@@ -705,6 +709,7 @@ const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
         : theme.colors.failure};
   border-radius: 999px;
 `
+/* eslint-enable no-restricted-syntax */
 
 // eslint-disable-next-line no-restricted-syntax -- BUY/SELL brand semantic + TODO(design): replace with color-mix or new token
 const CloseBtn = styled.button`

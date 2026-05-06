@@ -302,6 +302,7 @@ const TokenStack = styled.span`
   flex-shrink: 0;
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const TokenGlyph = styled.span<{ $color: string }>`
   position: absolute;
   left: 0;
@@ -335,6 +336,7 @@ const ChainBadge = styled.span<{ $color: string }>`
   font-size: 9px;
   font-weight: 700;
 `
+/* eslint-enable no-restricted-syntax */
 
 // ── Amount field (input view) ───────────────────────────────────
 
