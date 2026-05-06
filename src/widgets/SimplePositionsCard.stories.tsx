@@ -133,7 +133,11 @@ export const Disconnected: Story = {
   render: () => (
     <Live
       positions={[]}
-      disconnectedMessage="Connect your wallet to see your open positions"
+      disconnectedMessage={{
+        positions: 'Connect your wallet to see your active positions',
+        orders: 'Connect your wallet to see your open orders',
+        history: 'Connect your wallet to see your transaction history',
+      }}
     />
   ),
 }

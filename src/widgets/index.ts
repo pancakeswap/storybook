@@ -40,6 +40,9 @@ export type { PerpsErrorMessageProps, PerpsErrorVariant } from './PerpsErrorMess
 export { WithdrawModal } from './WithdrawModal'
 export type { WithdrawModalProps, WithdrawStep, WithdrawTokenRow } from './WithdrawModal'
 
+export { WithdrawModal12 } from './WithdrawModal12'
+export type { WithdrawModal12Props, WithdrawAssetRow } from './WithdrawModal12'
+
 export { OrderConfirmModal } from './OrderConfirmModal'
 export type { OrderConfirmModalProps, OrderConfirmDetails, OrderSide, OrderType } from './OrderConfirmModal'
 

@@ -87,6 +87,15 @@ export interface SimpleBetPanelProps {
   onDeposit?: () => void
   onWithdraw?: () => void
 
+  /**
+   * When set, the Deposit/Withdraw row is replaced with a single
+   * full-width primary button rendering this label. The PnL value also
+   * dims to textDisabled. Pass an i18n-translated string from the
+   * consumer.
+   */
+  connectWalletLabel?: string
+  onConnectWallet?: () => void
+
   unrealizedPnl: string
 }
 
@@ -1018,7 +1027,13 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
   }
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.6;
+    background: ${({ theme }) => theme.colors.backgroundDisabled};
+    color: ${({ theme }) => theme.colors.textDisabled};
+    border-color: transparent;
+  }
+
+  html.dark &:disabled {
+    color: ${({ theme }) => theme.colors.textDisabled};
   }
 `
 
@@ -1108,8 +1123,13 @@ const PnlLabel = styled.span`
   letter-spacing: -0.2px;
 `
 
-const PnlValue = styled.span<{ $zero?: boolean }>`
-  color: ${({ $zero, theme }) => ($zero ? theme.colors.textSubtle : theme.colors.text)};
+const PnlValue = styled.span<{ $zero?: boolean; $disabled?: boolean }>`
+  color: ${({ $zero, $disabled, theme }) =>
+    $disabled
+      ? theme.colors.textDisabled
+      : $zero
+        ? theme.colors.textSubtle
+        : theme.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -1253,6 +1273,8 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   onDown,
   onDeposit,
   onWithdraw,
+  connectWalletLabel,
+  onConnectWallet,
   unrealizedPnl,
 }) => {
   const fillPct = Math.min(100, Math.max(0, (leverage / maxLeverage) * 100))
@@ -1499,14 +1521,23 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
 
       {/* Bottom card: Deposit/Withdraw + Unrealized PnL */}
       <Bottom>
-      {/* Deposit / Withdraw */}
+      {/* Deposit / Withdraw — replaced by a single full-width Connect
+          wallet button when the consumer signals a disconnected state. */}
       <DwRow>
-        <DwButton $variant="primary" onClick={onDeposit} type="button">
-          Deposit
-        </DwButton>
-        <DwButton $variant="secondary" onClick={onWithdraw} type="button">
-          Withdraw
-        </DwButton>
+        {connectWalletLabel ? (
+          <DwButton $variant="primary" onClick={onConnectWallet} type="button">
+            {connectWalletLabel}
+          </DwButton>
+        ) : (
+          <>
+            <DwButton $variant="primary" onClick={onDeposit} type="button">
+              Deposit
+            </DwButton>
+            <DwButton $variant="secondary" onClick={onWithdraw} type="button">
+              Withdraw
+            </DwButton>
+          </>
+        )}
       </DwRow>
 
       {/* Unrealized PnL — muted color when value is zero (no open
@@ -1514,7 +1545,10 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           before checking so e.g. "$0", "+$0.00", "0.00 USDT" all match. */}
       <PnlCard>
         <PnlLabel>Unrealized PnL</PnlLabel>
-        <PnlValue $zero={Number(String(unrealizedPnl).replace(/[^\d.-]/g, '')) === 0}>
+        <PnlValue
+          $zero={Number(String(unrealizedPnl).replace(/[^\d.-]/g, '')) === 0}
+          $disabled={Boolean(connectWalletLabel)}
+        >
           {unrealizedPnl}
         </PnlValue>
       </PnlCard>

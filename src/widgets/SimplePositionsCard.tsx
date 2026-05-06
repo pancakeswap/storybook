@@ -75,11 +75,11 @@ export interface SimplePositionsCardProps {
   openOrders: readonly SimpleOpenOrderRow[]
   history: readonly SimpleHistoryRow[]
   /**
-   * When set, replaces every tab's body with a centered "connect wallet"
-   * message. Tabs remain interactive but all three render the same
-   * placeholder. Pass an i18n-translated string from the consumer.
+   * When set, replaces every tab's body with a centered placeholder.
+   * Tabs remain interactive but each renders its own "connect wallet"
+   * message keyed by tab. Pass i18n-translated strings from the consumer.
    */
-  disconnectedMessage?: string
+  disconnectedMessage?: Record<SimplePositionsTab, string>
   onClosePosition: (id: string) => void
   onCancelOrder: (id: string) => void
   /**
@@ -828,7 +828,7 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
       </TabsRow>
 
       {disconnectedMessage ? (
-        <DisconnectedBlock>{disconnectedMessage}</DisconnectedBlock>
+        <DisconnectedBlock>{disconnectedMessage[tab]}</DisconnectedBlock>
       ) : (
         <>
       {tab === 'positions' && positions.length > 0 && (

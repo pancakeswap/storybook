@@ -18,6 +18,12 @@ import {
 
 export interface SimplePerpsPageProps {
   initialPair?: string
+  /**
+   * Renders the page in a disconnected-wallet state — the positions card
+   * shows the "connect your wallet" placeholder across all tabs. Used by
+   * the Apps/Disconnected Perps · Simple story.
+   */
+  disconnected?: boolean
 }
 
 const TFS = ['1d', '1h', '30m', '15m', '5m'] as const
@@ -1234,7 +1240,10 @@ const mockBetPanelArgs = (
   unrealizedPnl: '$0',
 })
 
-export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProps = {}) {
+export function SimplePerpsPage({
+  initialPair = 'BTC/USD',
+  disconnected = false,
+}: SimplePerpsPageProps = {}) {
   const [tf, setTf] = useState<Tf>('1d')
   const [positionsTab, setPositionsTab] = useState<SimplePositionsTab>('positions')
   const [fundOpen, setFundOpen] = useState(false)
@@ -1275,9 +1284,18 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
             <SimplePositionsCard
               tab={positionsTab}
               onTabChange={setPositionsTab}
-              positions={SAMPLE_POSITIONS}
-              openOrders={SAMPLE_OPEN_ORDERS}
-              history={SAMPLE_HISTORY}
+              positions={disconnected ? [] : SAMPLE_POSITIONS}
+              openOrders={disconnected ? [] : SAMPLE_OPEN_ORDERS}
+              history={disconnected ? [] : SAMPLE_HISTORY}
+              disconnectedMessage={
+                disconnected
+                  ? {
+                      positions: 'Connect your wallet to see your active positions',
+                      orders: 'Connect your wallet to see your open orders',
+                      history: 'Connect your wallet to see your transaction history',
+                    }
+                  : undefined
+              }
               onClosePosition={() => undefined}
               onCancelOrder={() => undefined}
             />
@@ -1295,6 +1313,10 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
             () => setCollateralOpen(true),
             (side) => setOrderConfirm(side),
           )}
+          canSubmit={!disconnected}
+          {...(disconnected && { fundBalanceText: '0 USDT' })}
+          connectWalletLabel={disconnected ? 'Connect wallet' : undefined}
+          onConnectWallet={() => undefined}
         />
       </Body>
 
