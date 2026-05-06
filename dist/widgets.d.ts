@@ -31,6 +31,9 @@ import { WalletData } from './WalletPanel';
 import { WalletPanel } from './WalletPanel';
 import { WalletPanelLabels } from './WalletPanel';
 import { WalletPanelProps } from './WalletPanel';
+import { WithdrawAssetRow } from './WithdrawModal12';
+import { WithdrawModal12 } from './WithdrawModal12';
+import { WithdrawModal12Props } from './WithdrawModal12';
 
 export declare const AccountPanel: default_2.FC<AccountPanelProps>;
 
@@ -1510,6 +1513,8 @@ export { WalletPanelLabels }
 
 export { WalletPanelProps }
 
+export { WithdrawAssetRow }
+
 /**
  * Withdraw flow modal — multi-step (select asset → enter amount). The
  * consumer (pancake-frontend) wires the asset list from `/fapi/v3/account`
@@ -1518,6 +1523,10 @@ export { WalletPanelProps }
  * from the signed v3 withdraw call. This widget is presentation-only.
  */
 export declare const WithdrawModal: default_2.FC<WithdrawModalProps>;
+
+export { WithdrawModal12 }
+
+export { WithdrawModal12Props }
 
 export declare interface WithdrawModalProps {
     /** Controlled open state. */
