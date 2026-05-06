@@ -1130,6 +1130,11 @@ export declare interface PositionRow {
     /** Existing TP / SL trigger-order prices for this symbol, if any. */
     tpStopPrice?: string;
     slStopPrice?: string;
+    /** Per-position margin scheme. Rendered as a `(Cross)` / `(Isolated)`
+     *  tag under the Margin amount, matching Aster's positions table.
+     *  When omitted the tag is hidden — older consumers stay backward-
+     *  compatible. PAN-11866. */
+    marginType?: 'CROSS' | 'ISOLATED';
 }
 
 /** History sheet inner-tab (mobile only). */

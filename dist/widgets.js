@@ -3495,10 +3495,7 @@ var G = B(e)`
 			as: "div",
 			children: l !== void 0 && Number.isFinite(l) ? y(l) : "—"
 		}),
-		/* @__PURE__ */ U(X, {
-			as: "div",
-			children: Number.isFinite(g) ? `${g.toFixed(2)} USDT` : "—"
-		}),
+		/* @__PURE__ */ W(Ni, { children: [/* @__PURE__ */ U("span", { children: Number.isFinite(g) ? `${g.toFixed(2)} USDT` : "—" }), e.marginType ? /* @__PURE__ */ U(Pi, { children: e.marginType === "ISOLATED" ? `(${s("Isolated")})` : `(${s("Cross")})` }) : null] }),
 		/* @__PURE__ */ U(X, {
 			as: "div",
 			children: Number.isFinite(f) ? y(f) : "—"
@@ -4276,7 +4273,8 @@ var G = B(e)`
 					s(l === "BUY" ? "Long" : "Short"),
 					" · ",
 					e.leverage,
-					"x"
+					"x",
+					e.marginType ? ` · ${e.marginType === "ISOLATED" ? s("Isolated") : s("Cross")}` : ""
 				]
 			}),
 			/* @__PURE__ */ U(_a, {}),
