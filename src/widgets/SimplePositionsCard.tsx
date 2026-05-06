@@ -25,6 +25,10 @@ export interface SimplePositionRow {
   leverageText?: string
   unrealizedPnl: string
   pnlSign: 'positive' | 'negative' | 'zero'
+  /** Pre-formatted notional size, e.g. "$10.09". */
+  size: string
+  /** Currency the size is denominated in (rendered semibold), e.g. "USDT". */
+  sizeCurrency?: string
   entryPrice: string
   liqPrice: string
   liqDistancePct: number
@@ -176,11 +180,11 @@ const TableScroll = styled.div`
 
 const PositionsTable = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 64px;
-  min-width: 794px;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 64px;
+  min-width: 900px;
 
   @media (min-width: 968px) and (max-width: 1199.98px) {
-    grid-template-columns: 1fr 1fr 1fr 1fr 162px 64px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 162px 64px;
   }
 `
 
@@ -682,13 +686,22 @@ const SharePnlBtn = styled.button`
 const LiqDistance = styled(Td)`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 8px;
+  /* Pin the bar's left edge at the "D" position of the header (which is
+     right-anchored at ~138px from the cell's right edge for the default
+     English copy). Longer status labels like "Danger" make the bar
+     shrink rather than slide left, so the start of the bar stays put. */
+  padding-left: calc(100% - 138px);
 `
 
 const LiqTrack = styled.div`
   position: relative;
-  width: 100px;
+  /* Capped at 82px (Figma) but allowed to shrink so longer status labels
+     (like "Danger") trim the bar from the right while the start stays
+     anchored at the "D" of the header. */
+  flex: 0 1 82px;
+  min-width: 0;
   height: 6px;
   border-radius: 999px;
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
@@ -698,6 +711,14 @@ const LiqTrack = styled.div`
 `
 
 /* eslint-disable no-restricted-syntax -- brand SVG illustration */
+
+const LiqStatusLabel = styled.span`
+  /* Don't shrink — the bar gives up width instead so the status text
+     stays legible regardless of label length. */
+  flex-shrink: 0;
+  white-space: nowrap;
+`
+
 const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
   height: 100%;
   width: ${({ $pct }) => `${Math.max(0, Math.min(100, $pct))}%`};
@@ -870,6 +891,18 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
               <TabletPositionDivider />
               <TabletPositionStats>
                 <TabletPositionStatRow>
+                  <TabletPositionStatLabel>Size</TabletPositionStatLabel>
+                  <TabletPositionStatValue>
+                    {row.size}
+                    {row.sizeCurrency && (
+                      <>
+                        {' '}
+                        <CurrencyUnit>{row.sizeCurrency}</CurrencyUnit>
+                      </>
+                    )}
+                  </TabletPositionStatValue>
+                </TabletPositionStatRow>
+                <TabletPositionStatRow>
                   <TabletPositionStatLabel>Entry Price</TabletPositionStatLabel>
                   <TabletPositionStatValue>{row.entryPrice}</TabletPositionStatValue>
                 </TabletPositionStatRow>
@@ -908,6 +941,10 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
               <Th $align="right">
                 Unrealized PnL
                 <SortBtn type="button" aria-label="Sort by unrealized PnL"><SortGlyph /></SortBtn>
+              </Th>
+              <Th $align="right">
+                Size
+                <SortBtn type="button" aria-label="Sort by size"><SortGlyph /></SortBtn>
               </Th>
               <Th $align="right">
                 Entry Price
@@ -956,13 +993,22 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
                     </SharePnlBtn>
                   )}
                 </PnlCell>
+                <Td>
+                  {row.size}
+                  {row.sizeCurrency && (
+                    <>
+                      {' '}
+                      <CurrencyUnit>{row.sizeCurrency}</CurrencyUnit>
+                    </>
+                  )}
+                </Td>
                 <Td>{row.entryPrice}</Td>
                 <Td>{row.liqPrice}</Td>
                 <LiqDistance>
                   <LiqTrack>
                     <LiqFill $pct={row.liqDistancePct} $status={row.liqStatus} />
                   </LiqTrack>
-                  <span>{row.liqStatusLabel}</span>
+                  <LiqStatusLabel>{row.liqStatusLabel}</LiqStatusLabel>
                 </LiqDistance>
                 <CloseBtn
                   type="button"

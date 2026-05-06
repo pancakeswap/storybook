@@ -102,6 +102,15 @@ const ModalBody = styled(Flex)`
   gap: 20px;
   min-width: 380px;
   max-width: 420px;
+
+  /* On mobile/tablet the modal renders as a bottom-sheet — let the body
+     fill the full sheet width so prices line up with the right edge
+     instead of hugging the left half. */
+  @media (max-width: 967.98px) {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
 `
 
 const Pretitle = styled(Text).attrs({ fontSize: '12px', bold: true })`

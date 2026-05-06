@@ -256,7 +256,10 @@ const ModeButton = styled.button`
   border-bottom: 2px solid rgba(0, 0, 0, 0.10);
   border-radius: 12px;
   background: ${({ theme }) => theme.colors.tertiary};
-  color: #02919D;
+  /* V2-expanded primary 60 — #02919D in light mode, #48D0DB in dark.
+     Was hardcoded to the light value so the dark-mode treatment looked
+     dim against the tertiary surface. */
+  color: ${({ theme }) => theme.colors.primary60};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 16px;

@@ -3,6 +3,7 @@ import { styled } from 'styled-components'
 import { SimpleBetPanel, type SimpleBetPanelProps } from '../widgets/SimpleBetPanel'
 import { SimpleTickerCard } from '../widgets/SimpleTickerCard'
 import { SimpleChartCard } from '../widgets/SimpleChartCard'
+import { BottomDrawer } from '../primitives/Modal'
 import {
   SimplePositionsCard,
   type SimplePositionRow,
@@ -10,6 +11,10 @@ import {
   type SimpleHistoryRow,
   type SimplePositionsTab,
 } from '../widgets/SimplePositionsCard'
+import {
+  WithdrawModal12,
+  type WithdrawAssetRow,
+} from '../widgets/WithdrawModal12'
 import {
   DepositModal,
   type DepositStep,
@@ -52,11 +57,64 @@ const SAMPLE_POSITIONS: readonly SimplePositionRow[] = [
     leverageText: '100X',
     unrealizedPnl: '+$10.09',
     pnlSign: 'positive',
+    size: '$10.09',
+    sizeCurrency: 'USDT',
     entryPrice: '$649.98',
     liqPrice: '$637.00',
     liqDistancePct: 90,
     liqStatus: 'safe',
     liqStatusLabel: 'Safe',
+  },
+  {
+    id: 'btc-long',
+    symbol: 'BTC',
+    chainLabel: 'BTC',
+    iconColor: '#F7931A',
+    direction: 'up',
+    leverageText: '50X',
+    unrealizedPnl: '+$420.55',
+    pnlSign: 'positive',
+    size: '$2,103.10',
+    sizeCurrency: 'USDT',
+    entryPrice: '$78,053.60',
+    liqPrice: '$76,489.40',
+    liqDistancePct: 72,
+    liqStatus: 'safe',
+    liqStatusLabel: 'Safe',
+  },
+  {
+    id: 'eth-short',
+    symbol: 'ETH',
+    chainLabel: 'ETH',
+    iconColor: '#627EEA',
+    direction: 'down',
+    leverageText: '25X',
+    unrealizedPnl: '-$57.12',
+    pnlSign: 'negative',
+    size: '$891.27',
+    sizeCurrency: 'USDT',
+    entryPrice: '$3,420.18',
+    liqPrice: '$3,565.04',
+    liqDistancePct: 38,
+    liqStatus: 'warn',
+    liqStatusLabel: 'Warn',
+  },
+  {
+    id: 'cake-long',
+    symbol: 'CAKE',
+    chainLabel: 'BNB CHAIN',
+    iconColor: '#23CAD5',
+    direction: 'up',
+    leverageText: '500X',
+    unrealizedPnl: '-$8.43',
+    pnlSign: 'negative',
+    size: '$152.04',
+    sizeCurrency: 'USDT',
+    entryPrice: '$2.149',
+    liqPrice: '$2.131',
+    liqDistancePct: 12,
+    liqStatus: 'danger',
+    liqStatusLabel: 'Danger',
   },
 ] as const
 
@@ -70,6 +128,39 @@ const SAMPLE_OPEN_ORDERS: readonly SimpleOpenOrderRow[] = [
     price: '$649.98',
     origQty: '0.1',
     executedQty: '0',
+  },
+] as const
+
+const SAMPLE_WITHDRAW_ASSETS: readonly WithdrawAssetRow[] = [
+  {
+    id: 'BNB',
+    symbol: 'BNB',
+    chainLabel: 'BNB Chain',
+    chainBadgeColor: '#1E1E1E',
+    chainBadgeGlyph: 'B',
+    balanceText: '999,999.99',
+    usdText: '$999,999.99',
+    iconColor: '#F0B90B',
+  },
+  {
+    id: 'ETH-ETH',
+    symbol: 'ETH',
+    chainLabel: 'Ethereum',
+    chainBadgeColor: '#627EEA',
+    chainBadgeGlyph: 'E',
+    balanceText: '999,999.99',
+    usdText: '$999,999.99',
+    iconColor: '#627EEA',
+  },
+  {
+    id: 'USDC',
+    symbol: 'USDC',
+    chainLabel: 'Polygon',
+    chainBadgeColor: '#2D364D',
+    chainBadgeGlyph: 'P',
+    balanceText: '999,999.99',
+    usdText: '$999,999.99',
+    iconColor: '#2775CA',
   },
 ] as const
 
@@ -303,6 +394,122 @@ const LeftCol = styled.div`
 
   @media (max-width: 967.98px) {
     display: contents;
+  }
+`
+
+/* On phones and tablets the inline chart card collapses out of the
+   layout — the ticker exposes a graph button that opens the same chart
+   inside a bottom-sheet (Figma 621-29050 / 622-29522 / 623-30687), so
+   the body stays short above the fold. */
+const InlineChart = styled.div`
+  display: contents;
+
+  @media (max-width: 967.98px) {
+    display: none;
+  }
+`
+
+/* Bottom-sheet content for the mobile chart drawer (Figma 623-30687).
+   Token + price header sits above the chart with a divider; the chart
+   card's outer border is neutralised so it reads as a single sheet
+   instead of a card-within-a-card. */
+
+/* Reserves vertical space for the BottomDrawer's absolute-positioned
+   grabber (top: 16px, 4px tall) plus the 8px breathing room below it,
+   so the header doesn't sit underneath the grabber. */
+const ChartSheetGrabberSpacer = styled.div`
+  height: 28px;
+  flex-shrink: 0;
+  align-self: stretch;
+`
+
+const ChartSheetHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  align-self: stretch;
+`
+
+const ChartSheetSymbolRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+const ChartSheetTokenIcon = styled.span`
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #F3BA2F;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  font-family: Kanit;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+`
+
+const ChartSheetSymbol = styled.span`
+  font-family: Kanit;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const ChartSheetPrice = styled.div`
+  font-family: Kanit;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.32px;
+  color: ${({ theme }) => theme.colors.text};
+  font-variant-numeric: tabular-nums;
+`
+
+const ChartSheetStatsRow = styled.div`
+  display: flex;
+  gap: 16px;
+  font-family: Kanit;
+  font-size: 14px;
+`
+
+const ChartSheetStat = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 80px;
+`
+
+const ChartSheetStatLabel = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-weight: 400;
+  line-height: 150%;
+`
+
+const ChartSheetStatValue = styled.span<{ $sign?: 'positive' | 'negative' }>`
+  color: ${({ $sign, theme }) =>
+    $sign === 'negative' ? '#ED4B9E' : $sign === 'positive' ? '#129E7D' : theme.colors.text};
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`
+
+/* Strips the inner SimpleChartCard's card border / background / fixed
+   height so it lays out flush on the drawer's white surface. 10px top
+   padding matches Figma 623-30687 — the chart sits closer to the
+   header divider than the standalone card variant. */
+const ChartSheetChart = styled.div`
+  align-self: stretch;
+  & > div {
+    border: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 10px 16px 16px !important;
+    height: 460px !important;
   }
 `
 
@@ -1211,6 +1418,7 @@ const mockBetPanelArgs = (
   onFundOpen: () => void,
   onCollateralOpen: () => void,
   onConfirmOpen: (side: 'up' | 'down') => void,
+  onWithdrawOpen: () => void,
 ): SimpleBetPanelProps => ({
   symbol: 'BTCUSDT',
   baseAsset: 'BTC',
@@ -1236,7 +1444,7 @@ const mockBetPanelArgs = (
   onUp: () => onConfirmOpen('up'),
   onDown: () => onConfirmOpen('down'),
   onDeposit: onFundOpen,
-  onWithdraw: () => undefined,
+  onWithdraw: onWithdrawOpen,
   unrealizedPnl: '$0',
 })
 
@@ -1251,6 +1459,10 @@ export function SimplePerpsPage({
   const [orderConfirm, setOrderConfirm] = useState<'up' | 'down' | null>(null)
   const [bet, setBet] = useState('')
   const [leverage, setLeverage] = useState(10)
+  const [chartOpen, setChartOpen] = useState(false)
+  const [withdrawOpen, setWithdrawOpen] = useState(false)
+  const [withdrawAssetId, setWithdrawAssetId] = useState<string | undefined>(undefined)
+  const [withdrawAmount, setWithdrawAmount] = useState('')
 
   return (
     <Root aria-label={`Perpetuals · Simple mode · ${initialPair}`}>
@@ -1268,17 +1480,20 @@ export function SimplePerpsPage({
             openInterest="$2.13B"
             fundingRate="+0.010%"
             nextFunding="4h 12m"
+            onChartOpen={() => setChartOpen(true)}
           />
 
-          <SimpleChartCard
-            timeframe={tf}
-            timeframes={TFS}
-            onTimeframeChange={(next) => setTf(next as Tf)}
-            points={[]}
-            currentPriceLabel="640"
-            yTicks={Y_TICKS}
-            xTicks={X_TICKS}
-          />
+          <InlineChart>
+            <SimpleChartCard
+              timeframe={tf}
+              timeframes={TFS}
+              onTimeframeChange={(next) => setTf(next as Tf)}
+              points={[]}
+              currentPriceLabel="640"
+              yTicks={Y_TICKS}
+              xTicks={X_TICKS}
+            />
+          </InlineChart>
 
           <TabletPositionsWrapper>
             <SimplePositionsCard
@@ -1298,6 +1513,7 @@ export function SimplePerpsPage({
               }
               onClosePosition={() => undefined}
               onCancelOrder={() => undefined}
+              onSharePnl={() => undefined}
             />
           </TabletPositionsWrapper>
         </LeftCol>
@@ -1312,6 +1528,7 @@ export function SimplePerpsPage({
             () => setFundOpen(true),
             () => setCollateralOpen(true),
             (side) => setOrderConfirm(side),
+            () => setWithdrawOpen(true),
           )}
           canSubmit={!disconnected}
           {...(disconnected && { fundBalanceText: '0 USDT' })}
@@ -1324,6 +1541,28 @@ export function SimplePerpsPage({
 
       <CollateralModal isOpen={collateralOpen} onClose={() => setCollateralOpen(false)} />
 
+      <WithdrawModal12
+        isOpen={withdrawOpen}
+        onClose={() => {
+          setWithdrawOpen(false)
+          setWithdrawAssetId(undefined)
+          setWithdrawAmount('')
+        }}
+        perpsBalanceText="$1,000.98"
+        destinationAddress="0x...1234"
+        assets={SAMPLE_WITHDRAW_ASSETS}
+        selectedAssetId={withdrawAssetId}
+        onSelectAsset={setWithdrawAssetId}
+        amount={withdrawAmount}
+        onAmountChange={setWithdrawAmount}
+        amountUsdText="0.0"
+        onWithdraw={() => {
+          setWithdrawOpen(false)
+          setWithdrawAssetId(undefined)
+          setWithdrawAmount('')
+        }}
+      />
+
       <OrderConfirmModal
         isOpen={!!orderConfirm}
         side={orderConfirm ?? 'up'}
@@ -1335,6 +1574,49 @@ export function SimplePerpsPage({
         duration="Perpetual"
         onConfirm={() => setOrderConfirm(null)}
         onClose={() => setOrderConfirm(null)}
+      />
+
+      <BottomDrawer
+        isOpen={chartOpen}
+        setIsOpen={setChartOpen}
+        hideCloseButton
+        content={
+          <>
+            <ChartSheetGrabberSpacer />
+            <ChartSheetHeader>
+              <ChartSheetSymbolRow>
+                <ChartSheetTokenIcon>B</ChartSheetTokenIcon>
+                <ChartSheetSymbol>BTC</ChartSheetSymbol>
+              </ChartSheetSymbolRow>
+              <ChartSheetPrice>78,053.6</ChartSheetPrice>
+              <ChartSheetStatsRow>
+                <ChartSheetStat>
+                  <ChartSheetStatLabel>24h Change</ChartSheetStatLabel>
+                  <ChartSheetStatValue $sign="negative">-0.01%</ChartSheetStatValue>
+                </ChartSheetStat>
+                <ChartSheetStat>
+                  <ChartSheetStatLabel>24h High</ChartSheetStatLabel>
+                  <ChartSheetStatValue>0.0053863</ChartSheetStatValue>
+                </ChartSheetStat>
+                <ChartSheetStat>
+                  <ChartSheetStatLabel>24h Low</ChartSheetStatLabel>
+                  <ChartSheetStatValue>0.0051863</ChartSheetStatValue>
+                </ChartSheetStat>
+              </ChartSheetStatsRow>
+            </ChartSheetHeader>
+            <ChartSheetChart>
+              <SimpleChartCard
+                timeframe={tf}
+                timeframes={TFS}
+                onTimeframeChange={(next) => setTf(next as Tf)}
+                points={[]}
+                currentPriceLabel="640"
+                yTicks={Y_TICKS}
+                xTicks={X_TICKS}
+              />
+            </ChartSheetChart>
+          </>
+        }
       />
 
     </Root>

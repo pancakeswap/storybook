@@ -21,6 +21,15 @@ export const ModalHeader = styled(Flex)<{ width?: string; background?: string; h
   ${({ theme }) => theme.mediaQueries.md} {
     background: ${({ background }) => background || "transparent"};
   }
+
+  /* On mobile + tablet bottom-sheets the grabber pill is the dismissal
+     affordance — drop the redundant X close button so the header stays
+     clean. */
+  @media (max-width: 967.98px) {
+    [aria-label="Close the dialog"] {
+      display: none;
+    }
+  }
 `;
 
 export const ModalTitle: ComponentType<FlexProps> = styled(Flex)`
@@ -33,6 +42,15 @@ export const ModalBody: ComponentType<FlexProps> = styled(Flex)`
   overflow-y: auto;
   overflow-x: hidden;
   max-height: calc(90vh - ${mobileFooterHeight}px);
+
+  /* Mobile + tablet (≤967.98): 16px gutter for breathing room around
+     inner cards/lists. Desktop (≥968): default 24px from the
+     bodyPadding prop is kept. */
+  @media (max-width: 967.98px) {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
   ${({ theme }) => theme.mediaQueries.md} {
     display: flex;
     max-height: 90vh;
@@ -83,12 +101,44 @@ export const ModalContainer = styled(MotionBox)<{
   bottom: 0;
   max-width: none !important;
   min-height: ${({ $minHeight }) => $minHeight};
+  /* Reserve room for the bottom-sheet grabber so the header below
+     doesn't sit underneath it. Removed at the desktop breakpoint when
+     the layout becomes a centered modal. */
+  padding-top: 28px;
 
-  ${({ theme }) => theme.mediaQueries.md} {
+  /* Grabber pill — black/white at 10% opacity, matches BottomDrawer's
+     TopBar so every bottom-sheet on mobile/tablet feels consistent. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: calc(50% - 18px);
+    width: 36px;
+    height: 4px;
+    border-radius: 9999px;
+    background: #000;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  html.dark &::before {
+    background: #FFF;
+  }
+
+  /* Promote the bottom-sheet breakpoint to the lg (968px) cutoff used
+     by the rest of the perps app, so tablet widths (576-967.98) stay
+     in the bottom-sheet treatment instead of switching to centered at
+     852. Above 968, the grabber is dropped and the modal centers. */
+  ${({ theme }) => theme.mediaQueries.lg} {
     width: auto;
     position: auto;
     bottom: auto;
     border-radius: 32px;
     max-height: 100vh;
+    padding-top: 0;
+
+    &::before {
+      display: none;
+    }
   }
 ` as typeof MotionBox;

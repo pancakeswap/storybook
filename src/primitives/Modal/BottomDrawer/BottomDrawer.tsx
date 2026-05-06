@@ -12,8 +12,17 @@ export const TopBar = styled.div`
   left: calc(50% - 18px);
   width: 36px;
   height: 4px;
-  background-color: ${({ theme }) => theme.colors.v2Inverse};
+  border-radius: 9999px;
+  /* PCS v2-expanded "inverse" — black in light mode, white in dark — at
+     10% opacity. Hardcoded because the v2Inverse token isn't exposed
+     through the styled-components theme; fallback was transparent and
+     made the grabber invisible. */
+  background: #000;
   opacity: 0.1;
+
+  html.dark & {
+    background: #FFF;
+  }
 `;
 
 interface BottomDrawerProps {

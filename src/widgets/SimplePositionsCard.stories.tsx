@@ -19,6 +19,8 @@ const SAMPLE_POSITION: SimplePositionRow = {
   leverageText: '100X',
   unrealizedPnl: '+$10.09',
   pnlSign: 'positive',
+  size: '$10.09',
+  sizeCurrency: 'USDT',
   entryPrice: '$649.98',
   liqPrice: '$637.00',
   liqDistancePct: 90,
@@ -79,6 +81,7 @@ const baseArgs: SimplePositionsCardProps = {
   history: [],
   onClosePosition: fn(),
   onCancelOrder: fn(),
+  onSharePnl: fn(),
 }
 
 const meta = {

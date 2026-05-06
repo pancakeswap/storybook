@@ -81,6 +81,18 @@ const Backdrop = styled.div`
   justify-content: center;
   padding: 48px 16px;
   min-height: 100%;
+
+  /* On mobile + tablet anchor the card to the bottom of the viewport
+     so it reads as a bottom-sheet and matches the rest of the app's
+     modal treatment. The 48px frame collapses; the sheet hugs the
+     bottom edge. width: 100% is required because the parent
+     StyledModalWrapper centers children with align-items: center, so
+     without an explicit width Backdrop would shrink to fit the Card. */
+  @media (max-width: 967.98px) {
+    width: 100%;
+    align-items: flex-end;
+    padding: 0;
+  }
 `
 
 const Card = styled.div`
@@ -88,13 +100,42 @@ const Card = styled.div`
   flex-direction: column;
   gap: 24px;
   width: 100%;
-  max-width: 456px;
+  max-width: 466px;
   padding: 24px;
   background: ${({ theme }) => theme.colors.card};
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
   border-radius: 24px;
+
+  /* Bottom-sheet treatment on mobile + tablet — full-width, top-only
+     rounded corners, 28px reserved at the top for the grabber pill,
+     matching the rest of the modal system. */
+  @media (max-width: 967.98px) {
+    max-width: none;
+    border-radius: 32px 32px 0 0;
+    border-bottom: 0;
+    border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+    position: relative;
+    padding: 44px 16px 16px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: calc(50% - 18px);
+      width: 36px;
+      height: 4px;
+      border-radius: 9999px;
+      background: #000;
+      opacity: 0.1;
+      pointer-events: none;
+    }
+  }
+
+  html.dark &::before {
+    background: #FFF;
+  }
 `
 
 const Header = styled.div`
@@ -127,6 +168,12 @@ const CloseBtn = styled.button`
   border-radius: 6px;
   &:hover {
     color: ${({ theme }) => theme.colors.text};
+  }
+
+  /* On mobile + tablet the grabber pill is the dismissal cue — drop
+     the redundant X so the header reads as just title + sheet. */
+  @media (max-width: 967.98px) {
+    display: none;
   }
 `
 

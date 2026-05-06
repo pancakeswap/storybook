@@ -18,6 +18,13 @@ export interface SimpleTickerCardProps {
   nextFunding: string
   onSymbolClick?: () => void
   /**
+   * Mobile + tablet callback. When provided, the ticker renders a small
+   * graph-icon button next to the price on screens ≤967.98px. Tapping
+   * it fires this callback — typically wiring a chart bottom-sheet,
+   * since the inline chart is hidden at this breakpoint to save space.
+   */
+  onChartOpen?: () => void
+  /**
    * Optional token-icon renderer. When provided, replaces the default
    * letter chip with the consumer's element (typically the venue's CDN
    * logo). Returning null/undefined defers to the default chip so an
@@ -47,9 +54,11 @@ const Card = styled.div`
   background: ${({ theme }) => theme.colors.card};
   font-variant-numeric: tabular-nums;
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     padding: 16px;
-    gap: 8px;
+    /* 12px between the price/graph cluster and the markets-dropdown
+       button, per Figma 621-29050 spec. */
+    gap: 12px;
   }
 `
 
@@ -66,7 +75,7 @@ const Left = styled.button`
   text-align: left;
   flex-shrink: 0;
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     flex: 1;
   }
 `
@@ -85,7 +94,7 @@ const TokenChip = styled.span`
   font-weight: 700;
   flex-shrink: 0;
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     width: 40px;
     height: 40px;
     font-size: 14px;
@@ -113,7 +122,7 @@ const TokenIconSlot = styled.span`
     display: block;
   }
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     width: 40px;
     height: 40px;
     flex: 0 0 40px;
@@ -125,7 +134,7 @@ const Meta = styled.div`
   flex-direction: column;
   gap: 4px;
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     flex: 1;
     flex-direction: row;
     align-items: center;
@@ -155,7 +164,7 @@ const PairDropdown = styled.span`
   border-left: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     height: auto;
     padding: 0;
     border: 0;
@@ -177,7 +186,7 @@ const Name = styled.span`
   font-weight: 600;
   line-height: 150%;
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     font-size: 20px;
     letter-spacing: -0.2px;
   }
@@ -191,17 +200,17 @@ const PairArrowBox = styled.span`
   align-items: center;
   color: ${({ theme }) => theme.colors.textSubtle};
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     display: none;
   }
 `
 
 /* Standalone chevron button rendered to the right of the price at mobile.
    Replaces the inline chevron inside PairDropdown — see Figma 378:8075. */
-const MobilePairChevron = styled.span`
+const MobilePairChevron = styled.button`
   display: none;
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     display: inline-flex;
     padding: 2px;
     align-items: center;
@@ -214,8 +223,38 @@ const MobilePairChevron = styled.span`
     background: ${({ theme }) => theme.colors.input};
     color: ${({ theme }) => theme.colors.textSubtle};
     flex-shrink: 0;
+    cursor: pointer;
   }
 `
+
+const MobileChartButton = styled.button`
+  display: none;
+
+  @media (max-width: 967.98px) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: ${({ theme }) => theme.colors.textSubtle};
+    cursor: pointer;
+    border-radius: 6px;
+    flex-shrink: 0;
+
+    &:hover {
+      color: ${({ theme }) => theme.colors.text};
+    }
+  }
+`
+
+const ChartGlyph: React.FC = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M3 21V3h2v16h16v2H3zm4-4V9h3v8H7zm5 0V5h3v12h-3zm5 0v-6h3v6h-3z" />
+  </svg>
+)
 
 const PriceRow = styled.span`
   display: inline-flex;
@@ -230,7 +269,7 @@ const Price = styled.span`
   line-height: 1.2;
   color: ${({ theme }) => theme.colors.text};
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     font-family: Kanit;
     font-size: 20px;
     font-style: normal;
@@ -257,7 +296,7 @@ const Pnl = styled.span<{ $positive: boolean }>`
     background: ${({ $positive }) => ($positive ? '#0C3A32' : '#3E1C39')};
   }
 
-  @media (max-width: 575.98px) {
+  @media (max-width: 967.98px) {
     display: none;
   }
 `
@@ -316,11 +355,10 @@ const Stat = styled.div<{ $hideOnLaptop?: boolean }>`
     display: ${({ $hideOnLaptop }) => ($hideOnLaptop ? 'none' : 'flex')};
   }
 
-  @media (min-width: 576px) and (max-width: 967.98px) {
-    display: ${({ $hideOnLaptop }) => ($hideOnLaptop ? 'none' : 'flex')};
-  }
-
-  @media (max-width: 575.98px) {
+  /* Tablet (576-967.98) now mirrors the mobile compact layout — stats
+     are hidden along with the rest of the inline chart, replaced by the
+     graph icon + chart bottom-sheet. */
+  @media (max-width: 967.98px) {
     display: none;
   }
 `
@@ -399,6 +437,7 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
   fundingRate,
   nextFunding,
   onSymbolClick,
+  onChartOpen,
   renderTokenIcon,
 }) => {
   const positive = pricePnlPct >= 0
@@ -443,11 +482,32 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
               {pricePnlPct.toFixed(2)}%
             </Pnl>
           </PriceRow>
-          <MobilePairChevron aria-hidden>
-            <PairArrowGlyph />
-          </MobilePairChevron>
         </Meta>
       </Left>
+
+      {onChartOpen && (
+        <MobileChartButton
+          type="button"
+          aria-label="Open chart"
+          onClick={(e) => {
+            e.stopPropagation()
+            onChartOpen()
+          }}
+        >
+          <ChartGlyph />
+        </MobileChartButton>
+      )}
+
+      {/* Markets-dropdown trigger pinned to the right of the mobile
+          card. The widget no longer has its own picker — consumers wire
+          a real markets dropdown via onSymbolClick. */}
+      <MobilePairChevron
+        type="button"
+        aria-label={`Change market · ${pair}`}
+        onClick={() => onSymbolClick?.()}
+      >
+        <PairArrowGlyph />
+      </MobilePairChevron>
 
       <StatsWrap ref={wrapRef}>
         <Stats ref={statsRef}>
