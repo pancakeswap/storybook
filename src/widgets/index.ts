@@ -70,6 +70,9 @@ export type {
 export { TpSlModal } from './TpSlModal'
 export type { TpSlModalProps, TpSlIntent, PositionSide } from './TpSlModal'
 
+export { SharePnlModal, tierFromPnlPct } from './SharePnlModal'
+export type { SharePnlModalProps, SharePnlTier } from './SharePnlModal'
+
 export { ChartPanel } from './ChartPanel'
 export type { ChartPanelProps } from './ChartPanel'
 
