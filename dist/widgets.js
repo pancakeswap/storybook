@@ -2474,15 +2474,14 @@ var G = B(e)`
 	}
 	return [...o.entries()].sort((e, n) => t === "bid" ? Number(n[0]) - Number(e[0]) : Number(e[0]) - Number(n[0])).map(([e, t]) => [e, t.toString()]);
 }, Vr = [
-	100,
-	50,
+	1,
 	10,
-	1
+	50,
+	100
 ], Hr = (e) => e === 0 ? "1" : `0.${"0".repeat(e - 1)}1`, Ur = (e) => !e || e <= 0 ? 0 : Math.round(-Math.log10(e)), Wr = (e, t) => {
-	let n = [];
+	let n = [], r = Ur(e);
+	for (let e = r; e >= 1; e--) n.push(Hr(e));
 	for (let e of Vr) t > e * 10 && n.push(String(e));
-	let r = Ur(e);
-	for (let e = 1; e <= r; e++) n.push(Hr(e));
 	return n;
 }, Gr = (e, t) => {
 	M(() => {
@@ -2947,16 +2946,15 @@ var G = B(e)`
 	M(() => {
 		if (S.length !== 0) {
 			if (!S.includes(d)) {
-				f(S[S.length - 1]), C.current = i;
+				f(S[0]), C.current = i;
 				return;
 			}
-			C.current !== i && (C.current = i, o > 0 && Number(d) > o * .005 && f(S[S.length - 1]));
+			C.current !== i && (C.current = i, f(S[0]));
 		}
 	}, [
 		S,
 		d,
 		f,
-		o,
 		i
 	]);
 	let w = F(() => {
