@@ -33,6 +33,18 @@ export interface TpSlModalProps {
   entryPrice: number
   /** Resolved mark price — displayed in the summary row. */
   markPrice: number
+  /**
+   * Quote asset symbol (e.g. "USDT", "USDC"). Suffixed onto the Entry /
+   * Mark summary rows and the PnL field labels so the user always sees
+   * which token the numbers are denominated in. Defaults to "USDT".
+   */
+  quoteAsset?: string
+  /**
+   * Display precision for the Entry / Mark figures and for the trigger
+   * price computed from a PnL input. Defaults to 4 to match Aster's UI;
+   * pass the symbol's actual `pricePrecision` for finer-grained tokens.
+   */
+  pricePrecision?: number
   onConfirm: (intent: TpSlIntent) => Promise<void> | void
   onClose: () => void
   /** Translator. */
@@ -112,6 +124,8 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
   qty,
   entryPrice,
   markPrice,
+  quoteAsset = 'USDT',
+  pricePrecision = 4,
   onConfirm,
   onClose,
   t = identity,
@@ -154,7 +168,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
     setTpPnl(norm)
     if (norm === '' || norm === '-') return setTpPrice('')
     const n = Number(norm)
-    setTpPrice(Number.isFinite(n) ? formatRaw(priceFromPnl(n), 2) : '')
+    setTpPrice(Number.isFinite(n) ? formatRaw(priceFromPnl(n), pricePrecision) : '')
   }
   const onChangeSlPrice = (v: string) => {
     setSlPrice(v)
@@ -169,7 +183,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
     setSlPnl(norm)
     if (norm === '' || norm === '-') return setSlPrice('')
     const n = Number(norm)
-    setSlPrice(Number.isFinite(n) ? formatRaw(priceFromPnl(n), 2) : '')
+    setSlPrice(Number.isFinite(n) ? formatRaw(priceFromPnl(n), pricePrecision) : '')
   }
 
   const warning = useMemo(() => {
@@ -233,7 +247,9 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
               {t('Entry')}
             </Text>
             <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {Number.isFinite(entryPrice) ? formatWithThousandSeparator(entryPrice.toFixed(2)) : '—'}
+              {Number.isFinite(entryPrice)
+                ? `${formatWithThousandSeparator(entryPrice.toFixed(pricePrecision))} ${quoteAsset}`
+                : '—'}
             </Text>
           </SummaryRow>
           <SummaryRow>
@@ -241,7 +257,9 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
               {t('Mark')}
             </Text>
             <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {Number.isFinite(markPrice) ? formatWithThousandSeparator(markPrice.toFixed(2)) : '—'}
+              {Number.isFinite(markPrice)
+                ? `${formatWithThousandSeparator(markPrice.toFixed(pricePrecision))} ${quoteAsset}`
+                : '—'}
             </Text>
           </SummaryRow>
 
@@ -261,7 +279,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
                 />
               </Box>
               <Box style={{ flex: 1 }}>
-                <FieldLabel>{t('PnL (USDT)')}</FieldLabel>
+                <FieldLabel>{t('PnL')} ({quoteAsset})</FieldLabel>
                 <InputTight
                   {...useSeparatedNumberInput(tpPnl, onChangeTpPnl)}
                   placeholder="0.00"
@@ -285,7 +303,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
                 />
               </Box>
               <Box style={{ flex: 1 }}>
-                <FieldLabel>{t('PnL (USDT)')}</FieldLabel>
+                <FieldLabel>{t('PnL')} ({quoteAsset})</FieldLabel>
                 <InputTight
                   {...useSeparatedNumberInput(slPnl, onChangeSlPnl)}
                   placeholder="0.00"
