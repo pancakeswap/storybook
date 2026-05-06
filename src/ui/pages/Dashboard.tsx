@@ -13,7 +13,7 @@ import type { WalletTab } from './wallet-shared'
 
 /* ── Types ─────────────────────────────────────────────────── */
 
-interface Token {
+export interface Token {
   id: string
   symbol: string
   chain: string
@@ -28,7 +28,7 @@ interface Token {
 
 /* ── Data ──────────────────────────────────────────────────── */
 
-const TOKENS: Token[] = [
+export const TOKENS: Token[] = [
   {
     id: '1',
     symbol: 'BNB',
@@ -217,7 +217,7 @@ function fmtValue(n: number) {
 
 /* ── Sub-components ─────────────────────────────────────────── */
 
-function PnlTag({ value }: { value: number }) {
+export function PnlTag({ value }: { value: number }) {
   const positive = value >= 0
   const color = positive ? 'var(--pcs-colors-success)' : 'var(--pcs-colors-failure)'
   const bg = positive ? 'rgba(49,208,170,0.1)' : 'rgba(237,75,158,0.1)'
@@ -242,7 +242,7 @@ function PnlTag({ value }: { value: number }) {
   )
 }
 
-function AllocationBar({ pct }: { pct: number }) {
+export function AllocationBar({ pct }: { pct: number }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
       <Text fontSize="14px" style={{ fontVariantNumeric: 'tabular-nums', minWidth: 44, textAlign: 'right' }}>
@@ -275,12 +275,28 @@ function AllocationBar({ pct }: { pct: number }) {
 
 /* ── Portfolio Chart ─────────────────────────────────────────── */
 
-function PortfolioChart() {
+export interface PortfolioChartProps {
+  /** Formatted dollar amount, e.g. "$7,356.81" — defaults to `$1,892.26` */
+  value?: string
+  /** PnL percent — pass undefined to hide */
+  change?: number
+  /** Subtitle under the value (e.g. date) — defaults to `Mar 25, 2024 UTC` */
+  subtitle?: string
+  /** Optional content rendered below the SVG (e.g. info banner) */
+  footer?: React.ReactNode
+}
+
+export function PortfolioChart({
+  value = '$1,892.26',
+  change = 7.1,
+  subtitle = 'Mar 25, 2024 UTC',
+  footer,
+}: PortfolioChartProps = {}) {
   const [rangeIndex, setRangeIndex] = useState(0)
 
   return (
-    <Card style={{ flex: 1 }}>
-      <CardBody style={{ padding: '20px 20px 16px', display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
+    <Card style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <CardBody style={{ padding: '20px 20px 16px', display: 'flex', flexDirection: 'column', flex: 1, boxSizing: 'border-box' }}>
         {/* Header row */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4, flexShrink: 0 }}>
           <div>
@@ -295,11 +311,11 @@ function PortfolioChart() {
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
-                $1,892.26
+                {value}
               </Text>
-              <PnlTag value={7.1} />
+              {change !== undefined && <PnlTag value={change} />}
             </div>
-            <Text color="textSubtle" fontSize="12px">Mar 25, 2024 UTC</Text>
+            <Text color="textSubtle" fontSize="12px">{subtitle}</Text>
           </div>
 
           {/* Time range selector */}
@@ -419,6 +435,7 @@ function PortfolioChart() {
             })}
           </svg>
         </div>
+        {footer}
       </CardBody>
     </Card>
   )
@@ -426,14 +443,23 @@ function PortfolioChart() {
 
 /* ── Token Table ─────────────────────────────────────────────── */
 
-function TokenTable() {
+export interface TokenTableProps {
+  /** Token list to display — defaults to the full EVM token list */
+  tokens?: Token[]
+  /** Show the search + filter row above the table — defaults to true */
+  showFilters?: boolean
+  /** Optional title rendered above the filter row */
+  title?: React.ReactNode
+}
+
+export function TokenTable({ tokens = TOKENS, showFilters = true, title }: TokenTableProps = {}) {
   const [search, setSearch] = useState('')
   const [hideSmall, setHideSmall] = useState(false)
   const [showHidden, setShowHidden] = useState(false)
   const [sortField, setSortField] = useState<keyof Token | null>(null)
   const [sortOrder, setSortOrder] = useState<ISortOrder>(null)
 
-  const filtered = TOKENS.filter((t) => {
+  const filtered = tokens.filter((t) => {
     if (hideSmall && t.value < 10) return false
     if (!showHidden && t.value === 0) return false
     if (search) {
@@ -552,7 +578,9 @@ function TokenTable() {
 
   return (
     <Card>
+      {title}
       {/* Filter row */}
+      {showFilters && (
       <div style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
         {/* Search / token selector */}
         <style>{`.token-search::placeholder { color: var(--pcs-colors-text); opacity: 1; font-family: Kanit, sans-serif; font-size: 16px; font-weight: 400; }`}</style>
@@ -635,6 +663,7 @@ function TokenTable() {
           </label>
         </div>
       </div>
+      )}
 
       <TableView<Token>
         columns={columns}
@@ -650,13 +679,39 @@ function TokenTable() {
 
 /* ── Portfolio Breakdown ─────────────────────────────────────── */
 
-const BREAKDOWN_ITEMS = [
+export interface BreakdownItem {
+  label: string
+  pct: number
+  value: number
+  color: string
+}
+
+const BREAKDOWN_ITEMS: BreakdownItem[] = [
   { label: 'Wallet balance', pct: 62, value: 1173.20, color: 'var(--pcs-colors-primary)' },
   { label: 'Positions',      pct: 38, value:  719.06, color: 'var(--pcs-colors-secondary)' },
   { label: 'Unclaimed rewards', pct: 0, value: 0,     color: 'var(--pcs-colors-failure)' },
 ]
 
-function PortfolioBreakdown() {
+export interface PortfolioBreakdownCardProps {
+  /** Pretitle / header text — defaults to "My Portfolio Breakdown" */
+  title?: string
+  /** Total dollar amount (raw number) — defaults to PORTFOLIO_TOTAL */
+  total?: number
+  /** PnL percent change — pass undefined to hide */
+  change?: number
+  /** Breakdown rows — defaults to the existing 3-item list */
+  items?: BreakdownItem[]
+  /** Show Swap/Earn/Buy crypto action stack — defaults to true */
+  showActions?: boolean
+}
+
+export function PortfolioBreakdown({
+  title = 'My Portfolio Breakdown',
+  total = PORTFOLIO_TOTAL,
+  change = 171,
+  items = BREAKDOWN_ITEMS,
+  showActions = true,
+}: PortfolioBreakdownCardProps = {}) {
   return (
     <Card>
       <CardBody>
@@ -667,7 +722,7 @@ function PortfolioBreakdown() {
           bold
           style={{ letterSpacing: '0.24px', textTransform: 'uppercase', lineHeight: 1.5, marginBottom: 12 }}
         >
-          My Portfolio Breakdown
+          {title}
         </Text>
 
         {/* Total value */}
@@ -685,14 +740,15 @@ function PortfolioBreakdown() {
               fontVariantNumeric: 'tabular-nums',
             }}
           >
-            ${PORTFOLIO_TOTAL.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </Text>
-          <PnlTag value={171} />
+          {change !== undefined && <PnlTag value={change} />}
         </div>
 
         {/* Multi-segment allocation bar */}
         {(() => {
-          const visible = BREAKDOWN_ITEMS.filter((i) => i.pct > 0)
+          const visible = items.filter((i) => i.pct > 0)
+          if (visible.length === 0) return null
           return (
             <div style={{ display: 'flex', height: 12, marginBottom: 24, gap: 2 }}>
               {visible.map((item, i) => {
@@ -721,7 +777,7 @@ function PortfolioBreakdown() {
 
         {/* Breakdown rows — 8px gap, no borders */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {BREAKDOWN_ITEMS.map(({ label, pct, value, color }) => (
+        {items.map(({ label, pct, value, color }) => (
           <div
             key={label}
             style={{
@@ -745,22 +801,26 @@ function PortfolioBreakdown() {
         ))}
         </div>
 
-        {/* Action buttons */}
-        <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
-          <Button variant="primary" scale="md" style={{ flex: 1 }}>
-            Swap
-          </Button>
-          <Button variant="secondary" scale="md" style={{ flex: 1 }}>
-            Earn
-          </Button>
-        </div>
+        {showActions && (
+          <>
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: 8, marginTop: 20 }}>
+              <Button variant="primary" scale="md" style={{ flex: 1 }}>
+                Swap
+              </Button>
+              <Button variant="secondary" scale="md" style={{ flex: 1 }}>
+                Earn
+              </Button>
+            </div>
 
-        {/* Buy crypto link */}
-        <div style={{ textAlign: 'center', marginTop: 12 }}>
-          <Button variant="text" scale="sm">
-            Buy crypto
-          </Button>
-        </div>
+            {/* Buy crypto link */}
+            <div style={{ textAlign: 'center', marginTop: 12 }}>
+              <Button variant="text" scale="sm">
+                Buy crypto
+              </Button>
+            </div>
+          </>
+        )}
       </CardBody>
     </Card>
   )
