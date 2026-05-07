@@ -10208,7 +10208,6 @@ var sf = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   line-height: 150%;
 `, yf = B.section`
   display: flex;
-  width: 400px;
   flex-direction: column;
   align-items: center;
   gap: 16px;
