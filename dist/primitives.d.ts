@@ -1057,6 +1057,22 @@ export declare const pcsTheme: {
         primary10: string;
         primary20: string;
         primary60: string;
+        positive10: string;
+        positive60: string;
+        negative60: string;
+        negativeSubtle: string;
+        v2Inverse: string;
+        v2Default: string;
+        tooltipInverseBg: string;
+        tooltipInverseText: string;
+        walletChipSpotBg: string;
+        walletChipSpotBorder: string;
+        walletChipPerpBg: string;
+        walletChipPerpBorder: string;
+        timeframeBg: string;
+        timeframeBorder: string;
+        levTrackBg: string;
+        inputPrimary: string;
         gradientBubblegum: string;
         white: string;
         transparent: string;
@@ -1076,6 +1092,8 @@ export declare const pcsTheme: {
         focus: string;
         inset: string;
         tooltip: string;
+        sunken: string;
+        sunkenStrong: string;
     };
     toggle: {
         handleBackground: string;
@@ -2435,9 +2453,9 @@ ref?: ((instance: SVGSVGElement | null) => void | DO_NOT_USE_OR_YOU_WILL_BE_FIRE
 
 /**
  * High-contrast tooltip — dark surface in light mode, light surface in
- * dark mode (per Figma 391:39212-style direction). Color swap is keyed
- * on the `html.dark` class set by Storybook's theme toolbar / consumer
- * theme switcher.
+ * dark mode (per Figma 391:39212-style direction). Theme-flip is driven
+ * by the `tooltipInverse*` semantic tokens (CSS vars), so styled-components
+ * does not need to know about the dark class.
  */
 export declare const StyledTooltipContent: IStyledComponent<"web", Substitute<Omit<Popover.PopoverContentProps & RefAttributes<HTMLDivElement>, "ref"> & {
 ref?: ((instance: HTMLDivElement | null) => void | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<HTMLDivElement> | null | undefined;

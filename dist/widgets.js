@@ -1,4 +1,4 @@
-import { B as e, D as t, E as n, F as r, H as i, Ht as a, Jn as o, Jt as s, Ki as c, M as l, Q as u, S as d, T as f, V as p, Vt as m, b as h, i as g, it as _, j as v, lt as y, nn as b, nr as x, o as S, ot as C, qi as w, t as T, w as E, wi as D } from "./chunks/useTooltip-uXUkH2IB.js";
+import { B as e, D as t, E as n, F as r, H as i, Ht as a, Jn as o, Jt as s, Ki as c, M as l, Q as u, S as d, T as f, V as p, Vt as m, b as h, i as g, it as _, j as v, lt as y, nn as b, nr as x, o as S, ot as C, qi as w, t as T, w as E, wi as D } from "./chunks/useTooltip-CCNLvFzX.js";
 import O, { Children as k, cloneElement as A, useCallback as j, useEffect as M, useId as N, useLayoutEffect as P, useMemo as F, useRef as I, useState as L } from "react";
 import { css as R, keyframes as z, styled as B, useTheme as V } from "styled-components";
 import { Fragment as H, jsx as U, jsxs as W } from "react/jsx-runtime";
@@ -1106,14 +1106,10 @@ var G = B(e)`
       width: 36px;
       height: 4px;
       border-radius: 9999px;
-      background: #000;
+      background: ${({ theme: e }) => e.colors.v2Inverse};
       opacity: 0.1;
       pointer-events: none;
     }
-  }
-
-  html.dark &::before {
-    background: #FFF;
   }
 `, vt = B.div`
   display: flex;
@@ -1969,8 +1965,8 @@ var G = B(e)`
   align-items: stretch;
   gap: 8px;
   border-radius: 16px;
-  background: #08060B;
-  color: #FFF;
+  background: ${({ theme: e }) => e.colors.tooltipInverseBg};
+  color: ${({ theme: e }) => e.colors.tooltipInverseText};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
@@ -1983,14 +1979,6 @@ var G = B(e)`
   pointer-events: none;
   z-index: 100;
   white-space: normal;
-
-  html.dark & {
-    background: #FFF;
-    color: #000;
-    box-shadow:
-      0 1px 2px 0 rgba(0, 0, 0, 0.16),
-      0 4px 8px 0 rgba(0, 0, 0, 0.32);
-  }
 `, Zn = B.div`
   display: flex;
   align-items: baseline;
@@ -3336,12 +3324,8 @@ var G = B(e)`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-  color: #02919D;
+  color: ${({ theme: e }) => e.colors.primary60};
   font-feature-settings: 'liga' off;
-
-  html.dark & {
-    color: #48D0DB;
-  }
 `, Mi = B.button`
   background: transparent;
   border: 0;
@@ -3351,15 +3335,11 @@ var G = B(e)`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-  color: #02919D;
+  color: ${({ theme: e }) => e.colors.primary60};
   font-feature-settings: 'liga' off;
   &:disabled {
     opacity: 0.5;
     cursor: default;
-  }
-
-  html.dark & {
-    color: #48D0DB;
   }
 `, Ni = B(E)`
   gap: 8px;
@@ -3385,7 +3365,7 @@ var G = B(e)`
   align-items: center;
   gap: 4px;
 `, Ii = B.span`
-  color: ${({ $up: e }) => e ? "#129E7D" : "#D8376C"};
+  color: ${({ $up: e, theme: t }) => e ? t.colors.positive60 : t.colors.negative60};
   font-family: Kanit;
   font-size: 12px;
   font-weight: 400;
@@ -3393,10 +3373,6 @@ var G = B(e)`
   letter-spacing: 0.12px;
   font-feature-settings: 'liga' off;
   white-space: nowrap;
-
-  html.dark & {
-    color: ${({ $up: e }) => e ? "#3DDBB5" : "#FFA3D0"};
-  }
 `, Li = B.span`
   display: inline-flex;
   align-items: center;
@@ -3660,7 +3636,7 @@ var G = B(e)`
   border: 0;
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
   background: ${({ theme: e }) => e.colors.tertiary};
-  color: #02919D;
+  color: ${({ theme: e }) => e.colors.primary60};
   font-family: Kanit;
   font-size: 12px;
   font-weight: 600;
@@ -3680,10 +3656,6 @@ var G = B(e)`
     opacity: 0.5;
     cursor: default;
   }
-
-  html.dark & {
-    color: #48D0DB;
-  }
 `, ta = B.button`
   display: inline-flex;
   align-items: center;
@@ -3692,7 +3664,7 @@ var G = B(e)`
   border-radius: 8px;
   border: 2px solid ${({ theme: e }) => e.colors.primary};
   background: transparent;
-  color: #02919D;
+  color: ${({ theme: e }) => e.colors.primary60};
   font-family: Kanit;
   font-size: 12px;
   font-weight: 600;
@@ -3707,10 +3679,6 @@ var G = B(e)`
   &:disabled {
     opacity: 0.5;
     cursor: default;
-  }
-
-  html.dark & {
-    color: #48D0DB;
   }
 `, na = (e) => {
 	let { isMobile: t } = h();
@@ -5121,7 +5089,7 @@ var _o = B(ho)`
   font-size: 16px;
   font-weight: 600;
   line-height: 1.5;
-  color: #02919D;
+  color: ${({ theme: e }) => e.colors.primary60};
   cursor: pointer;
   transition: opacity 0.12s, background 0.12s;
 
@@ -5131,10 +5099,6 @@ var _o = B(ho)`
   &:disabled {
     opacity: 0.5;
     cursor: default;
-  }
-
-  html.dark & {
-    color: #48D0DB;
   }
 `, Go = B.button`
   display: inline-flex;
@@ -5404,7 +5368,7 @@ var _o = B(ho)`
   border: 0;
   border-radius: 12px;
   background: transparent;
-  color: ${({ $active: e, theme: t }) => e ? "#FFF" : t.colors.textSubtle};
+  color: ${({ $active: e, theme: t }) => e ? t.colors.v2Default : t.colors.textSubtle};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 16px;
@@ -5413,10 +5377,6 @@ var _o = B(ho)`
   line-height: 150%;
   cursor: pointer;
   transition: color 0.25s ease;
-
-  html.dark & {
-    color: ${({ $active: e, theme: t }) => e ? "#000" : t.colors.textSubtle};
-  }
 `, ys = B.button`
   display: flex;
   flex: 1 0 0;
@@ -5549,8 +5509,8 @@ var _o = B(ho)`
   align-items: stretch;
   gap: 8px;
   border-radius: 16px;
-  background: #08060B;
-  color: #FFF;
+  background: ${({ theme: e }) => e.colors.tooltipInverseBg};
+  color: ${({ theme: e }) => e.colors.tooltipInverseText};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
@@ -5578,18 +5538,7 @@ var _o = B(ho)`
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
     border-top: 8px solid currentColor;
-    color: #08060B;
-  }
-
-  html.dark & {
-    background: #FFF;
-    color: #000;
-    box-shadow:
-      0 1px 2px 0 rgba(0, 0, 0, 0.08),
-      0 4px 8px 0 rgba(0, 0, 0, 0.16);
-    &::after {
-      color: #FFF;
-    }
+    color: ${({ theme: e }) => e.colors.tooltipInverseBg};
   }
 `, js = B.span`
   display: inline-flex;
@@ -6176,9 +6125,7 @@ var _o = B(ho)`
 		})
 	] });
 }, mc = (e) => {
-	let { isMobile: t } = h();
-	if (t) return /* @__PURE__ */ U(pc, { ...e });
-	let { baseAsset: n, quoteAsset: i, draft: a, onDraftChange: o, typeKey: s, onTypeKeyChange: c, availableBalanceText: m, preview: g, feeText: _, sizePercent: v, onSizePercentChange: y, cta: b, canSubmit: x, isSubmitting: S = !1, marginSubmitting: C = !1, authReady: w = !0, hasAddress: T = !0, errorSlot: D, onSubmit: O, onLeverageClick: k, onMarginModeToggle: A, onDepositClick: j, extraControls: N, markPrice: P, priceDecimals: F = 2, t: R = Xs } = e, z = a.sizeUnit === "QUOTE" ? i : n, B = (e) => o({
+	let { isMobile: t } = h(), { baseAsset: n, quoteAsset: i, draft: a, onDraftChange: o, typeKey: s, onTypeKeyChange: c, availableBalanceText: m, preview: g, feeText: _, sizePercent: v, onSizePercentChange: y, cta: b, canSubmit: x, isSubmitting: S = !1, marginSubmitting: C = !1, authReady: w = !0, hasAddress: T = !0, errorSlot: D, onSubmit: O, onLeverageClick: k, onMarginModeToggle: A, onDepositClick: j, extraControls: N, markPrice: P, priceDecimals: F = 2, t: R = Xs } = e, z = a.sizeUnit === "QUOTE" ? i : n, B = (e) => o({
 		...a,
 		side: e
 	}), V = () => o({
@@ -6249,7 +6196,7 @@ var _o = B(ho)`
 		top: 0,
 		left: 0
 	}), [be, xe] = L(!1), [Se, Ce] = L(!1), [we, Te] = L(null);
-	M(() => {
+	if (M(() => {
 		if (!ge || !me.current || !he.current) return;
 		let e = me.current.getBoundingClientRect(), t = he.current.getBoundingClientRect(), n = e.bottom + 4, r = window.innerWidth - t.width - 8;
 		ye({
@@ -6263,7 +6210,7 @@ var _o = B(ho)`
 			me.current && !me.current.contains(t) && he.current && !he.current.contains(t) && _e(!1);
 		};
 		return document.addEventListener("click", e), () => document.removeEventListener("click", e);
-	}, [ge]);
+	}, [ge]), t) return /* @__PURE__ */ U(pc, { ...e });
 	let Ee = de, De = s === "stop-market" ? `${R("Stop Market")} ▾` : `${R("Stop Limit")} ▾`, Oe = () => {
 		_e((e) => !e);
 	}, ke = (e) => {
@@ -7459,57 +7406,7 @@ var _o = B(ho)`
   align-self: stretch;
   flex: 0 0 auto;
   gap: 64px;
-`;
-B(E)`
-  padding: 16px 20px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border-bottom: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-`, B.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  font-family: inherit;
-  color: ${({ theme: e }) => e.colors.text};
-`, B.span`
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: #f7931a;
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  flex-shrink: 0;
-`, B.span`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  padding: 0 6px;
-`, B.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-`, B.span`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  line-height: 1.2;
-`, B.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 12px;
-  color: ${({ theme: e, $positive: t }) => t ? e.colors.success : e.colors.failure};
-`;
-var sl = B.div`
+`, sl = B.div`
   align-self: stretch;
   display: flex;
   flex-direction: column;
@@ -7745,12 +7642,7 @@ var sl = B.div`
     object-fit: contain;
     display: block;
   }
-`;
-B.span`
-  font-size: 14px;
-  font-weight: 600;
-`;
-var El = B(E)`
+`, El = B(E)`
   display: flex;
   align-items: center;
   gap: 8px;
@@ -7811,7 +7703,7 @@ var El = B(E)`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  color: #FFF;
+  color: ${({ theme: e }) => e.colors.v2Default};
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -7819,19 +7711,11 @@ var El = B(E)`
   font-style: normal;
   font-weight: 400;
   line-height: 150%;
-
-  html.dark & {
-    color: #000;
-  }
 `, Pl = B.span`
   display: inline-flex;
   align-items: center;
-  color: #FFF;
+  color: ${({ theme: e }) => e.colors.v2Default};
   cursor: help;
-
-  html.dark & {
-    color: #000;
-  }
 `, Fl = B.div`
   display: flex;
   flex-direction: column;
@@ -7846,18 +7730,15 @@ var El = B(E)`
   align-self: stretch;
   border-radius: 24px;
   border: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
-  background: linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%);
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.06) inset;
+  background: ${({ theme: e }) => e.colors.levTrackBg};
+  box-shadow: ${({ theme: e }) => e.shadows.sunkenStrong};
   overflow: visible;
+  cursor: pointer;
+  touch-action: none;
 
-  /* PCS V1 decorative bubblegum-light gradient + heavier inset shadow
-     in dark mode, per the design spec. The gradient flips from the
-     light pastel (#E5FDFF → #F3EFFF) to the dark variants
-     (#121621 → #160F1E), and the inset opacity bumps 0.06 → 0.16 so
-     the depth stays readable on the darker surface. */
-  html.dark & {
-    background: linear-gradient(140deg, #121621 0%, #160F1E 100%);
-    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.16) inset;
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   @media (min-width: 968px) and (max-width: 1199.98px) {
@@ -7869,14 +7750,10 @@ var El = B(E)`
   left: ${({ $fillPct: e, $variant: t }) => t === "triple" ? `calc(${e}% - 22px)` : t === "double" ? `calc(${e}% - 20.7px)` : `calc(${e}% - 19px)`};
   width: ${({ $variant: e }) => e === "triple" ? "44px" : e === "double" ? "41.455px" : "38.004px"};
   height: ${({ $variant: e }) => e === "triple" ? "48px" : e === "double" ? "42.549px" : "38.186px"};
-  /* Sits above LevRangeInput so dragging the thumb is captured by our
-     pointer handler instead of falling through to the native input
-     (which maps click X→value and would snap to 1 at low leverage). */
+  /* Purely visual — every gesture is captured by the LevTrack pointer
+     handler, which decides whether the user is clicking or dragging. */
   z-index: 2;
-  pointer-events: auto;
-  touch-action: none;
-  cursor: grab;
-  &:active { cursor: grabbing; }
+  pointer-events: none;
 `, Rl = () => /* @__PURE__ */ W("svg", {
 	width: "38",
 	height: "39",
@@ -8015,8 +7892,10 @@ var El = B(E)`
   width: 100%;
   height: calc(100% + 8px);
   opacity: 0;
-  cursor: pointer;
   margin: 0;
+  /* Mouse/touch is owned by LevTrack's pointer handler — keep this
+     element only for keyboard a11y (screen readers + Tab/arrow keys). */
+  pointer-events: none;
 `, Hl = B(E)`
   display: flex;
   align-items: center;
@@ -8041,8 +7920,12 @@ var El = B(E)`
   font-size: 13px;
   font-weight: ${({ $active: e }) => e ? 600 : 400};
   cursor: pointer;
-  &:hover {
+  &:hover:not(:disabled) {
     color: ${({ $active: e, theme: t }) => e ? t.colors.invertedContrast : t.colors.text};
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 `, Wl = B.div`
   display: flex;
@@ -8080,15 +7963,7 @@ var El = B(E)`
   color: ${({ theme: e }) => e.colors.textSubtle};
   border-left: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   padding-left: 4px;
-`;
-B.div`
-  margin: 0 20px;
-  background: ${({ theme: e }) => e.colors.input};
-  border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
-  border-radius: 16px;
-  overflow: hidden;
-`;
-var ql = z`
+`, ql = z`
   from {
     opacity: 0;
     transform: translateY(-8px);
@@ -8156,14 +8031,11 @@ var ql = z`
   line-height: 150%;
   letter-spacing: -0.24px;
   font-feature-settings: 'liga' off;
-  color: #FFF;
+  color: ${({ theme: e }) => e.colors.v2Default};
   cursor: pointer;
   transition: filter 0.12s, transform 0.06s;
   background: ${({ theme: e, $variant: t }) => t === "up" ? e.colors.success : e.colors.failure};
 
-  html.dark & {
-    color: #000;
-  }
   &:hover:not(:disabled) {
     filter: brightness(1.08);
   }
@@ -8176,10 +8048,6 @@ var ql = z`
     background: ${({ theme: e }) => e.colors.backgroundDisabled};
     color: ${({ theme: e }) => e.colors.textDisabled};
     border-color: transparent;
-  }
-
-  html.dark &:disabled {
-    color: ${({ theme: e }) => e.colors.textDisabled};
   }
 `, $l = B.span`
   display: flex;
@@ -8320,33 +8188,48 @@ var ql = z`
 			}, t.code))
 		}) : null]
 	});
-}, su = ({ symbol: e, baseAsset: t, pair: n, price: r, pricePnlPct: i, onSymbolClick: a, bet: o, onBetChange: s, betError: c, leverage: l, onLeverageChange: u, maxLeverage: d = Uc, presets: f = Hc, quoteAsset: p, onQuoteAssetClick: m, assetOptions: h, onAssetChange: g, fundBalanceText: _, onTopUpFund: v, onPercentClick: y, estimatedEntry: b, liqIfLong: x, marginRequired: S, openingFee: C, canSubmit: w, isSubmittingUp: E = !1, isSubmittingDown: D = !1, onUp: k, onDown: A, onDeposit: j, onWithdraw: M, connectWalletLabel: N, onConnectWallet: P, unrealizedPnl: F }) => {
-	let I = Math.min(100, Math.max(0, l / d * 100)), L = Wc(l), R = Gc(l), z = Kc(l), B = E || D, V = !w || B, ee = !w || B, { targetRef: G, tooltip: K } = T(Yc(L), { placement: "top" }), te = O.useRef(null), q = O.useCallback((e) => {
-		e.preventDefault(), e.stopPropagation();
-		let t = e.currentTarget, n = te.current;
-		if (!n) return;
-		t.setPointerCapture(e.pointerId);
-		let r = n.getBoundingClientRect(), i = (e) => {
-			let t = Math.max(0, Math.min(1, (e - r.left) / r.width)), n = Math.round(1 + t * (d - 1));
-			return Math.max(1, Math.min(d, n));
-		}, a = (e) => u(i(e.clientX)), o = () => {
-			t.removeEventListener("pointermove", a), t.removeEventListener("pointerup", o), t.removeEventListener("pointercancel", o);
+}, su = ({ symbol: e, baseAsset: t, pair: n, price: r, pricePnlPct: i, onSymbolClick: a, bet: o, onBetChange: s, betError: c, leverage: l, onLeverageChange: u, isApplyingLeverage: d = !1, maxLeverage: f = Uc, presets: p = Hc, quoteAsset: m, onQuoteAssetClick: h, assetOptions: g, onAssetChange: _, fundBalanceText: v, onTopUpFund: y, onPercentClick: b, estimatedEntry: x, liqIfLong: S, marginRequired: C, openingFee: w, canSubmit: E, isSubmittingUp: D = !1, isSubmittingDown: k = !1, onUp: A, onDown: j, onDeposit: M, onWithdraw: N, connectWalletLabel: P, onConnectWallet: F, unrealizedPnl: I }) => {
+	let [L, R] = O.useState(null), z = L ?? l, B = Math.min(100, Math.max(0, z / f * 100)), V = Wc(z), ee = Gc(z), G = Kc(z), K = D || k, te = !E || K, q = !E || K, { targetRef: ne, tooltip: re } = T(Yc(V), { placement: "top" }), ie = O.useRef(null), J = O.useCallback((e) => {
+		if (d) return;
+		let t = ie.current;
+		if (!t) return;
+		e.preventDefault();
+		let n = t.getBoundingClientRect(), r = (e) => {
+			let t = Math.max(0, Math.min(1, (e - n.left) / n.width)), r = Math.round(1 + t * (f - 1));
+			return Math.max(1, Math.min(f, r));
 		};
-		t.addEventListener("pointermove", a), t.addEventListener("pointerup", o), t.addEventListener("pointercancel", o);
-	}, [d, u]);
+		t.setPointerCapture(e.pointerId);
+		let i = r(e.clientX);
+		R(i);
+		let a = () => {
+			t.removeEventListener("pointermove", o), t.removeEventListener("pointerup", s), t.removeEventListener("pointercancel", c);
+		}, o = (e) => {
+			i = r(e.clientX), R(i);
+		}, s = () => {
+			a(), R(null), i !== l && u(i);
+		}, c = () => {
+			a(), R(null);
+		};
+		t.addEventListener("pointermove", o), t.addEventListener("pointerup", s), t.addEventListener("pointercancel", c);
+	}, [
+		d,
+		l,
+		f,
+		u
+	]);
 	return /* @__PURE__ */ W(nl, {
 		"aria-label": `Simple bet panel · ${n || e}`,
 		children: [/* @__PURE__ */ U(rl, { children: /* @__PURE__ */ W(ol, { children: [/* @__PURE__ */ W(sl, { children: [/* @__PURE__ */ W(cl, { children: [
 			/* @__PURE__ */ W(ll, { children: [/* @__PURE__ */ U(ul, { children: "My Perp Fund" }), /* @__PURE__ */ W(dl, {
 				type: "button",
-				onClick: v,
+				onClick: y,
 				"aria-label": "Top up fund",
 				children: [
 					/* @__PURE__ */ U("span", {
 						style: { display: "inline-flex" },
 						children: /* @__PURE__ */ U(tl, {})
 					}),
-					/* @__PURE__ */ U(fl, { children: _ }),
+					/* @__PURE__ */ U(fl, { children: v }),
 					/* @__PURE__ */ U("span", {
 						style: { display: "inline-flex" },
 						children: /* @__PURE__ */ U(el, {})
@@ -8361,10 +8244,10 @@ var ql = z`
 				"aria-label": "Bet amount",
 				placeholder: "0"
 			}), /* @__PURE__ */ U(ou, {
-				selected: p,
-				options: h,
-				onSelect: g,
-				onClickFallback: m
+				selected: m,
+				options: g,
+				onSelect: _,
+				onClickFallback: h
 			})] })] }), c ? /* @__PURE__ */ U(hl, {
 				role: "alert",
 				children: c
@@ -8372,118 +8255,122 @@ var ql = z`
 			/* @__PURE__ */ W(El, { children: [
 				/* @__PURE__ */ U(Dl, {
 					type: "button",
-					onClick: () => y?.(.25),
+					onClick: () => b?.(.25),
 					children: "25%"
 				}),
 				/* @__PURE__ */ U(Ol, {}),
 				/* @__PURE__ */ U(Dl, {
 					type: "button",
-					onClick: () => y?.(.5),
+					onClick: () => b?.(.5),
 					children: "50%"
 				}),
 				/* @__PURE__ */ U(Ol, {}),
 				/* @__PURE__ */ U(Dl, {
 					type: "button",
-					onClick: () => y?.(1),
+					onClick: () => b?.(1),
 					children: "MAX"
 				})
 			] })
 		] }), /* @__PURE__ */ W(cl, { children: [
 			/* @__PURE__ */ U(ul, { children: "Leverage" }),
 			/* @__PURE__ */ W(kl, { children: [/* @__PURE__ */ W(Al, { children: [l, "x"] }), /* @__PURE__ */ W(Ml, {
-				$zone: L,
+				$zone: V,
 				children: [
-					Jc(L) ? /* @__PURE__ */ U(Nl, {
+					Jc(V) ? /* @__PURE__ */ U(Nl, {
 						as: "span",
 						"aria-hidden": !0,
-						children: Jc(L)
+						children: Jc(V)
 					}) : null,
-					/* @__PURE__ */ U(Nl, { children: qc(L) }),
+					/* @__PURE__ */ U(Nl, { children: qc(V) }),
 					/* @__PURE__ */ U(Pl, {
-						ref: G,
-						"aria-label": `${qc(L)} explanation`,
+						ref: ne,
+						"aria-label": `${qc(V)} explanation`,
 						children: /* @__PURE__ */ U(Qc, {})
 					}),
-					K
+					re
 				]
 			})] }),
 			/* @__PURE__ */ W(Fl, { children: [/* @__PURE__ */ W(Il, {
-				ref: te,
-				$fillPct: I,
-				$zone: L,
+				ref: ie,
+				$fillPct: B,
+				$zone: V,
 				"aria-hidden": !0,
+				"aria-disabled": d || void 0,
+				onPointerDown: J,
 				children: [/* @__PURE__ */ U(Vl, {
 					type: "range",
 					min: 1,
-					max: d,
-					value: l,
+					max: f,
+					value: z,
+					disabled: d,
 					onChange: (e) => u(Number(e.target.value)),
 					"aria-label": "Leverage"
 				}), /* @__PURE__ */ U(Ll, {
-					$fillPct: I,
-					$variant: R ? "triple" : z ? "double" : "single",
-					onPointerDown: q,
-					children: U(R ? Bl : z ? zl : Rl, {})
+					$fillPct: B,
+					$variant: ee ? "triple" : G ? "double" : "single",
+					children: U(ee ? Bl : G ? zl : Rl, {})
 				})]
 			}), /* @__PURE__ */ W(Hl, {
 				role: "tablist",
 				children: [/* @__PURE__ */ W(Wl, { children: [/* @__PURE__ */ U(Gl, {
 					type: "number",
 					min: 1,
-					max: d,
+					max: f,
 					value: l,
-					onChange: (e) => u(Math.max(1, Math.min(d, Number(e.target.value) || 1))),
+					disabled: d,
+					onChange: (e) => u(Math.max(1, Math.min(f, Number(e.target.value) || 1))),
 					"aria-label": "Custom leverage"
-				}), /* @__PURE__ */ U(Kl, { children: "x" })] }), f.map((e) => /* @__PURE__ */ W(Ul, {
+				}), /* @__PURE__ */ U(Kl, { children: "x" })] }), p.map((e) => /* @__PURE__ */ W(Ul, {
 					type: "button",
 					role: "tab",
 					"aria-selected": l === e,
 					$active: l === e,
+					disabled: d,
 					onClick: () => u(e),
 					children: [e, "x"]
 				}, e))]
 			})] })
 		] })] }), /* @__PURE__ */ W(il, { children: [o && o !== "0" ? /* @__PURE__ */ W(Jl, { children: [
-			/* @__PURE__ */ W(Yl, { children: [/* @__PURE__ */ U(Xl, { children: "Estimated Entry" }), /* @__PURE__ */ U(Zl, { children: b })] }),
+			/* @__PURE__ */ W(Yl, { children: [/* @__PURE__ */ U(Xl, { children: "Estimated Entry" }), /* @__PURE__ */ U(Zl, { children: x })] }),
 			/* @__PURE__ */ W(Yl, { children: [/* @__PURE__ */ U(Xl, { children: "Liquidation if long" }), /* @__PURE__ */ U(Zl, {
 				$danger: !0,
-				children: x
+				children: S
 			})] }),
-			/* @__PURE__ */ W(Yl, { children: [/* @__PURE__ */ U(Xl, { children: "Margin required" }), /* @__PURE__ */ U(Zl, { children: S })] }),
-			/* @__PURE__ */ W(Yl, { children: [/* @__PURE__ */ U(Xl, { children: "Opening fee" }), /* @__PURE__ */ U(Zl, { children: C })] })
+			/* @__PURE__ */ W(Yl, { children: [/* @__PURE__ */ U(Xl, { children: "Margin required" }), /* @__PURE__ */ U(Zl, { children: C })] }),
+			/* @__PURE__ */ W(Yl, { children: [/* @__PURE__ */ U(Xl, { children: "Opening fee" }), /* @__PURE__ */ U(Zl, { children: w })] })
 		] }) : null, /* @__PURE__ */ W(al, { children: [/* @__PURE__ */ U(Ql, {
 			type: "button",
 			$variant: "up",
-			disabled: V,
-			onClick: k,
-			"aria-busy": E,
-			children: /* @__PURE__ */ W($l, { children: [/* @__PURE__ */ U(Xc, {}), E ? "..." : "UP"] })
+			disabled: te,
+			onClick: A,
+			"aria-busy": D,
+			children: /* @__PURE__ */ W($l, { children: [/* @__PURE__ */ U(Xc, {}), D ? "..." : "UP"] })
 		}), /* @__PURE__ */ U(Ql, {
 			type: "button",
 			$variant: "down",
-			disabled: ee,
-			onClick: A,
-			"aria-busy": D,
-			children: /* @__PURE__ */ W($l, { children: [/* @__PURE__ */ U(Zc, {}), D ? "..." : "DOWN"] })
-		})] })] })] }) }), /* @__PURE__ */ W(nu, { children: [/* @__PURE__ */ U(eu, { children: N ? /* @__PURE__ */ U(tu, {
+			disabled: q,
+			onClick: j,
+			"aria-busy": k,
+			children: /* @__PURE__ */ W($l, { children: [/* @__PURE__ */ U(Zc, {}), k ? "..." : "DOWN"] })
+		})] })] })] }) }), /* @__PURE__ */ W(nu, { children: [/* @__PURE__ */ U(eu, { children: P ? /* @__PURE__ */ U(tu, {
 			$variant: "primary",
-			onClick: P,
+			onClick: F,
 			type: "button",
-			children: N
+			children: P
 		}) : /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(tu, {
 			$variant: "primary",
-			onClick: j,
+			onClick: M,
 			type: "button",
 			children: "Deposit"
 		}), /* @__PURE__ */ U(tu, {
 			$variant: "secondary",
-			onClick: M,
+			onClick: N,
 			type: "button",
 			children: "Withdraw"
 		})] }) }), /* @__PURE__ */ W(ru, { children: [/* @__PURE__ */ U(iu, { children: "Unrealized PnL" }), /* @__PURE__ */ U(au, {
-			$zero: Number(String(F).replace(/[^\d.-]/g, "")) === 0,
-			$disabled: !!N,
-			children: F
+			$zero: Number(String(I).replace(/[^\d.-]/g, "")) === 0,
+			$disabled: !!P,
+			children: I
 		})] })] })]
 	});
 }, cu = B.div`
@@ -8706,13 +8593,9 @@ var ql = z`
   align-items: center;
   gap: 2px;
   border-radius: 999px;
-  background: ${({ $positive: e }) => e ? "#EAFBF7" : "#FFF0F9"};
+  background: ${({ $positive: e, theme: t }) => e ? t.colors.positive10 : t.colors.negativeSubtle};
   font-size: 16px;
   color: ${({ theme: e }) => e.colors.text};
-
-  html.dark & {
-    background: ${({ $positive: e }) => e ? "#0C3A32" : "#3E1C39"};
-  }
 
   @media (max-width: 967.98px) {
     display: none;
@@ -9199,7 +9082,7 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: ${({ $direction: e }) => e === "up" ? "#129E7D" : "#ED4B9E"};
+  color: ${({ $direction: e, theme: t }) => e === "up" ? t.colors.positive60 : t.colors.failure};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 12px;
@@ -9207,12 +9090,8 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   line-height: 150%;
   letter-spacing: 0.24px;
   text-transform: uppercase;
-
-  html.dark & {
-    color: ${({ $direction: e }) => e === "up" ? "#3DDBB5" : "#ED4B9E"};
-  }
 `, dd = B.span`
-  color: ${({ $sign: e, theme: t }) => e === "positive" ? "#129E7D" : e === "negative" ? "#ED4B9E" : t.colors.text};
+  color: ${({ $sign: e, theme: t }) => e === "positive" ? t.colors.positive60 : e === "negative" ? t.colors.failure : t.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -9221,10 +9100,6 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-weight: 600;
   line-height: 150%;
   font-variant-numeric: tabular-nums;
-
-  html.dark & {
-    color: ${({ $sign: e, theme: t }) => e === "positive" ? "#3DDBB5" : e === "negative" ? "#ED4B9E" : t.colors.text};
-  }
 `, fd = B.span`
   display: block;
   height: 1px;
@@ -9385,11 +9260,7 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 `, jd = B(Ad)`
   color: #ED4B9E;
 `, Md = B(Ad)`
-  color: ${({ $sign: e, theme: t }) => e === "positive" ? "#129E7D" : e === "negative" ? "#ED4B9E" : t.colors.text};
-
-  html.dark & {
-    color: ${({ $sign: e, theme: t }) => e === "positive" ? "#3DDBB5" : e === "negative" ? "#ED4B9E" : t.colors.text};
-  }
+  color: ${({ $sign: e, theme: t }) => e === "positive" ? t.colors.positive60 : e === "negative" ? t.colors.failure : t.colors.text};
 `, Nd = B.div`
   display: flex;
   align-items: center;
@@ -9440,7 +9311,7 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
-  color: ${({ $direction: e }) => e === "up" ? "#129E7D" : "#ED4B9E"};
+  color: ${({ $direction: e, theme: t }) => e === "up" ? t.colors.positive60 : t.colors.failure};
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -9451,10 +9322,6 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   letter-spacing: 0.24px;
   text-transform: uppercase;
   white-space: nowrap;
-
-  html.dark & {
-    color: ${({ $direction: e }) => e === "up" ? "#3DDBB5" : "#ED4B9E"};
-  }
 `, Rd = B.div`
   display: flex;
   align-items: center;
@@ -9462,7 +9329,7 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   gap: 4px;
   padding: 16px;
 `, zd = B.span`
-  color: ${({ $sign: e, theme: t }) => e === "positive" ? "#129E7D" : e === "negative" ? "#ED4B9E" : t.colors.text};
+  color: ${({ $sign: e, theme: t }) => e === "positive" ? t.colors.positive60 : e === "negative" ? t.colors.failure : t.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -9473,10 +9340,6 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   letter-spacing: -0.2px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-
-  html.dark & {
-    color: ${({ $sign: e, theme: t }) => e === "positive" ? "#3DDBB5" : e === "negative" ? "#ED4B9E" : t.colors.text};
-  }
 `, Bd = B.button`
   display: inline-flex;
   align-items: center;
@@ -9538,14 +9401,10 @@ var Ju = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   border-right: 1px solid #ED4B9E;
   border-bottom: 2px solid #ED4B9E;
   border-left: 1px solid #ED4B9E;
-  background: #FFF0F9;
+  background: ${({ theme: e }) => e.colors.negativeSubtle};
   color: #ED4B9E;
   cursor: pointer;
   &:hover { filter: brightness(0.97); }
-
-  html.dark & {
-    background: #3E1C39;
-  }
 `, Kd = B.div`
   display: flex;
   align-items: center;
@@ -10151,20 +10010,15 @@ var cf = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   align-items: center;
   border-radius: 12px;
   border: 1px solid
-    ${({ $variant: e }) => e === "spot" ? "#D7CAEC" : "#C2D8DB"};
-  background: ${({ $variant: e }) => e === "spot" ? "#EEEAF4" : "#F4FAFB"};
-  color: #000;
+    ${({ $variant: e, theme: t }) => e === "spot" ? t.colors.walletChipSpotBorder : t.colors.walletChipPerpBorder};
+  background: ${({ $variant: e, theme: t }) => e === "spot" ? t.colors.walletChipSpotBg : t.colors.walletChipPerpBg};
+  color: ${({ theme: e }) => e.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 24px;
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-
-  html.dark & {
-    border-color: ${({ $variant: e }) => e === "spot" ? "#55496E" : "#575775"};
-    background: ${({ $variant: e }) => e === "spot" ? "#27252B" : "#223537"};
-  }
 `, mf = () => /* @__PURE__ */ U(pf, {
 	$variant: "spot",
 	"aria-hidden": !0,
@@ -10328,23 +10182,17 @@ var cf = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   align-items: flex-start;
   gap: 2px;
   border-radius: 16px;
-  border: 1px solid ${({ theme: e }) => e.colors.inputSecondary};
-  background: ${({ theme: e }) => e.colors.input};
-  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  border: 1px solid ${({ theme: e }) => e.colors.timeframeBorder};
+  background: ${({ theme: e }) => e.colors.timeframeBg};
+  box-shadow: ${({ theme: e }) => e.shadows.sunken};
   opacity: ${({ $muted: e }) => e ? .6 : 1};
-
-  html.dark & {
-    border-color: #55496E;
-    background: #372F47;
-    box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
-  }
 `, Nf = B.button`
   display: flex;
   justify-content: center;
   align-items: center;
   border: 0;
   background: ${({ $active: e, theme: t }) => e ? t.colors.textSubtle : "transparent"};
-  color: ${({ $active: e, theme: t }) => e ? "#fff" : t.colors.textSubtle};
+  color: ${({ $active: e, theme: t }) => e ? t.colors.v2Default : t.colors.textSubtle};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 16px;
@@ -10356,16 +10204,6 @@ var cf = ({ size: e = 12 }) => /* @__PURE__ */ U("svg", {
   cursor: pointer;
   min-width: 40px;
   transition: background 0.16s, color 0.16s;
-
-  html.dark & {
-    ${({ $active: e }) => e ? R`
-            width: 47px;
-            padding: 4px;
-            background: #B8ADD2;
-            color: #000;
-            min-width: 0;
-          ` : ""}
-  }
 `, Pf = B(E)`
   align-items: center;
   gap: 4px;

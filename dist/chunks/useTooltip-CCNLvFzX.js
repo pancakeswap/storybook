@@ -1037,6 +1037,17 @@ var _t = {
 	warning20: "#F9D9B8",
 	warning60: "#AB6502",
 	bubblegum: "#F3EFFF",
+	negative60: "#D8376C",
+	negativeSubtle: "#FFF0F9",
+	tooltipInverseBg: "#08060B",
+	tooltipInverseText: "#FFFFFF",
+	walletChipSpotBg: "#EEEAF4",
+	walletChipSpotBorder: "#D7CAEC",
+	walletChipPerpBg: "#F4FAFB",
+	walletChipPerpBorder: "#C2D8DB",
+	timeframeBg: "#EEEAF4",
+	timeframeBorder: "#D7CAEC",
+	levTrackBg: "linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%)",
 	gradientPrimary: "linear-gradient(228.54deg, #1FC7D4 -13.69%, #7645D9 91.33%)",
 	gradientBubblegum: "linear-gradient(139.73deg, #E5FDFF 0%, #F3EFFF 100%)",
 	gradientInverseBubblegum: "linear-gradient(139.73deg, #F3EFFF 0%, #E5FDFF 100%)",
@@ -10193,13 +10204,9 @@ var rd = (e) => /* @__PURE__ */ R(nd, {
     width: 36px;
     height: 4px;
     border-radius: 9999px;
-    background: #000;
+    background: ${({ theme: e }) => e.colors.v2Inverse};
     opacity: 0.1;
     pointer-events: none;
-  }
-
-  html.dark &::before {
-    background: #FFF;
   }
 
   /* Promote the bottom-sheet breakpoint to the lg (968px) cutoff used
@@ -12857,8 +12864,8 @@ var Pg = mg, Fg = gg, Ig = Sg, Lg = wg, Rg = Mg, zg = /* @__PURE__ */ B(((e, t) 
   align-items: center;
   border-radius: 16px;
   z-index: 101;
-  background: #08060B;
-  color: #FFFFFF;
+  background: ${({ theme: e }) => e.colors.tooltipInverseBg};
+  color: ${({ theme: e }) => e.colors.tooltipInverseText};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
@@ -12871,20 +12878,11 @@ var Pg = mg, Fg = gg, Ig = Sg, Lg = wg, Rg = Mg, zg = /* @__PURE__ */ B(((e, t) 
   word-wrap: break-word;
   white-space: ${({ $oneLine: e }) => e ? "nowrap" : "normal"};
 
-  html.dark & {
-    background: #FFFFFF;
-    color: #08060B;
-  }
-
   & > * {
     align-self: ${({ $oneLine: e }) => e ? "auto" : "stretch"};
   }
 `, Kg = L(Rg)`
-  fill: #08060B;
-
-  html.dark & {
-    fill: #FFFFFF;
-  }
+  fill: ${({ theme: e }) => e.colors.tooltipInverseBg};
 `, qg = /* @__PURE__ */ Oe(Ug(), 1), Jg = (e) => {
 	if (e.startsWith("auto")) return {
 		side: "top",
@@ -12992,4 +12990,4 @@ var Pg = mg, Fg = gg, Ig = Sg, Lg = wg, Rg = Mg, zg = /* @__PURE__ */ B(((e, t) 
 //#endregion
 export { no as $, sa as $i, pr as $n, di as $r, xn as $t, es as A, Ia as Aa, Bi as Ai, Jn as An, Ur as Ar, en as At, Lo as B, Wa as Ba, Ji as Bi, co as Bn, Qr as Br, un as Bt, kc as C, ka as Ca, Ni as Ci, Wn as Cn, Ir as Cr, qt as Ct, gs as D, Na as Da, Ii as Di, Kn as Dn, Br as Dr, Zt as Dt, vs as E, Ma as Ea, Ya as Ei, Gn as En, zr as Er, Xt as Et, Uo as F, Va as Fa, Wi as Fi, $n as Fn, qr as Fr, on as Ft, To as G, Ja as Ga, $i as Gi, ar as Gn, ri as Gr, hn as Gt, No as H, Ga as Ha, _o as Hi, lo as Hn, ti as Hr, dn as Ht, Ho as I, Ha as Ia, Gi as Ii, go as In, Jr as Ir, sn as It, wt as J, qe as Ja, na as Ji, lr as Jn, oi as Jr, gn as Jt, Co as K, pt as Ka, ea as Ki, cr as Kn, ii as Kr, mn as Kt, Bo as L, Ua as La, Ki as Li, er as Ln, Yr as Lr, cn as Lt, Jo as M, za as Ma, Vi as Mi, Zn as Mn, Gr as Mr, nn as Mt, Go as N, Ba as Na, Hi as Ni, Xa as Nn, oo as Nr, rn as Nt, ls as O, Pa as Oa, Li as Oi, qn as On, Vr as Or, Qt as Ot, Wo as P, La as Pa, Ui as Pi, Qn as Pn, Kr as Pr, an as Pt, Tt as Q, ia as Qi, mr as Qn, ui as Qr, bn as Qt, zo as R, fo as Ra, qi as Ri, tr as Rn, Zr as Rr, ao as Rt, Qc as S, Oa as Sa, ji as Si, Un as Sn, Fr as Sr, Gt as St, Dc as T, ja as Ta, Fi as Ti, so as Tn, Rr as Tr, Yt as Tt, ko as U, Ka as Ua, Zi as Ui, ir as Un, $r as Ur, to as Ut, Po as V, So as Va, Xi as Vi, rr as Vn, ei as Vr, fn as Vt, Z as W, qa as Wa, Qi as Wi, or as Wn, ni as Wr, eo as Wt, xo as X, Oe as Xa, aa as Xi, dr as Xn, ci as Xr, vn as Xt, Ct as Y, Ke as Ya, ra as Yi, ur as Yn, si as Yr, _n as Yt, Et as Z, oa as Zi, fr as Zn, li as Zr, yn as Zt, ed as _, wa as _a, Di as _i, po as _n, jr as _r, Ht as _t, xd as a, ma as aa, hi as ai, Dn as an, xr as ar, Mt as at, dl as b, Ea as ba, Ai as bi, Bn as bn, Za as br, Wt as bt, yd as c, ga as ca, vi as ci, On as cn, Cr as cr, Ft as ct, ld as d, ba as da, xi as di, Mn as dn, Tr as dr, Qa as dt, ca as ea, fi as ei, Sn as en, hr as er, Dt as et, sd as f, ya as fa, Si as fi, Nn as fn, Er as fr, zt as ft, od as g, Ca as ga, Ei as gi, Ln as gn, Ar as gr, io as gt, ad as h, mo as ha, Ti as hi, In as hn, kr as hr, Vt as ht, wd as i, fa as ia, mi as ii, En as in, yr as ir, jt as it, Xo as j, Ra as ja, zi as ji, Xn as jn, Wr as jr, tn as jt, as as k, Fa as ka, Ri as ki, Yn as kn, Hr as kr, $t as kt, md as l, _a as la, yi as li, An as ln, yo as lr, It as lt, ud as m, ho as ma, wi as mi, Fn as mn, Or as mr, Bt as mt, Kg as n, ua as na, pi as ni, Cn as nn, gr as nr, kt as nt, bd as o, pa as oa, gi as oi, vo as on, br as or, Nt as ot, cd as p, xa as pa, Ci as pi, Pn as pn, Dr as pr, Rt as pt, Eo as q, Y as qa, ta as qi, sr as qn, ai as qr, pn as qt, Gg as r, da as ra, $a as ri, Tn as rn, vr as rr, At as rt, vd as s, ha as sa, _i as si, kn as sn, Sr as sr, Pt as st, Zg as t, la as ta, bo as ti, wn as tn, _r as tr, Ot as tt, hd as u, va as ua, bi as ui, jn as un, wr as ur, Lt as ut, du as v, Sa as va, ki as vi, Rn as vn, Mr as vr, Ut as vt, Oc as w, Aa as wa, Pi as wi, Hn as wn, Lr as wr, Jt as wt, ol as x, Da as xa, Mi as xi, Vn as xn, Pr as xr, Kt as xt, lu as y, Ta as ya, Oi as yi, zn as yn, Nr as yr, uo as yt, Ro as z, ro as za, Yi as zi, nr as zn, Xr as zr, ln as zt };
 
-//# sourceMappingURL=useTooltip-uXUkH2IB.js.map
+//# sourceMappingURL=useTooltip-CCNLvFzX.js.map
