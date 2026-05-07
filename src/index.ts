@@ -74,6 +74,12 @@ export type { ModalProps, InjectedModalProps, UseModalV2Props } from './primitiv
 // ── Theme ─────────────────────────────────────────────────────
 export { pcsTheme } from './primitives/theme'
 export type { PcsTheme } from './primitives/theme'
+// CSS-var emitter — consumers (pancake-frontend) render this inside a
+// `<style>` tag at their perps mount point so widgets resolve
+// `--pcs-colors-*` / `--pcs-shadows-*` under their existing
+// `data-theme` attribute on `<html>`.
+export { PCS_THEME_CSS } from './design-system/theme'
+export type { Theme as PcsThemeMode } from './design-system/theme'
 
 // ── Icons ─────────────────────────────────────────────────────
 // Re-export the full 253-icon set. Consumers get tree-shaken individual

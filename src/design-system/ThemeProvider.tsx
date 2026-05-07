@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from 'next-themes'
-import { ChakraProvider } from '@chakra-ui/react'
-import { system, type Theme } from './theme'
+import { PCS_THEME_CSS, type Theme } from './theme'
 
 interface ThemeProviderProps {
   children: React.ReactNode
@@ -10,35 +9,40 @@ interface ThemeProviderProps {
 }
 
 /**
- * Composes next-themes (manages .dark/.light class on <html>) with ChakraProvider.
- * Chakra v3 scopes semantic tokens to ".dark &" / ":root &, .light &" selectors,
- * so next-themes must use attribute="class" (not "data-theme").
+ * Composes next-themes (manages `data-theme="light|dark"` on `<html>`)
+ * with an inline `<style>` tag that emits the `--pcs-colors-*` /
+ * `--pcs-shadows-*` CSS variables for both modes. Mirrors the pattern
+ * used by `packages/uikit/src/css/vars.css.ts` in pancake-frontend so
+ * the same widgets work under either ThemeProvider.
  */
 export function ThemeProvider({ children, forcedTheme }: ThemeProviderProps) {
   return (
     <NextThemesProvider
-      attribute="class"
+      attribute="data-theme"
       defaultTheme="dark"
       themes={['dark', 'light']}
       forcedTheme={forcedTheme}
     >
-      <ChakraProvider value={system}>
-        {children}
-      </ChakraProvider>
+      {/* Inline style tag — also gets serialized in SSR if anyone
+          server-renders a story. */}
+      <style dangerouslySetInnerHTML={{ __html: PCS_THEME_CSS }} />
+      {children}
     </NextThemesProvider>
   )
 }
 
 /**
  * Hook for components that need to read the current theme.
- * Reads directly from the HTML class (the same signal Chakra v3 CSS vars respond to),
- * avoiding next-themes' initial undefined resolvedTheme on first render.
+ * Reads directly from `<html data-theme>`, avoiding next-themes' initial
+ * `undefined resolvedTheme` on first render.
  */
+// eslint-disable-next-line react-refresh/only-export-components -- hook colocated with provider, intentional
 export function useTheme() {
   const { setTheme } = useNextTheme()
 
   const getTheme = (): Theme =>
-    typeof document !== 'undefined' && document.documentElement.classList.contains('light')
+    typeof document !== 'undefined' &&
+    document.documentElement.getAttribute('data-theme') === 'light'
       ? 'light'
       : 'dark'
 
@@ -46,7 +50,7 @@ export function useTheme() {
 
   useEffect(() => {
     const obs = new MutationObserver(() => setThemeState(getTheme()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     return () => obs.disconnect()
   }, [])
 
