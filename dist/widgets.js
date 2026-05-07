@@ -7251,20 +7251,11 @@ var eo = B(E)`
 							D.hash.slice(-8)
 						]
 					})] }) }),
-					/* @__PURE__ */ W(E, {
-						style: { gap: 8 },
-						children: [/* @__PURE__ */ U(i, {
-							style: { flex: 1 },
-							scale: "md",
-							onClick: t,
-							children: M("View Balance")
-						}), /* @__PURE__ */ U(i, {
-							style: { flex: 1 },
-							scale: "md",
-							variant: "secondary",
-							onClick: A,
-							children: M("Deposit Again")
-						})]
+					/* @__PURE__ */ U(i, {
+						scale: "md",
+						variant: "secondary",
+						onClick: A,
+						children: M("Deposit Again")
 					})
 				] }),
 				n === "failed" && /* @__PURE__ */ W(H, { children: [
