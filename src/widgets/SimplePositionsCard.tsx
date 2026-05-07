@@ -11,7 +11,7 @@ import { PerpsPanel } from './primitives'
  * No data fetching, no theme overrides, no business logic.
  */
 
-export type SimplePositionsTab = 'positions' | 'orders' | 'history'
+export type SimplePositionsTab = 'positions' | 'history'
 export type SimplePositionDirection = 'up' | 'down' // up = long, down = short
 export type SimplePositionLiqStatus = 'safe' | 'warn' | 'danger'
 
@@ -61,22 +61,10 @@ export interface SimpleHistoryRow {
   time: string
 }
 
-export interface SimpleOpenOrderRow {
-  id: string
-  symbol: string
-  iconColor?: string
-  side: 'BUY' | 'SELL'
-  type: string
-  price: string
-  origQty: string
-  executedQty: string
-}
-
 export interface SimplePositionsCardProps {
   tab: SimplePositionsTab
   onTabChange: (tab: SimplePositionsTab) => void
   positions: readonly SimplePositionRow[]
-  openOrders: readonly SimpleOpenOrderRow[]
   history: readonly SimpleHistoryRow[]
   /**
    * When set, replaces every tab's body with a centered placeholder.
@@ -85,7 +73,6 @@ export interface SimplePositionsCardProps {
    */
   disconnectedMessage?: Record<SimplePositionsTab, string>
   onClosePosition: (id: string) => void
-  onCancelOrder: (id: string) => void
   /**
    * When provided, renders a small share-PnL affordance next to the
    * unrealized PnL value. Omit to hide the icon entirely.
@@ -396,43 +383,6 @@ const TabletPositionCloseBtn = styled.button`
   &:hover { background: #FFF0F9; }
 `
 
-const OrdersTable = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 64px;
-  min-width: 794px;
-
-  @media (max-width: 967.98px) {
-    display: none;
-  }
-`
-
-const TabletOrdersList = styled.div`
-  display: none;
-
-  @media (max-width: 967.98px) {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 16px;
-  }
-`
-
-const TabletOrderHeader = styled(TabletPositionHeader)``
-
-const TabletOrderSideBadge = styled.span<{ $side: 'BUY' | 'SELL' }>`
-  display: inline-flex;
-  align-items: center;
-  margin-left: auto;
-  color: ${({ $side, theme }) => ($side === 'BUY' ? theme.colors.success : theme.colors.failure)};
-  font-family: Kanit;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 150%;
-  font-variant-numeric: tabular-nums;
-`
-
-const TabletOrderCancelBtn = styled(TabletPositionCloseBtn)``
-
 const HistoryTable = styled.div`
   display: grid;
   grid-template-columns: 190px 1fr 1fr 1fr 1fr 1fr;
@@ -443,7 +393,16 @@ const HistoryTable = styled.div`
   }
 `
 
-const TabletHistoryList = styled(TabletOrdersList)``
+const TabletHistoryList = styled.div`
+  display: none;
+
+  @media (max-width: 967.98px) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+`
 
 /* Currency suffix shown next to fee / realized-profit values in semibold,
    per Figma 86:30657 ("-0.11412 USDT" with "USDT" emphasised). */
@@ -745,11 +704,6 @@ const DisconnectedBlock = styled.div`
   text-align: center;
 `
 
-const SideText = styled.span<{ $side: 'BUY' | 'SELL' }>`
-  color: ${({ $side, theme }) => ($side === 'BUY' ? theme.colors.success : theme.colors.failure)};
-  font-weight: 600;
-`
-
 // Default per-symbol icon palette. These are visual-only fallbacks — the
 // consumer can override per-row via `iconColor` or replace with
 // `renderTokenIcon` entirely.
@@ -785,11 +739,9 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
   tab,
   onTabChange,
   positions,
-  openOrders,
   history,
   disconnectedMessage,
   onClosePosition,
-  onCancelOrder,
   onSharePnl,
   renderTokenIcon,
 }) => {
@@ -804,15 +756,6 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
           onClick={() => onTabChange('positions')}
         >
           Positions
-        </Tab>
-        <Tab
-          type="button"
-          role="tab"
-          aria-selected={tab === 'orders'}
-          $active={tab === 'orders'}
-          onClick={() => onTabChange('orders')}
-        >
-          Open Orders
         </Tab>
         <Tab
           type="button"
@@ -980,108 +923,6 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
               </TableRow>
             ))}
           </PositionsTable>
-          </TableScroll>
-        ))}
-
-      {tab === 'orders' && openOrders.length > 0 && (
-        <TabletOrdersList>
-          {openOrders.map((o) => (
-            <TabletPositionCard key={`tablet-${o.id}`}>
-              <TabletOrderHeader>
-                <TabletPositionTokenIcon $color={o.iconColor ?? defaultIconColor(o.symbol)}>
-                  {o.symbol.slice(0, 1)}
-                </TabletPositionTokenIcon>
-                <TabletPositionMeta>
-                  <TabletPositionSymbol>{o.symbol}</TabletPositionSymbol>
-                </TabletPositionMeta>
-                <TabletOrderSideBadge $side={o.side}>
-                  {o.side === 'BUY' ? 'Buy' : 'Sell'}
-                </TabletOrderSideBadge>
-              </TabletOrderHeader>
-              <TabletPositionDivider />
-              <TabletPositionStats>
-                <TabletPositionStatRow>
-                  <TabletPositionStatLabel>Type</TabletPositionStatLabel>
-                  <TabletPositionStatValue>{o.type}</TabletPositionStatValue>
-                </TabletPositionStatRow>
-                <TabletPositionStatRow>
-                  <TabletPositionStatLabel>Price</TabletPositionStatLabel>
-                  <TabletPositionStatValue>{o.price}</TabletPositionStatValue>
-                </TabletPositionStatRow>
-                <TabletPositionStatRow>
-                  <TabletPositionStatLabel>Size</TabletPositionStatLabel>
-                  <TabletPositionStatValue>{o.origQty}</TabletPositionStatValue>
-                </TabletPositionStatRow>
-                <TabletPositionStatRow>
-                  <TabletPositionStatLabel>Filled</TabletPositionStatLabel>
-                  <TabletPositionStatValue>{`${o.executedQty}/${o.origQty}`}</TabletPositionStatValue>
-                </TabletPositionStatRow>
-              </TabletPositionStats>
-              <TabletOrderCancelBtn type="button" onClick={() => onCancelOrder(o.id)}>
-                Cancel
-              </TabletOrderCancelBtn>
-            </TabletPositionCard>
-          ))}
-        </TabletOrdersList>
-      )}
-
-      {tab === 'orders' &&
-        (openOrders.length === 0 ? (
-          <Empty>No open orders</Empty>
-        ) : (
-          <TableScroll>
-          <OrdersTable role="table">
-            <TableRow $isHeader role="row">
-              <Th>Token</Th>
-              <Th $align="right">
-                Side
-                <SortBtn type="button" aria-label="Sort by side"><SortGlyph /></SortBtn>
-              </Th>
-              <Th $align="right">
-                Type
-                <SortBtn type="button" aria-label="Sort by type"><SortGlyph /></SortBtn>
-              </Th>
-              <Th $align="right">
-                Price
-                <SortBtn type="button" aria-label="Sort by price"><SortGlyph /></SortBtn>
-              </Th>
-              <Th $align="right">
-                Size
-                <SortBtn type="button" aria-label="Sort by size"><SortGlyph /></SortBtn>
-              </Th>
-              <Th $align="right">
-                Filled
-                <SortBtn type="button" aria-label="Sort by filled"><SortGlyph /></SortBtn>
-              </Th>
-              <Th />
-            </TableRow>
-            {openOrders.map((o) => (
-              <TableRow key={o.id} role="row">
-                <TokenCell>
-                  <TokenIcon $color={o.iconColor ?? defaultIconColor(o.symbol)}>
-                    {o.symbol.slice(0, 1)}
-                  </TokenIcon>
-                  <TokenMeta>
-                    <TokenSymbol>{o.symbol}</TokenSymbol>
-                  </TokenMeta>
-                </TokenCell>
-                <Td>
-                  <SideText $side={o.side}>{o.side === 'BUY' ? 'Buy' : 'Sell'}</SideText>
-                </Td>
-                <Td>{o.type}</Td>
-                <Td>{o.price}</Td>
-                <Td>{o.origQty}</Td>
-                <Td>{`${o.executedQty}/${o.origQty}`}</Td>
-                <CloseBtn
-                  type="button"
-                  aria-label="Cancel order"
-                  onClick={() => onCancelOrder(o.id)}
-                >
-                  <CloseIcon />
-                </CloseBtn>
-              </TableRow>
-            ))}
-          </OrdersTable>
           </TableScroll>
         ))}
 

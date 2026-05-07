@@ -5,7 +5,6 @@ import {
   SimplePositionsCard,
   type SimplePositionsCardProps,
   type SimplePositionRow,
-  type SimpleOpenOrderRow,
   type SimpleHistoryRow,
   type SimplePositionsTab,
 } from './SimplePositionsCard'
@@ -33,17 +32,6 @@ const MANY_POSITIONS: readonly SimplePositionRow[] = [
   { ...SAMPLE_POSITION, id: 'bnb-long-2' },
   { ...SAMPLE_POSITION, id: 'bnb-long-3' },
 ]
-
-const SAMPLE_ORDER: SimpleOpenOrderRow = {
-  id: '1',
-  symbol: 'BNB',
-  iconColor: '#F0B90B',
-  side: 'BUY',
-  type: 'Limit',
-  price: '$649.98',
-  origQty: '0.1',
-  executedQty: '0',
-}
 
 const SAMPLE_HISTORY_ROW: SimpleHistoryRow = {
   id: 'h1',
@@ -77,10 +65,8 @@ const baseArgs: SimplePositionsCardProps = {
   tab: 'positions',
   onTabChange: fn(),
   positions: [SAMPLE_POSITION],
-  openOrders: [],
   history: [],
   onClosePosition: fn(),
-  onCancelOrder: fn(),
   onSharePnl: fn(),
 }
 
@@ -120,10 +106,6 @@ export const Empty: Story = {
   render: () => <Live tab="positions" positions={[]} />,
 }
 
-export const OrdersTab: Story = {
-  render: () => <Live tab="orders" positions={[]} openOrders={[SAMPLE_ORDER]} />,
-}
-
 export const History: Story = {
   render: () => <Live tab="history" positions={[]} history={SAMPLE_HISTORY} />,
 }
@@ -138,7 +120,6 @@ export const Disconnected: Story = {
       positions={[]}
       disconnectedMessage={{
         positions: 'Connect your wallet to see your active positions',
-        orders: 'Connect your wallet to see your open orders',
         history: 'Connect your wallet to see your transaction history',
       }}
     />

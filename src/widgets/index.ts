@@ -113,7 +113,6 @@ export { SimplePositionsCard } from './SimplePositionsCard'
 export type {
   SimplePositionsCardProps,
   SimplePositionRow,
-  SimpleOpenOrderRow,
   SimpleHistoryRow,
   SimplePositionsTab,
   SimplePositionDirection,
