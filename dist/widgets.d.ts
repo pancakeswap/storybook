@@ -646,8 +646,11 @@ export declare interface OrderFormProps {
         cost: string;
         liq: string;
     };
-    /** Maker/taker fee bps for the summary footer (e.g. "0.02% / 0.05%"). */
-    feeText: string;
+    /**
+     * Maker/taker fee bps for the summary footer (e.g. "0.02% / 0.05%").
+     * Omit to hide the fee row entirely.
+     */
+    feeText?: string;
     /** Slider position 0-100 (consumer computes from quantity ÷ maxSize). */
     sizePercent: number;
     onSizePercentChange: (pct: number) => void;
@@ -1255,6 +1258,14 @@ export declare interface PositionsPanelProps {
     /** Mobile-only: active sub-tab inside the History sheet. */
     historyTab?: PositionsHistoryTab;
     onHistoryTabChange?: (tab: PositionsHistoryTab) => void;
+    /**
+     * Display unit for the Size column. `'QUOTE'` (default) shows the
+     * USDT notional (|base| × markPrice, falling back to entry); `'BASE'`
+     * shows the raw base-asset quantity. Consumer typically syncs this
+     * with the order form's size-unit toggle so the user sees one
+     * denomination across the whole perps view.
+     */
+    sizeUnit?: 'BASE' | 'QUOTE';
 }
 
 export declare type PositionsPanelTab = 'positions' | 'orders' | 'history' | 'trades' | 'transactions'
@@ -1433,6 +1444,14 @@ export declare interface TpSlIntent {
     /** Quantity to close (base asset, absolute). */
     qty: string;
     closePosition: boolean;
+    /**
+     * Which oracle the TP/SL trigger compares against:
+     *   - `'Last'` → last traded price (Aster `CONTRACT_PRICE`).
+     *   - `'Mark'` → mark price (Aster `MARK_PRICE`).
+     * Picked from the Last/Mark dropdown in the modal header. The
+     * consumer maps this onto `placeOrder`'s `workingType` field.
+     */
+    triggerSource: TriggerSource;
 }
 
 export declare const TpSlModal: default_2.FC<TpSlModalProps>;
@@ -1448,6 +1467,15 @@ export declare interface TpSlModalProps {
     leverage?: number;
     /** Display symbol of the base asset, e.g. "BTC" — used as the amount-input suffix. */
     baseAsset?: string;
+    /**
+     * Display unit for the Amount input + Position-amount summary.
+     *   - `'BASE'` (default) — input typed in base asset (e.g. BTC), suffix is `baseAsset`.
+     *   - `'QUOTE'` — input typed in quote asset (USDT), suffix is `quoteAsset`.
+     * The slider always represents 0–100% of the open position; switching
+     * just changes the displayed amount and the conversion. The signed
+     * `intent.qty` always returns base-asset units (the API requires it).
+     */
+    sizeUnit?: 'BASE' | 'QUOTE';
     /**
      * Quote asset symbol (e.g. "USDT", "USDC"). Suffixed onto the Entry /
      * Mark summary rows, the price-summary suffix, and the PnL field
@@ -1468,6 +1496,13 @@ export declare interface TpSlModalProps {
     initialTpPrice?: number | string;
     /** Existing SL trigger price for this position, or undefined if none set. */
     initialSlPrice?: number | string;
+    /**
+     * Trigger source seed for the Last/Mark dropdown. When the user is
+     * editing an existing TP/SL, the consumer can pre-select the source
+     * the original order used (`CONTRACT_PRICE` → `'Last'`,
+     * `MARK_PRICE` → `'Mark'`). Defaults to `'Last'` when omitted.
+     */
+    initialTriggerSource?: TriggerSource;
     /**
      * Cancel the existing TP order for this position. Rendered as a
      * "Cancel" link beside the Take Profit section header when an existing
@@ -1512,6 +1547,8 @@ export declare interface TransactionHistoryRow {
     amount: string;
     symbol: string;
 }
+
+declare type TriggerSource = 'Last' | 'Mark';
 
 export declare const UnderlineTab: default_2.FC<UnderlineTabProps>;
 
