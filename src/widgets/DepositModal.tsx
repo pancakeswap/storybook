@@ -770,14 +770,9 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                   )}
                 </SummaryRow>
               </SummaryCard>
-              <Flex style={{ gap: 8 }}>
-                <Button style={{ flex: 1 }} scale="md" onClick={onClose}>
-                  {t('View Balance')}
-                </Button>
-                <Button style={{ flex: 1 }} scale="md" variant="secondary" onClick={onDepositAgain}>
-                  {t('Deposit Again')}
-                </Button>
-              </Flex>
+              <Button scale="md" variant="secondary" onClick={onDepositAgain}>
+                {t('Deposit Again')}
+              </Button>
             </>
           )}
 
