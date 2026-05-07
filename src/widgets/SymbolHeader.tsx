@@ -328,6 +328,23 @@ const formatCountdown = (nextTimeMs?: number) => {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
+/**
+ * Drives a 1Hz re-render so the funding countdown ticks every second
+ * regardless of WebSocket cadence. Asterdex.com does the same — they
+ * coalesce WS pushes into 100–250 ms render batches but keep a separate
+ * `setInterval(..., 1000)` for the clock so it never stutters when the
+ * stream slows. Returns nothing — the act of `setState` re-renders the
+ * caller.
+ */
+const useTick = (active: boolean): void => {
+  const [, setN] = useState(0)
+  useEffect(() => {
+    if (!active) return undefined
+    const id = setInterval(() => setN((x) => x + 1), 1000)
+    return () => clearInterval(id)
+  }, [active])
+}
+
 const formatVolume = (v?: string) => {
   if (!v) return '—'
   const n = Number(v)
@@ -395,6 +412,9 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   t = identity,
 }) => {
   const theme = useTheme()
+  // 1Hz re-render so the funding countdown ticks every second even when
+  // the upstream `@markPrice@1s` WS frame slows or stalls. PAN-11804.
+  useTick(nextFundingTime !== undefined && nextFundingTime > Date.now())
   // Controlled when the consumer provides `marketsOpen`; otherwise fall
   // back to local state so existing call sites (no controlled prop) keep
   // working. `setOpen` writes to whichever side is active so the rest of
