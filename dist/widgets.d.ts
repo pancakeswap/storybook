@@ -19,7 +19,6 @@ import { SimpleBetPanelProps } from './SimpleBetPanel';
 import { SimpleChartCard } from './SimpleChartCard';
 import { SimpleChartCardProps } from './SimpleChartCard';
 import { SimpleHistoryRow } from './SimplePositionsCard';
-import { SimpleOpenOrderRow } from './SimplePositionsCard';
 import { SimplePositionDirection } from './SimplePositionsCard';
 import { SimplePositionLiqStatus } from './SimplePositionsCard';
 import { SimplePositionRow } from './SimplePositionsCard';
@@ -1323,8 +1322,6 @@ export { SimpleChartCard }
 export { SimpleChartCardProps }
 
 export { SimpleHistoryRow }
-
-export { SimpleOpenOrderRow }
 
 export { SimplePositionDirection }
 
