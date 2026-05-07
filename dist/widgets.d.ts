@@ -1433,26 +1433,11 @@ export declare interface TpSlIntent {
     tpPrice: string;
     /** Trigger price for the SL leg. Empty string → skip SL leg. */
     slPrice: string;
-    /** Position size (absolute value), for order qty. */
+    /** Quantity to close (base asset, absolute). */
     qty: string;
     closePosition: boolean;
 }
 
-/**
- * TP/SL setup for an existing position.
- *
- * Price↔PnL sync is bidirectional but direction-aware:
- *   - LONG:  PnL = (exitPrice - entry) × qty    → TP price above entry
- *   - SHORT: PnL = (entry - exitPrice) × qty    → TP price below entry
- *
- * The widget tracks which input the user last typed into so it doesn't
- * fight the cursor — editing Price only propagates to PnL, and vice
- * versa.
- *
- * A direction sanity check surfaces an inline warning when the user
- * types a nonsensical value (e.g. TP below entry on a LONG). The server
- * would reject anyway, but surfacing it early is friendlier.
- */
 export declare const TpSlModal: default_2.FC<TpSlModalProps>;
 
 export declare interface TpSlModalProps {
@@ -1462,15 +1447,20 @@ export declare interface TpSlModalProps {
     positionSide: PositionSide;
     /** Absolute position size (base asset). */
     qty: number;
+    /** Position leverage shown in the summary row, e.g. 20 → "BTCUSDT 20x". */
+    leverage?: number;
+    /** Display symbol of the base asset, e.g. "BTC" — used as the amount-input suffix. */
+    baseAsset?: string;
+    /**
+     * Quote asset symbol (e.g. "USDT", "USDC"). Suffixed onto the Entry /
+     * Mark summary rows, the price-summary suffix, and the PnL field
+     * labels so the user always sees which token the numbers are
+     * denominated in. Defaults to "USDT".
+     */
+    quoteAsset?: string;
     entryPrice: number;
     /** Resolved mark price — displayed in the summary row. */
     markPrice: number;
-    /**
-     * Quote asset symbol (e.g. "USDT", "USDC"). Suffixed onto the Entry /
-     * Mark summary rows and the PnL field labels so the user always sees
-     * which token the numbers are denominated in. Defaults to "USDT".
-     */
-    quoteAsset?: string;
     /**
      * Display precision for the Entry / Mark figures and for the trigger
      * price computed from a PnL input. Defaults to 4 to match Aster's UI;
