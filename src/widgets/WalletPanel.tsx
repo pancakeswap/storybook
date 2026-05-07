@@ -391,7 +391,6 @@ const EmptyState = styled(Flex)`
 
 const Root = styled.section<{ $embedded?: boolean }>`
   display: flex;
-  width: 400px;
   flex-direction: column;
   align-items: center;
   gap: 16px;
