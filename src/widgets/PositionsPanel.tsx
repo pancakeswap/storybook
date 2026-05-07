@@ -214,6 +214,15 @@ export interface PositionsPanelProps {
   /** Mobile-only: active sub-tab inside the History sheet. */
   historyTab?: PositionsHistoryTab
   onHistoryTabChange?: (tab: PositionsHistoryTab) => void
+
+  /**
+   * Display unit for the Size column. `'QUOTE'` (default) shows the
+   * USDT notional (|base| × markPrice, falling back to entry); `'BASE'`
+   * shows the raw base-asset quantity. Consumer typically syncs this
+   * with the order form's size-unit toggle so the user sees one
+   * denomination across the whole perps view.
+   */
+  sizeUnit?: 'BASE' | 'QUOTE'
 }
 
 const Card = styled(PerpsPanel)`
@@ -262,15 +271,28 @@ const Empty = styled(Flex)`
 /*
  * Positions table — desktop layout.
  *
- * Columns are fixed-width (per Figma 72:12961): Symbol(92) · Size(80) ·
- * Entry(80) · Mark(80) · Margin(80) · Liq(80) · PNL(136) · TP/SL(136) ·
- * Actions(auto). The 16px content gap between columns lives on the
- * cells (8px each side) instead of `column-gap`, so the hover-active
- * strip can paint every cell with no transparent slits in between.
+ * Symbol pin column keeps the "BTCUSDT / Buy 93x" stack at 108px (its
+ * two-line content needs a known minimum), the 7 numeric data columns
+ * flex with `minmax(min-content, 1fr)` so the row spans the full panel
+ * width like the history tables, and the trailing TP/SL + Close action
+ * group stays `auto`-sized at the right edge.
+ *
+ * Header `<Th>` cells live inside this same grid (above the row groups
+ * in JSX) — that's load-bearing for `1fr` alignment, since two
+ * separate grids would each compute column widths from their own
+ * cell-content min-contents and drift out of sync. Mirrors the pattern
+ * used by `OrdersTable` / `OrderHistoryTable` below.
+ *
+ * The 16px content gap between columns lives on the cells (8px each
+ * side) instead of `column-gap`, so the hover-active strip can paint
+ * every cell with no transparent slits in between. Body cells receive
+ * their 8px from `RowGroup`; header `<Th>` cells receive theirs from
+ * the `& > *` rule below (RowGroup is display:contents so this
+ * selector lands on Th + RowGroup, and the no-box RowGroup ignores it).
  */
 const PositionsTable = styled.div`
   display: grid;
-  grid-template-columns: 108px 96px 96px 96px 96px 96px 152px 152px auto;
+  grid-template-columns: 108px repeat(7, minmax(min-content, 1fr)) auto;
   column-gap: 0;
   /* Row gap is 0 so the active/hover bg of one row sits flush against
    * the next row — matches the responsive Figma 75:12034 where the
@@ -278,6 +300,9 @@ const PositionsTable = styled.div`
    * row, with no visible breathing strip between them. */
   row-gap: 0;
   font-variant-numeric: tabular-nums;
+  & > * {
+    padding: 16px 12px;
+  }
 `
 
 /* Wraps a row's cells with display:contents so the cells stay direct
@@ -286,11 +311,15 @@ const PositionsTable = styled.div`
 const RowGroup = styled.div`
   display: contents;
   /* Padding lives on the cells (RowGroup is display:contents so any
-   * padding set here would be dropped). 8px each side combines with the
-   * neighbour's 8px to produce the 16px content gap from Figma, while
-   * keeping the cells flush so the hover strip is unbroken. */
+   * padding set here would be dropped). 16px vertical / 12px horizontal
+   * matches the wrapping table's child rule (used by OrdersTable,
+   * OrderHistoryTable, TradesTable, TxTable, PositionsTable) so the
+   * header strip and body rows share the same row height + the 24px
+   * horizontal gap between cells reads consistent across both. Keeping
+   * cells flush against each other (no column-gap) is what lets the
+   * hover-active strip paint as one continuous bg. */
   & > * {
-    padding: 8px;
+    padding: 16px 12px;
     transition: background 0.12s;
   }
   &:hover > * {
@@ -307,23 +336,6 @@ const RowGroup = styled.div`
   }
 `
 
-/* Header strip above the table body — same fixed-width column grid as
- * PositionsTable. No outer horizontal padding so its columns line up
- * exactly with the row cells (which get 8px each-side padding via
- * RowGroup). The 8px each-side padding here lives on the children so
- * we don't pollute the shared `Th` primitive used by other tables. */
-const PositionsHeaderRow = styled.div`
-  display: grid;
-  grid-template-columns: 108px 96px 96px 96px 96px 96px 152px 152px auto;
-  column-gap: 0;
-  align-items: center;
-  padding: 8px 0;
-
-  & > * {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-`
 
 /* Wraps the tabs row + the right-side controls (Hide Other Symbols,
  * Close All). Owns the bottom border so it spans the whole panel
@@ -648,13 +660,16 @@ const Th = styled(Text).attrs({ fontSize: '12px', color: 'textSubtle' })`
   line-height: 14px;
   letter-spacing: 0.12px;
   text-transform: uppercase;
-  opacity: 0.6;
   display: inline-flex;
   align-items: center;
   /* Anchor the header row when the history tables overflow + scroll.
      position: sticky is a no-op when the parent doesn't scroll, so
      this is also safe on the Positions / Open Orders tables (which
-     don't use the scroll mixin today). */
+     don't use the scroll mixin today). The opaque card bg + z-index
+     are load-bearing: the previous 0.6 opacity made the whole element
+     translucent, so scrolled body rows bled through the header strip
+     (PAN-perps trade-history bug). textSubtle alone gives the muted
+     reading we want without making the bg see-through. */
   position: sticky;
   top: 0;
   z-index: 1;
@@ -684,8 +699,9 @@ const PositionTableRow: React.FC<{
   onEditTpSl: (p: PositionRow, markPrice: number) => void
   onShare?: (p: PositionRow) => void
   closingSymbol?: string | null
+  sizeUnit: 'BASE' | 'QUOTE'
   t: (key: string) => string
-}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, onShare, closingSymbol, t }) => {
+}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, onShare, closingSymbol, sizeUnit, t }) => {
   const theme = useTheme()
   const markPrice = useMarkPriceForSymbol?.(p.symbol)
   const side: 'BUY' | 'SELL' = p.positionAmt >= 0 ? 'BUY' : 'SELL'
@@ -705,13 +721,19 @@ const PositionTableRow: React.FC<{
 
   const isClosing = closingSymbol === p.symbol
 
-  // Notional value (= |size| × entryPrice) used as a stand-in for "Size" /
-  // "Margin" while the consumer hasn't wired richer values. Margin is
-  // displayed as notional ÷ leverage with a USDT suffix.
+  // Aster's positions table reports Size as the *USDT notional* of the
+  // open position (|base| × markPrice, falling back to entryPrice when
+  // mark hasn't streamed in yet) — not the raw base-asset quantity.
+  // Mirrors the screenshot at https://www.asterdex.com/positions where
+  // a 0.001 BTC long @ ~81k reads as "81.0 USDT". The previous render
+  // showed `0.001` labelled `USDT`, which is the BTC quantity with the
+  // wrong unit. Margin is still notional ÷ leverage with a USDT suffix.
   const sizeBase = Math.abs(p.positionAmt)
-  const notional = Number.isFinite(p.entryPrice) ? sizeBase * p.entryPrice : NaN
+  const entryNotional = Number.isFinite(p.entryPrice) ? sizeBase * p.entryPrice : NaN
+  const markNotional = Number.isFinite(markPrice) ? sizeBase * (markPrice as number) : NaN
+  const sizeNotional = Number.isFinite(markNotional) ? markNotional : entryNotional
   const margin =
-    Number.isFinite(notional) && p.leverage > 0 ? notional / p.leverage : NaN
+    Number.isFinite(entryNotional) && p.leverage > 0 ? entryNotional / p.leverage : NaN
 
   // Live uPnL %: gain / margin × 100. Falls back to '—' when we can't
   // compute either side. Matches the ROE% the design hints at next to
@@ -744,11 +766,24 @@ const PositionTableRow: React.FC<{
         </StackSub>
       </StackCell>
 
-      {/* Size cell — base amount on top, USDT settle below */}
-      <StackCell>
-        <span>{Number.isFinite(sizeBase) ? sizeBase : '—'}</span>
-        <StackSub>USDT</StackSub>
-      </StackCell>
+      {/* Size cell — unit follows the order-form toggle. QUOTE (default)
+          shows USDT notional (|base| × mark, fallback to entry); BASE
+          shows the raw base-asset quantity. Asset suffix derived from
+          the symbol (e.g. BTCUSDT → BTC / USDT). */}
+      {(() => {
+        const baseAsset = p.symbol.replace(/USDT$|USDC$|USD1$/i, '') || p.symbol
+        const quoteAsset = p.symbol.endsWith('USDC') ? 'USDC' : p.symbol.endsWith('USD1') ? 'USD1' : 'USDT'
+        const useBase = sizeUnit === 'BASE'
+        const value = useBase ? sizeBase : sizeNotional
+        const decimals = useBase ? 4 : 2
+        const label = useBase ? baseAsset : quoteAsset
+        return (
+          <StackCell>
+            <span>{Number.isFinite(value) ? value.toFixed(decimals) : '—'}</span>
+            <StackSub>{label}</StackSub>
+          </StackCell>
+        )
+      })()}
 
       <Td as="div">
         {Number.isFinite(p.entryPrice) ? fmtPrice(p.entryPrice) : '—'}
@@ -972,6 +1007,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   onHideOtherSymbolsChange,
   onCloseAll,
   onSharePnl,
+  sizeUnit = 'QUOTE',
   t = identity,
 }) => {
   const theme = useTheme()
@@ -1074,7 +1110,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
             </Empty>
           ) : (
             <>
-              <PositionsHeaderRow>
+              <PositionsTable>
                 <Th>{t('Symbol')}</Th>
                 <Th>{t('Size')}</Th>
                 <Th>{t('Entry Price')}</Th>
@@ -1090,8 +1126,6 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
                 </Th>
                 <Th>{t('TP/SL')}</Th>
                 <Th />
-              </PositionsHeaderRow>
-              <PositionsTable>
                 {positions.map((p) => (
                   <RowGroup key={p.id}>
                     <PositionTableRow
@@ -1102,6 +1136,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
                       onEditTpSl={onEditTpSl}
                       onShare={onSharePnl}
                       closingSymbol={closingSymbol}
+                      sizeUnit={sizeUnit}
                       t={t}
                     />
                   </RowGroup>
@@ -1774,8 +1809,9 @@ const MobilePositionCard: React.FC<{
   onClose: (p: PositionRow) => void
   onEditTpSl: (p: PositionRow, markPrice: number) => void
   closingSymbol?: string | null
+  sizeUnit: 'BASE' | 'QUOTE'
   t: (key: string) => string
-}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, closingSymbol, t }) => {
+}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, closingSymbol, sizeUnit, t }) => {
   const markPrice = useMarkPriceForSymbol?.(p.symbol)
   const side: 'BUY' | 'SELL' = p.positionAmt >= 0 ? 'BUY' : 'SELL'
 
@@ -1790,7 +1826,18 @@ const MobilePositionCard: React.FC<{
       : undefined
 
   const isClosing = closingSymbol === p.symbol
-  const sizeAbs = Math.abs(p.positionAmt)
+  // Size unit follows the desktop row: QUOTE shows USDT notional
+  // (|base| × mark, fallback entry); BASE shows raw base-asset qty.
+  const sizeBase = Math.abs(p.positionAmt)
+  const entryNotional = Number.isFinite(p.entryPrice) ? sizeBase * p.entryPrice : NaN
+  const markNotional = Number.isFinite(markPrice) ? sizeBase * (markPrice as number) : NaN
+  const sizeNotional = Number.isFinite(markNotional) ? markNotional : entryNotional
+  const sizeBaseAsset = p.symbol.replace(/USDT$|USDC$|USD1$/i, '') || p.symbol
+  const sizeQuoteAsset = p.symbol.endsWith('USDC') ? 'USDC' : p.symbol.endsWith('USD1') ? 'USD1' : 'USDT'
+  const sizeIsBase = sizeUnit === 'BASE'
+  const sizeValue = sizeIsBase ? sizeBase : sizeNotional
+  const sizeLabel = sizeIsBase ? sizeBaseAsset : sizeQuoteAsset
+  const sizeDecimals = sizeIsBase ? 4 : 2
 
   return (
     <MobileCard>
@@ -1808,7 +1855,9 @@ const MobilePositionCard: React.FC<{
       <MobileCardGrid>
         <MobileCardCell>
           <span>{t('Size')}</span>
-          <strong>{sizeAbs}</strong>
+          <strong>
+            {Number.isFinite(sizeValue) ? `${sizeValue.toFixed(sizeDecimals)} ${sizeLabel}` : '—'}
+          </strong>
         </MobileCardCell>
         <MobileCardCell>
           <span>{t('Entry')}</span>
@@ -1924,6 +1973,7 @@ const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
   onHistoryToggle,
   historyTab = 'orders',
   onHistoryTabChange,
+  sizeUnit = 'QUOTE',
   t = identity,
 }) => {
   // Mobile tab order — differs from desktop. Open Orders / Positions /
@@ -2008,6 +2058,7 @@ const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
               onClose={onClosePosition}
               onEditTpSl={onEditTpSl}
               closingSymbol={closingSymbol}
+              sizeUnit={sizeUnit}
               t={t}
             />
           ))}

@@ -71,8 +71,11 @@ export interface OrderFormProps {
   availableBalanceText: string
   /** Pre-formatted preview lines for the summary footer. */
   preview: { cost: string; liq: string }
-  /** Maker/taker fee bps for the summary footer (e.g. "0.02% / 0.05%"). */
-  feeText: string
+  /**
+   * Maker/taker fee bps for the summary footer (e.g. "0.02% / 0.05%").
+   * Omit to hide the fee row entirely.
+   */
+  feeText?: string
   /** Slider position 0-100 (consumer computes from quantity ÷ maxSize). */
   sizePercent: number
   onSizePercentChange: (pct: number) => void
@@ -1142,9 +1145,11 @@ const MobileOrderForm: React.FC<OrderFormProps> = ({
         {t('Sell/Short')}
       </MCta>
 
-      <Text fontSize="11px" color="textSubtle" textAlign="right">
-        {t('Fees')}: {feeText}
-      </Text>
+      {feeText ? (
+        <Text fontSize="11px" color="textSubtle" textAlign="right">
+          {t('Fees')}: {feeText}
+        </Text>
+      ) : null}
     </MBody>
   )
 }
@@ -1633,18 +1638,22 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
             <SV>{preview.liq}</SV>
           </>
         )}
-        <DashedLabelWrap
-          onMouseEnter={() => setSummaryTip('fees')}
-          onMouseLeave={() => setSummaryTip(null)}
-        >
-          <SK>{t('Fees')}</SK>
-          {summaryTip === 'fees' && (
-            <ReduceOnlyTooltip role="tooltip">
-              {t('Trading and funding fees applied to this position.')}
-            </ReduceOnlyTooltip>
-          )}
-        </DashedLabelWrap>
-        <SV>{feeText}</SV>
+        {feeText ? (
+          <>
+            <DashedLabelWrap
+              onMouseEnter={() => setSummaryTip('fees')}
+              onMouseLeave={() => setSummaryTip(null)}
+            >
+              <SK>{t('Fees')}</SK>
+              {summaryTip === 'fees' && (
+                <ReduceOnlyTooltip role="tooltip">
+                  {t('Trading and funding fees applied to this position.')}
+                </ReduceOnlyTooltip>
+              )}
+            </DashedLabelWrap>
+            <SV>{feeText}</SV>
+          </>
+        ) : null}
       </SummaryGrid>
     </Card>
   )

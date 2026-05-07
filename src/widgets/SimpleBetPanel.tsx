@@ -87,7 +87,8 @@ export interface SimpleBetPanelProps {
   estimatedEntry: string
   liqIfLong: string
   marginRequired: string
-  openingFee: string
+  /** Pre-formatted opening fee. Omit to hide the row entirely. */
+  openingFee?: string
 
   // ── CTA ──────────────────────────────────────────────────
   canSubmit: boolean
@@ -1446,10 +1447,12 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
               <StatsLabel>Margin required</StatsLabel>
               <StatsValue>{marginRequired}</StatsValue>
             </StatsRow>
-            <StatsRow>
-              <StatsLabel>Opening fee</StatsLabel>
-              <StatsValue>{openingFee}</StatsValue>
-            </StatsRow>
+            {openingFee ? (
+              <StatsRow>
+                <StatsLabel>Opening fee</StatsLabel>
+                <StatsValue>{openingFee}</StatsValue>
+              </StatsRow>
+            ) : null}
           </StatsList>
         ) : null}
         <UpDownCardActions>

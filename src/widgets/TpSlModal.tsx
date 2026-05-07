@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { styled, useTheme } from 'styled-components'
+import { styled } from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Input } from '../primitives/Input'
@@ -7,7 +7,7 @@ import { Text } from '../primitives/Text'
 import Modal from '../primitives/Modal/Modal'
 import { ModalV2 } from '../primitives/Modal/ModalV2'
 import { BunnySlider } from './BunnySlider'
-import { ensureNegative, ensurePositive, formatWithThousandSeparator, useSeparatedNumberInput } from './separatedNumberInput'
+import { formatWithThousandSeparator, useSeparatedNumberInput } from './separatedNumberInput'
 
 export type PositionSide = 'LONG' | 'SHORT'
 export type TriggerSource = 'Last' | 'Mark'
@@ -24,6 +24,14 @@ export interface TpSlIntent {
   /** Quantity to close (base asset, absolute). */
   qty: string
   closePosition: boolean
+  /**
+   * Which oracle the TP/SL trigger compares against:
+   *   - `'Last'` → last traded price (Aster `CONTRACT_PRICE`).
+   *   - `'Mark'` → mark price (Aster `MARK_PRICE`).
+   * Picked from the Last/Mark dropdown in the modal header. The
+   * consumer maps this onto `placeOrder`'s `workingType` field.
+   */
+  triggerSource: TriggerSource
 }
 
 export interface TpSlModalProps {
@@ -37,6 +45,15 @@ export interface TpSlModalProps {
   leverage?: number
   /** Display symbol of the base asset, e.g. "BTC" — used as the amount-input suffix. */
   baseAsset?: string
+  /**
+   * Display unit for the Amount input + Position-amount summary.
+   *   - `'BASE'` (default) — input typed in base asset (e.g. BTC), suffix is `baseAsset`.
+   *   - `'QUOTE'` — input typed in quote asset (USDT), suffix is `quoteAsset`.
+   * The slider always represents 0–100% of the open position; switching
+   * just changes the displayed amount and the conversion. The signed
+   * `intent.qty` always returns base-asset units (the API requires it).
+   */
+  sizeUnit?: 'BASE' | 'QUOTE'
   /**
    * Quote asset symbol (e.g. "USDT", "USDC"). Suffixed onto the Entry /
    * Mark summary rows, the price-summary suffix, and the PnL field
@@ -57,6 +74,13 @@ export interface TpSlModalProps {
   initialTpPrice?: number | string
   /** Existing SL trigger price for this position, or undefined if none set. */
   initialSlPrice?: number | string
+  /**
+   * Trigger source seed for the Last/Mark dropdown. When the user is
+   * editing an existing TP/SL, the consumer can pre-select the source
+   * the original order used (`CONTRACT_PRICE` → `'Last'`,
+   * `MARK_PRICE` → `'Mark'`). Defaults to `'Last'` when omitted.
+   */
+  initialTriggerSource?: TriggerSource
   /**
    * Cancel the existing TP order for this position. Rendered as a
    * "Cancel" link beside the Take Profit section header when an existing
@@ -221,8 +245,6 @@ const UnitShell = styled(InputShell)`
   justify-content: space-between;
 `
 
-const UnitLabel = styled(Text).attrs({ fontSize: '14px', color: 'textSubtle' })``
-
 const UnitToggle = styled.button`
   display: inline-flex;
   align-items: center;
@@ -287,24 +309,33 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
   leverage,
   baseAsset,
   quoteAsset = 'USDT',
+  sizeUnit = 'BASE',
   entryPrice,
   markPrice,
   pricePrecision = 4,
   initialTpPrice,
   initialSlPrice,
+  initialTriggerSource,
   onCancelTpOrder,
   onCancelSlOrder,
   onConfirm,
   onClose,
   t = identity,
 }) => {
-  const theme = useTheme()
   const dir = positionSide === 'LONG' ? 1 : -1
 
   const [tpPrice, setTpPrice] = useState('')
   const [tpPnl, setTpPnl] = useState('')
   const [slPrice, setSlPrice] = useState('')
   const [slPnl, setSlPnl] = useState('')
+  /* User-facing Gain / Loss strings — what the input shows. Always
+     positive magnitude (gain/loss is implied by which field). Format
+     follows `gainUnit` / `lossUnit`: in USDT mode it's just the absolute
+     pnl; in % mode it's |pnl| / margin × 100. The signed `tpPnl` /
+     `slPnl` stay as the source of truth in USDT — these texts derive
+     from them on programmatic price changes and unit toggles. */
+  const [tpGainText, setTpGainText] = useState('')
+  const [slLossText, setSlLossText] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [cancellingTp, setCancellingTp] = useState(false)
   const [cancellingSl, setCancellingSl] = useState(false)
@@ -320,6 +351,16 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
   const [amountText, setAmountText] = useState('')
 
   const closeQty = (qty * closePct) / 100
+  const isQuoteUnit = sizeUnit === 'QUOTE' && Number.isFinite(markPrice) && (markPrice as number) > 0
+  // Convert base→quote (or vice-versa) for the Amount input + summary.
+  // Falls back to base when markPrice isn't available so we never show
+  // bogus zeros while the price stream warms up.
+  const baseToUnit = (baseAmt: number): number => (isQuoteUnit ? baseAmt * (markPrice as number) : baseAmt)
+  const unitToBase = (unitAmt: number): number => (isQuoteUnit ? unitAmt / (markPrice as number) : unitAmt)
+  const closeQtyDisplay = baseToUnit(closeQty)
+  const amountDecimals = isQuoteUnit ? 2 : 4
+  const fallbackBase = symbol.replace(/USDT$|USDC$|USD1$/i, '') || symbol
+  const amountAssetLabel = isQuoteUnit ? quoteAsset : (baseAsset ?? fallbackBase)
 
   // Pre-fill drafts from the existing TP/SL orders when the modal
   // opens, so a user who clicks the TP/SL row to *update* (not create)
@@ -329,12 +370,18 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
     if (!isOpen) {
       setTpPrice('')
       setTpPnl('')
+      setTpGainText('')
       setSlPrice('')
       setSlPnl('')
+      setSlLossText('')
       setClosePct(100)
       setAmountText('')
+      // Reset trigger-source toggle so the next open starts from the
+      // consumer-provided default (or "Last" when none).
+      setTriggerSource(initialTriggerSource ?? 'Last')
       return
     }
+    setTriggerSource(initialTriggerSource ?? 'Last')
     const seedTp = initialTpPrice !== undefined && initialTpPrice !== '' ? String(initialTpPrice) : ''
     const seedSl = initialSlPrice !== undefined && initialSlPrice !== '' ? String(initialSlPrice) : ''
     setTpPrice(seedTp)
@@ -342,60 +389,187 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
     if (qty > 0 && Number.isFinite(entryPrice)) {
       const tpN = Number(seedTp)
       const slN = Number(seedSl)
-      setTpPnl(seedTp && Number.isFinite(tpN) ? (dir * (tpN - entryPrice) * qty).toFixed(4) : '')
-      setSlPnl(seedSl && Number.isFinite(slN) ? (dir * (slN - entryPrice) * qty).toFixed(4) : '')
+      const tpUsd = seedTp && Number.isFinite(tpN) ? dir * (tpN - entryPrice) * qty : NaN
+      const slUsd = seedSl && Number.isFinite(slN) ? dir * (slN - entryPrice) * qty : NaN
+      setTpPnl(Number.isFinite(tpUsd) ? tpUsd.toFixed(4) : '')
+      setSlPnl(Number.isFinite(slUsd) ? slUsd.toFixed(4) : '')
+      setTpGainText(Number.isFinite(tpUsd) ? pnlToText(tpUsd, gainUnit) : '')
+      setSlLossText(Number.isFinite(slUsd) ? pnlToLossText(slUsd, lossUnit) : '')
     } else {
       setTpPnl('')
       setSlPnl('')
+      setTpGainText('')
+      setSlLossText('')
     }
-  }, [isOpen, initialTpPrice, initialSlPrice, qty, entryPrice, dir])
+    // pnlToText closes over gainUnit / lossUnit / marginUsdt, all stable
+    // for a given open. Listing initialTpPrice + initialSlPrice + the
+    // trigger-source seed covers the "open with prefill" case.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialTpPrice, initialSlPrice, initialTriggerSource, qty, entryPrice, dir])
+
+  // Re-render the amount input value when sizeUnit toggles mid-session
+  // so the displayed number tracks the user's chosen denomination
+  // (otherwise the field would show a stale base value after switching
+  // to QUOTE, or vice-versa). Formatted to `amountDecimals` so the
+  // input doesn't bloom to 14 fractional digits from a raw `.toString()`.
+  useEffect(() => {
+    if (!isOpen || qty <= 0) return
+    const baseAmt = (qty * closePct) / 100
+    setAmountText(baseAmt > 0 ? baseToUnit(baseAmt).toFixed(amountDecimals) : '')
+    // baseToUnit + amountDecimals close over markPrice / isQuoteUnit,
+    // both already in deps via sizeUnit + markPrice.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, sizeUnit, qty, markPrice])
 
   const handleAmountChange = (raw: string) => {
     setAmountText(raw)
     if (raw === '' || qty <= 0) return
     const n = Number(raw)
     if (!Number.isFinite(n)) return
-    const pct = Math.max(0, Math.min(100, (n / qty) * 100))
+    const baseAmt = unitToBase(n)
+    const pct = Math.max(0, Math.min(100, (baseAmt / qty) * 100))
     setClosePct(pct)
   }
 
   const handleSliderChange = (pct: number) => {
     setClosePct(pct)
     if (qty > 0) {
-      setAmountText(((qty * pct) / 100).toString())
+      const baseAmt = (qty * pct) / 100
+      // Format to the unit's display precision (2 dp QUOTE / 4 dp BASE)
+      // so we don't dump 162.07367349275998-style float noise into the
+      // input. Matches the Position-amount summary directly below.
+      setAmountText(baseToUnit(baseAmt).toFixed(amountDecimals))
     }
   }
 
   const priceFromPnl = (pnl: number) => (qty > 0 ? entryPrice + (dir * pnl) / qty : NaN)
   const pnlFromPrice = (price: number) => (qty > 0 ? dir * (price - entryPrice) * qty : NaN)
 
+  // Margin held against the position — used as the denominator for
+  // percent-based Gain / Loss values. = notional / leverage. NaN when
+  // we don't have leverage, in which case `%` mode just shows blank
+  // until the prop arrives.
+  const marginUsdt =
+    leverage && leverage > 0 && qty > 0 && Number.isFinite(entryPrice) ? (qty * entryPrice) / leverage : NaN
+
+  // Signed USDT pnl → display string in the chosen unit (always
+  // positive magnitude — sign is implicit by gain/loss field).
+  const pnlToText = (pnlUsd: number, unit: GainLossUnit): string => {
+    if (!Number.isFinite(pnlUsd)) return ''
+    const abs = Math.abs(pnlUsd)
+    if (unit === 'USDT') return abs.toFixed(2)
+    if (!Number.isFinite(marginUsdt) || marginUsdt <= 0) return ''
+    return ((abs / marginUsdt) * 100).toFixed(2)
+  }
+  // Display string in the chosen unit → positive USDT magnitude. Caller
+  // is responsible for signing it (TP = +, SL = -).
+  const textToUsd = (text: string, unit: GainLossUnit): number => {
+    const n = Number(text)
+    if (!Number.isFinite(n)) return NaN
+    if (unit === 'USDT') return Math.abs(n)
+    if (!Number.isFinite(marginUsdt) || marginUsdt <= 0) return NaN
+    return (Math.abs(n) / 100) * marginUsdt
+  }
+  // Loss text mirrors the Gain text but always carries the leading
+  // "-" (Aster convention — see screenshot in the task). Empty stays
+  // empty so the placeholder still surfaces.
+  const pnlToLossText = (pnlUsd: number, unit: GainLossUnit): string => {
+    const m = pnlToText(pnlUsd, unit)
+    return m === '' ? '' : `-${m}`
+  }
+
   const formatRaw = (n: number, digits: number) => (Number.isFinite(n) ? n.toFixed(digits) : '')
+
+  // ── TP price / Gain bidirectional sync ───────────────────────────
   const onChangeTpPrice = (v: string) => {
     setTpPrice(v)
-    if (v === '') return setTpPnl('')
+    if (v === '') {
+      setTpPnl('')
+      setTpGainText('')
+      return
+    }
     const n = Number(v)
-    setTpPnl(Number.isFinite(n) ? formatRaw(pnlFromPrice(n), 4) : '')
+    if (!Number.isFinite(n)) return
+    const usd = pnlFromPrice(n)
+    setTpPnl(formatRaw(usd, 4))
+    setTpGainText(pnlToText(usd, gainUnit))
   }
-  const onChangeTpPnl = (v: string) => {
-    const norm = ensurePositive(v)
-    setTpPnl(norm)
-    if (norm === '' || norm === '-') return setTpPrice('')
-    const n = Number(norm)
-    setTpPrice(Number.isFinite(n) ? formatRaw(priceFromPnl(n), pricePrecision) : '')
+  const onChangeTpGain = (v: string) => {
+    // Gain is a magnitude — strip any leading "-" so the negative sign
+    // never gets stuck in the field if a user fat-fingers.
+    const norm = v.replace(/^-/, '')
+    setTpGainText(norm)
+    if (norm === '') {
+      setTpPnl('')
+      setTpPrice('')
+      return
+    }
+    const usd = textToUsd(norm, gainUnit)
+    if (!Number.isFinite(usd)) return
+    setTpPnl(formatRaw(usd, 4))
+    const price = priceFromPnl(usd)
+    setTpPrice(Number.isFinite(price) ? formatRaw(price, pricePrecision) : '')
   }
+
+  // ── SL price / Loss bidirectional sync ───────────────────────────
   const onChangeSlPrice = (v: string) => {
     setSlPrice(v)
-    if (v === '') return setSlPnl('')
+    if (v === '') {
+      setSlPnl('')
+      setSlLossText('')
+      return
+    }
     const n = Number(v)
-    setSlPnl(Number.isFinite(n) ? formatRaw(pnlFromPrice(n), 4) : '')
+    if (!Number.isFinite(n)) return
+    const usd = pnlFromPrice(n)
+    setSlPnl(formatRaw(usd, 4))
+    setSlLossText(pnlToLossText(usd, lossUnit))
   }
-  const onChangeSlPnl = (v: string) => {
-    const norm = ensureNegative(v)
-    setSlPnl(norm)
-    if (norm === '' || norm === '-') return setSlPrice('')
-    const n = Number(norm)
-    setSlPrice(Number.isFinite(n) ? formatRaw(priceFromPnl(n), pricePrecision) : '')
+  const onChangeSlLoss = (v: string) => {
+    // Allow a transitional bare "-" so the cursor doesn't bounce while
+    // the user is mid-typing a value like "-5".
+    if (v === '' || v === '-') {
+      setSlLossText(v)
+      setSlPnl('')
+      setSlPrice('')
+      return
+    }
+    // Magnitude — the leading "-" is rendered as a fixed prefix on the
+    // displayed text (Aster convention). Strip any sign the user typed
+    // so we don't end up with double "--".
+    const magnitude = v.replace(/^[-+]/, '')
+    if (magnitude === '') {
+      setSlLossText('')
+      setSlPnl('')
+      setSlPrice('')
+      return
+    }
+    setSlLossText(`-${magnitude}`)
+    const usd = textToUsd(magnitude, lossUnit)
+    if (!Number.isFinite(usd)) return
+    // SL is a *loss* — signed pnl is negative.
+    const signed = -usd
+    setSlPnl(formatRaw(signed, 4))
+    const price = priceFromPnl(signed)
+    setSlPrice(Number.isFinite(price) ? formatRaw(price, pricePrecision) : '')
   }
+
+  // Re-derive the displayed Gain / Loss text when the user toggles
+  // between % and USDT. Only listens to the unit (not pnl) so a user
+  // mid-keystroke doesn't get their cursor yanked by a pnl re-format —
+  // the pnl-derived setText already happens in the price/gain handlers.
+  useEffect(() => {
+    if (tpPnl === '' || tpPnl === '-') return
+    const usd = Number(tpPnl)
+    if (Number.isFinite(usd)) setTpGainText(pnlToText(usd, gainUnit))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gainUnit])
+  useEffect(() => {
+    if (slPnl === '' || slPnl === '-') return
+    const usd = Number(slPnl)
+    if (Number.isFinite(usd)) setSlLossText(pnlToLossText(usd, lossUnit))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lossUnit])
 
   const warning = useMemo(() => {
     const tp = Number(tpPrice)
@@ -425,6 +599,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
         slPrice,
         qty: String(closeQty),
         closePosition: closePct >= 100,
+        triggerSource,
       })
       onClose()
     } finally {
@@ -499,14 +674,40 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
                   />
                 </InputShell>
                 <UnitShell>
-                  <UnitLabel>{t('Gain')}</UnitLabel>
+                  <NakedInput
+                    {...useSeparatedNumberInput(tpGainText, onChangeTpGain)}
+                    placeholder={t('Gain')}
+                    inputMode="decimal"
+                  />
                   <UnitToggle type="button" onClick={cycleGainUnit}>
                     {gainUnit}
                     <ChevronGlyph />
                   </UnitToggle>
                 </UnitShell>
               </InputRow>
-              <Helper>{tpHelper}</Helper>
+              <Flex justifyContent="space-between" alignItems="center" style={{ gap: 8, alignSelf: 'stretch' }}>
+                <Helper>{tpHelper}</Helper>
+                {initialTpPrice && onCancelTpOrder ? (
+                  <CancelLink
+                    type="button"
+                    onClick={async () => {
+                      if (cancellingTp) return
+                      setCancellingTp(true)
+                      try {
+                        await onCancelTpOrder()
+                        setTpPrice('')
+                        setTpPnl('')
+                        setTpGainText('')
+                      } finally {
+                        setCancellingTp(false)
+                      }
+                    }}
+                    disabled={cancellingTp}
+                  >
+                    {cancellingTp ? t('Cancelling…') : t('Cancel Order')}
+                  </CancelLink>
+                ) : null}
+              </Flex>
             </Flex>
 
             <Flex flexDirection="column" style={{ gap: 12, alignSelf: 'stretch' }}>
@@ -519,14 +720,40 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
                   />
                 </InputShell>
                 <UnitShell>
-                  <UnitLabel>{t('Loss')}</UnitLabel>
+                  <NakedInput
+                    {...useSeparatedNumberInput(slLossText, onChangeSlLoss)}
+                    placeholder={t('Loss')}
+                    inputMode="decimal"
+                  />
                   <UnitToggle type="button" onClick={cycleLossUnit}>
                     {lossUnit}
                     <ChevronGlyph />
                   </UnitToggle>
                 </UnitShell>
               </InputRow>
-              <Helper>{slHelper}</Helper>
+              <Flex justifyContent="space-between" alignItems="center" style={{ gap: 8, alignSelf: 'stretch' }}>
+                <Helper>{slHelper}</Helper>
+                {initialSlPrice && onCancelSlOrder ? (
+                  <CancelLink
+                    type="button"
+                    onClick={async () => {
+                      if (cancellingSl) return
+                      setCancellingSl(true)
+                      try {
+                        await onCancelSlOrder()
+                        setSlPrice('')
+                        setSlPnl('')
+                        setSlLossText('')
+                      } finally {
+                        setCancellingSl(false)
+                      }
+                    }}
+                    disabled={cancellingSl}
+                  >
+                    {cancellingSl ? t('Cancelling…') : t('Cancel Order')}
+                  </CancelLink>
+                ) : null}
+              </Flex>
             </Flex>
           </SummaryGroup>
 
@@ -541,13 +768,13 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
                 placeholder={t('Quantity')}
                 inputMode="decimal"
               />
-              <AmountAsset>{baseAsset ?? symbol.replace(/USDT$/i, '')}</AmountAsset>
+              <AmountAsset>{amountAssetLabel}</AmountAsset>
             </AmountField>
             <SliderWrap>
               <BunnySlider
                 min={0}
                 max={100}
-                step={25}
+                step={1}
                 value={closePct}
                 onValueChanged={handleSliderChange}
               />
@@ -555,7 +782,7 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
             <SummaryRow>
               <SummaryLabel>{t('Position amount')}</SummaryLabel>
               <SummaryValue>
-                {formatWithThousandSeparator(closeQty.toFixed(2))} {quoteAsset}
+                {formatWithThousandSeparator(closeQtyDisplay.toFixed(amountDecimals))} {amountAssetLabel}
               </SummaryValue>
             </SummaryRow>
           </SummaryGroup>
