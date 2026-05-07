@@ -46,6 +46,16 @@ export interface LeverageModalProps {
   t?: (key: string, options?: Record<string, string | number | undefined>) => string
 }
 
+const Body = styled(Flex)`
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  ${({ theme }) => theme.mediaQueries.lg} {
+    min-width: 340px;
+    max-width: 440px;
+  }
+`
+
 const Stepper = styled(Flex)`
   gap: 10px;
   align-items: stretch;
@@ -106,6 +116,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
   // with a different `currentLeverage` (e.g. user closed without
   // confirming, then reopened after Aster updated their position lev).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional draft re-sync on (re)open
     if (isOpen) setValue(currentLeverage)
   }, [isOpen, currentLeverage])
 
@@ -115,7 +126,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
   return (
     <ModalV2 isOpen={isOpen} onDismiss={onClose} closeOnOverlayClick>
       <Modal title={t('%symbol% Adjust Leverage', { symbol })} onDismiss={onClose}>
-        <Flex flexDirection="column" style={{ gap: 16, minWidth: 340, maxWidth: 440 }}>
+        <Body>
           <Stepper>
             <StepButton
               onClick={() => setValue((v) => clamp(v - 1))}
@@ -169,7 +180,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
           <Button scale="md" disabled={isSubmitting} onClick={() => onConfirm(value)}>
             {isSubmitting ? t('Confirming…') : t('Confirm')}
           </Button>
-        </Flex>
+        </Body>
       </Modal>
     </ModalV2>
   )
