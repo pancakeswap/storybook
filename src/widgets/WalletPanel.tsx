@@ -145,7 +145,7 @@ export interface WalletPanelProps {
   /** @deprecated Pass actions via `bucket.actions` instead. */
   onSpotAction?: (action: 'send' | 'receive' | 'swap') => void
   /** @deprecated Pass actions via `bucket.actions` instead. */
-  onPerpAction?: (action: 'deposit' | 'withdraw' | 'manage' | 'transfer') => void
+  onPerpAction?: (action: 'deposit' | 'withdraw') => void
 }
 
 /* ── Mock data ─────────────────────────────────────────────── */
