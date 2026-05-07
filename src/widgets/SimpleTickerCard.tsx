@@ -296,13 +296,11 @@ const Pnl = styled.span<{ $positive: boolean }>`
   }
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const PnlTriangle = styled.span<{ $positive: boolean }>`
   display: inline-flex;
   align-items: center;
-  color: ${({ $positive }) => ($positive ? '#129E7D' : '#ED4B9E')};
+  color: ${({ $positive, theme }) => ($positive ? theme.colors.positive60 : theme.colors.failure)};
 `
-/* eslint-enable no-restricted-syntax */
 
 const StatsWrap = styled.div`
   display: flex;

@@ -284,12 +284,10 @@ const FundingTipRow = styled.div`
   gap: 8px;
 `
 
-/* eslint-disable no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark */
 const FundingTipDirSpan = styled.span<{ $color: 'long' | 'short' | 'plain' }>`
-  color: ${({ $color }) =>
-    $color === 'long' ? '#31D0AA' : $color === 'short' ? '#ED4B9E' : 'inherit'};
+  color: ${({ $color, theme }) =>
+    $color === 'long' ? theme.colors.success : $color === 'short' ? theme.colors.failure : 'inherit'};
 `
-/* eslint-enable no-restricted-syntax */
 
 const FundingTipDesc = styled.p`
   margin: 0;

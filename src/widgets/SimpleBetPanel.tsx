@@ -642,13 +642,6 @@ const LevValue = styled.span`
   }
 `
 
-const ZONE_BG: Record<Zone, string> = {
-  safe: '#31D0AA',
-  caution: '#1FC7D4',
-  warn: '#FFB237',
-  danger: '#ED4B9E',
-}
-
 const ZonePill = styled.span<{ $zone: Zone }>`
   display: flex;
   padding: 2px 5px;
@@ -656,7 +649,14 @@ const ZonePill = styled.span<{ $zone: Zone }>`
   align-items: center;
   gap: 4px;
   border-radius: 999px;
-  background: ${({ $zone }) => ZONE_BG[$zone]};
+  background: ${({ $zone, theme }) =>
+    $zone === 'safe'
+      ? theme.colors.success
+      : $zone === 'caution'
+        ? theme.colors.primary
+        : $zone === 'warn'
+          ? theme.colors.warning
+          : theme.colors.failure};
 `
 
 const ZonePillText = styled.span`

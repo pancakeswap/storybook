@@ -220,13 +220,11 @@ const Row = styled.div<{ $side: 'bid' | 'ask' }>`
   }
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const Price = styled.span<{ $side: 'bid' | 'ask' }>`
   position: relative;
   z-index: 1;
-  color: ${({ $side, theme }) => ($side === 'bid' ? '#129E7D' : theme.colors.failure)};
+  color: ${({ $side, theme }) => ($side === 'bid' ? theme.colors.positive60 : theme.colors.failure)};
 `
-/* eslint-enable no-restricted-syntax */
 
 const Cell = styled.span<{ $align?: 'center' | 'right' }>`
   position: relative;
@@ -470,7 +468,6 @@ const MHeadSize = styled.span`
   gap: 2px;
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const MRow = styled.div<{ $side: 'bid' | 'ask' }>`
   position: relative;
   display: flex;
@@ -480,9 +477,8 @@ const MRow = styled.div<{ $side: 'bid' | 'ask' }>`
   line-height: 1.5;
   z-index: 1;
   font-variant-numeric: tabular-nums;
-  color: ${({ $side, theme }) => ($side === 'bid' ? '#129E7D' : theme.colors.failure)};
+  color: ${({ $side, theme }) => ($side === 'bid' ? theme.colors.positive60 : theme.colors.failure)};
 `
-/* eslint-enable no-restricted-syntax */
 
 const MBar = styled.span`
   position: absolute;
@@ -675,7 +671,7 @@ const MobileOrderBook: React.FC<OrderBookProps> = ({
   }, [rows])
 
   const askBg = `color-mix(in srgb, ${theme.colors.failure} 18%, transparent)`
-  const bidBg = `color-mix(in srgb, #129E7D 18%, transparent)`
+  const bidBg = `color-mix(in srgb, ${theme.colors.positive60} 18%, transparent)`
 
   const renderRow = (price: string, qty: string, side: 'bid' | 'ask') => {
     const pct = Math.max(6, Math.min(100, (Number(qty) / maxQty) * 100))
@@ -695,7 +691,7 @@ const MobileOrderBook: React.FC<OrderBookProps> = ({
   ]
 
   const askColor = theme.colors.failure
-  const bidColor = '#129E7D'
+  const bidColor = theme.colors.positive60
   const listColor = theme.colors.textSubtle
 
   return (

@@ -229,7 +229,6 @@ const TabletPositionHeader = styled.div`
   align-self: stretch;
 `
 
-/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const TabletPositionTokenIcon = styled.span<{ $color: string }>`
   display: inline-flex;
   width: 40px;
@@ -238,13 +237,12 @@ const TabletPositionTokenIcon = styled.span<{ $color: string }>`
   justify-content: center;
   border-radius: 50%;
   background: ${({ $color }) => $color};
-  color: #fff;
+  color: ${({ theme }) => theme.colors.white};
   font-weight: 700;
   font-size: 14px;
   flex-shrink: 0;
   margin-right: 12px;
 `
-/* eslint-enable no-restricted-syntax */
 
 const TabletPositionMeta = styled.div`
   display: flex;
@@ -320,10 +318,9 @@ const TabletPositionStatLabel = styled.span`
   line-height: 150%;
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const TabletPositionStatValue = styled.span<{ $danger?: boolean; $safe?: boolean }>`
   color: ${({ $danger, $safe, theme }) =>
-    $safe ? '#129E7D' : $danger ? '#ED4B9E' : theme.colors.text};
+    $safe ? theme.colors.positive60 : $danger ? theme.colors.failure : theme.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -333,7 +330,6 @@ const TabletPositionStatValue = styled.span<{ $danger?: boolean; $safe?: boolean
   line-height: 150%;
   font-variant-numeric: tabular-nums;
 `
-/* eslint-enable no-restricted-syntax */
 
 const TabletPositionLiqBar = styled.div`
   display: flex;
@@ -361,7 +357,6 @@ const TabletPositionLiqFill = styled.div<{ $pct: number; $status: SimplePosition
         : theme.colors.failure};
 `
 
-// eslint-disable-next-line no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark
 const TabletPositionCloseBtn = styled.button`
   display: flex;
   height: 48px;
@@ -370,17 +365,17 @@ const TabletPositionCloseBtn = styled.button`
   align-items: center;
   align-self: stretch;
   border-radius: 16px;
-  border-top: 1px solid #ED4B9E;
-  border-right: 1px solid #ED4B9E;
-  border-bottom: 2px solid #ED4B9E;
-  border-left: 1px solid #ED4B9E;
+  border-top: 1px solid ${({ theme }) => theme.colors.failure};
+  border-right: 1px solid ${({ theme }) => theme.colors.failure};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.failure};
+  border-left: 1px solid ${({ theme }) => theme.colors.failure};
   background: transparent;
-  color: #ED4B9E;
+  color: ${({ theme }) => theme.colors.failure};
   font-family: Kanit;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  &:hover { background: #FFF0F9; }
+  &:hover { background: ${({ theme }) => theme.colors.negativeSubtle}; }
 `
 
 const HistoryTable = styled.div`
@@ -476,9 +471,8 @@ const Td = styled.div`
 /* Fee values are always rendered in the pink "destructive" color since
    they represent a cost (consistent across positive rebates too — the
    product treats fees as a single visual category). */
-// eslint-disable-next-line no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark
 const FeeCell = styled(Td)`
-  color: #ED4B9E;
+  color: ${({ theme }) => theme.colors.failure};
 `
 
 const RealizedProfitCell = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
@@ -509,7 +503,6 @@ const TokenCell = styled.div`
   }
 `
 
-/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const TokenIcon = styled.span<{ $color: string }>`
   display: inline-flex;
   width: 40px;
@@ -518,11 +511,10 @@ const TokenIcon = styled.span<{ $color: string }>`
   justify-content: center;
   border-radius: 50%;
   background: ${({ $color }) => $color};
-  color: #fff;
+  color: ${({ theme }) => theme.colors.white};
   font-weight: 700;
   font-size: 14px;
 `
-/* eslint-enable no-restricted-syntax */
 
 const TokenMeta = styled.div`
   display: flex;
@@ -654,7 +646,6 @@ const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
 `
 /* eslint-enable no-restricted-syntax */
 
-/* eslint-disable no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark */
 const CloseBtn = styled.button`
   display: flex;
   width: 32px;
@@ -666,16 +657,15 @@ const CloseBtn = styled.button`
   aspect-ratio: 1 / 1;
   margin: 16px;
   border-radius: 8px;
-  border-top: 1px solid #ED4B9E;
-  border-right: 1px solid #ED4B9E;
-  border-bottom: 2px solid #ED4B9E;
-  border-left: 1px solid #ED4B9E;
+  border-top: 1px solid ${({ theme }) => theme.colors.failure};
+  border-right: 1px solid ${({ theme }) => theme.colors.failure};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.failure};
+  border-left: 1px solid ${({ theme }) => theme.colors.failure};
   background: ${({ theme }) => theme.colors.negativeSubtle};
-  color: #ED4B9E;
+  color: ${({ theme }) => theme.colors.failure};
   cursor: pointer;
   &:hover { filter: brightness(0.97); }
 `
-/* eslint-enable no-restricted-syntax */
 
 const Empty = styled.div`
   display: flex;

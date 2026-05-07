@@ -187,7 +187,6 @@ const SideToggle = styled(Flex)`
  * bouncy snap. Background color transitions on a separate (gentler)
  * timing so the slide and the recolor don't cross-blend muddily.
  */
-/* eslint-disable no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark */
 const SideIndicator = styled.span<{ $side: OrderSide }>`
   position: absolute;
   top: 0;
@@ -196,7 +195,7 @@ const SideIndicator = styled.span<{ $side: OrderSide }>`
   width: 50%;
   border-radius: 12px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.10);
-  background: ${({ $side }) => ($side === 'BUY' ? '#31D0AA' : '#ED4B9E')};
+  background: ${({ $side, theme }) => ($side === 'BUY' ? theme.colors.success : theme.colors.failure)};
   transform: translateX(${({ $side }) => ($side === 'BUY' ? '0%' : '100%')});
   transition:
     transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -204,7 +203,6 @@ const SideIndicator = styled.span<{ $side: OrderSide }>`
   pointer-events: none;
   z-index: 0;
 `
-/* eslint-enable no-restricted-syntax */
 
 /* Active-press effect for Buy/Sell — drop the SideIndicator's bottom
    stroke while either toggle button is pressed so it reads as a tap. */
