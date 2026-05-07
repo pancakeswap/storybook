@@ -37,17 +37,16 @@ export interface TpSlModalProps {
   leverage?: number
   /** Display symbol of the base asset, e.g. "BTC" — used as the amount-input suffix. */
   baseAsset?: string
-  /** Display symbol of the quote asset, e.g. "USDT" — used as the price-summary suffix. */
+  /**
+   * Quote asset symbol (e.g. "USDT", "USDC"). Suffixed onto the Entry /
+   * Mark summary rows, the price-summary suffix, and the PnL field
+   * labels so the user always sees which token the numbers are
+   * denominated in. Defaults to "USDT".
+   */
   quoteAsset?: string
   entryPrice: number
   /** Resolved mark price — displayed in the summary row. */
   markPrice: number
-  /**
-   * Quote asset symbol (e.g. "USDT", "USDC"). Suffixed onto the Entry /
-   * Mark summary rows and the PnL field labels so the user always sees
-   * which token the numbers are denominated in. Defaults to "USDT".
-   */
-  quoteAsset?: string
   /**
    * Display precision for the Entry / Mark figures and for the trigger
    * price computed from a PnL input. Defaults to 4 to match Aster's UI;
@@ -290,7 +289,6 @@ export const TpSlModal: React.FC<TpSlModalProps> = ({
   quoteAsset = 'USDT',
   entryPrice,
   markPrice,
-  quoteAsset = 'USDT',
   pricePrecision = 4,
   initialTpPrice,
   initialSlPrice,
