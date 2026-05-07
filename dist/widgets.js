@@ -8588,7 +8588,7 @@ var go = B(mo)`
   align-items: center;
   gap: 2px;
   border-radius: 999px;
-  background: ${({ $positive: e, theme: t }) => e ? t.colors.positive10 : t.colors.negativeSubtle};
+  background: ${({ $positive: e, theme: t }) => e ? t.colors.positive10 : t.colors.destructive10};
   font-size: 16px;
   color: ${({ theme: e }) => e.colors.text};
 
@@ -9161,7 +9161,7 @@ var Ku = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  &:hover { background: ${({ theme: e }) => e.colors.negativeSubtle}; }
+  &:hover { background: ${({ theme: e }) => e.colors.destructive10}; }
 `, yd = B.div`
   display: grid;
   grid-template-columns: 190px 1fr 1fr 1fr 1fr 1fr;
@@ -9378,7 +9378,7 @@ var Ku = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
   border-right: 1px solid ${({ theme: e }) => e.colors.failure};
   border-bottom: 2px solid ${({ theme: e }) => e.colors.failure};
   border-left: 1px solid ${({ theme: e }) => e.colors.failure};
-  background: ${({ theme: e }) => e.colors.negativeSubtle};
+  background: ${({ theme: e }) => e.colors.destructive10};
   color: ${({ theme: e }) => e.colors.failure};
   cursor: pointer;
   &:hover { filter: brightness(0.97); }
