@@ -375,7 +375,7 @@ const TabletPositionCloseBtn = styled.button`
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  &:hover { background: ${({ theme }) => theme.colors.negativeSubtle}; }
+  &:hover { background: ${({ theme }) => theme.colors.destructive10}; }
 `
 
 const HistoryTable = styled.div`
@@ -661,7 +661,7 @@ const CloseBtn = styled.button`
   border-right: 1px solid ${({ theme }) => theme.colors.failure};
   border-bottom: 2px solid ${({ theme }) => theme.colors.failure};
   border-left: 1px solid ${({ theme }) => theme.colors.failure};
-  background: ${({ theme }) => theme.colors.negativeSubtle};
+  background: ${({ theme }) => theme.colors.destructive10};
   color: ${({ theme }) => theme.colors.failure};
   cursor: pointer;
   &:hover { filter: brightness(0.97); }

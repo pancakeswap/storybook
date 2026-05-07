@@ -287,7 +287,7 @@ const Pnl = styled.span<{ $positive: boolean }>`
   align-items: center;
   gap: 2px;
   border-radius: 999px;
-  background: ${({ $positive, theme }) => ($positive ? theme.colors.positive10 : theme.colors.negativeSubtle)};
+  background: ${({ $positive, theme }) => ($positive ? theme.colors.positive10 : theme.colors.destructive10)};
   font-size: 16px;
   color: ${({ theme }) => theme.colors.text};
 
