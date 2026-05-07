@@ -179,12 +179,13 @@ jobs:
           # --no-verify: pancake-frontend's husky pre-commit runs
           # lint-staged formatters. They'd succeed on package.json, but
           # bot commits should bypass human-facing hooks unconditionally.
-          git commit --no-verify -m "chore(perps): auto-bump @pancakeswap/storybook to ${SHORT_SHA}
-
-Auto-bumped by storybook .github/workflows/bump-pancake-frontend.yml
-after rebuild-dist on feat/perps-simple3 (commit ${TARGET_SHA}).
-
-Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          # Multiple -m args avoid YAML literal-block-scalar indentation
+          # quirks: each -m becomes its own paragraph in the commit body
+          # without leaking indentation into the rendered message.
+          git commit --no-verify \
+            -m "chore(perps): auto-bump @pancakeswap/storybook to ${SHORT_SHA}" \
+            -m "Auto-bumped by storybook .github/workflows/bump-pancake-frontend.yml after rebuild-dist on feat/perps-simple3 (commit ${TARGET_SHA})." \
+            -m "Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
           # Race guard: a human may have pushed to feat/perps-aster while
           # we were running pnpm install (~3 min). Rebase on top instead
           # of force-pushing — better to fail than to overwrite work.
