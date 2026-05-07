@@ -1018,6 +1018,8 @@ export declare function PancakesIcon(p: IconProps): JSX_2.Element;
 
 export declare function PauseCircleIcon(p: IconProps): JSX_2.Element;
 
+export declare const PCS_THEME_CSS: string;
+
 export declare type PcsTheme = typeof pcsTheme;
 
 /**
@@ -1143,6 +1145,21 @@ export declare const pcsTheme: {
         xxl: string;
     };
 };
+
+/**
+ * PCS design-system CSS-variable emitter.
+ *
+ * Replaces the previous Chakra-v3-based system. Emits `--pcs-colors-*` and
+ * `--pcs-shadows-*` vars under `[data-theme="light"]` / `[data-theme="dark"]`
+ * (matching `packages/uikit/src/css/vars.css.ts` in pancake-frontend) so the
+ * same widgets can render under either repo's theme switching without
+ * pulling in Chakra.
+ *
+ * `.light` / `.dark` class selectors are kept as co-selectors so storybook
+ * stories that wrap a subtree in `<div className="light">` (e.g.
+ * `SideBySideThemes`) continue to scope the vars locally.
+ */
+export declare type PcsThemeMode = 'dark' | 'light';
 
 export declare function PencilIcon(p: IconProps): JSX_2.Element;
 
