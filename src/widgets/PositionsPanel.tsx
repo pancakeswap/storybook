@@ -415,7 +415,6 @@ const HeaderRightControls = styled.div`
  * checkbox. Both elements sit on the same row, gap 8px. The label uses
  * the primary60 (teal) color so it pulls slightly toward the action
  * tone of the Close All affordance to its right. */
-// eslint-disable-next-line no-restricted-syntax -- TODO(design): need info-teal token in uikit
 const HideOtherChip = styled.label`
   display: inline-flex;
   align-items: center;
@@ -427,15 +426,10 @@ const HideOtherChip = styled.label`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-  color: #02919D;
+  color: ${({ theme }) => theme.colors.primary60};
   font-feature-settings: 'liga' off;
-
-  html.dark & {
-    color: #48D0DB;
-  }
 `
 
-// eslint-disable-next-line no-restricted-syntax -- TODO(design): need info-teal token in uikit
 const CloseAllBtn = styled.button`
   background: transparent;
   border: 0;
@@ -445,15 +439,11 @@ const CloseAllBtn = styled.button`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
-  color: #02919D;
+  color: ${({ theme }) => theme.colors.primary60};
   font-feature-settings: 'liga' off;
   &:disabled {
     opacity: 0.5;
     cursor: default;
-  }
-
-  html.dark & {
-    color: #48D0DB;
   }
 `
 
@@ -491,9 +481,8 @@ const StackSub = styled.span<{ $color?: string; $size?: string }>`
 
 /* "Buy 20x" badge — positive60 / negative60 text per side, 12px Kanit
  * Regular. Sits inline with the leverage-tier indicator bars. */
-/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const SideLevText = styled.span<{ $up: boolean }>`
-  color: ${({ $up }) => ($up ? '#129E7D' : '#D8376C')};
+  color: ${({ $up, theme }) => ($up ? theme.colors.positive60 : theme.colors.negative60)};
   font-family: Kanit;
   font-size: 12px;
   font-weight: 400;
@@ -501,12 +490,7 @@ const SideLevText = styled.span<{ $up: boolean }>`
   letter-spacing: 0.12px;
   font-feature-settings: 'liga' off;
   white-space: nowrap;
-
-  html.dark & {
-    color: ${({ $up }) => ($up ? '#3DDBB5' : '#FFA3D0')};
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 /* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Per the
  * design (Figma 72:12995 / 72:13051), the leftmost bar is always
@@ -887,7 +871,6 @@ const HelpGlyph = () => (
  * when its label renders through a translator (e.g. localized "TP/SL"
  * variants) — the parent ActionCell otherwise lets each row's chip
  * shrink to its own content. */
-/* eslint-disable no-restricted-syntax -- TODO(design): need info-teal token in uikit */
 const TpSlChip = styled.button`
   display: inline-flex;
   align-items: center;
@@ -898,7 +881,7 @@ const TpSlChip = styled.button`
   border: 0;
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
   background: ${({ theme }) => theme.colors.tertiary};
-  color: #02919D;
+  color: ${({ theme }) => theme.colors.primary60};
   font-family: Kanit;
   font-size: 12px;
   font-weight: 600;
@@ -918,16 +901,10 @@ const TpSlChip = styled.button`
     opacity: 0.5;
     cursor: default;
   }
-
-  html.dark & {
-    color: #48D0DB;
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 /* Outlined Close button — Figma 72:13213. 2px primary stroke, no fill,
  * primary60 label. Same dimensions as TpSlChip so the pair lines up. */
-/* eslint-disable no-restricted-syntax -- TODO(design): need info-teal token in uikit */
 const CloseChip = styled.button`
   display: inline-flex;
   align-items: center;
@@ -936,7 +913,7 @@ const CloseChip = styled.button`
   border-radius: 8px;
   border: 2px solid ${({ theme }) => theme.colors.primary};
   background: transparent;
-  color: #02919D;
+  color: ${({ theme }) => theme.colors.primary60};
   font-family: Kanit;
   font-size: 12px;
   font-weight: 600;
@@ -952,12 +929,7 @@ const CloseChip = styled.button`
     opacity: 0.5;
     cursor: default;
   }
-
-  html.dark & {
-    color: #48D0DB;
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 /**
  * Bottom-panel tabs: Positions / Open Orders / History. Stateless apart

@@ -217,6 +217,33 @@ const config = defineConfig({
           text:   { value: { _light: lightColors.secondary, _dark: darkColors.secondary } },
         },
 
+        /* ── Pure-inverse pair (theme-flips between modes) ─── */
+        v2Inverse: { DEFAULT: { value: { _light: lightColors.v2Inverse, _dark: darkColors.v2Inverse } } },
+        v2Default: { DEFAULT: { value: { _light: lightColors.v2Default, _dark: darkColors.v2Default } } },
+
+        /* ── High-contrast inverse tooltip surface ──────────── */
+        tooltipInverseBg:   { DEFAULT: { value: { _light: lightColors.tooltipInverseBg,   _dark: darkColors.tooltipInverseBg } } },
+        tooltipInverseText: { DEFAULT: { value: { _light: lightColors.tooltipInverseText, _dark: darkColors.tooltipInverseText } } },
+
+        /* ── Long/Short label shade (≠ destructive60) ──────── */
+        negative60: { DEFAULT: { value: { _light: lightColors.negative60, _dark: darkColors.negative60 } } },
+
+        /* ── Subtle danger background (light=destructive10, dark differs) ── */
+        negativeSubtle: { DEFAULT: { value: { _light: lightColors.negativeSubtle, _dark: darkColors.negativeSubtle } } },
+
+        /* ── Wallet bucket chip (spot vs perp) ──────────────── */
+        walletChipSpotBg:     { DEFAULT: { value: { _light: lightColors.walletChipSpotBg,     _dark: darkColors.walletChipSpotBg } } },
+        walletChipSpotBorder: { DEFAULT: { value: { _light: lightColors.walletChipSpotBorder, _dark: darkColors.walletChipSpotBorder } } },
+        walletChipPerpBg:     { DEFAULT: { value: { _light: lightColors.walletChipPerpBg,     _dark: darkColors.walletChipPerpBg } } },
+        walletChipPerpBorder: { DEFAULT: { value: { _light: lightColors.walletChipPerpBorder, _dark: darkColors.walletChipPerpBorder } } },
+
+        /* ── Timeframe surface (WalletPanel) ────────────────── */
+        timeframeBg:     { DEFAULT: { value: { _light: lightColors.timeframeBg,     _dark: darkColors.timeframeBg } } },
+        timeframeBorder: { DEFAULT: { value: { _light: lightColors.timeframeBorder, _dark: darkColors.timeframeBorder } } },
+
+        /* ── Leverage-slider track (SimpleBetPanel) ─────────── */
+        levTrackBg: { DEFAULT: { value: { _light: lightColors.levTrackBg, _dark: darkColors.levTrackBg } } },
+
         /* ── Card header backgrounds ─────────────────────── */
         cardHeader: {
           DEFAULT:   { value: { _light: lightColors.gradientCardHeader, _dark: darkColors.gradientCardHeader } },
@@ -244,6 +271,9 @@ const config = defineConfig({
         'glow-long':  { value: shadows.success },
         'glow-short': { value: shadows.danger },
         'glow-focus': { value: shadows.focus },
+        /* Bottom-edge inset for sunken surfaces (LevTrack, TfRoot). Heavier in dark. */
+        sunken:       { value: { _light: '0 2px 0 -1px rgba(0, 0, 0, 0.06) inset', _dark: '0 2px 0 -1px rgba(0, 0, 0, 0.16) inset' } },
+        sunkenStrong: { value: { _light: '0 2px 0 0 rgba(0, 0, 0, 0.06) inset',     _dark: '0 2px 0 0 rgba(0, 0, 0, 0.16) inset' } },
       },
     },
   },

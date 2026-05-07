@@ -10,9 +10,9 @@ import { styled } from 'styled-components'
  */
 /**
  * High-contrast tooltip — dark surface in light mode, light surface in
- * dark mode (per Figma 391:39212-style direction). Color swap is keyed
- * on the `html.dark` class set by Storybook's theme toolbar / consumer
- * theme switcher.
+ * dark mode (per Figma 391:39212-style direction). Theme-flip is driven
+ * by the `tooltipInverse*` semantic tokens (CSS vars), so styled-components
+ * does not need to know about the dark class.
  */
 export const StyledTooltipContent = styled(Popover.Content)<{ $oneLine?: boolean }>`
   display: flex;
@@ -24,8 +24,8 @@ export const StyledTooltipContent = styled(Popover.Content)<{ $oneLine?: boolean
   align-items: center;
   border-radius: 16px;
   z-index: 101;
-  background: #08060B;
-  color: #FFFFFF;
+  background: ${({ theme }) => theme.colors.tooltipInverseBg};
+  color: ${({ theme }) => theme.colors.tooltipInverseText};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
@@ -38,20 +38,11 @@ export const StyledTooltipContent = styled(Popover.Content)<{ $oneLine?: boolean
   word-wrap: break-word;
   white-space: ${({ $oneLine }) => ($oneLine ? 'nowrap' : 'normal')};
 
-  html.dark & {
-    background: #FFFFFF;
-    color: #08060B;
-  }
-
   & > * {
     align-self: ${({ $oneLine }) => ($oneLine ? 'auto' : 'stretch')};
   }
 `
 
 export const StyledTooltipArrow = styled(Popover.Arrow)`
-  fill: #08060B;
-
-  html.dark & {
-    fill: #FFFFFF;
-  }
+  fill: ${({ theme }) => theme.colors.tooltipInverseBg};
 `

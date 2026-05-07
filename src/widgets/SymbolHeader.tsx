@@ -249,7 +249,6 @@ const FundingTipAnchor = styled.span`
   display: inline-flex;
 `
 
-// eslint-disable-next-line no-restricted-syntax -- overlay scrim, intentional always-dark/always-light
 const FundingTipBubble = styled.div`
   position: fixed;
   transform: translateX(-50%);
@@ -261,8 +260,8 @@ const FundingTipBubble = styled.div`
   align-items: stretch;
   gap: 8px;
   border-radius: 16px;
-  background: #08060B;
-  color: #FFF;
+  background: ${({ theme }) => theme.colors.tooltipInverseBg};
+  color: ${({ theme }) => theme.colors.tooltipInverseText};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
@@ -275,14 +274,6 @@ const FundingTipBubble = styled.div`
   pointer-events: none;
   z-index: 100;
   white-space: normal;
-
-  html.dark & {
-    background: #FFF;
-    color: #000;
-    box-shadow:
-      0 1px 2px 0 rgba(0, 0, 0, 0.16),
-      0 4px 8px 0 rgba(0, 0, 0, 0.32);
-  }
 `
 
 const FundingTipRow = styled.div`
@@ -414,6 +405,7 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   const theme = useTheme()
   // 1Hz re-render so the funding countdown ticks every second even when
   // the upstream `@markPrice@1s` WS frame slows or stalls. PAN-11804.
+  // eslint-disable-next-line react-hooks/purity -- intentional: re-check active state each render so the tick stops once the deadline passes
   useTick(nextFundingTime !== undefined && nextFundingTime > Date.now())
   // Controlled when the consumer provides `marketsOpen`; otherwise fall
   // back to local state so existing call sites (no controlled prop) keep

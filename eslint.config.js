@@ -15,6 +15,12 @@ const HEX_RE = '/#[0-9A-Fa-f]{8}\\b|#[0-9A-Fa-f]{6}\\b|#[0-9A-Fa-f]{4}\\b|#[0-9A
 const HEX_MSG =
   'Hardcoded hex color — use theme.colors.* tokens. For brand-semantic exceptions: // eslint-disable-next-line no-restricted-syntax -- <reason>'
 
+// AST selector regex for `html.dark` selector inside CSS-in-JS strings.
+// Matches `html.dark` and any leading-whitespace prefix.
+const HTML_DARK_RE = '/html\\.dark/'
+const HTML_DARK_MSG =
+  'Do not key styles on `html.dark`. Use a theme-aware token (theme.colors.* or theme.shadows.*) — CSS vars auto-flip between light/dark. If a token is missing, add a semantic token in src/design-system/theme.ts.'
+
 const noHardcodedHexRules = {
   'no-restricted-syntax': [
     'error',
@@ -129,6 +135,36 @@ const noHardcodedHexRules = {
       selector: `JSXAttribute[name.name='stroke'] > Literal[value=${HEX_RE}]`,
       message: HEX_MSG,
     },
+    // ───── html.dark selector inside styled-components / css template strings ─────
+    // styled.X`... html.dark & {...} ...`
+    {
+      selector: `TaggedTemplateExpression[tag.object.name='styled'] TemplateElement[value.raw=${HTML_DARK_RE}]`,
+      message: HTML_DARK_MSG,
+    },
+    {
+      selector: `TaggedTemplateExpression[tag.callee.name='styled'] TemplateElement[value.raw=${HTML_DARK_RE}]`,
+      message: HTML_DARK_MSG,
+    },
+    {
+      selector: `TaggedTemplateExpression[tag.callee.object.object.name='styled'] TemplateElement[value.raw=${HTML_DARK_RE}]`,
+      message: HTML_DARK_MSG,
+    },
+    {
+      selector: `TaggedTemplateExpression[tag.callee.object.callee.name='styled'] TemplateElement[value.raw=${HTML_DARK_RE}]`,
+      message: HTML_DARK_MSG,
+    },
+    {
+      selector: `TaggedTemplateExpression[tag.name='css'] TemplateElement[value.raw=${HTML_DARK_RE}]`,
+      message: HTML_DARK_MSG,
+    },
+    {
+      selector: `TaggedTemplateExpression[tag.name='createGlobalStyle'] TemplateElement[value.raw=${HTML_DARK_RE}]`,
+      message: HTML_DARK_MSG,
+    },
+    {
+      selector: `TaggedTemplateExpression[tag.name='keyframes'] TemplateElement[value.raw=${HTML_DARK_RE}]`,
+      message: HTML_DARK_MSG,
+    },
   ],
 }
 
@@ -145,6 +181,21 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+    rules: {
+      // Allow `_`-prefixed identifiers to be intentionally unused — common
+      // convention for "extracted from props but not consumed here" or
+      // "placeholder positional arg".
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
   // Forbid hardcoded hex color literals in widget / primitive source.

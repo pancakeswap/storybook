@@ -293,6 +293,18 @@ All in `src/primitives/`:
 - Use CSS variables for colors — they auto-switch with light/dark.
 - Use `useTheme()` only when you need the theme value in JS (e.g. chart colors).
 
+### Never key styles on `html.dark`
+
+Theme switching is driven by Chakra semantic tokens that emit CSS variables (`--pcs-colors-*`). Reference those via `theme.colors.*` / `theme.shadows.*` — they auto-flip between light and dark. Do **not** add `html.dark &` selectors inside styled-components or `css` strings; that pattern hardcodes a hex per mode and bypasses the token layer.
+
+If you need a value that doesn't have a token yet:
+
+1. Add a `_light` / `_dark` pair to `src/design-system/tokens.ts` (`lightColors` + `darkColors`).
+2. Surface it as a `semanticTokens.colors` or `.shadows` entry in `src/design-system/theme.ts`.
+3. Expose it on `pcsTheme` in `src/primitives/theme.ts` so styled-components can read it via `theme.colors.<name>`.
+
+The ESLint rule `no-restricted-syntax` flags `html.dark` inside any styled-components / `css` / `keyframes` / `createGlobalStyle` template literal — fix the underlying token rather than disabling the rule.
+
 ---
 
 ## Storybook Structure

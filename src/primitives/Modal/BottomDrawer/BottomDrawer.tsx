@@ -6,6 +6,7 @@ import { ModalV2 } from "../ModalV2";
 import { ModalCloseButton } from "../styles";
 import { DrawerContainer } from "./styles";
 
+// eslint-disable-next-line react-refresh/only-export-components -- styled-component sibling export, intentional
 export const TopBar = styled.div`
   position: absolute;
   top: 16px;
@@ -14,15 +15,9 @@ export const TopBar = styled.div`
   height: 4px;
   border-radius: 9999px;
   /* PCS v2-expanded "inverse" — black in light mode, white in dark — at
-     10% opacity. Hardcoded because the v2Inverse token isn't exposed
-     through the styled-components theme; fallback was transparent and
-     made the grabber invisible. */
-  background: #000;
+     10% opacity. */
+  background: ${({ theme }) => theme.colors.v2Inverse};
   opacity: 0.1;
-
-  html.dark & {
-    background: #FFF;
-  }
 `;
 
 interface BottomDrawerProps {

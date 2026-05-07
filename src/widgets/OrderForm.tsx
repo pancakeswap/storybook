@@ -215,7 +215,6 @@ const SideToggleWrap = styled(SideToggle)`
   }
 `
 
-/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const SideButton = styled.button<{ $active: boolean; $side: OrderSide }>`
   position: relative;
   z-index: 1;
@@ -229,7 +228,7 @@ const SideButton = styled.button<{ $active: boolean; $side: OrderSide }>`
   border: 0;
   border-radius: 12px;
   background: transparent;
-  color: ${({ $active, theme }) => ($active ? '#FFF' : theme.colors.textSubtle)};
+  color: ${({ $active, theme }) => ($active ? theme.colors.v2Default : theme.colors.textSubtle)};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 16px;
@@ -238,12 +237,7 @@ const SideButton = styled.button<{ $active: boolean; $side: OrderSide }>`
   line-height: 150%;
   cursor: pointer;
   transition: color 0.25s ease;
-
-  html.dark & {
-    color: ${({ $active, theme }) => ($active ? '#000' : theme.colors.textSubtle)};
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 /* eslint-disable no-restricted-syntax -- TODO(design): need info-teal token in uikit */
 const ModeButton = styled.button`
@@ -391,7 +385,6 @@ const DashedLabel = styled.span`
  * Shadow strengthens from light to dark to keep readable elevation
  * against the darker page bg.
  */
-// eslint-disable-next-line no-restricted-syntax -- overlay scrim, intentional always-dark/always-light
 const ReduceOnlyTooltip = styled.div`
   position: absolute;
   bottom: calc(100% + 8px);
@@ -405,8 +398,8 @@ const ReduceOnlyTooltip = styled.div`
   align-items: stretch;
   gap: 8px;
   border-radius: 16px;
-  background: #08060B;
-  color: #FFF;
+  background: ${({ theme }) => theme.colors.tooltipInverseBg};
+  color: ${({ theme }) => theme.colors.tooltipInverseText};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 14px;
@@ -434,18 +427,7 @@ const ReduceOnlyTooltip = styled.div`
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
     border-top: 8px solid currentColor;
-    color: #08060B;
-  }
-
-  html.dark & {
-    background: #FFF;
-    color: #000;
-    box-shadow:
-      0 1px 2px 0 rgba(0, 0, 0, 0.08),
-      0 4px 8px 0 rgba(0, 0, 0, 0.16);
-    &::after {
-      color: #FFF;
-    }
+    color: ${({ theme }) => theme.colors.tooltipInverseBg};
   }
 `
 
@@ -1189,7 +1171,6 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
   // into the mobile breakpoint. Same pattern as Modal / MotionModal —
   // consumer doesn't pass any flag.
   const { isMobile } = useMatchBreakpoints()
-  if (isMobile) return <MobileOrderForm {...props} />
 
   const {
     baseAsset,
@@ -1327,6 +1308,8 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
   }, [stopMenuOpen])
+
+  if (isMobile) return <MobileOrderForm {...props} />
 
   const stopTabActive = isStopOrder
   const stopTabLabel =

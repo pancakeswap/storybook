@@ -3,7 +3,6 @@ import { keyframes, styled } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
-import { AddIcon, WalletFilledIcon } from '../primitives/Icons'
 import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel } from './primitives'
 
@@ -39,7 +38,20 @@ export interface SimpleBetPanelProps {
    */
   betError?: string
   leverage: number
+  /**
+   * Fired once per user gesture: a click on the bar, a drag-release on
+   * the slider, a keyboard arrow press, a preset-tab click, or a custom
+   * input edit. While the user is dragging the thumb, this is NOT
+   * fired — only the drop commits — so the consumer's signed
+   * `/fapi/v3/leverage` call runs once per drag, not once per tick.
+   */
   onLeverageChange: (next: number) => void
+  /**
+   * When true, the slider + preset tabs + custom input are all disabled
+   * to prevent overlapping `/fapi/v3/leverage` calls. The consumer flips
+   * this on while a leverage commit is in flight (PAN-11823).
+   */
+  isApplyingLeverage?: boolean
   /**
    * Per-symbol max leverage. Aster's `/fapi/v1/leverageBracket` defines
    * tier caps per market, so this must be configurable. Defaults to the
@@ -160,12 +172,6 @@ const DownArrow: React.FC = () => (
     />
   </svg>
 )
-const TriangleUp: React.FC = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-    <path d="M6 2l5 8H1z" />
-  </svg>
-)
-
 const InfoCircleGlyph: React.FC = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ aspectRatio: '1 / 1' }}>
     <path
@@ -296,70 +302,6 @@ const TopCardInner = styled.div`
   align-self: stretch;
   flex: 0 0 auto;
   gap: 64px;
-`
-
-// Symbol header strip
-const Head = styled(Flex)`
-  padding: 16px 20px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
-`
-
-const HeadLeft = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  font-family: inherit;
-  color: ${({ theme }) => theme.colors.text};
-`
-
-// eslint-disable-next-line no-restricted-syntax -- brand SVG illustration + on colored bg, contrast guarantee
-const TokenChip = styled.span`
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: #f7931a;
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  flex-shrink: 0;
-`
-
-const Pair = styled.span`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  padding: 0 6px;
-`
-
-const HeadRight = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-`
-
-const HeadPrice = styled.span`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  line-height: 1.2;
-`
-
-const HeadPnl = styled.span<{ $positive: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 12px;
-  color: ${({ theme, $positive }) => ($positive ? theme.colors.success : theme.colors.failure)};
 `
 
 // Body
@@ -645,11 +587,6 @@ const AssetItemChip = styled.span<{ $color?: string }>`
 `
 /* eslint-enable no-restricted-syntax */
 
-const QuoteSym = styled.span`
-  font-size: 14px;
-  font-weight: 600;
-`
-
 // % shortcut row
 const PctRow = styled(Flex)`
   display: flex;
@@ -722,13 +659,12 @@ const ZonePill = styled.span<{ $zone: Zone }>`
   background: ${({ $zone }) => ZONE_BG[$zone]};
 `
 
-// eslint-disable-next-line no-restricted-syntax -- on colored bg, contrast guarantee
 const ZonePillText = styled.span`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  color: #FFF;
+  color: ${({ theme }) => theme.colors.v2Default};
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -736,22 +672,13 @@ const ZonePillText = styled.span`
   font-style: normal;
   font-weight: 400;
   line-height: 150%;
-
-  html.dark & {
-    color: #000;
-  }
 `
 
-// eslint-disable-next-line no-restricted-syntax -- on colored bg, contrast guarantee
 const ZoneTipAnchor = styled.span`
   display: inline-flex;
   align-items: center;
-  color: #FFF;
+  color: ${({ theme }) => theme.colors.v2Default};
   cursor: help;
-
-  html.dark & {
-    color: #000;
-  }
 `
 
 // Hand-rolled leverage slider (the Slider primitive can't do a per-zone
@@ -765,7 +692,8 @@ const LevBar = styled.div`
   margin-top: 8px;
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): replace with color-mix or new token */
+/* PCS V1 decorative bubblegum-light gradient flips between modes via the
+   levTrackBg semantic token (light pastel → dark deep-purple). */
 const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   position: relative;
   height: 21px;
@@ -773,25 +701,21 @@ const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   align-self: stretch;
   border-radius: 24px;
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
-  background: linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%);
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.06) inset;
+  background: ${({ theme }) => theme.colors.levTrackBg};
+  box-shadow: ${({ theme }) => theme.shadows.sunkenStrong};
   overflow: visible;
+  cursor: pointer;
+  touch-action: none;
 
-  /* PCS V1 decorative bubblegum-light gradient + heavier inset shadow
-     in dark mode, per the design spec. The gradient flips from the
-     light pastel (#E5FDFF → #F3EFFF) to the dark variants
-     (#121621 → #160F1E), and the inset opacity bumps 0.06 → 0.16 so
-     the depth stays readable on the darker surface. */
-  html.dark & {
-    background: linear-gradient(140deg, #121621 0%, #160F1E 100%);
-    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.16) inset;
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   @media (min-width: 968px) and (max-width: 1199.98px) {
     height: 16px;
   }
 `
-/* eslint-enable no-restricted-syntax */
 
 const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' | 'triple' }>`
   position: absolute;
@@ -806,14 +730,10 @@ const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' |
     $variant === 'triple' ? '44px' : $variant === 'double' ? '41.455px' : '38.004px'};
   height: ${({ $variant }) =>
     $variant === 'triple' ? '48px' : $variant === 'double' ? '42.549px' : '38.186px'};
-  /* Sits above LevRangeInput so dragging the thumb is captured by our
-     pointer handler instead of falling through to the native input
-     (which maps click X→value and would snap to 1 at low leverage). */
+  /* Purely visual — every gesture is captured by the LevTrack pointer
+     handler, which decides whether the user is clicking or dragging. */
   z-index: 2;
-  pointer-events: auto;
-  touch-action: none;
-  cursor: grab;
-  &:active { cursor: grabbing; }
+  pointer-events: none;
 `
 
 /* eslint-disable no-restricted-syntax -- brand SVG illustration */
@@ -854,8 +774,10 @@ const LevRangeInput = styled.input`
   width: 100%;
   height: calc(100% + 8px);
   opacity: 0;
-  cursor: pointer;
   margin: 0;
+  /* Mouse/touch is owned by LevTrack's pointer handler — keep this
+     element only for keyboard a11y (screen readers + Tab/arrow keys). */
+  pointer-events: none;
 `
 
 // Leverage tab row (preset values + custom field)
@@ -887,8 +809,12 @@ const LevTab = styled.button<{ $active: boolean }>`
   font-size: 13px;
   font-weight: ${({ $active }) => ($active ? 600 : 400)};
   cursor: pointer;
-  &:hover {
+  &:hover:not(:disabled) {
     color: ${({ $active, theme }) => ($active ? theme.colors.invertedContrast : theme.colors.text)};
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 `
 
@@ -932,15 +858,6 @@ const LevCustomSuffix = styled.span`
   color: ${({ theme }) => theme.colors.textSubtle};
   border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
   padding-left: 4px;
-`
-
-// Stats summary
-const StatsCard = styled.div`
-  margin: 0 20px;
-  background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 16px;
-  overflow: hidden;
 `
 
 /**
@@ -1005,7 +922,6 @@ const StatsValue = styled.span<{ $danger?: boolean }>`
 `
 
 // UP / DOWN buttons
-/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
   display: flex;
   padding: 8px;
@@ -1029,14 +945,11 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
   line-height: 150%;
   letter-spacing: -0.24px;
   font-feature-settings: 'liga' off;
-  color: #FFF;
+  color: ${({ theme }) => theme.colors.v2Default};
   cursor: pointer;
   transition: filter 0.12s, transform 0.06s;
   background: ${({ theme, $variant }) => ($variant === 'up' ? theme.colors.success : theme.colors.failure)};
 
-  html.dark & {
-    color: #000;
-  }
   &:hover:not(:disabled) {
     filter: brightness(1.08);
   }
@@ -1050,12 +963,7 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
     color: ${({ theme }) => theme.colors.textDisabled};
     border-color: transparent;
   }
-
-  html.dark &:disabled {
-    color: ${({ theme }) => theme.colors.textDisabled};
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 const DirectionButtonContent = styled.span`
   display: flex;
@@ -1263,16 +1171,17 @@ const BetAssetSelector: React.FC<BetAssetSelectorProps> = ({
 
 export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   symbol,
-  baseAsset,
+  baseAsset: _baseAsset,
   pair,
-  price,
-  pricePnlPct,
-  onSymbolClick,
+  price: _price,
+  pricePnlPct: _pricePnlPct,
+  onSymbolClick: _onSymbolClick,
   bet,
   onBetChange,
   betError,
   leverage,
   onLeverageChange,
+  isApplyingLeverage = false,
   maxLeverage = DEFAULT_MAX_LEVERAGE,
   presets = DEFAULT_PRESETS,
   quoteAsset,
@@ -1297,10 +1206,16 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   onConnectWallet,
   unrealizedPnl,
 }) => {
-  const fillPct = Math.min(100, Math.max(0, (leverage / maxLeverage) * 100))
-  const zone = zoneFromLeverage(leverage)
-  const degen = isDegen(leverage)
-  const double = isDouble(leverage)
+  // While the thumb is being dragged we render the visual at `dragValue`
+  // and skip propagating to the consumer — only the drop commits. This
+  // gives a snappy local UI without firing one signed `/fapi/v3/leverage`
+  // call per pointermove tick (PAN-11823).
+  const [dragValue, setDragValue] = React.useState<number | null>(null)
+  const displayLeverage = dragValue ?? leverage
+  const fillPct = Math.min(100, Math.max(0, (displayLeverage / maxLeverage) * 100))
+  const zone = zoneFromLeverage(displayLeverage)
+  const degen = isDegen(displayLeverage)
+  const double = isDouble(displayLeverage)
   const submitting = isSubmittingUp || isSubmittingDown
   const upDisabled = !canSubmit || submitting
   const downDisabled = !canSubmit || submitting
@@ -1311,39 +1226,55 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   const zoneTipText = zoneTooltip(zone)
   const { targetRef: zoneTipTargetRef, tooltip: zoneTipNode } = useTooltip(zoneTipText, { placement: 'top' })
 
-  // Custom thumb-drag handler. The native range input below the thumb
-  // maps the click X coordinate to a value, so when the visual thumb
-  // sits at fillPct≈1% (low leverage), clicking it lands the click at
-  // the track's left edge → value=1. We intercept pointer-down on the
-  // thumb itself, capture the pointer, and translate motion deltas
-  // into leverage values so the gesture starts at the current value
-  // rather than where the thumb happened to be drawn.
+  // Single pointer handler for the whole track — handles both clicks
+  // (commit immediately at the click point) and thumb drags (preview
+  // during pointermove, commit on pointerup). The native range input
+  // and the visual thumb both have `pointer-events: none` so every
+  // gesture lands here. While `isApplyingLeverage` is true (a previous
+  // commit's signed call is still in flight) we ignore new gestures
+  // outright — the LevTab/LevCustomInput are also `disabled`.
   const trackRef = React.useRef<HTMLDivElement | null>(null)
-  const onThumbPointerDown = React.useCallback(
-    (e: React.PointerEvent<HTMLSpanElement>) => {
-      e.preventDefault()
-      e.stopPropagation()
-      const target = e.currentTarget
+  const onTrackPointerDown = React.useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (isApplyingLeverage) return
       const track = trackRef.current
       if (!track) return
-      target.setPointerCapture(e.pointerId)
-      const trackRect = track.getBoundingClientRect()
+      e.preventDefault()
+      const rect = track.getBoundingClientRect()
       const compute = (clientX: number) => {
-        const pct = Math.max(0, Math.min(1, (clientX - trackRect.left) / trackRect.width))
+        const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
         const next = Math.round(1 + pct * (maxLeverage - 1))
         return Math.max(1, Math.min(maxLeverage, next))
       }
-      const onMove = (ev: PointerEvent) => onLeverageChange(compute(ev.clientX))
-      const onUp = () => {
-        target.removeEventListener('pointermove', onMove)
-        target.removeEventListener('pointerup', onUp)
-        target.removeEventListener('pointercancel', onUp)
+      track.setPointerCapture(e.pointerId)
+      let last = compute(e.clientX)
+      setDragValue(last)
+      const cleanup = () => {
+        track.removeEventListener('pointermove', onMove)
+        track.removeEventListener('pointerup', onPointerUp)
+        track.removeEventListener('pointercancel', onCancel)
       }
-      target.addEventListener('pointermove', onMove)
-      target.addEventListener('pointerup', onUp)
-      target.addEventListener('pointercancel', onUp)
+      const onMove = (ev: PointerEvent) => {
+        last = compute(ev.clientX)
+        setDragValue(last)
+      }
+      const onPointerUp = () => {
+        cleanup()
+        setDragValue(null)
+        // Skip the commit when the user clicked exactly where the thumb
+        // already sat — otherwise a benign click would still trigger
+        // a redundant signed call.
+        if (last !== leverage) onLeverageChange(last)
+      }
+      const onCancel = () => {
+        cleanup()
+        setDragValue(null)
+      }
+      track.addEventListener('pointermove', onMove)
+      track.addEventListener('pointerup', onPointerUp)
+      track.addEventListener('pointercancel', onCancel)
     },
-    [maxLeverage, onLeverageChange],
+    [isApplyingLeverage, leverage, maxLeverage, onLeverageChange],
   )
 
   return (
@@ -1424,21 +1355,31 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           </LevRow>
 
           <LevBar>
-          <LevTrack ref={trackRef} $fillPct={fillPct} $zone={zone} aria-hidden>
-            {/* Native input below the thumb still handles clicks on the
-                rest of the track + keyboard interaction. */}
+          <LevTrack
+            ref={trackRef}
+            $fillPct={fillPct}
+            $zone={zone}
+            aria-hidden
+            aria-disabled={isApplyingLeverage || undefined}
+            onPointerDown={onTrackPointerDown}
+          >
+            {/* Native range input is kept ONLY for keyboard a11y — its
+                `pointer-events: none` means every mouse/touch gesture is
+                handled by the track's pointer handler instead. Disabled
+                while a commit is in flight so arrow keys don't queue up
+                a second signed call. */}
             <LevRangeInput
               type="range"
               min={1}
               max={maxLeverage}
-              value={leverage}
+              value={displayLeverage}
+              disabled={isApplyingLeverage}
               onChange={(e) => onLeverageChange(Number(e.target.value))}
               aria-label="Leverage"
             />
             <LevThumb
               $fillPct={fillPct}
               $variant={degen ? 'triple' : double ? 'double' : 'single'}
-              onPointerDown={onThumbPointerDown}
             >
               {degen ? (
                 <GrabberDegenGlyph />
@@ -1457,6 +1398,7 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                 min={1}
                 max={maxLeverage}
                 value={leverage}
+                disabled={isApplyingLeverage}
                 onChange={(e) =>
                   onLeverageChange(Math.max(1, Math.min(maxLeverage, Number(e.target.value) || 1)))
                 }
@@ -1471,6 +1413,7 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                 role="tab"
                 aria-selected={leverage === p}
                 $active={leverage === p}
+                disabled={isApplyingLeverage}
                 onClick={() => onLeverageChange(p)}
               >
                 {p}x

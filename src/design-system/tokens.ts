@@ -299,6 +299,27 @@ export const lightColors = {
 
   bubblegum: '#F3EFFF',
 
+  /* ── PnL / Long-Short shades (slightly differ from positive/destructive) ── */
+  negative60:     '#D8376C',
+  negativeSubtle: '#FFF0F9',
+
+  /* ── High-contrast inverse tooltip surface (dark bg in light mode) ── */
+  tooltipInverseBg:   '#08060B',
+  tooltipInverseText: '#FFFFFF',
+
+  /* ── Wallet bucket chip (spot vs perp) ── */
+  walletChipSpotBg:     '#EEEAF4',
+  walletChipSpotBorder: '#D7CAEC',
+  walletChipPerpBg:     '#F4FAFB',
+  walletChipPerpBorder: '#C2D8DB',
+
+  /* ── Timeframe panel surface (WalletPanel) ── */
+  timeframeBg:     '#EEEAF4',
+  timeframeBorder: '#D7CAEC',
+
+  /* ── Leverage-slider track (SimpleBetPanel LevTrack) ── */
+  levTrackBg: 'linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%)',
+
   gradientPrimary:         'linear-gradient(228.54deg, #1FC7D4 -13.69%, #7645D9 91.33%)',
   gradientBubblegum:       'linear-gradient(139.73deg, #E5FDFF 0%, #F3EFFF 100%)',
   gradientInverseBubblegum:'linear-gradient(139.73deg, #F3EFFF 0%, #E5FDFF 100%)',
@@ -380,6 +401,27 @@ export const darkColors = {
   warning60: '#D67E0A',
 
   bubblegum: '#160F1E',
+
+  /* ── PnL / Long-Short shades (slightly differ from positive/destructive) ── */
+  negative60:     '#FFA3D0',
+  negativeSubtle: '#3E1C39',
+
+  /* ── High-contrast inverse tooltip surface (light bg in dark mode) ── */
+  tooltipInverseBg:   '#FFFFFF',
+  tooltipInverseText: '#08060B',
+
+  /* ── Wallet bucket chip (spot vs perp) ── */
+  walletChipSpotBg:     '#27252B',
+  walletChipSpotBorder: '#55496E',
+  walletChipPerpBg:     '#223537',
+  walletChipPerpBorder: '#575775',
+
+  /* ── Timeframe panel surface (WalletPanel) ── */
+  timeframeBg:     '#372F47',
+  timeframeBorder: '#55496E',
+
+  /* ── Leverage-slider track (SimpleBetPanel LevTrack) ── */
+  levTrackBg: 'linear-gradient(140deg, #121621 0%, #160F1E 100%)',
 
   gradientPrimary:         'linear-gradient(228.54deg, #1FC7D4 -13.69%, #9A6AFF 91.33%)',
   gradientBubblegum:       'linear-gradient(139.73deg, #313D5C 0%, #3D2A54 100%)',

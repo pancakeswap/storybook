@@ -280,7 +280,6 @@ const Price = styled.span`
   }
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): replace with color-mix or new token */
 const Pnl = styled.span<{ $positive: boolean }>`
   display: flex;
   padding: 0 6px;
@@ -288,19 +287,14 @@ const Pnl = styled.span<{ $positive: boolean }>`
   align-items: center;
   gap: 2px;
   border-radius: 999px;
-  background: ${({ $positive }) => ($positive ? '#EAFBF7' : '#FFF0F9')};
+  background: ${({ $positive, theme }) => ($positive ? theme.colors.positive10 : theme.colors.negativeSubtle)};
   font-size: 16px;
   color: ${({ theme }) => theme.colors.text};
-
-  html.dark & {
-    background: ${({ $positive }) => ($positive ? '#0C3A32' : '#3E1C39')};
-  }
 
   @media (max-width: 967.98px) {
     display: none;
   }
 `
-/* eslint-enable no-restricted-syntax */
 
 /* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const PnlTriangle = styled.span<{ $positive: boolean }>`

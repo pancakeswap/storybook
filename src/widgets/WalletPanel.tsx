@@ -299,7 +299,6 @@ const BnbDiamond = ({ size = 16 }: { size?: number }) => (
 
 /* Bucket icon chips — 36×36 rounded squares with a single emoji glyph
    inside. Replaces the previous raster wallet.png / perps-chart.png. */
-/* eslint-disable no-restricted-syntax -- TODO(design): perps-variant tokens */
 const BucketIconChip = styled.span<{ $variant: 'spot' | 'perp' }>`
   display: flex;
   width: 36px;
@@ -308,22 +307,18 @@ const BucketIconChip = styled.span<{ $variant: 'spot' | 'perp' }>`
   align-items: center;
   border-radius: 12px;
   border: 1px solid
-    ${({ $variant }) => ($variant === 'spot' ? '#D7CAEC' : '#C2D8DB')};
-  background: ${({ $variant }) => ($variant === 'spot' ? '#EEEAF4' : '#F4FAFB')};
-  color: #000;
+    ${({ $variant, theme }) =>
+      $variant === 'spot' ? theme.colors.walletChipSpotBorder : theme.colors.walletChipPerpBorder};
+  background: ${({ $variant, theme }) =>
+    $variant === 'spot' ? theme.colors.walletChipSpotBg : theme.colors.walletChipPerpBg};
+  color: ${({ theme }) => theme.colors.text};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 24px;
   font-style: normal;
   font-weight: 600;
   line-height: 150%;
-
-  html.dark & {
-    border-color: ${({ $variant }) => ($variant === 'spot' ? '#55496E' : '#575775')};
-    background: ${({ $variant }) => ($variant === 'spot' ? '#27252B' : '#223537')};
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 const SpotWalletGlyph = () => (
   <BucketIconChip $variant="spot" aria-hidden>
@@ -538,22 +533,15 @@ const HeroTitle = styled.span`
   letter-spacing: -0.2px;
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): missing dark/light counterpart */
 const TfRoot = styled.div<{ $muted?: boolean }>`
   display: flex;
   align-items: flex-start;
   gap: 2px;
   border-radius: 16px;
-  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
-  background: ${({ theme }) => theme.colors.input};
-  box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  border: 1px solid ${({ theme }) => theme.colors.timeframeBorder};
+  background: ${({ theme }) => theme.colors.timeframeBg};
+  box-shadow: ${({ theme }) => theme.shadows.sunken};
   opacity: ${({ $muted }) => ($muted ? 0.6 : 1)};
-
-  html.dark & {
-    border-color: #55496E;
-    background: #372F47;
-    box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.16) inset;
-  }
 `
 
 const TfButton = styled.button<{ $active: boolean }>`
@@ -562,7 +550,7 @@ const TfButton = styled.button<{ $active: boolean }>`
   align-items: center;
   border: 0;
   background: ${({ $active, theme }) => ($active ? theme.colors.textSubtle : 'transparent')};
-  color: ${({ $active, theme }) => ($active ? '#fff' : theme.colors.textSubtle)};
+  color: ${({ $active, theme }) => ($active ? theme.colors.v2Default : theme.colors.textSubtle)};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 16px;
@@ -574,21 +562,7 @@ const TfButton = styled.button<{ $active: boolean }>`
   cursor: pointer;
   min-width: 40px;
   transition: background 0.16s, color 0.16s;
-
-  html.dark & {
-    ${({ $active }) =>
-      $active
-        ? css`
-            width: 47px;
-            padding: 4px;
-            background: #B8ADD2;
-            color: #000;
-            min-width: 0;
-          `
-        : ''}
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 const HeroAmountRow = styled(Flex)`
   align-items: center;

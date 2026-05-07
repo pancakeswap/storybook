@@ -41,6 +41,7 @@ const TIER_IMAGES: Record<SharePnlTier, string> = {
 
 /** Map a signed ROE% (e.g. 24.78 for +24.78%) to its bucket. The
  *  thresholds match the eight Figma frames the design team supplied. */
+// eslint-disable-next-line react-refresh/only-export-components -- helper colocated with widget
 export const tierFromPnlPct = (pnlPct: number): SharePnlTier => {
   if (pnlPct >= 75) return 'gain-above-75'
   if (pnlPct >= 25) return 'gain-25-75'
@@ -189,7 +190,6 @@ const Actions = styled.div`
 `
 
 /* "Copy image" — outlined primary, primary60 text. */
-/* eslint-disable no-restricted-syntax -- TODO(design): need info-teal token in uikit */
 const CopyBtn = styled.button`
   display: inline-flex;
   align-items: center;
@@ -204,7 +204,7 @@ const CopyBtn = styled.button`
   font-size: 16px;
   font-weight: 600;
   line-height: 1.5;
-  color: #02919D;
+  color: ${({ theme }) => theme.colors.primary60};
   cursor: pointer;
   transition: opacity 0.12s, background 0.12s;
 
@@ -215,12 +215,7 @@ const CopyBtn = styled.button`
     opacity: 0.5;
     cursor: default;
   }
-
-  html.dark & {
-    color: #48D0DB;
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 /* "share on X" — filled primary with the 2px bottom-inset shadow the
  * design system uses on filled CTAs. */

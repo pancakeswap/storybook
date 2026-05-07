@@ -275,12 +275,11 @@ const TabletPositionSymbol = styled.span`
   line-height: 150%;
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const TabletPositionDirection = styled.span<{ $direction: SimplePositionDirection }>`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: ${({ $direction }) => ($direction === 'up' ? '#129E7D' : '#ED4B9E')};
+  color: ${({ $direction, theme }) => ($direction === 'up' ? theme.colors.positive60 : theme.colors.failure)};
   font-feature-settings: 'liga' off;
   font-family: Kanit;
   font-size: 12px;
@@ -288,15 +287,11 @@ const TabletPositionDirection = styled.span<{ $direction: SimplePositionDirectio
   line-height: 150%;
   letter-spacing: 0.24px;
   text-transform: uppercase;
-
-  html.dark & {
-    color: ${({ $direction }) => ($direction === 'up' ? '#3DDBB5' : '#ED4B9E')};
-  }
 `
 
 const TabletPositionPnl = styled.span<{ $sign: 'positive' | 'negative' | 'zero' }>`
   color: ${({ $sign, theme }) =>
-    $sign === 'positive' ? '#129E7D' : $sign === 'negative' ? '#ED4B9E' : theme.colors.text};
+    $sign === 'positive' ? theme.colors.positive60 : $sign === 'negative' ? theme.colors.failure : theme.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
   font-family: Kanit;
@@ -305,13 +300,7 @@ const TabletPositionPnl = styled.span<{ $sign: 'positive' | 'negative' | 'zero' 
   font-weight: 600;
   line-height: 150%;
   font-variant-numeric: tabular-nums;
-
-  html.dark & {
-    color: ${({ $sign, theme }) =>
-      $sign === 'positive' ? '#3DDBB5' : $sign === 'negative' ? '#ED4B9E' : theme.colors.text};
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 const TabletPositionDivider = styled.span`
   display: block;
@@ -533,25 +522,14 @@ const FeeCell = styled(Td)`
   color: #ED4B9E;
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const RealizedProfitCell = styled(Td)<{ $sign: 'positive' | 'negative' | 'zero' }>`
   color: ${({ $sign, theme }) =>
     $sign === 'positive'
-      ? '#129E7D'
+      ? theme.colors.positive60
       : $sign === 'negative'
-        ? '#ED4B9E'
+        ? theme.colors.failure
         : theme.colors.text};
-
-  html.dark & {
-    color: ${({ $sign, theme }) =>
-      $sign === 'positive'
-        ? '#3DDBB5'
-        : $sign === 'negative'
-          ? '#ED4B9E'
-          : theme.colors.text};
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 const TokenCell = styled.div`
   display: flex;
@@ -608,13 +586,12 @@ const TokenSymbol = styled.span`
   line-height: 150%;
 `
 
-/* eslint-disable no-restricted-syntax -- TODO(design): need positive60/negative60 tokens in uikit */
 const DirectionLabel = styled.span<{ $direction: SimplePositionDirection }>`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
-  color: ${({ $direction }) => ($direction === 'up' ? '#129E7D' : '#ED4B9E')};
+  color: ${({ $direction, theme }) => ($direction === 'up' ? theme.colors.positive60 : theme.colors.failure)};
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -625,10 +602,6 @@ const DirectionLabel = styled.span<{ $direction: SimplePositionDirection }>`
   letter-spacing: 0.24px;
   text-transform: uppercase;
   white-space: nowrap;
-
-  html.dark & {
-    color: ${({ $direction }) => ($direction === 'up' ? '#3DDBB5' : '#ED4B9E')};
-  }
 `
 
 const PnlCell = styled.div`
@@ -642,9 +615,9 @@ const PnlCell = styled.div`
 const PnlValue = styled.span<{ $sign: 'positive' | 'negative' | 'zero' }>`
   color: ${({ $sign, theme }) =>
     $sign === 'positive'
-      ? '#129E7D'
+      ? theme.colors.positive60
       : $sign === 'negative'
-        ? '#ED4B9E'
+        ? theme.colors.failure
         : theme.colors.text};
   text-align: right;
   font-feature-settings: 'liga' off;
@@ -656,17 +629,7 @@ const PnlValue = styled.span<{ $sign: 'positive' | 'negative' | 'zero' }>`
   letter-spacing: -0.2px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-
-  html.dark & {
-    color: ${({ $sign, theme }) =>
-      $sign === 'positive'
-        ? '#3DDBB5'
-        : $sign === 'negative'
-          ? '#ED4B9E'
-          : theme.colors.text};
-  }
 `
-/* eslint-enable no-restricted-syntax */
 
 const SharePnlBtn = styled.button`
   display: inline-flex;
@@ -732,7 +695,7 @@ const LiqFill = styled.div<{ $pct: number; $status: SimplePositionLiqStatus }>`
 `
 /* eslint-enable no-restricted-syntax */
 
-// eslint-disable-next-line no-restricted-syntax -- BUY/SELL brand semantic + TODO(design): replace with color-mix or new token
+/* eslint-disable no-restricted-syntax -- BUY/SELL brand semantic, intentional same in light + dark */
 const CloseBtn = styled.button`
   display: flex;
   width: 32px;
@@ -748,15 +711,12 @@ const CloseBtn = styled.button`
   border-right: 1px solid #ED4B9E;
   border-bottom: 2px solid #ED4B9E;
   border-left: 1px solid #ED4B9E;
-  background: #FFF0F9;
+  background: ${({ theme }) => theme.colors.negativeSubtle};
   color: #ED4B9E;
   cursor: pointer;
   &:hover { filter: brightness(0.97); }
-
-  html.dark & {
-    background: #3E1C39;
-  }
 `
+/* eslint-enable no-restricted-syntax */
 
 const Empty = styled.div`
   display: flex;

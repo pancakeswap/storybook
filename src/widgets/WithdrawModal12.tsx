@@ -127,14 +127,10 @@ const Card = styled.div`
       width: 36px;
       height: 4px;
       border-radius: 9999px;
-      background: #000;
+      background: ${({ theme }) => theme.colors.v2Inverse};
       opacity: 0.1;
       pointer-events: none;
     }
-  }
-
-  html.dark &::before {
-    background: #FFF;
   }
 `
 
