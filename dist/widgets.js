@@ -7841,8 +7841,14 @@ var Tl = B(E)`
   box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.06) inset;
   overflow: visible;
 
+  /* PCS V1 decorative bubblegum-light gradient + heavier inset shadow
+     in dark mode, per the design spec. The gradient flips from the
+     light pastel (#E5FDFF → #F3EFFF) to the dark variants
+     (#121621 → #160F1E), and the inset opacity bumps 0.06 → 0.16 so
+     the depth stays readable on the darker surface. */
   html.dark & {
-    background: ${({ theme: e }) => e.colors.backgroundBubblegum};
+    background: linear-gradient(140deg, #121621 0%, #160F1E 100%);
+    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.16) inset;
   }
 
   @media (min-width: 968px) and (max-width: 1199.98px) {
