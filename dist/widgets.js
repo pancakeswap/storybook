@@ -3751,48 +3751,48 @@ var G = B(e)`
 `, ta = (e) => {
 	let { isMobile: t } = h();
 	return e.isMobile ?? t ? /* @__PURE__ */ U(Ba, { ...e }) : /* @__PURE__ */ U(na, { ...e });
-}, na = ({ tab: e, onTabChange: t, positions: n, openOrders: a, orderHistory: o = [], tradeHistory: s = [], transactionHistory: c = [], onShareTrade: u, useMarkPriceForSymbol: d, computeLiqPrice: f, onClosePosition: p, onEditTpSl: m, onCancelOrder: h, closingSymbol: g = null, cancellingOrderId: _ = null, hideOtherSymbols: v = !1, onHideOtherSymbolsChange: y, onCloseAll: b, onSharePnl: x, sizeUnit: S = "QUOTE", t: C = qi }) => {
-	let w = V(), D = [
+}, na = ({ tab: e, onTabChange: t, positions: n, openOrders: a, orderHistory: o = [], tradeHistory: s = [], transactionHistory: c = [], onShareTrade: u, useMarkPriceForSymbol: d, computeLiqPrice: f, onClosePosition: p, onEditTpSl: m, onCancelOrder: h, closingSymbol: _ = null, cancellingOrderId: v = null, hideOtherSymbols: y = !1, onHideOtherSymbolsChange: b, onCloseAll: x, onSharePnl: C, sizeUnit: w = "QUOTE", t: D = qi }) => {
+	let O = V(), k = [
 		"positions",
 		"orders",
 		"history",
 		"trades",
 		"transactions"
-	], O = D.indexOf(e), { targetRef: k, tooltip: A } = T(C("Return on equity — uPnL ÷ initial margin."), {
+	], A = k.indexOf(e), [j, M] = L(!1), { targetRef: N, tooltip: P } = T(D("Return on equity — uPnL ÷ initial margin."), {
 		placement: "top",
 		oneLine: !0
 	});
-	return /* @__PURE__ */ W(yi, { children: [/* @__PURE__ */ W(wi, { children: [/* @__PURE__ */ W(Ti, { children: [/* @__PURE__ */ W(J, {
-		activeIndex: O,
-		onItemClick: (e) => t(D[e]),
+	return /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(yi, { children: [/* @__PURE__ */ W(wi, { children: [/* @__PURE__ */ W(Ti, { children: [/* @__PURE__ */ W(J, {
+		activeIndex: A,
+		onItemClick: (e) => t(k[e]),
 		noBorder: !0,
 		children: [
 			/* @__PURE__ */ W(q, { children: [
-				C("Positions"),
+				D("Positions"),
 				" (",
 				n.length,
 				")"
 			] }),
 			/* @__PURE__ */ W(q, { children: [
-				C("Open Orders"),
+				D("Open Orders"),
 				" (",
 				a.length,
 				")"
 			] }),
 			/* @__PURE__ */ W(q, { children: [
-				C("Order History"),
+				D("Order History"),
 				" (",
 				o.length,
 				")"
 			] }),
 			/* @__PURE__ */ W(q, { children: [
-				C("Trade History"),
+				D("Trade History"),
 				" (",
 				s.length,
 				")"
 			] }),
 			/* @__PURE__ */ W(q, { children: [
-				C("Transaction History"),
+				D("Transaction History"),
 				" (",
 				c.length,
 				")"
@@ -3806,44 +3806,44 @@ var G = B(e)`
 		role: "button",
 		tabIndex: 0,
 		onClick: (e) => {
-			e.target.tagName !== "INPUT" && (e.preventDefault(), y?.(!v));
+			e.target.tagName !== "INPUT" && (e.preventDefault(), b?.(!y));
 		},
 		onKeyDown: (e) => {
-			(e.key === " " || e.key === "Enter") && (e.preventDefault(), y?.(!v));
+			(e.key === " " || e.key === "Enter") && (e.preventDefault(), b?.(!y));
 		},
 		children: [/* @__PURE__ */ U(l, {
 			scale: "sm",
-			checked: v,
-			onChange: (e) => y?.(e.target.checked),
+			checked: y,
+			onChange: (e) => b?.(e.target.checked),
 			onClick: (e) => e.stopPropagation()
-		}), /* @__PURE__ */ U("span", { children: C("Hide Other Symbols") })]
-	}), b && /* @__PURE__ */ U(ki, {
+		}), /* @__PURE__ */ U("span", { children: D("Hide Other Symbols") })]
+	}), x && /* @__PURE__ */ U(ki, {
 		type: "button",
-		onClick: b,
+		onClick: () => M(!0),
 		disabled: n.length === 0,
-		children: C("Close All")
+		children: D("Close All")
 	})] })] }), /* @__PURE__ */ W(bi, { children: [
 		e === "positions" && (n.length === 0 ? /* @__PURE__ */ U(xi, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: C("No open positions")
+			children: D("No open positions")
 		}) }) : /* @__PURE__ */ U(H, { children: /* @__PURE__ */ W(Si, { children: [
-			/* @__PURE__ */ U(Q, { children: C("Symbol") }),
-			/* @__PURE__ */ U(Q, { children: C("Size") }),
-			/* @__PURE__ */ U(Q, { children: C("Entry Price") }),
-			/* @__PURE__ */ U(Q, { children: C("Mark Price") }),
-			/* @__PURE__ */ U(Q, { children: C("Margin") }),
-			/* @__PURE__ */ U(Q, { children: C("Liq Price") }),
+			/* @__PURE__ */ U(Q, { children: D("Symbol") }),
+			/* @__PURE__ */ U(Q, { children: D("Size") }),
+			/* @__PURE__ */ U(Q, { children: D("Entry Price") }),
+			/* @__PURE__ */ U(Q, { children: D("Mark Price") }),
+			/* @__PURE__ */ U(Q, { children: D("Margin") }),
+			/* @__PURE__ */ U(Q, { children: D("Liq Price") }),
 			/* @__PURE__ */ W(Q, { children: [
-				C("PNL (ROE%)"),
+				D("PNL (ROE%)"),
 				/* @__PURE__ */ U(Ri, {
-					ref: k,
-					"aria-label": C("PNL ROE% explanation"),
+					ref: N,
+					"aria-label": D("PNL ROE% explanation"),
 					children: /* @__PURE__ */ U(Qi, {})
 				}),
-				A
+				P
 			] }),
-			/* @__PURE__ */ U(Q, { children: C("TP/SL") }),
+			/* @__PURE__ */ U(Q, { children: D("TP/SL") }),
 			/* @__PURE__ */ U(Q, {}),
 			n.map((e) => /* @__PURE__ */ U(Ci, { children: /* @__PURE__ */ U(Yi, {
 				p: e,
@@ -3851,34 +3851,34 @@ var G = B(e)`
 				computeLiqPrice: f,
 				onClose: p,
 				onEditTpSl: m,
-				onShare: x,
-				closingSymbol: g,
-				sizeUnit: S,
-				t: C
+				onShare: C,
+				closingSymbol: _,
+				sizeUnit: w,
+				t: D
 			}) }, e.id))
 		] }) })),
 		e === "orders" && (a.length === 0 ? /* @__PURE__ */ U(xi, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: C("No open orders")
+			children: D("No open orders")
 		}) }) : /* @__PURE__ */ W(zi, { children: [
-			/* @__PURE__ */ U(Q, { children: C("Symbol") }),
-			/* @__PURE__ */ U(Q, { children: C("Side") }),
-			/* @__PURE__ */ U(Q, { children: C("Type") }),
-			/* @__PURE__ */ U(Q, { children: C("Price") }),
-			/* @__PURE__ */ U(Q, { children: C("Size") }),
-			/* @__PURE__ */ U(Q, { children: C("Filled") }),
-			/* @__PURE__ */ U(Q, { children: C("Status") }),
+			/* @__PURE__ */ U(Q, { children: D("Symbol") }),
+			/* @__PURE__ */ U(Q, { children: D("Side") }),
+			/* @__PURE__ */ U(Q, { children: D("Type") }),
+			/* @__PURE__ */ U(Q, { children: D("Price") }),
+			/* @__PURE__ */ U(Q, { children: D("Size") }),
+			/* @__PURE__ */ U(Q, { children: D("Filled") }),
+			/* @__PURE__ */ U(Q, { children: D("Status") }),
 			/* @__PURE__ */ U(Q, {}),
 			a.map((e) => {
-				let t = _ === e.id;
+				let t = v === e.id;
 				return /* @__PURE__ */ W(Ci, { children: [
 					/* @__PURE__ */ U($, {
 						bold: !0,
 						children: e.symbol
 					}),
 					/* @__PURE__ */ U($, {
-						style: { color: e.side === "BUY" ? w.colors.success : w.colors.failure },
+						style: { color: e.side === "BUY" ? O.colors.success : O.colors.failure },
 						children: e.side
 					}),
 					/* @__PURE__ */ U($, { children: e.type }),
@@ -3892,7 +3892,7 @@ var G = B(e)`
 						disabled: t,
 						isLoading: t,
 						onClick: () => h(e),
-						children: C("Cancel")
+						children: D("Cancel")
 					}) })
 				] }, e.id);
 			})
@@ -3900,16 +3900,16 @@ var G = B(e)`
 		e === "history" && (o.length === 0 ? /* @__PURE__ */ U(xi, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: C("No order history")
+			children: D("No order history")
 		}) }) : /* @__PURE__ */ W(Ui, { children: [
-			/* @__PURE__ */ U(Q, { children: C("Time") }),
-			/* @__PURE__ */ U(Q, { children: C("Symbol") }),
-			/* @__PURE__ */ U(Q, { children: C("Side") }),
-			/* @__PURE__ */ U(Q, { children: C("Type") }),
-			/* @__PURE__ */ U(Q, { children: C("Price") }),
-			/* @__PURE__ */ U(Q, { children: C("Size") }),
-			/* @__PURE__ */ U(Q, { children: C("Filled") }),
-			/* @__PURE__ */ U(Q, { children: C("Status") }),
+			/* @__PURE__ */ U(Q, { children: D("Time") }),
+			/* @__PURE__ */ U(Q, { children: D("Symbol") }),
+			/* @__PURE__ */ U(Q, { children: D("Side") }),
+			/* @__PURE__ */ U(Q, { children: D("Type") }),
+			/* @__PURE__ */ U(Q, { children: D("Price") }),
+			/* @__PURE__ */ U(Q, { children: D("Size") }),
+			/* @__PURE__ */ U(Q, { children: D("Filled") }),
+			/* @__PURE__ */ U(Q, { children: D("Status") }),
 			o.map((e) => /* @__PURE__ */ W(Ci, { children: [
 				/* @__PURE__ */ U($, {
 					as: "div",
@@ -3920,7 +3920,7 @@ var G = B(e)`
 					children: e.symbol
 				}),
 				/* @__PURE__ */ U($, {
-					style: { color: e.side === "BUY" ? w.colors.success : w.colors.failure },
+					style: { color: e.side === "BUY" ? O.colors.success : O.colors.failure },
 					children: e.side
 				}),
 				/* @__PURE__ */ U($, { children: e.type }),
@@ -3933,16 +3933,16 @@ var G = B(e)`
 		e === "trades" && (s.length === 0 ? /* @__PURE__ */ U(xi, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: C("No trades yet")
+			children: D("No trades yet")
 		}) }) : /* @__PURE__ */ W(Vi, { children: [
-			/* @__PURE__ */ U(Q, { children: C("Time") }),
-			/* @__PURE__ */ U(Q, { children: C("Symbol") }),
-			/* @__PURE__ */ U(Q, { children: C("Price") }),
-			/* @__PURE__ */ U(Q, { children: C("Quantity") }),
-			/* @__PURE__ */ U(Q, { children: C("Fee") }),
-			/* @__PURE__ */ U(Q, { children: C("Realized profit") }),
+			/* @__PURE__ */ U(Q, { children: D("Time") }),
+			/* @__PURE__ */ U(Q, { children: D("Symbol") }),
+			/* @__PURE__ */ U(Q, { children: D("Price") }),
+			/* @__PURE__ */ U(Q, { children: D("Quantity") }),
+			/* @__PURE__ */ U(Q, { children: D("Fee") }),
+			/* @__PURE__ */ U(Q, { children: D("Realized profit") }),
 			s.map((e) => {
-				let t = e.side === "BUY" ? w.colors.success : w.colors.failure, n = e.realizedProfit.startsWith("+");
+				let t = e.side === "BUY" ? O.colors.success : O.colors.failure, n = e.realizedProfit.startsWith("+");
 				return /* @__PURE__ */ W(Ci, { children: [
 					/* @__PURE__ */ U($, {
 						as: "div",
@@ -3955,7 +3955,7 @@ var G = B(e)`
 								color: t,
 								fontSize: 12
 							},
-							children: e.side === "BUY" ? C("Buy") : C("Sell")
+							children: e.side === "BUY" ? D("Buy") : D("Sell")
 						})] })
 					}),
 					/* @__PURE__ */ U($, { children: e.price }),
@@ -3967,12 +3967,12 @@ var G = B(e)`
 							alignItems: "center",
 							style: { gap: 8 },
 							children: [/* @__PURE__ */ U("span", {
-								style: { color: n ? w.colors.success : w.colors.failure },
+								style: { color: n ? O.colors.success : O.colors.failure },
 								children: e.realizedProfit
 							}), u && /* @__PURE__ */ U(Ki, {
 								type: "button",
 								onClick: () => u(e),
-								"aria-label": C("Share trade"),
+								"aria-label": D("Share trade"),
 								children: /* @__PURE__ */ U("svg", {
 									width: "14",
 									height: "14",
@@ -3996,12 +3996,12 @@ var G = B(e)`
 		e === "transactions" && (c.length === 0 ? /* @__PURE__ */ U(xi, { children: /* @__PURE__ */ U(r, {
 			fontSize: "12px",
 			color: "textSubtle",
-			children: C("No transactions yet")
+			children: D("No transactions yet")
 		}) }) : /* @__PURE__ */ W(Hi, { children: [
-			/* @__PURE__ */ U(Q, { children: C("Time") }),
-			/* @__PURE__ */ U(Q, { children: C("Type") }),
-			/* @__PURE__ */ U(Q, { children: C("Amount") }),
-			/* @__PURE__ */ U(Q, { children: C("Symbol") }),
+			/* @__PURE__ */ U(Q, { children: D("Time") }),
+			/* @__PURE__ */ U(Q, { children: D("Type") }),
+			/* @__PURE__ */ U(Q, { children: D("Amount") }),
+			/* @__PURE__ */ U(Q, { children: D("Symbol") }),
 			c.map((e) => /* @__PURE__ */ W(Ci, { children: [
 				/* @__PURE__ */ U($, {
 					as: "div",
@@ -4012,7 +4012,45 @@ var G = B(e)`
 				/* @__PURE__ */ U($, { children: e.symbol })
 			] }, e.id))
 		] }))
-	] })] });
+	] })] }), /* @__PURE__ */ U(S, {
+		isOpen: j,
+		onDismiss: () => M(!1),
+		closeOnOverlayClick: !0,
+		children: /* @__PURE__ */ U(g, {
+			title: D("Close All Positions"),
+			onDismiss: () => M(!1),
+			children: /* @__PURE__ */ W(E, {
+				flexDirection: "column",
+				style: {
+					gap: 16,
+					minWidth: 320,
+					maxWidth: 380
+				},
+				children: [/* @__PURE__ */ U(r, {
+					fontSize: "14px",
+					color: "textSubtle",
+					children: D("This will market-close all %count% open position(s) at the current price. This action cannot be undone.", { count: n.length })
+				}), /* @__PURE__ */ W(E, {
+					style: { gap: 8 },
+					children: [/* @__PURE__ */ U(i, {
+						variant: "secondary",
+						scale: "md",
+						style: { flex: 1 },
+						onClick: () => M(!1),
+						children: D("Cancel")
+					}), /* @__PURE__ */ U(i, {
+						variant: "danger",
+						scale: "md",
+						style: { flex: 1 },
+						onClick: () => {
+							M(!1), x?.();
+						},
+						children: D("Close All")
+					})]
+				})]
+			})
+		})
+	})] });
 }, ra = B.nav`
   display: flex;
   align-items: center;
