@@ -810,8 +810,9 @@ const MobileOrderBook: React.FC<OrderBookProps> = ({
  * the finest available option and emits a change.
  */
 export const OrderBook: React.FC<OrderBookProps> = (props) => {
-  const { isMobile } = useMatchBreakpoints()
-  if (isMobile) return <MobileOrderBook {...props} />
+  // Mobile variant covers both mobile and tablet (below uikit's xl/968px).
+  const { isMobile, isTablet } = useMatchBreakpoints()
+  if (isMobile || isTablet) return <MobileOrderBook {...props} />
   return <DesktopOrderBook {...props} />
 }
 

@@ -1227,10 +1227,11 @@ const MobileOrderForm: React.FC<OrderFormProps> = ({
  * form — keeps the widget free of any imperative-modal coupling.
  */
 export const OrderForm: React.FC<OrderFormProps> = (props) => {
-  // Auto-responsive: switch to mobile layout when the viewport drops
-  // into the mobile breakpoint. Same pattern as Modal / MotionModal —
-  // consumer doesn't pass any flag.
-  const { isMobile } = useMatchBreakpoints()
+  // Auto-responsive: switch to mobile layout for both mobile and tablet
+  // viewports (everything below uikit's xl/968px). Same pattern as Modal
+  // / MotionModal — consumer doesn't pass any flag.
+  const { isMobile: isMobileBp, isTablet } = useMatchBreakpoints()
+  const isMobile = isMobileBp || isTablet
 
   const {
     baseAsset,

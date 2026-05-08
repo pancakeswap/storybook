@@ -3,6 +3,7 @@ import { css, styled } from 'styled-components'
 import { useMatchBreakpoints } from '../contexts'
 import { PerpsPanel } from './primitives'
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const DEFAULT_TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1d'] as const
 
 export interface ChartPanelProps {
@@ -174,8 +175,9 @@ const MobileChartPanel: React.FC<ChartPanelProps> = ({
  * the original `children` + `minHeight` API untouched.
  */
 export const ChartPanel: React.FC<ChartPanelProps> = (props) => {
-  const { isMobile } = useMatchBreakpoints()
-  if (isMobile) return <MobileChartPanel {...props} />
+  // Mobile variant covers both mobile and tablet (below uikit's xl/968px).
+  const { isMobile, isTablet } = useMatchBreakpoints()
+  if (isMobile || isTablet) return <MobileChartPanel {...props} />
   const { children, minHeight = '420px' } = props
   return <Panel $minHeight={toCss(minHeight)}>{children}</Panel>
 }

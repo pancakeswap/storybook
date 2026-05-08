@@ -375,11 +375,11 @@ const identity = (s: string) => s
  * anchoring + outside-click / Escape dismissal stay here.
  */
 export const SymbolHeader: React.FC<SymbolHeaderProps> = (props) => {
-  // Auto-responsive: switch to mobile layout when the viewport drops
-  // into the mobile breakpoint. Same pattern as OrderForm — desktop
-  // call sites don't need to pass any flag.
-  const { isMobile } = useMatchBreakpoints()
-  if (isMobile) return <MobileSymbolHeader {...props} />
+  // Auto-responsive: switch to mobile layout for both mobile and tablet
+  // viewports (everything below uikit's xl/968px). Desktop call sites
+  // don't need to pass any flag.
+  const { isMobile, isTablet } = useMatchBreakpoints()
+  if (isMobile || isTablet) return <MobileSymbolHeader {...props} />
   return <DesktopSymbolHeader {...props} />
 }
 

@@ -203,11 +203,11 @@ const MobileAccountPanel: React.FC<AccountPanelProps> = ({
 }
 
 export const AccountPanel: React.FC<AccountPanelProps> = (props) => {
-  // Auto-responsive: switch to slim row layout when the viewport drops
-  // into the mobile breakpoint. Same pattern as OrderForm — consumer
-  // doesn't pass any flag.
-  const { isMobile } = useMatchBreakpoints()
-  if (isMobile) return <MobileAccountPanel {...props} />
+  // Auto-responsive: switch to slim row layout for both mobile and tablet
+  // viewports (everything below uikit's xl/968px). Same pattern as OrderForm
+  // — consumer doesn't pass any flag.
+  const { isMobile, isTablet } = useMatchBreakpoints()
+  if (isMobile || isTablet) return <MobileAccountPanel {...props} />
 
   const {
     walletDisplay,

@@ -1029,8 +1029,10 @@ const CloseChip = styled.button`
  * | TWAP`) and owns a full-page History sheet portal.
  */
 export const PositionsPanel: React.FC<PositionsPanelProps> = (props) => {
-  const { isMobile: isMobileBp } = useMatchBreakpoints()
-  const isMobile = props.isMobile ?? isMobileBp
+  // Default mobile variant covers both mobile and tablet viewports
+  // (everything below uikit's xl/968px); explicit `isMobile` prop wins.
+  const { isMobile: isMobileBp, isTablet } = useMatchBreakpoints()
+  const isMobile = props.isMobile ?? (isMobileBp || isTablet)
   if (isMobile) return <MobilePositionsPanel {...props} />
   return <DesktopPositionsPanel {...props} />
 }
