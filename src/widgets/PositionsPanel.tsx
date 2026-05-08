@@ -532,18 +532,18 @@ const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
 `
 
 /**
- * Map Aster's 0–4 ADL quantile to the 4-bar gauge. Aster's API spec
- * documents 5 buckets (`0, 1, 2, 3, 4 shows the queue position and
- * possibility of ADL from low to high`). Their UI renders 4 bars per
- * row; the bucket-to-bar mapping isn't documented, so we use the
- * straightforward `min(quantile + 1, 4)` collapse — quantile 0 lights
- * the resting marker, each step adds a bar, and 3 / 4 both fill the
- * gauge. Update if Aster publishes the official mapping.
+ * Map Aster's 0–4 ADL quantile to the 4-bar gauge. Confirmed against
+ * Asterdex's own JS bundle: the gauge component renders
+ * `Array(adl).fill().map(...filled)` followed by
+ * `Array(4 - adl).fill().map(...empty)` — i.e. `lit = adl` straight
+ * identity. Quantile 0 leaves every bar empty; quantile 4 fills all
+ * four. We clamp defensively in case the server ever returns an
+ * out-of-range value, and treat unknown / not-yet-loaded as 0 lit.
  */
-const litFromAdlQuantile = (q: number | undefined): 1 | 2 | 3 | 4 => {
-  if (q === undefined || !Number.isFinite(q)) return 1
+const litFromAdlQuantile = (q: number | undefined): 0 | 1 | 2 | 3 | 4 => {
+  if (q === undefined || !Number.isFinite(q)) return 0
   const clamped = Math.max(0, Math.min(4, Math.floor(q)))
-  return Math.min(clamped + 1, 4) as 1 | 2 | 3 | 4
+  return clamped as 0 | 1 | 2 | 3 | 4
 }
 
 const TpSlCell = styled.div`
