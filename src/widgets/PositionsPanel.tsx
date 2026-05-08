@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { css, styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
@@ -6,6 +6,8 @@ import { Button } from '../primitives/Button'
 import { Checkbox } from '../primitives/Checkbox'
 import { Text } from '../primitives/Text'
 import { ChevronDownIcon, CloseIcon, HistoryIcon } from '../primitives/Icons'
+import Modal from '../primitives/Modal/Modal'
+import { ModalV2 } from '../primitives/Modal/ModalV2'
 import { useMatchBreakpoints } from '../contexts'
 import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel, UnderlineTab, UnderlineTabs } from './primitives'
@@ -1060,6 +1062,12 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   const tabOrder: PositionsPanelTab[] = ['positions', 'orders', 'history', 'trades', 'transactions']
   const activeIndex = tabOrder.indexOf(tab)
 
+  // Close-All confirm modal — destructive, account-wide action, so we
+  // always gate it behind a confirmation step instead of firing onCloseAll
+  // directly on click. No "don't show again" toggle: every Close All run
+  // should require an intentional confirm.
+  const [closeAllConfirmOpen, setCloseAllConfirmOpen] = useState(false)
+
   // Help-icon tooltip on the PNL (ROE%) column header. One-line variant
   // because the copy is short — keeps the bubble tight around the text.
   const { targetRef: pnlHelpRef, tooltip: pnlHelpNode } = useTooltip(
@@ -1071,6 +1079,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   // TabsHeader (see TabsChevronOverlay). No JS measurement needed.
 
   return (
+    <>
     <Card>
       <TabsHeader>
         <TabsLeft>
@@ -1136,7 +1145,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
             {onCloseAll && (
               <CloseAllBtn
                 type="button"
-                onClick={onCloseAll}
+                onClick={() => setCloseAllConfirmOpen(true)}
                 disabled={positions.length === 0}
               >
                 {t('Close All')}
@@ -1374,6 +1383,45 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
           ))}
       </Body>
     </Card>
+
+    <ModalV2
+      isOpen={closeAllConfirmOpen}
+      onDismiss={() => setCloseAllConfirmOpen(false)}
+      closeOnOverlayClick
+    >
+      <Modal title={t('Close All Positions')} onDismiss={() => setCloseAllConfirmOpen(false)}>
+        <Flex flexDirection="column" style={{ gap: 16, minWidth: 320, maxWidth: 380 }}>
+          <Text fontSize="14px" color="textSubtle">
+            {t(
+              'This will market-close all %count% open position(s) at the current price. This action cannot be undone.',
+              { count: positions.length },
+            )}
+          </Text>
+          <Flex style={{ gap: 8 }}>
+            <Button
+              variant="secondary"
+              scale="md"
+              style={{ flex: 1 }}
+              onClick={() => setCloseAllConfirmOpen(false)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              scale="md"
+              style={{ flex: 1 }}
+              onClick={() => {
+                setCloseAllConfirmOpen(false)
+                onCloseAll?.()
+              }}
+            >
+              {t('Close All')}
+            </Button>
+          </Flex>
+        </Flex>
+      </Modal>
+    </ModalV2>
+    </>
   )
 }
 
