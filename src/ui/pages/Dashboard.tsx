@@ -157,18 +157,18 @@ const PORTFOLIO_TOTAL = 1892.26
 
 const CHART_VALUES = [850, 720, 650, 690, 1100, 1430, 1680, 1730, 1680, 1810, 1892]
 const CHART_X_LABELS = ['1:00 AM', '5:00 AM', '9:00 AM', '1:00 PM', '5:00 PM', '9:00 PM']
-const CHART_Y_LABELS = ['$3,000', '$2,500', '$2,000', '$1,500', '$1,000', '$500']
+const CHART_Y_LABELS = ['$2,500', '$2,000', '$1,500', '$1,000', '$500']
 const TIME_RANGES = ['1D', '1W', '1M', '3M', '1Y']
 
 const CHART_W = 860
 const CHART_H = 340
 const CHART_PAD_TOP = 8
 const CHART_PAD_BOTTOM = 32
-const CHART_PAD_RIGHT = 52
+const CHART_PAD_RIGHT = 64
 const CHART_DRAW_H = CHART_H - CHART_PAD_TOP - CHART_PAD_BOTTOM
 const CHART_DRAW_W = CHART_W - CHART_PAD_RIGHT
-const MIN_V = 400
-const MAX_V = 3100
+const MIN_V = 500
+const MAX_V = 2500
 
 function valueToY(v: number) {
   return CHART_PAD_TOP + (1 - (v - MIN_V) / (MAX_V - MIN_V)) * CHART_DRAW_H
@@ -190,7 +190,7 @@ function buildChartPath() {
 
   const last = pts[pts.length - 1]
   const first = pts[0]
-  const area = `${line} L ${last.x} ${CHART_PAD_TOP + CHART_DRAW_H} L ${first.x} ${CHART_PAD_TOP + CHART_DRAW_H} Z`
+  const area = `${line} L ${last.x} ${CHART_H} L ${first.x} ${CHART_H} Z`
 
   return { line, area }
 }
@@ -321,13 +321,14 @@ export function PortfolioChart({
 
           {/* Time range selector */}
           <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            background: 'var(--pcs-colors-input)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 2,
+            background: 'var(--pcs-colors-input-primary)',
             border: '1px solid var(--pcs-colors-input-secondary)',
             borderRadius: 16,
-            padding: 4,
-            gap: 2,
+            boxShadow: 'inset 0 2px 0 -1px rgba(0, 0, 0, 0.06)',
+            overflow: 'hidden',
           }}>
             {TIME_RANGES.map((r, i) => (
               <button
@@ -339,7 +340,7 @@ export function PortfolioChart({
                   padding: 4,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  background: rangeIndex === i ? 'var(--V1-Fill-Secondary, #7A6EAA)' : 'transparent',
+                  background: rangeIndex === i ? 'var(--pcs-colors-text-subtle)' : 'transparent',
                   border: 'none',
                   borderRadius: 16,
                   cursor: 'pointer',
@@ -347,7 +348,7 @@ export function PortfolioChart({
                   fontSize: 14,
                   fontWeight: rangeIndex === i ? 600 : 400,
                   lineHeight: '150%',
-                  color: rangeIndex === i ? '#FFFFFF' : 'var(--pcs-colors-text-subtle)',
+                  color: rangeIndex === i ? 'var(--pcs-colors-inverted-contrast)' : 'var(--pcs-colors-text-subtle)',
                   transition: 'background 0.15s, color 0.15s',
                   whiteSpace: 'nowrap',
                   boxSizing: 'border-box',
@@ -360,11 +361,11 @@ export function PortfolioChart({
         </div>
 
         {/* SVG Chart — fills remaining card height */}
-        <div style={{ position: 'relative', marginTop: 8, flex: 1, minHeight: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', marginTop: 8, flex: 1, minHeight: 0 }}>
           <svg
             viewBox={`0 0 ${CHART_W} ${CHART_H}`}
             preserveAspectRatio="none"
-            style={{ width: '100%', height: '100%', display: 'block' }}
+            style={{ width: '100%', flex: 1, minHeight: 0, display: 'block' }}
             aria-label="Portfolio value chart"
             role="img"
           >
@@ -376,8 +377,8 @@ export function PortfolioChart({
             </defs>
 
             {/* Y-axis grid lines */}
-            {[0, 1, 2, 3, 4, 5].map((i) => {
-              const yVal = MAX_V - i * ((MAX_V - MIN_V) / 5)
+            {CHART_Y_LABELS.map((_, i) => {
+              const yVal = MAX_V - i * ((MAX_V - MIN_V) / (CHART_Y_LABELS.length - 1))
               const y = valueToY(yVal)
               return (
                 <line
@@ -399,42 +400,42 @@ export function PortfolioChart({
             {/* Line */}
             <path d={CHART_LINE} fill="none" stroke="#1FC7D4" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
 
-            {/* Y-axis labels (right side) */}
+            {/* Y-axis labels (right side, right-aligned so they don't clip) */}
             {CHART_Y_LABELS.map((label, i) => {
-              const yVal = MAX_V - i * ((MAX_V - MIN_V) / 5)
+              const yVal = MAX_V - i * ((MAX_V - MIN_V) / (CHART_Y_LABELS.length - 1))
               const y = valueToY(yVal)
               return (
                 <text
                   key={i}
-                  x={CHART_DRAW_W + 6}
+                  x={CHART_W - 4}
                   y={y + 4}
                   fontSize={9}
+                  textAnchor="end"
                   fill="var(--pcs-colors-text-subtle)"
                   fontFamily="Kanit, sans-serif"
-                >
-                  {label}
-                </text>
-              )
-            })}
-
-            {/* X-axis labels */}
-            {CHART_X_LABELS.map((label, i) => {
-              const x = (i / (CHART_X_LABELS.length - 1)) * CHART_DRAW_W
-              return (
-                <text
-                  key={i}
-                  x={x}
-                  y={CHART_H - 6}
-                  fontSize={9}
-                  fill="var(--pcs-colors-text-subtle)"
-                  fontFamily="Kanit, sans-serif"
-                  textAnchor={i === 0 ? 'start' : i === CHART_X_LABELS.length - 1 ? 'end' : 'middle'}
                 >
                   {label}
                 </text>
               )
             })}
           </svg>
+
+          {/* X-axis labels — rendered below the SVG so the gradient fills to the chart bottom */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              paddingTop: 8,
+              paddingRight: `${(CHART_PAD_RIGHT / CHART_W) * 100}%`,
+              fontFamily: 'Kanit, sans-serif',
+              fontSize: 12,
+              color: 'var(--pcs-colors-text-subtle)',
+            }}
+          >
+            {CHART_X_LABELS.map((label) => (
+              <span key={label}>{label}</span>
+            ))}
+          </div>
         </div>
         {footer}
       </CardBody>
@@ -456,7 +457,6 @@ export interface TokenTableProps {
 export function TokenTable({ tokens = TOKENS, showFilters = true, title }: TokenTableProps = {}) {
   const [search, setSearch] = useState('')
   const [hideSmall, setHideSmall] = useState(false)
-  const [showHidden, setShowHidden] = useState(false)
   const [sortField, setSortField] = useState<keyof Token | null>(null)
   const [sortOrder, setSortOrder] = useState<ISortOrder>(null)
   const w = useWindowWidth()
@@ -465,7 +465,6 @@ export function TokenTable({ tokens = TOKENS, showFilters = true, title }: Token
 
   const filtered = tokens.filter((t) => {
     if (hideSmall && t.value < 10) return false
-    if (!showHidden && t.value === 0) return false
     if (search) {
       const q = search.toLowerCase()
       return t.symbol.toLowerCase().includes(q) || t.chain.toLowerCase().includes(q)
@@ -658,15 +657,6 @@ export function TokenTable({ tokens = TOKENS, showFilters = true, title }: Token
               scale="sm"
               checked={hideSmall}
               onChange={(e) => setHideSmall(e.target.checked)}
-            />
-          </label>
-
-          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-            <Text fontSize="14px" color="textSubtle">Show hidden tokens</Text>
-            <Checkbox
-              scale="sm"
-              checked={showHidden}
-              onChange={(e) => setShowHidden(e.target.checked)}
             />
           </label>
         </div>
