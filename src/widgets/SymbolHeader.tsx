@@ -43,6 +43,8 @@ export interface SymbolHeaderProps {
   change24h?: string
   /** Raw 24h quote volume. */
   volume24h?: string
+  /** Raw open-interest in USDT notional (consumer multiplies base × mark). */
+  openInterestUsd?: string
 
   // ── Favorite ──────────────────────────────────────────────────
   favorited?: boolean
@@ -393,6 +395,7 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   nextFundingTime,
   change24h,
   volume24h,
+  openInterestUsd,
   favorited = false,
   onToggleFavorite,
   renderMarketsDropdown,
@@ -610,6 +613,13 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
           <StatLabel>{t('24h Volume (USDT)')}</StatLabel>
           <StatValue>{formatVolume(volume24h)}</StatValue>
         </Stat>
+
+        {openInterestUsd ? (
+          <Stat role="listitem">
+            <StatLabel>{t('Open Interest (USDT)')}</StatLabel>
+            <StatValue>{formatVolume(openInterestUsd)}</StatValue>
+          </Stat>
+        ) : null}
       </Stats>
     </Root>
   )

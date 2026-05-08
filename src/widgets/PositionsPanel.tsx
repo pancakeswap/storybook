@@ -504,17 +504,18 @@ const SideLevText = styled.span<{ $up: boolean }>`
   white-space: nowrap;
 `
 
-/* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Per the
- * design (Figma 72:12995 / 72:13051), the leftmost bar is always
- * destructive (pink) and the remaining three are the primary fill
- * color. The pink bar reads as a "this is a leveraged position"
- * marker while the white bars echo the SymbolHeader-style direction
- * indicator. */
+/* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Mirrors
+ * Aster's ADL ("auto-deleverage") gauge in the positions table: the
+ * leftmost bar is always lit, and additional bars light up as the
+ * position approaches the top of the ADL queue. Without an `adlQuantile`
+ * yet wired through the widget API we fall back to leverage as a proxy
+ * (PAN-11867 — higher leverage ≈ more risk of being deleveraged). */
 const LevBarRow = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 2px;
   padding-top: 2px;
+  cursor: help;
 `
 
 const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
@@ -523,6 +524,14 @@ const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
   background: ${({ $variant, theme }) =>
     $variant === 'destructive' ? theme.colors.failure : theme.colors.text};
 `
+
+/** Red-bar count from leverage as an ADL-queue proxy (PAN-11867). */
+const litFromLeverage = (lev: number): 1 | 2 | 3 | 4 => {
+  if (!Number.isFinite(lev) || lev <= 24) return 1
+  if (lev <= 99) return 2
+  if (lev <= 499) return 3
+  return 4
+}
 
 const TpSlCell = styled.div`
   display: flex;
@@ -685,6 +694,19 @@ const Td = styled(Text).attrs({ fontSize: '14px' })`
 
 const identity = (s: string) => s
 
+// TP/SL stopPrice arrives from Aster as a string with the symbol's
+// tick-size precision baked in (e.g. "1.49900"). Routing through Number()
+// collapses trailing zeros, so we keep the raw precision and only add
+// thousand-separators around the integer part.
+const fmtStopPrice = (raw: string) => {
+  const trimmed = raw.replace(/^0+(?=\d)/, '') || '0'
+  const [intPart, fracPart] = trimmed.split('.')
+  const withSeparators = Number(intPart).toLocaleString(undefined, {
+    maximumFractionDigits: 0,
+  })
+  return fracPart ? `${withSeparators}.${fracPart}` : withSeparators
+}
+
 /**
  * Single positions-table row. Split out as a component so
  * `useMarkPriceForSymbol` can be called at a stable hook index per
@@ -749,6 +771,14 @@ const PositionTableRow: React.FC<{
   const fmtPrice = (v: number) =>
     v.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 1 })
 
+  const litBars = litFromLeverage(p.leverage)
+  const { targetRef: adlTipRef, tooltip: adlTipNode } = useTooltip(
+    t(
+      'This indicator shows your position in the auto-deleverage queue. If all lights are lit, in the event of a liquidation, your position may be reduced.',
+    ),
+    { placement: 'top' },
+  )
+
   return (
     <>
       {/* Symbol cell — symbol name on top, side+lev pill + tier bars below */}
@@ -758,11 +788,12 @@ const PositionTableRow: React.FC<{
           <SideLevText $up={side === 'BUY'}>
             {side === 'BUY' ? t('Buy') : t('Sell')} {p.leverage}x
           </SideLevText>
-          <LevBarRow aria-hidden>
+          <LevBarRow ref={adlTipRef as React.RefObject<HTMLSpanElement>}>
             {[0, 1, 2, 3].map((i) => (
-              <LevBar key={i} $variant={i === 0 ? 'destructive' : 'fill'} />
+              <LevBar key={i} $variant={i < litBars ? 'destructive' : 'fill'} />
             ))}
           </LevBarRow>
+          {adlTipNode}
         </StackSub>
       </StackCell>
 
@@ -825,8 +856,8 @@ const PositionTableRow: React.FC<{
 
       {/* TP/SL cell — two muted lines, dashes when not set */}
       <TpSlCell>
-        <span>{p.tpStopPrice ? fmtPrice(Number(p.tpStopPrice)) : '--'}</span>
-        <span>{p.slStopPrice ? fmtPrice(Number(p.slStopPrice)) : '--'}</span>
+        <span>{p.tpStopPrice ? fmtStopPrice(p.tpStopPrice) : '--'}</span>
+        <span>{p.slStopPrice ? fmtStopPrice(p.slStopPrice) : '--'}</span>
       </TpSlCell>
 
       <ActionCell>
@@ -1875,11 +1906,11 @@ const MobilePositionCard: React.FC<{
         </MobileCardCell>
         <MobileCardCell>
           <span>{t('TP')}</span>
-          <strong>{p.tpStopPrice ? Number(p.tpStopPrice).toFixed(2) : '—'}</strong>
+          <strong>{p.tpStopPrice ? fmtStopPrice(p.tpStopPrice) : '—'}</strong>
         </MobileCardCell>
         <MobileCardCell>
           <span>{t('SL')}</span>
-          <strong>{p.slStopPrice ? Number(p.slStopPrice).toFixed(2) : '—'}</strong>
+          <strong>{p.slStopPrice ? fmtStopPrice(p.slStopPrice) : '—'}</strong>
         </MobileCardCell>
       </MobileCardGrid>
       <MobileCardActions>

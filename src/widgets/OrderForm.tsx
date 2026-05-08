@@ -1465,9 +1465,30 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
             }
             aria-label={t('Time in force')}
           >
-            <option value="GTC">GTC</option>
-            <option value="IOC">IOC</option>
-            <option value="FOK">FOK</option>
+            <option
+              value="GTC"
+              title={t(
+                'Good till canceled — the order will continue to work until the order fills or is canceled.',
+              )}
+            >
+              GTC ({t('Good till canceled')})
+            </option>
+            <option
+              value="IOC"
+              title={t(
+                'Immediate or canceled — execute all or part immediately and cancel any unfilled portion of the order.',
+              )}
+            >
+              IOC ({t('Immediate or canceled')})
+            </option>
+            <option
+              value="FOK"
+              title={t(
+                'Fill or kill — the order must be filled immediately in its entirety or not executed at all.',
+              )}
+            >
+              FOK ({t('Fill or Kill')})
+            </option>
           </TifSelect>
         </PriceInputRow>
       )}
@@ -1614,7 +1635,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
           onMouseEnter={() => setSummaryTip('cost')}
           onMouseLeave={() => setSummaryTip(null)}
         >
-          <SK>{t('Cost')}</SK>
+          <SK>{t('Margin')}</SK>
           {summaryTip === 'cost' && (
             <ReduceOnlyTooltip role="tooltip">
               {t('Total margin required to open this position.')}

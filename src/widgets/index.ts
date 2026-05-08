@@ -23,7 +23,7 @@ export { LeverageModal } from './LeverageModal'
 export type { LeverageModalProps } from './LeverageModal'
 
 export { AssetModeModal } from './AssetModeModal'
-export type { AssetMode, AssetModeModalProps } from './AssetModeModal'
+export type { AssetMode, AssetModeModalProps, IsolatedPositionMigration } from './AssetModeModal'
 
 export { AssetModeButton } from './AssetModeButton'
 export type { AssetModeButtonProps } from './AssetModeButton'

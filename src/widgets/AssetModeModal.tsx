@@ -9,14 +9,22 @@ import { ModalV2 } from '../primitives/Modal/ModalV2'
 
 export type AssetMode = 'SINGLE' | 'MULTI'
 
+export interface IsolatedPositionMigration {
+  symbol: string
+  /** `true` once the user has flipped this position's row toggle to Cross. */
+  willSwitchToCross: boolean
+}
+
 export interface AssetModeModalProps {
   /** Controlled open state. */
   isOpen: boolean
   /** Current account-wide mode loaded from Aster. */
   currentMode: AssetMode
   /**
-   * Called with the user's chosen mode. Consumer owns the async write +
-   * closing the modal on success (via `isOpen=false`).
+   * Called with the user's chosen mode. When the user accepts the
+   * multi-asset migration screen this also fires with `mode: 'MULTI'`,
+   * but the consumer is expected to first run `onMigratePosition` for
+   * every entry whose `willSwitchToCross` is true (PAN-11908).
    */
   onConfirm: (mode: AssetMode) => void
   onClose: () => void
@@ -30,6 +38,17 @@ export interface AssetModeModalProps {
   disabled?: boolean
   /** Slot for caller-classified error messages or hints (positions present, etc). */
   errorSlot?: React.ReactNode
+  /**
+   * List of currently-Isolated positions that block a Single → Multi
+   * switch. When provided AND non-empty AND the user has selected
+   * MULTI, the modal swaps to a migration screen mirroring Aster's
+   * "Activate multi-assets mode" dialog: per-symbol Cross toggles +
+   * Confirm. The parent owns the toggle state and handles the actual
+   * `setMarginType` calls on confirm.
+   */
+  isolatedMigrations?: IsolatedPositionMigration[]
+  /** Fired when the user flips a position-row toggle to Cross (or back). */
+  onToggleMigration?: (symbol: string, next: boolean) => void
   /** Optional translator. Defaults to identity. */
   t?: (key: string, options?: Record<string, string | number | undefined>) => string
 }
@@ -95,6 +114,8 @@ export const AssetModeModal: React.FC<AssetModeModalProps> = ({
   isSubmitting = false,
   disabled = false,
   errorSlot,
+  isolatedMigrations,
+  onToggleMigration,
   t = identity,
 }) => {
   const theme = useTheme()
@@ -106,12 +127,76 @@ export const AssetModeModal: React.FC<AssetModeModalProps> = ({
   }, [isOpen, currentMode])
 
   const dirty = selected !== currentMode
-  const canConfirm = !disabled && !isSubmitting && dirty
+  // Migration screen kicks in once the user picks MULTI while the parent
+  // surfaces at least one Isolated position. All toggles must be flipped
+  // to Cross before Confirm activates.
+  const inMigration = selected === 'MULTI' && (isolatedMigrations?.length ?? 0) > 0
+  const allMigrated = (isolatedMigrations ?? []).every((m) => m.willSwitchToCross)
+  const canConfirm = inMigration
+    ? !disabled && !isSubmitting && allMigrated
+    : !disabled && !isSubmitting && dirty
 
   return (
     <ModalV2 isOpen={isOpen} onDismiss={onClose} closeOnOverlayClick>
-      <Modal title={t('Asset Mode')} onDismiss={onClose}>
+      <Modal
+        title={inMigration ? t('Activate multi-assets mode') : t('Asset Mode')}
+        onDismiss={onClose}
+      >
         <Flex flexDirection="column" style={{ gap: 14, minWidth: 360, maxWidth: 460 }}>
+          {inMigration ? (
+            <>
+              <Text fontSize="13px" color="textSubtle">
+                {t(
+                  'Isolated margin positions are not supported in multi-asset mode. Please switch all perp positions to cross margin to enable multi-asset mode.',
+                )}
+              </Text>
+              <Flex flexDirection="column" style={{ gap: 8 }}>
+                {(isolatedMigrations ?? []).map((m) => (
+                  <Flex
+                    key={m.symbol}
+                    alignItems="center"
+                    style={{
+                      padding: '12px 14px',
+                      borderRadius: 12,
+                      background: theme.colors.input,
+                      border: `1px solid ${theme.colors.cardBorder}`,
+                      gap: 12,
+                    }}
+                  >
+                    <Text
+                      fontSize="14px"
+                      bold
+                      style={{ flex: 1, color: theme.colors.textSubtle }}
+                    >
+                      {m.symbol}
+                    </Text>
+                    <Text fontSize="13px" color="textSubtle">
+                      {t('Cross')}
+                    </Text>
+                    <Checkbox
+                      scale="md"
+                      checked={m.willSwitchToCross}
+                      disabled={disabled || isSubmitting}
+                      onChange={(e) =>
+                        onToggleMigration?.(m.symbol, (e.target as HTMLInputElement).checked)
+                      }
+                      aria-label={t('Switch {{symbol}} to Cross', { symbol: m.symbol })}
+                    />
+                  </Flex>
+                ))}
+              </Flex>
+              {errorSlot}
+              <Button
+                onClick={() => canConfirm && onConfirm(selected)}
+                disabled={!canConfirm}
+                isLoading={isSubmitting}
+                scale="md"
+              >
+                {t('Confirm')}
+              </Button>
+            </>
+          ) : (
+            <>
           <Card
             type="button"
             $active={selected === 'SINGLE'}
@@ -206,6 +291,8 @@ export const AssetModeModal: React.FC<AssetModeModalProps> = ({
           >
             {t('Confirm')}
           </Button>
+            </>
+          )}
         </Flex>
       </Modal>
     </ModalV2>
