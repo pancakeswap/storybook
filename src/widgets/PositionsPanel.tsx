@@ -505,11 +505,12 @@ const SideLevText = styled.span<{ $up: boolean }>`
 `
 
 /* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Mirrors
- * Aster's ADL ("auto-deleverage") gauge in the positions table: the
- * leftmost bar is always lit, and additional bars light up as the
- * position approaches the top of the ADL queue. Without an `adlQuantile`
- * yet wired through the widget API we fall back to leverage as a proxy
- * (PAN-11867 — higher leverage ≈ more risk of being deleveraged). */
+ * Aster's ADL ("auto-deleverage") gauge: a single leftmost destructive
+ * bar reads as a "leveraged position" marker, the remaining three are
+ * the neutral fill color. Aster only lights additional bars off the
+ * server-pushed `adlQuantile` field; until we plumb that through the
+ * widget we keep the count at 1 to match their UI exactly (PAN-11867 —
+ * verified against Aster's positions list). */
 const LevBarRow = styled.span`
   display: inline-flex;
   align-items: center;
@@ -524,14 +525,6 @@ const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
   background: ${({ $variant, theme }) =>
     $variant === 'destructive' ? theme.colors.failure : theme.colors.text};
 `
-
-/** Red-bar count from leverage as an ADL-queue proxy (PAN-11867). */
-const litFromLeverage = (lev: number): 1 | 2 | 3 | 4 => {
-  if (!Number.isFinite(lev) || lev <= 24) return 1
-  if (lev <= 99) return 2
-  if (lev <= 499) return 3
-  return 4
-}
 
 const TpSlCell = styled.div`
   display: flex;
@@ -771,7 +764,6 @@ const PositionTableRow: React.FC<{
   const fmtPrice = (v: number) =>
     v.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 1 })
 
-  const litBars = litFromLeverage(p.leverage)
   const { targetRef: adlTipRef, tooltip: adlTipNode } = useTooltip(
     t(
       'This indicator shows your position in the auto-deleverage queue. If all lights are lit, in the event of a liquidation, your position may be reduced.',
@@ -790,7 +782,7 @@ const PositionTableRow: React.FC<{
           </SideLevText>
           <LevBarRow ref={adlTipRef as React.RefObject<HTMLSpanElement>}>
             {[0, 1, 2, 3].map((i) => (
-              <LevBar key={i} $variant={i < litBars ? 'destructive' : 'fill'} />
+              <LevBar key={i} $variant={i === 0 ? 'destructive' : 'fill'} />
             ))}
           </LevBarRow>
           {adlTipNode}
