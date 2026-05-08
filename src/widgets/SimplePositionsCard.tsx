@@ -57,7 +57,7 @@ export interface SimpleHistoryRow {
   realizedProfitSign: 'positive' | 'negative' | 'zero'
   /** Currency the profit is denominated in (rendered semibold). */
   realizedProfitCurrency?: string
-  /** Pre-formatted timestamp, e.g. "2026-05-05". */
+  /** Pre-formatted timestamp, e.g. "2026-05-05 14:23:45". */
   time: string
 }
 
@@ -591,10 +591,10 @@ const SharePnlBtn = styled.button`
   padding: 0;
   border: 0;
   background: transparent;
-  color: ${({ theme }) => theme.colors.textSubtle};
+  color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
   border-radius: 4px;
-  &:hover { color: ${({ theme }) => theme.colors.text}; }
+  &:hover { opacity: 0.7; }
 `
 
 const LiqDistance = styled(Td)`
@@ -661,7 +661,7 @@ const CloseBtn = styled.button`
   border-right: 1px solid ${({ theme }) => theme.colors.failure};
   border-bottom: 2px solid ${({ theme }) => theme.colors.failure};
   border-left: 1px solid ${({ theme }) => theme.colors.failure};
-  background: ${({ theme }) => theme.colors.destructive10};
+  background: ${({ theme }) => theme.colors.negativeSubtle};
   color: ${({ theme }) => theme.colors.failure};
   cursor: pointer;
   &:hover { filter: brightness(0.97); }
@@ -939,7 +939,7 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
                   <TabletPositionStatValue>{h.price}</TabletPositionStatValue>
                 </TabletPositionStatRow>
                 <TabletPositionStatRow>
-                  <TabletPositionStatLabel>Quantity</TabletPositionStatLabel>
+                  <TabletPositionStatLabel>Size</TabletPositionStatLabel>
                   <TabletPositionStatValue>{h.quantity}</TabletPositionStatValue>
                 </TabletPositionStatRow>
                 <TabletPositionStatRow>
@@ -992,8 +992,8 @@ export const SimplePositionsCard: React.FC<SimplePositionsCardProps> = ({
                 <SortBtn type="button" aria-label="Sort by price"><SortGlyph /></SortBtn>
               </Th>
               <Th $align="right">
-                Quantity
-                <SortBtn type="button" aria-label="Sort by quantity"><SortGlyph /></SortBtn>
+                Size
+                <SortBtn type="button" aria-label="Sort by size"><SortGlyph /></SortBtn>
               </Th>
               <Th $align="right">
                 Fee

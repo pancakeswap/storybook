@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { styled } from 'styled-components'
 import { ModalV2 } from '../primitives/Modal/ModalV2'
 
@@ -130,6 +130,33 @@ const Card = styled.div`
       background: ${({ theme }) => theme.colors.v2Inverse};
       opacity: 0.1;
       pointer-events: none;
+    }
+  }
+`
+
+/* Tap- and swipe-down-to-close hit area for the bottom-sheet grabber.
+   Sits in the 28px reservation above the header, transparent so the
+   ::before pill on Card stays visible. Hidden above 968px where the
+   modal centers as a regular dialog. */
+const GrabberHit = styled.button`
+  display: none;
+
+  @media (max-width: 967.98px) {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: grab;
+    touch-action: none;
+    z-index: 1;
+
+    &:active {
+      cursor: grabbing;
     }
   }
 `
@@ -544,10 +571,41 @@ export const WithdrawModal12: React.FC<WithdrawModal12Props> = ({
      or display-formatted "999,999.5". */
   const amountValid = Number(amount.replace(/[^\d.-]/g, '')) > 0
 
+  /* Tap-or-swipe-down on the grabber pill to dismiss. 30px down past
+     the start point counts as a swipe; anything less is treated as a
+     tap and also dismisses. */
+  const dragStartY = useRef<number | null>(null)
+  const onGrabberPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    dragStartY.current = e.clientY
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+  const onGrabberPointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const startY = dragStartY.current
+    dragStartY.current = null
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      // Already released — ignore.
+    }
+    if (startY === null) return
+    const dy = e.clientY - startY
+    if (dy >= 0 || dy >= 30) onClose()
+  }
+  const onGrabberPointerCancel = () => {
+    dragStartY.current = null
+  }
+
   return (
     <ModalV2 isOpen={isOpen} onDismiss={onClose} closeOnOverlayClick>
       <Backdrop>
         <Card role="dialog" aria-modal="true" aria-label="Withdraw from your perps account">
+          <GrabberHit
+            type="button"
+            aria-label="Close withdraw"
+            onPointerDown={onGrabberPointerDown}
+            onPointerUp={onGrabberPointerUp}
+            onPointerCancel={onGrabberPointerCancel}
+          />
           <Header>
             <Title>Withdraw from Your Perps Account</Title>
             <CloseBtn type="button" aria-label="Close" onClick={onClose}>

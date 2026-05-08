@@ -17,13 +17,14 @@ import { lightColors, darkColors, shadows } from './tokens'
 export type Theme = 'dark' | 'light'
 
 /**
- * camelCase → kebab-case for CSS var names, but DON'T split digit-letter
- * boundaries (`primary10` stays `primary10`, `cardBorder` → `card-border`,
- * `v2Inverse` → `v2-inverse`). Matches Chakra's previous output so
- * `pcsTheme` (styled-components) keeps resolving the same names.
+ * camelCase → kebab-case for CSS var names. Splits at lowercase→uppercase
+ * AND digit→uppercase boundaries, but NOT letter→digit (`primary10` stays
+ * `primary10`, `cardBorder` → `card-border`, `v2Inverse` → `v2-inverse`).
+ * Matches Chakra's previous output so `pcsTheme` (styled-components) keeps
+ * resolving the same names.
  */
 const cssName = (camel: string): string =>
-  camel.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+  camel.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
 
 /* ── Synthesized semantic colors ──────────────────────────────────
    Tokens that aren't in lightColors/darkColors but are referenced by

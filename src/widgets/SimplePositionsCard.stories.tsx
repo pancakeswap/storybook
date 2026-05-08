@@ -46,19 +46,20 @@ const SAMPLE_HISTORY_ROW: SimpleHistoryRow = {
   realizedProfit: '+200.091',
   realizedProfitSign: 'positive',
   realizedProfitCurrency: 'USDT',
-  time: '2026-05-05',
+  time: '2026-05-05 14:23:45',
 }
 
 const SAMPLE_HISTORY: readonly SimpleHistoryRow[] = [
-  { ...SAMPLE_HISTORY_ROW, id: 'h1' },
+  { ...SAMPLE_HISTORY_ROW, id: 'h1', time: '2026-05-05 14:23:45' },
   {
     ...SAMPLE_HISTORY_ROW,
     id: 'h2',
     direction: 'down',
     realizedProfit: '-42.187',
     realizedProfitSign: 'negative',
+    time: '2026-05-05 11:07:02',
   },
-  { ...SAMPLE_HISTORY_ROW, id: 'h3' },
+  { ...SAMPLE_HISTORY_ROW, id: 'h3', time: '2026-05-04 22:48:19' },
 ]
 
 const baseArgs: SimplePositionsCardProps = {

@@ -3,7 +3,7 @@ import { styled } from 'styled-components'
 import { SimpleBetPanel, type SimpleBetPanelProps } from '../widgets/SimpleBetPanel'
 import { SimpleTickerCard } from '../widgets/SimpleTickerCard'
 import { SimpleChartCard } from '../widgets/SimpleChartCard'
-import { BottomDrawer } from '../primitives/Modal'
+import { BottomDrawer, Modal, ModalV2 } from '../primitives/Modal'
 import {
   SimplePositionsCard,
   type SimplePositionRow,
@@ -19,6 +19,7 @@ import {
   type DepositStep,
   type DepositTokenRow,
 } from '../widgets/DepositModal'
+import { MarketsDropdown, type MarketRow } from '../widgets/MarketsDropdown'
 
 export interface SimplePerpsPageProps {
   initialPair?: string
@@ -44,6 +45,21 @@ const X_TICKS = [
   '5:00 AM',
   '9:00 AM',
   '1:00 PM',
+] as const
+
+/* Single-line short labels for the chart bottom-drawer rendered on
+   mobile/tablet — the long "5:00 AM" form clips inside the ~360-540px
+   drawer width. */
+const X_TICKS_DRAWER = [
+  '5AM',
+  '9AM',
+  '1PM',
+  '5PM',
+  '9PM',
+  '1AM',
+  '5AM',
+  '9AM',
+  '1PM',
 ] as const
 
 const SAMPLE_POSITIONS: readonly SimplePositionRow[] = [
@@ -487,15 +503,21 @@ const ChartSheetStatValue = styled.span<{ $sign?: 'positive' | 'negative' }>`
 /* Strips the inner SimpleChartCard's card border / background / fixed
    height so it lays out flush on the drawer's white surface. 10px top
    padding matches Figma 623-30687 — the chart sits closer to the
-   header divider than the standalone card variant. */
+   header divider than the standalone card variant. The chart flex-fills
+   the drawer's remaining height instead of locking to 480px so it hugs
+   the home-indicator at any device size. */
 const ChartSheetChart = styled.div`
   align-self: stretch;
+  flex: 1;
+  display: flex;
+  min-height: 0;
   & > div {
+    flex: 1 !important;
+    height: auto !important;
     border: 0 !important;
     background: transparent !important;
     border-radius: 0 !important;
     padding: 10px 16px 16px !important;
-    height: 460px !important;
   }
 `
 
@@ -513,65 +535,61 @@ const TabletPositionsWrapper = styled.div`
   }
 `
 
-/* ── Collateral picker modal (opens when + is clicked on My Perp Fund) ── */
+/* ── Collateral picker modal (opens when + is clicked on My Perp Fund) ──
+   Wraps the search + token-list body in the shared Modal primitive so
+   the modal renders as a centered dialog on desktop and as a bottom-
+   sheet (with grabber pill, drag-to-close, tap-on-grabber to close) on
+   mobile/tablet — same treatment as DepositModal/WithdrawModal. */
 
-const Overlay = styled.div`
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(40, 13, 95, 0.60);
-  z-index: 1000;
-`
-
-const ModalCard = styled.div`
-  display: flex;
-  width: 480px;
-  min-width: 360px;
-  flex-direction: column;
-  align-items: flex-start;
-  border-radius: 24px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  background: ${({ theme }) => theme.colors.card};
-  box-shadow:
-    0 1px 2px 0 rgba(0, 0, 0, 0.08),
-    0 4px 8px 0 rgba(0, 0, 0, 0.16);
-  padding: 16px;
-  gap: 16px;
-`
-
-const ModalHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Wrapper that strips MarketsDropdown's <Root> card chrome and its
+   built-in mobile fullscreen takeover so it lays out cleanly inside
+   the shared Modal — the Modal already provides borders, shadow, and
+   the bottom-sheet treatment on mobile/tablet. */
+const MarketsWrap = styled.div`
   align-self: stretch;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+
+  & > div {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    height: 50vh;
+    max-height: 50vh;
+    width: 100%;
+
+    @media (max-width: 767px) {
+      position: static;
+      inset: auto;
+      width: 100%;
+      height: 60vh;
+      max-height: 60vh;
+    }
+  }
+
+  @media (max-width: 967.98px) {
+    width: 100%;
+  }
 `
 
-const ModalTitle = styled.h3`
-  margin: 0;
-  font-family: 'Kanit', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.text};
+/* Vertical-stack body for the collateral modal — search field on top,
+   scrollable token list below. Matches the rhythm of DepositModal's
+   ModalBody. */
+const CollateralBody = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: stretch;
+  min-width: 0;
+
+  @media (max-width: 967.98px) {
+    width: 100%;
+  }
 `
 
-const ModalCloseBtn = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 0;
-  background: transparent;
-  color: ${({ theme }) => theme.colors.textSubtle};
-  cursor: pointer;
-  border-radius: 999px;
-  &:hover { background: ${({ theme }) => theme.colors.input}; }
-`
 
 const SearchField = styled.label`
   display: flex;
@@ -687,37 +705,24 @@ const TokenValue = styled.span`
   font-variant-numeric: tabular-nums;
 `
 
-/* ── Order Confirmation modal ──────────────────────────────────── */
+/* ── Order Confirmation modal ────────────────────────────────────
+   Wraps order-summary rows + Don't-show toggle + action buttons in
+   the shared Modal primitive — same Deposit-style chrome (centered
+   on desktop, bottom-sheet with grabber/drag-to-close on
+   mobile/tablet) as Collateral and Withdraw. */
 
-const ConfirmModalCard = styled.div`
+/* Vertical-stack body for the order confirmation content. Matches
+   the 24px rhythm the original ConfirmModalCard used (gap: 24px). */
+const ConfirmBody = styled.div`
   display: flex;
-  width: 411px;
-  padding: 24px;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   gap: 24px;
-  border-radius: 24px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  background: ${({ theme }) => theme.colors.card};
-  box-shadow:
-    0 1px 2px 0 rgba(0, 0, 0, 0.08),
-    0 4px 8px 0 rgba(0, 0, 0, 0.16);
-`
-
-const ConfirmModalTitle = styled.h3`
-  margin: 0;
   align-self: stretch;
-  color: ${({ theme }) => theme.colors.text};
-  font-feature-settings: 'liga' off;
-  font-family: Kanit;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 150%;
+  min-width: 0;
+
+  @media (max-width: 967.98px) {
+    width: 100%;
+  }
 `
 
 const OrderRowsList = styled.div`
@@ -884,44 +889,37 @@ const OrderConfirmModal: React.FC<{
   onConfirm: () => void
   onClose: () => void
 }> = ({ isOpen, side, pair, baseAsset, price, estLiqPrice, positionSize, duration, onConfirm, onClose }) => {
-  if (!isOpen) return null
   const isUp = side === 'up'
   return (
-    <Overlay onClick={onClose}>
-      <ConfirmModalCard onClick={(e) => e.stopPropagation()}>
-        <ModalHeader>
-          <ConfirmModalTitle>Order Confirmation</ConfirmModalTitle>
-          <ModalCloseBtn type="button" onClick={onClose} aria-label="Close">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-            </svg>
-          </ModalCloseBtn>
-        </ModalHeader>
-        <OrderTokenRow>
-          <OrderTokenLeft>
-            <TokenIcon $color="#F0B90B">{baseAsset.slice(0, 1)}</TokenIcon>
-            <OrderTokenSymbol>{pair}</OrderTokenSymbol>
-          </OrderTokenLeft>
-          <SidePill $up={isUp}>
-            {isUp ? '↑' : '↓'} {isUp ? 'Up' : 'Down'}
-          </SidePill>
-        </OrderTokenRow>
-        <OrderRowsList>
-          <OrderRow><OrderLabel>Price</OrderLabel><OrderValue>{price}</OrderValue></OrderRow>
-          <OrderRow><OrderLabel>Est. Liquidation price</OrderLabel><OrderValue>{estLiqPrice}</OrderValue></OrderRow>
-          <OrderRow><OrderLabel>Position size</OrderLabel><OrderValue>{positionSize}</OrderValue></OrderRow>
-          <OrderRow><OrderLabel>Time duration</OrderLabel><OrderValue>{duration}</OrderValue></OrderRow>
-        </OrderRowsList>
-        <DontShowRow>
-          Don&apos;t show again
-          <DontShowCheckbox defaultChecked />
-        </DontShowRow>
-        <ModalActions>
-          <ModalActionBtn type="button" $variant="primary" onClick={onConfirm}>Confirm</ModalActionBtn>
-          <ModalActionBtn type="button" $variant="secondary" onClick={onClose}>Cancel</ModalActionBtn>
-        </ModalActions>
-      </ConfirmModalCard>
-    </Overlay>
+    <ModalV2 isOpen={isOpen} onDismiss={onClose} closeOnOverlayClick>
+      <Modal title="Order Confirmation" onDismiss={onClose} minWidth="360px">
+        <ConfirmBody>
+          <OrderTokenRow>
+            <OrderTokenLeft>
+              <TokenIcon $color="#F0B90B">{baseAsset.slice(0, 1)}</TokenIcon>
+              <OrderTokenSymbol>{pair}</OrderTokenSymbol>
+            </OrderTokenLeft>
+            <SidePill $up={isUp}>
+              {isUp ? '↑' : '↓'} {isUp ? 'Up' : 'Down'}
+            </SidePill>
+          </OrderTokenRow>
+          <OrderRowsList>
+            <OrderRow><OrderLabel>Price</OrderLabel><OrderValue>{price}</OrderValue></OrderRow>
+            <OrderRow><OrderLabel>Est. Liquidation price</OrderLabel><OrderValue>{estLiqPrice}</OrderValue></OrderRow>
+            <OrderRow><OrderLabel>Position size</OrderLabel><OrderValue>{positionSize}</OrderValue></OrderRow>
+            <OrderRow><OrderLabel>Time duration</OrderLabel><OrderValue>{duration}</OrderValue></OrderRow>
+          </OrderRowsList>
+          <DontShowRow>
+            Don&apos;t show again
+            <DontShowCheckbox defaultChecked />
+          </DontShowRow>
+          <ModalActions>
+            <ModalActionBtn type="button" $variant="primary" onClick={onConfirm}>Confirm</ModalActionBtn>
+            <ModalActionBtn type="button" $variant="secondary" onClick={onClose}>Cancel</ModalActionBtn>
+          </ModalActions>
+        </ConfirmBody>
+      </Modal>
+    </ModalV2>
   )
 }
 
@@ -1015,6 +1013,18 @@ interface CollateralAsset {
   color: string
 }
 
+/* Demo market list for the SimpleTickerCard's BTC/USD pill picker.
+   Mirrors the shape consumed by pancake-frontend's MarketsDropdown. */
+const SAMPLE_MARKETS: MarketRow[] = [
+  { symbol: 'BTCUSDT',  lastPrice: '78053.6', priceChangePercent: '0.93',  quoteVolume: '2130000000', maxLeverage: 125 },
+  { symbol: 'ETHUSDT',  lastPrice: '3245.8',  priceChangePercent: '1.04',  quoteVolume: '983142000',  maxLeverage: 100 },
+  { symbol: 'SOLUSDT',  lastPrice: '182.35',  priceChangePercent: '3.14',  quoteVolume: '412099900',  maxLeverage: 75  },
+  { symbol: 'BNBUSDT',  lastPrice: '608.1',   priceChangePercent: '-0.18', quoteVolume: '281050000',  maxLeverage: 75  },
+  { symbol: 'XRPUSDT',  lastPrice: '2.412',   priceChangePercent: '5.67',  quoteVolume: '192034500',  maxLeverage: 50  },
+  { symbol: 'DOGEUSDT', lastPrice: '0.1821',  priceChangePercent: '-2.33', quoteVolume: '112887000',  maxLeverage: 50  },
+  { symbol: 'AVAXUSDT', lastPrice: '41.27',   priceChangePercent: '0.44',  quoteVolume: '74012000',   maxLeverage: 25  },
+]
+
 const COLLATERAL_ASSETS: CollateralAsset[] = [
   { symbol: 'BNB',  name: 'BNB chain native token', amount: '23.62',  valueUsd: '$18,053.62', color: '#F0B90B' },
   { symbol: 'CAKE', name: 'PancakeSwap Token',      amount: '987.98', valueUsd: '$1,390.98',  color: '#23CAD5' },
@@ -1023,44 +1033,37 @@ const COLLATERAL_ASSETS: CollateralAsset[] = [
 ]
 
 const CollateralModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-  if (!isOpen) return null
   return (
-    <Overlay onClick={onClose}>
-      <ModalCard onClick={(e) => e.stopPropagation()}>
-        <ModalHeader>
-          <ModalTitle>Collateral</ModalTitle>
-          <ModalCloseBtn type="button" onClick={onClose} aria-label="Close">
+    <ModalV2 isOpen={isOpen} onDismiss={onClose} closeOnOverlayClick>
+      <Modal title="Collateral" onDismiss={onClose} minWidth="360px">
+        <CollateralBody>
+          <SearchField>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
             </svg>
-          </ModalCloseBtn>
-        </ModalHeader>
-        <SearchField>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
-          </svg>
-          <SearchInput type="text" placeholder="Search" />
-        </SearchField>
-        <TokenList>
-          {COLLATERAL_ASSETS.map((a) => (
-            <TokenRow key={a.symbol} type="button">
-              <TokenIcon $color={a.color}>{a.symbol.slice(0, 1)}</TokenIcon>
-              <TokenMain>
-                <TokenLine>
-                  <TokenSymbol>{a.symbol}</TokenSymbol>
-                  <TokenName>{a.name}</TokenName>
-                </TokenLine>
-                <CollateralTag>COLLATERAL</CollateralTag>
-              </TokenMain>
-              <TokenRight>
-                <TokenAmount>{a.amount}</TokenAmount>
-                <TokenValue>{a.valueUsd}</TokenValue>
-              </TokenRight>
-            </TokenRow>
-          ))}
-        </TokenList>
-      </ModalCard>
-    </Overlay>
+            <SearchInput type="text" placeholder="Search" />
+          </SearchField>
+          <TokenList>
+            {COLLATERAL_ASSETS.map((a) => (
+              <TokenRow key={a.symbol} type="button">
+                <TokenIcon $color={a.color}>{a.symbol.slice(0, 1)}</TokenIcon>
+                <TokenMain>
+                  <TokenLine>
+                    <TokenSymbol>{a.symbol}</TokenSymbol>
+                    <TokenName>{a.name}</TokenName>
+                  </TokenLine>
+                  <CollateralTag>COLLATERAL</CollateralTag>
+                </TokenMain>
+                <TokenRight>
+                  <TokenAmount>{a.amount}</TokenAmount>
+                  <TokenValue>{a.valueUsd}</TokenValue>
+                </TokenRight>
+              </TokenRow>
+            ))}
+          </TokenList>
+        </CollateralBody>
+      </Modal>
+    </ModalV2>
   )
 }
 
@@ -1156,6 +1159,8 @@ export function SimplePerpsPage({
   const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [withdrawAssetId, setWithdrawAssetId] = useState<string | undefined>(undefined)
   const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [marketsOpen, setMarketsOpen] = useState(false)
+  const [marketsFavorites, setMarketsFavorites] = useState<string[]>([])
 
   return (
     <Root aria-label={`Perpetuals · Simple mode · ${initialPair}`}>
@@ -1173,6 +1178,7 @@ export function SimplePerpsPage({
             openInterest="$2.13B"
             fundingRate="+0.010%"
             nextFunding="4h 12m"
+            onSymbolClick={() => setMarketsOpen(true)}
             onChartOpen={() => setChartOpen(true)}
           />
 
@@ -1231,6 +1237,23 @@ export function SimplePerpsPage({
 
       <CollateralModal isOpen={collateralOpen} onClose={() => setCollateralOpen(false)} />
 
+      <ModalV2 isOpen={marketsOpen} onDismiss={() => setMarketsOpen(false)} closeOnOverlayClick>
+        <Modal title="Select Market" onDismiss={() => setMarketsOpen(false)} minWidth="360px" bodyPadding="16px">
+          <MarketsWrap>
+            <MarketsDropdown
+              markets={SAMPLE_MARKETS}
+              favorites={marketsFavorites}
+              onToggleFavorite={(s) =>
+                setMarketsFavorites((prev) =>
+                  prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s],
+                )
+              }
+              onSelect={() => setMarketsOpen(false)}
+            />
+          </MarketsWrap>
+        </Modal>
+      </ModalV2>
+
       <WithdrawModal12
         isOpen={withdrawOpen}
         onClose={() => {
@@ -1270,6 +1293,7 @@ export function SimplePerpsPage({
         isOpen={chartOpen}
         setIsOpen={setChartOpen}
         hideCloseButton
+        drawerContainerStyle={{ display: 'flex', flexDirection: 'column' }}
         content={
           <>
             <ChartSheetGrabberSpacer />
@@ -1302,7 +1326,7 @@ export function SimplePerpsPage({
                 points={[]}
                 currentPriceLabel="640"
                 yTicks={Y_TICKS}
-                xTicks={X_TICKS}
+                xTicks={X_TICKS_DRAWER}
               />
             </ChartSheetChart>
           </>

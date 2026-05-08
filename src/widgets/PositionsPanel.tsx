@@ -639,7 +639,7 @@ const ShareBtn = styled.button`
   justify-content: center;
   width: 21px;
   height: 21px;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.primary};
   transition: opacity 0.12s;
   &:hover:not(:disabled) {
     opacity: 0.7;
@@ -811,7 +811,6 @@ const PositionTableRow: React.FC<{
             type="button"
             aria-label={t('Share position')}
             onClick={() => onShare?.(p)}
-            disabled={!onShare}
           >
             <ShareGlyph />
           </ShareBtn>
@@ -1808,10 +1807,11 @@ const MobilePositionCard: React.FC<{
   computeLiqPrice?: PositionsPanelProps['computeLiqPrice']
   onClose: (p: PositionRow) => void
   onEditTpSl: (p: PositionRow, markPrice: number) => void
+  onShare?: (p: PositionRow) => void
   closingSymbol?: string | null
   sizeUnit: 'BASE' | 'QUOTE'
   t: (key: string) => string
-}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, closingSymbol, sizeUnit, t }) => {
+}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, onShare, closingSymbol, sizeUnit, t }) => {
   const markPrice = useMarkPriceForSymbol?.(p.symbol)
   const side: 'BUY' | 'SELL' = p.positionAmt >= 0 ? 'BUY' : 'SELL'
 
@@ -1851,6 +1851,13 @@ const MobilePositionCard: React.FC<{
         <MobileCardPnl $up={livePnl >= 0}>
           {Number.isFinite(livePnl) ? `${livePnl >= 0 ? '+' : ''}${livePnl.toFixed(4)}` : '—'}
         </MobileCardPnl>
+        <ShareBtn
+          type="button"
+          aria-label={t('Share position')}
+          onClick={() => onShare?.(p)}
+        >
+          <ShareGlyph />
+        </ShareBtn>
       </MobileCardHead>
       <MobileCardGrid>
         <MobileCardCell>
@@ -1960,6 +1967,7 @@ const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
   onClosePosition,
   onEditTpSl,
   onCancelOrder,
+  onSharePnl,
   useMarkPriceForSymbol,
   computeLiqPrice,
   closingSymbol,
@@ -2057,6 +2065,7 @@ const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
               computeLiqPrice={computeLiqPrice}
               onClose={onClosePosition}
               onEditTpSl={onEditTpSl}
+              onShare={onSharePnl}
               closingSymbol={closingSymbol}
               sizeUnit={sizeUnit}
               t={t}

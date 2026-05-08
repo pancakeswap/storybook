@@ -18,8 +18,8 @@ export interface SimpleTickerCardProps {
   nextFunding: string
   onSymbolClick?: () => void
   /**
-   * Mobile + tablet callback. When provided, the ticker renders a small
-   * graph-icon button next to the price on screens ≤967.98px. Tapping
+   * Mobile callback. When provided, the ticker renders a small
+   * graph-icon button next to the price on screens <576px. Tapping
    * it fires this callback — typically wiring a chart bottom-sheet,
    * since the inline chart is hidden at this breakpoint to save space.
    */
@@ -54,7 +54,7 @@ const Card = styled.div`
   background: ${({ theme }) => theme.colors.card};
   font-variant-numeric: tabular-nums;
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     padding: 16px;
     /* 12px between the price/graph cluster and the markets-dropdown
        button, per Figma 621-29050 spec. */
@@ -75,7 +75,7 @@ const Left = styled.button`
   text-align: left;
   flex-shrink: 0;
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     flex: 1;
   }
 `
@@ -94,7 +94,7 @@ const TokenChip = styled.span`
   font-weight: 700;
   flex-shrink: 0;
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     width: 40px;
     height: 40px;
     font-size: 14px;
@@ -122,7 +122,7 @@ const TokenIconSlot = styled.span`
     display: block;
   }
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     width: 40px;
     height: 40px;
     flex: 0 0 40px;
@@ -134,7 +134,7 @@ const Meta = styled.div`
   flex-direction: column;
   gap: 4px;
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     flex: 1;
     flex-direction: row;
     align-items: center;
@@ -164,7 +164,7 @@ const PairDropdown = styled.span`
   border-left: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     height: auto;
     padding: 0;
     border: 0;
@@ -186,7 +186,7 @@ const Name = styled.span`
   font-weight: 600;
   line-height: 150%;
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     font-size: 20px;
     letter-spacing: -0.2px;
   }
@@ -200,7 +200,7 @@ const PairArrowBox = styled.span`
   align-items: center;
   color: ${({ theme }) => theme.colors.textSubtle};
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     display: none;
   }
 `
@@ -210,7 +210,7 @@ const PairArrowBox = styled.span`
 const MobilePairChevron = styled.button`
   display: none;
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     display: inline-flex;
     padding: 2px;
     align-items: center;
@@ -230,7 +230,34 @@ const MobilePairChevron = styled.button`
 const MobileChartButton = styled.button`
   display: none;
 
-  @media (max-width: 967.98px) {
+  @media (min-width: 576px) and (max-width: 967.98px) {
+    /* Tablet — chart icon styled like the pair-pill button (32×32, input
+       chrome), pinned to the far right outside the scrollable stats so it
+       stays visible regardless of scroll position. */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 32px;
+    height: 32px;
+    padding: 2px;
+    border-top: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+    border-right: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+    border-bottom: 2px solid ${({ theme }) => theme.colors.inputSecondary};
+    border-left: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+    border-radius: 8px;
+    background: ${({ theme }) => theme.colors.input};
+    color: ${({ theme }) => theme.colors.textSubtle};
+    cursor: pointer;
+    flex-shrink: 0;
+    order: 1;
+
+    &:hover {
+      color: ${({ theme }) => theme.colors.text};
+    }
+  }
+
+  @media (max-width: 575.98px) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -269,7 +296,15 @@ const Price = styled.span`
   line-height: 1.2;
   color: ${({ theme }) => theme.colors.text};
 
-  @media (max-width: 967.98px) {
+  @media (min-width: 576px) and (max-width: 967.98px) {
+    font-family: Kanit;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 150%;
+    letter-spacing: -0.24px;
+  }
+
+  @media (max-width: 575.98px) {
     font-family: Kanit;
     font-size: 20px;
     font-style: normal;
@@ -291,7 +326,7 @@ const Pnl = styled.span<{ $positive: boolean }>`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.text};
 
-  @media (max-width: 967.98px) {
+  @media (max-width: 575.98px) {
     display: none;
   }
 `
@@ -307,9 +342,15 @@ const StatsWrap = styled.div`
   align-items: center;
   flex: 0 1 auto;
   min-width: 0;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   position: relative;
   justify-content: flex-start;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `
 
 const Stats = styled(Flex)`
@@ -337,20 +378,16 @@ const StatsChevron = styled.span<{ $visible: boolean }>`
   transition: opacity 0.15s;
 `
 
-const Stat = styled.div<{ $hideOnLaptop?: boolean }>`
+const Stat = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;
 
-  @media (min-width: 968px) and (max-width: 1199.98px) {
-    display: ${({ $hideOnLaptop }) => ($hideOnLaptop ? 'none' : 'flex')};
-  }
-
-  /* Tablet (576-967.98) now mirrors the mobile compact layout — stats
-     are hidden along with the rest of the inline chart, replaced by the
-     graph icon + chart bottom-sheet. */
-  @media (max-width: 967.98px) {
+  /* Below 576 (mobile) the stats strip is hidden — the inline chart is
+     also hidden at this breakpoint and the ticker offers a chart-bottom-
+     sheet button instead. */
+  @media (max-width: 575.98px) {
     display: none;
   }
 `
@@ -359,7 +396,7 @@ const StatLabel = styled.span`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.textSubtle};
 
-  @media (min-width: 968px) and (max-width: 1199.98px) {
+  @media (min-width: 576px) and (max-width: 1199.98px) {
     color: ${({ theme }) => theme.colors.textSubtle};
     font-feature-settings: 'liga' off;
     font-family: Kanit;
@@ -374,6 +411,15 @@ const StatValue = styled.span`
   font-size: 14px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.text};
+
+  @media (min-width: 576px) and (max-width: 967.98px) {
+    color: ${({ theme }) => theme.colors.text};
+    font-feature-settings: 'liga' off;
+    font-family: Kanit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 150%;
+  }
 
   @media (min-width: 968px) and (max-width: 1199.98px) {
     color: ${({ theme }) => theme.colors.text};
@@ -441,12 +487,20 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
     const wrap = wrapRef.current
     const stats = statsRef.current
     if (!wrap || !stats) return
-    const check = () => setIsOverflow(stats.scrollWidth > wrap.clientWidth + 1)
+    const check = () => {
+      const hasOverflow = wrap.scrollWidth > wrap.clientWidth + 1
+      const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 1
+      setIsOverflow(hasOverflow && !atEnd)
+    }
     check()
     const ro = new ResizeObserver(check)
     ro.observe(wrap)
     ro.observe(stats)
-    return () => ro.disconnect()
+    wrap.addEventListener('scroll', check, { passive: true })
+    return () => {
+      ro.disconnect()
+      wrap.removeEventListener('scroll', check)
+    }
   }, [])
   return (
     <Card>
@@ -507,15 +561,15 @@ export const SimpleTickerCard: React.FC<SimpleTickerCardProps> = ({
             <StatLabel>24h Volume</StatLabel>
             <StatValue>{volume24h}</StatValue>
           </Stat>
-          <Stat $hideOnLaptop>
+          <Stat>
             <StatLabel>Open Interest</StatLabel>
             <StatValue>{openInterest}</StatValue>
           </Stat>
-          <Stat $hideOnLaptop>
+          <Stat>
             <StatLabel>Funding Rate</StatLabel>
             <StatValue>{fundingRate}</StatValue>
           </Stat>
-          <Stat $hideOnLaptop>
+          <Stat>
             <StatLabel>Next Funding</StatLabel>
             <StatValue>{nextFunding}</StatValue>
           </Stat>
