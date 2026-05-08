@@ -3287,7 +3287,7 @@ var G = B(e)`
   row-gap: 0;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
 `, Ci = B.div`
   display: contents;
@@ -3300,7 +3300,7 @@ var G = B(e)`
    * cells flush against each other (no column-gap) is what lets the
    * hover-active strip paint as one continuous bg. */
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
     transition: background 0.12s;
   }
   &:hover > * {
@@ -3459,7 +3459,7 @@ var G = B(e)`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
 `, Bi = R`
   max-height: 360px;
@@ -3471,7 +3471,7 @@ var G = B(e)`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${Bi}
 `, Hi = B.div`
@@ -3481,7 +3481,7 @@ var G = B(e)`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${Bi}
 `, Ui = B.div`
@@ -3491,7 +3491,7 @@ var G = B(e)`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${Bi}
 `, Wi = B.div`
