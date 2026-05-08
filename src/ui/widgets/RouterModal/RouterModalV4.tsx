@@ -1,13 +1,14 @@
 import { styled } from "styled-components";
 import { Card, CardBody, CardFooter, CardHeader, IconButton, Text } from "../../components";
 import { CloseIcon, HelpIcon, RefreshIcon } from "../../Icons";
-import { TokenChip } from "./RouteDiagramV2";
+import { TokenChip } from "./TokenChip";
 import { RouteDiagramV4 } from "./RouteDiagramV4";
 import type { RouteV4 } from "./types";
 
 const ModalCard = styled(Card)`
   width: 560px;
   max-width: 100%;
+  font-family: "Kanit", sans-serif;
 `;
 
 const HeaderInner = styled(CardHeader)`

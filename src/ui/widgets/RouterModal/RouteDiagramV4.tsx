@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { styled, useTheme } from "styled-components";
 import { SOURCE_COLORS } from "./tokens";
-import { TokenChip } from "./RouteDiagramV2";
+import { TokenChip } from "./TokenChip";
 import type { LegV4, RouteV4, SourceName, TokenSymbol } from "./types";
 
 interface SourceDotProps {

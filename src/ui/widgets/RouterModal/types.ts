@@ -17,29 +17,6 @@ export interface RouteEndpoint {
   usd: string;
 }
 
-export interface SourceShare {
-  name: string;
-  pct: number;
-}
-
-export interface HopV2 {
-  pair: [TokenSymbol, TokenSymbol];
-  source: SourceName;
-  fee: string;
-  sources: SourceShare[];
-}
-
-export interface BranchV2 {
-  pct: number;
-  hops: HopV2[];
-}
-
-export interface RouteV2 {
-  src: RouteEndpoint;
-  dst: RouteEndpoint;
-  branches: BranchV2[];
-}
-
 export interface PoolV4 {
   source: SourceName;
   fee: string;
