@@ -366,6 +366,7 @@ const UnitPicker = styled(Button).attrs({ variant: 'text', scale: 'xs' })`
 const DashedLabelWrap = styled.span`
   position: relative;
   display: inline-flex;
+  width: fit-content;
 `
 
 // eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
@@ -1740,7 +1741,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
               <SK>{t('Est. Liq. Price')}</SK>
               {summaryTip === 'liq' && (
                 <ReduceOnlyTooltip role="tooltip">
-                  {t('Total margin required to open this position.')}
+                  {t('Estimated price at which this position will be liquidated.')}
                 </ReduceOnlyTooltip>
               )}
             </DashedLabelWrap>
