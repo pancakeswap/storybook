@@ -32,6 +32,11 @@ export interface PositionRow {
    *  When omitted the tag is hidden — older consumers stay backward-
    *  compatible. PAN-11866. */
   marginType?: 'CROSS' | 'ISOLATED'
+  /** Aster `/fapi/v3/adlQuantile` value for this position's side
+   *  (0–4, low → imminent ADL). Drives the lit-bar count in the ADL
+   *  gauge. When undefined the gauge falls back to a single red marker
+   *  (Aster's resting state). PAN-11867. */
+  adlQuantile?: number
 }
 
 export interface OpenOrderRow {
@@ -505,12 +510,12 @@ const SideLevText = styled.span<{ $up: boolean }>`
 `
 
 /* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Mirrors
- * Aster's ADL ("auto-deleverage") gauge: a single leftmost destructive
- * bar reads as a "leveraged position" marker, the remaining three are
- * the neutral fill color. Aster only lights additional bars off the
- * server-pushed `adlQuantile` field; until we plumb that through the
- * widget we keep the count at 1 to match their UI exactly (PAN-11867 —
- * verified against Aster's positions list). */
+ * Aster's ADL ("auto-deleverage") gauge: lit count is driven by the
+ * server-pushed `adlQuantile` field (`/fapi/v3/adlQuantile`, 0–4 from
+ * low → imminent ADL). Lit bars are the destructive color, unlit are
+ * the neutral fill. When the consumer hasn't loaded the quantile yet
+ * we light just the leftmost bar — Aster's resting chrome.
+ * PAN-11867. */
 const LevBarRow = styled.span`
   display: inline-flex;
   align-items: center;
@@ -525,6 +530,21 @@ const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
   background: ${({ $variant, theme }) =>
     $variant === 'destructive' ? theme.colors.failure : theme.colors.text};
 `
+
+/**
+ * Map Aster's 0–4 ADL quantile to the 4-bar gauge. Aster's API spec
+ * documents 5 buckets (`0, 1, 2, 3, 4 shows the queue position and
+ * possibility of ADL from low to high`). Their UI renders 4 bars per
+ * row; the bucket-to-bar mapping isn't documented, so we use the
+ * straightforward `min(quantile + 1, 4)` collapse — quantile 0 lights
+ * the resting marker, each step adds a bar, and 3 / 4 both fill the
+ * gauge. Update if Aster publishes the official mapping.
+ */
+const litFromAdlQuantile = (q: number | undefined): 1 | 2 | 3 | 4 => {
+  if (q === undefined || !Number.isFinite(q)) return 1
+  const clamped = Math.max(0, Math.min(4, Math.floor(q)))
+  return Math.min(clamped + 1, 4) as 1 | 2 | 3 | 4
+}
 
 const TpSlCell = styled.div`
   display: flex;
@@ -781,9 +801,12 @@ const PositionTableRow: React.FC<{
             {side === 'BUY' ? t('Buy') : t('Sell')} {p.leverage}x
           </SideLevText>
           <LevBarRow ref={adlTipRef as React.RefObject<HTMLSpanElement>}>
-            {[0, 1, 2, 3].map((i) => (
-              <LevBar key={i} $variant={i === 0 ? 'destructive' : 'fill'} />
-            ))}
+            {(() => {
+              const lit = litFromAdlQuantile(p.adlQuantile)
+              return [0, 1, 2, 3].map((i) => (
+                <LevBar key={i} $variant={i < lit ? 'destructive' : 'fill'} />
+              ))
+            })()}
           </LevBarRow>
           {adlTipNode}
         </StackSub>
