@@ -308,7 +308,7 @@ const PositionsTable = styled.div`
   row-gap: 0;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
 `
 
@@ -326,7 +326,7 @@ const RowGroup = styled.div`
    * cells flush against each other (no column-gap) is what lets the
    * hover-active strip paint as one continuous bg. */
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
     transition: background 0.12s;
   }
   &:hover > * {
@@ -582,7 +582,7 @@ const OrdersTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
 `
 
@@ -604,7 +604,7 @@ const TradesTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${historyTableScroll}
 `
@@ -616,7 +616,7 @@ const TxTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${historyTableScroll}
 `
@@ -628,7 +628,7 @@ const OrderHistoryTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${historyTableScroll}
 `
