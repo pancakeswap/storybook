@@ -2,9 +2,9 @@ import { B as e, D as t, E as n, F as r, H as i, Ht as a, Jn as o, Jt as s, Ki a
 import O, { Children as k, cloneElement as A, useCallback as j, useEffect as M, useId as N, useLayoutEffect as P, useMemo as F, useRef as I, useState as L } from "react";
 import { css as R, keyframes as z, styled as B, useTheme as V } from "styled-components";
 import { Fragment as H, jsx as U, jsxs as W } from "react/jsx-runtime";
-import { createPortal as ee } from "react-dom";
+import { createPortal as G } from "react-dom";
 //#region src/widgets/primitives.tsx
-var G = B(e)`
+var K = B(e)`
   border-radius: 0;
   padding: 0;
   display: flex;
@@ -20,7 +20,7 @@ var G = B(e)`
     min-height: 0;
     background: ${({ theme: e }) => e.colors.backgroundAlt};
   }
-`, K = B.div`
+`, ee = B.div`
   display: flex;
   gap: ${({ $fullWidth: e }) => e ? "0" : "16px"};
   padding: ${({ $fullWidth: e }) => e ? "0" : "0 12px"};
@@ -50,7 +50,7 @@ var G = B(e)`
 	onClick: n,
 	type: "button",
 	children: e
-}), J = ({ activeIndex: e, onItemClick: t, children: n, fullWidth: r = !1, noBorder: i = !1, className: a }) => /* @__PURE__ */ U(K, {
+}), J = ({ activeIndex: e, onItemClick: t, children: n, fullWidth: r = !1, noBorder: i = !1, className: a }) => /* @__PURE__ */ U(ee, {
 	$fullWidth: r,
 	$noBorder: i,
 	className: a,
@@ -59,26 +59,26 @@ var G = B(e)`
 		onClick: () => t(i),
 		fullWidth: r
 	}))
-}), ne = B(G)`
+}), ne = B(K)`
   flex: 1;
   & > div {
     padding: 12px;
     gap: 12px;
   }
-`, re = B(r).attrs({ fontSize: "16px" })`
+`, Y = B(r).attrs({ fontSize: "16px" })`
   line-height: 1.3;
   color: ${({ theme: e }) => e.colors.text};
-`, Y = B(E)`
+`, re = B(E)`
   justify-content: space-between;
   align-items: center;
 `, X = B(r).attrs({
 	fontSize: "14px",
 	color: "textSubtle"
-})``, ie = B(r).attrs({ fontSize: "14px" })`
+})``, Z = B(r).attrs({ fontSize: "14px" })`
   font-variant-numeric: tabular-nums;
   color: ${({ theme: e }) => e.colors.text};
   text-align: right;
-`, ae = B.button`
+`, ie = B.button`
   flex: 1;
   height: 48px;
   border: 0;
@@ -102,22 +102,22 @@ var G = B(e)`
     opacity: 0.5;
     cursor: not-allowed;
   }
-`, oe = B(E)`
+`, ae = B(E)`
   flex-direction: column;
   gap: 8px;
-`, se = B(ie)`
+`, oe = B(Z)`
   color: ${({ $sign: e, theme: t }) => e === "positive" ? t.colors.success : e === "negative" ? t.colors.failure : t.colors.text};
-`, ce = (e) => e, le = B(E)`
+`, se = (e) => e, ce = B(E)`
   align-items: center;
   gap: 12px;
   padding: 12px;
-`, ue = B(r).attrs({ fontSize: "14px" })`
+`, le = B(r).attrs({ fontSize: "14px" })`
   flex: 1;
   color: ${({ theme: e }) => e.colors.text};
-`, de = B.strong`
+`, ue = B.strong`
   margin-left: 8px;
   font-weight: 600;
-`, fe = B.button`
+`, de = B.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -143,38 +143,38 @@ var G = B(e)`
     opacity: 0.5;
     cursor: not-allowed;
   }
-`, pe = ({ state: e, canDeposit: t = !0, onDeposit: n, t: r = ce, mobileLabel: i }) => {
+`, fe = ({ state: e, canDeposit: t = !0, onDeposit: n, t: r = se, mobileLabel: i }) => {
 	let a = e.kind === "ready" && e.equity ? e.equity : "$0.00";
-	return /* @__PURE__ */ W(le, { children: [/* @__PURE__ */ W(ue, { children: [
+	return /* @__PURE__ */ W(ce, { children: [/* @__PURE__ */ W(le, { children: [
 		i ?? r("Perpetual Account"),
 		" ",
-		/* @__PURE__ */ U(de, { children: a })
-	] }), /* @__PURE__ */ U(fe, {
+		/* @__PURE__ */ U(ue, { children: a })
+	] }), /* @__PURE__ */ U(de, {
 		type: "button",
 		onClick: n,
 		disabled: !t,
 		children: r("Deposit")
 	})] });
-}, me = (e) => {
-	let { isMobile: a } = h();
-	if (a) return /* @__PURE__ */ U(pe, { ...e });
-	let { walletDisplay: o, state: s, canDeposit: c = !0, canWithdraw: l = !0, onDeposit: u, onWithdraw: d, onEnableTrading: f, t: p = ce } = e;
+}, pe = (e) => {
+	let { isMobile: a, isTablet: o } = h();
+	if (a || o) return /* @__PURE__ */ U(fe, { ...e });
+	let { walletDisplay: s, state: c, canDeposit: l = !0, canWithdraw: u = !0, onDeposit: d, onWithdraw: f, onEnableTrading: p, t: m = se } = e;
 	return /* @__PURE__ */ W(ne, { children: [
 		/* @__PURE__ */ W(E, {
 			style: { gap: 8 },
-			children: [/* @__PURE__ */ U(ae, {
+			children: [/* @__PURE__ */ U(ie, {
 				$variant: "primary",
-				onClick: u,
-				disabled: !c,
-				children: p("Deposit")
-			}), /* @__PURE__ */ U(ae, {
-				$variant: "secondary",
 				onClick: d,
 				disabled: !l,
-				children: p("Withdraw")
+				children: m("Deposit")
+			}), /* @__PURE__ */ U(ie, {
+				$variant: "secondary",
+				onClick: f,
+				disabled: !u,
+				children: m("Withdraw")
 			})]
 		}),
-		s.kind === "needs-deposit" && /* @__PURE__ */ U(n, {
+		c.kind === "needs-deposit" && /* @__PURE__ */ U(n, {
 			variant: "warning",
 			children: /* @__PURE__ */ W(E, {
 				flexDirection: "column",
@@ -182,14 +182,14 @@ var G = B(e)`
 				children: [/* @__PURE__ */ U(r, {
 					fontSize: "14px",
 					bold: !0,
-					children: p("Deposit to get started")
+					children: m("Deposit to get started")
 				}), /* @__PURE__ */ U(t, {
 					fontSize: "12px",
-					children: p("Aster activates your account on your first deposit. Once it lands you'll be able to enable trading and see your balance here.")
+					children: m("Aster activates your account on your first deposit. Once it lands you'll be able to enable trading and see your balance here.")
 				})]
 			})
 		}),
-		s.kind === "needs-trading" && /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(n, {
+		c.kind === "needs-trading" && /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(n, {
 			variant: "warning",
 			children: /* @__PURE__ */ W(E, {
 				flexDirection: "column",
@@ -197,31 +197,31 @@ var G = B(e)`
 				children: [/* @__PURE__ */ U(r, {
 					fontSize: "14px",
 					bold: !0,
-					children: p("Enable Trading to view your Aster balance")
+					children: m("Enable Trading to view your Aster balance")
 				}), /* @__PURE__ */ U(t, {
 					fontSize: "12px",
-					children: p("Already deposited? Your funds are safe on Aster — we just can't display them until you sign the one-time trading authorization.")
+					children: m("Already deposited? Your funds are safe on Aster — we just can't display them until you sign the one-time trading authorization.")
 				})]
 			})
 		}), /* @__PURE__ */ U(i, {
-			onClick: f,
+			onClick: p,
 			scale: "sm",
 			variant: "primary",
-			children: p("Enable Trading")
+			children: m("Enable Trading")
 		})] }),
-		s.kind === "ready" && /* @__PURE__ */ W(oe, { children: [
-			/* @__PURE__ */ U(re, { children: p("Account Equity") }),
-			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(X, { children: p("Wallet") }), /* @__PURE__ */ U(ie, { children: o ?? "—" })] }),
-			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(X, { children: p("Equity") }), /* @__PURE__ */ U(ie, { children: s.equity || "—" })] }),
-			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(X, { children: p("Available") }), /* @__PURE__ */ U(ie, { children: s.available || "—" })] }),
-			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(X, { children: p("Unrealized PnL") }), /* @__PURE__ */ U(se, {
-				$sign: s.pnlSign,
-				children: s.unrealizedPnl || "—"
+		c.kind === "ready" && /* @__PURE__ */ W(ae, { children: [
+			/* @__PURE__ */ U(Y, { children: m("Account Equity") }),
+			/* @__PURE__ */ W(re, { children: [/* @__PURE__ */ U(X, { children: m("Wallet") }), /* @__PURE__ */ U(Z, { children: s ?? "—" })] }),
+			/* @__PURE__ */ W(re, { children: [/* @__PURE__ */ U(X, { children: m("Equity") }), /* @__PURE__ */ U(Z, { children: c.equity || "—" })] }),
+			/* @__PURE__ */ W(re, { children: [/* @__PURE__ */ U(X, { children: m("Available") }), /* @__PURE__ */ U(Z, { children: c.available || "—" })] }),
+			/* @__PURE__ */ W(re, { children: [/* @__PURE__ */ U(X, { children: m("Unrealized PnL") }), /* @__PURE__ */ U(oe, {
+				$sign: c.pnlSign,
+				children: c.unrealizedPnl || "—"
 			})] }),
-			/* @__PURE__ */ W(Y, { children: [/* @__PURE__ */ U(X, { children: p("Margin mode") }), /* @__PURE__ */ U(ie, { children: s.marginMode ?? p("Cross") })] })
+			/* @__PURE__ */ W(re, { children: [/* @__PURE__ */ U(X, { children: m("Margin mode") }), /* @__PURE__ */ U(Z, { children: c.marginMode ?? m("Cross") })] })
 		] })
 	] });
-}, he = B(E)`
+}, me = B(E)`
   flex-direction: column;
   gap: 16px;
   width: 100%;
@@ -229,17 +229,17 @@ var G = B(e)`
     min-width: 340px;
     max-width: 440px;
   }
-`, ge = B(E)`
+`, he = B(E)`
   gap: 10px;
   align-items: stretch;
-`, _e = B(i).attrs({
+`, ge = B(i).attrs({
 	variant: "tertiary",
 	scale: "md"
 })`
   width: 44px;
   font-size: 20px;
   font-weight: 700;
-`, ve = B(E)`
+`, _e = B(E)`
   flex: 1;
   align-items: center;
   justify-content: center;
@@ -249,7 +249,7 @@ var G = B(e)`
   font-size: 18px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-`, ye = (e, t) => t ? Object.entries(t).reduce((e, [t, n]) => e.split(`%${t}%`).join(String(n)), e) : e, be = ({ isOpen: e, symbol: t, currentLeverage: n, minLeverage: a = 1, maxLeverage: o = 100, availableBalance: s, onConfirm: c, onClose: l, isSubmitting: u = !1, errorSlot: p, t: m = ye }) => {
+`, ve = (e, t) => t ? Object.entries(t).reduce((e, [t, n]) => e.split(`%${t}%`).join(String(n)), e) : e, ye = ({ isOpen: e, symbol: t, currentLeverage: n, minLeverage: a = 1, maxLeverage: o = 100, availableBalance: s, onConfirm: c, onClose: l, isSubmitting: u = !1, errorSlot: p, t: m = ve }) => {
 	let [h, _] = L(n);
 	M(() => {
 		e && _(n);
@@ -262,16 +262,16 @@ var G = B(e)`
 		children: /* @__PURE__ */ U(g, {
 			title: m("%symbol% Adjust Leverage", { symbol: t }),
 			onDismiss: l,
-			children: /* @__PURE__ */ W(he, { children: [
-				/* @__PURE__ */ W(ge, { children: [
-					/* @__PURE__ */ U(_e, {
+			children: /* @__PURE__ */ W(me, { children: [
+				/* @__PURE__ */ W(he, { children: [
+					/* @__PURE__ */ U(ge, {
 						onClick: () => _((e) => v(e - 1)),
 						disabled: h <= a,
 						"aria-label": "minus",
 						children: "−"
 					}),
-					/* @__PURE__ */ W(ve, { children: [h, "X"] }),
-					/* @__PURE__ */ U(_e, {
+					/* @__PURE__ */ W(_e, { children: [h, "X"] }),
+					/* @__PURE__ */ U(ge, {
 						onClick: () => _((e) => v(e + 1)),
 						disabled: h >= o,
 						"aria-label": "plus",
@@ -312,7 +312,7 @@ var G = B(e)`
 			] })
 		})
 	});
-}, xe = B.button`
+}, be = B.button`
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -333,10 +333,10 @@ var G = B(e)`
   &:not(:disabled):hover {
     border-color: ${({ theme: e }) => e.colors.secondary};
   }
-`, Se = B.div`
+`, xe = B.div`
   flex: 0 0 auto;
   margin-top: 2px;
-`, Z = B(E)`
+`, Se = B(E)`
   flex-direction: column;
   gap: 4px;
   margin-top: 6px;
@@ -412,13 +412,13 @@ var G = B(e)`
 						children: p("Confirm")
 					})
 				] }) : /* @__PURE__ */ W(H, { children: [
-					/* @__PURE__ */ W(xe, {
+					/* @__PURE__ */ W(be, {
 						type: "button",
 						$active: h === "SINGLE",
 						onClick: () => !s && _("SINGLE"),
 						disabled: s,
 						"aria-pressed": h === "SINGLE",
-						children: [/* @__PURE__ */ U(Se, {
+						children: [/* @__PURE__ */ U(xe, {
 							onClick: (e) => e.stopPropagation(),
 							children: /* @__PURE__ */ U(l, {
 								scale: "md",
@@ -433,7 +433,7 @@ var G = B(e)`
 								fontSize: "16px",
 								bold: !0,
 								children: p("Single-Asset Mode")
-							}), /* @__PURE__ */ W(Z, { children: [
+							}), /* @__PURE__ */ W(Se, { children: [
 								/* @__PURE__ */ U(r, {
 									fontSize: "13px",
 									color: "textSubtle",
@@ -452,13 +452,13 @@ var G = B(e)`
 							] })]
 						})]
 					}),
-					/* @__PURE__ */ W(xe, {
+					/* @__PURE__ */ W(be, {
 						type: "button",
 						$active: h === "MULTI",
 						onClick: () => !s && _("MULTI"),
 						disabled: s,
 						"aria-pressed": h === "MULTI",
-						children: [/* @__PURE__ */ U(Se, {
+						children: [/* @__PURE__ */ U(xe, {
 							onClick: (e) => e.stopPropagation(),
 							children: /* @__PURE__ */ U(l, {
 								scale: "md",
@@ -473,7 +473,7 @@ var G = B(e)`
 								fontSize: "16px",
 								bold: !0,
 								children: p("Multi-Asset Mode")
-							}), /* @__PURE__ */ W(Z, { children: [
+							}), /* @__PURE__ */ W(Se, { children: [
 								/* @__PURE__ */ U(r, {
 									fontSize: "13px",
 									color: "textSubtle",
@@ -708,7 +708,7 @@ var G = B(e)`
 	return i ? /* @__PURE__ */ U("div", {
 		style: r ? { display: "none" } : { display: "contents" },
 		children: l
-	}) : /* @__PURE__ */ U(G, {
+	}) : /* @__PURE__ */ U(K, {
 		style: r ? { display: "none" } : void 0,
 		children: l
 	});
@@ -2074,8 +2074,8 @@ var G = B(e)`
 	"aria-hidden": "true",
 	children: /* @__PURE__ */ U("path", { d: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z" })
 }), ar = (e) => e, or = (e) => {
-	let { isMobile: t } = h();
-	return U(t ? vr : sr, { ...e });
+	let { isMobile: t, isTablet: n } = h();
+	return U(t || n ? vr : sr, { ...e });
 }, sr = ({ symbol: e, pairLabel: t, logoUrl: n, lastPrice: r, lastPriceDirection: i = "flat", markPrice: a, indexPrice: o, fundingRate: c, nextFundingTime: l, change24h: u, volume24h: d, openInterestUsd: f, favorited: p = !1, onToggleFavorite: m, renderMarketsDropdown: h, marketsOpen: g, onMarketsOpenChange: _, t: v = ar }) => {
 	let y = V();
 	tr(l !== void 0 && l > Date.now());
@@ -2111,14 +2111,14 @@ var G = B(e)`
 			window.removeEventListener("mousedown", e), window.removeEventListener("keydown", t);
 		};
 	}, [C, w]);
-	let A = j(() => w(!1), [w]), N = Number(c) < 0, F = Number(u) < 0, { targetRef: R, tooltip: z } = T(v("The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes."), { placement: "bottom" }), [B, H] = L(!1), [G, K] = L(null), te = I(null), q = (() => {
+	let A = j(() => w(!1), [w]), N = Number(c) < 0, F = Number(u) < 0, { targetRef: R, tooltip: z } = T(v("The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes."), { placement: "bottom" }), [B, H] = L(!1), [K, ee] = L(null), te = I(null), q = (() => {
 		let e = Number(c);
 		return Number.isFinite(e) ? e * 100 : null;
 	})(), J = q == null ? "—" : `${(q * 3 * 365).toFixed(4)}%`, ne = () => {
 		let e = te.current;
 		if (!e) return;
 		let t = e.getBoundingClientRect();
-		K({
+		ee({
 			top: t.bottom + 8,
 			left: t.left + t.width / 2
 		}), H(!0);
@@ -2154,7 +2154,7 @@ var G = B(e)`
 					})
 				]
 			})] }),
-			C && E && typeof document < "u" && h ? ee(/* @__PURE__ */ U(Pn, {
+			C && E && typeof document < "u" && h ? G(/* @__PURE__ */ U(Pn, {
 				ref: k,
 				style: {
 					top: E.top,
@@ -2198,11 +2198,11 @@ var G = B(e)`
 									children: v("Funding / Countdown")
 								})
 							}),
-							B && G && typeof document < "u" ? ee(/* @__PURE__ */ W(Jn, {
+							B && K && typeof document < "u" ? G(/* @__PURE__ */ W(Jn, {
 								role: "tooltip",
 								style: {
-									top: G.top,
-									left: G.left
+									top: K.top,
+									left: K.left
 								},
 								children: [
 									/* @__PURE__ */ W(Yn, { children: [/* @__PURE__ */ U("span", { children: v("Interval") }), /* @__PURE__ */ U("span", { children: "8h" })] }),
@@ -2415,7 +2415,7 @@ var G = B(e)`
 				onClick: u,
 				children: U(l ? m : a, { width: "20px" })
 			}),
-			y && C && typeof document < "u" && d ? ee(/* @__PURE__ */ U(_r, {
+			y && C && typeof document < "u" && d ? G(/* @__PURE__ */ U(_r, {
 				ref: S,
 				style: {
 					top: C.top,
@@ -3032,7 +3032,7 @@ var G = B(e)`
 					}, e))
 				})]
 			})] }),
-			x && typeof document < "u" && ee(/* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(di, { onClick: () => S(!1) }), /* @__PURE__ */ W(fi, {
+			x && typeof document < "u" && G(/* @__PURE__ */ W(H, { children: [/* @__PURE__ */ U(di, { onClick: () => S(!1) }), /* @__PURE__ */ W(fi, {
 				role: "dialog",
 				"aria-label": f("Choose view"),
 				children: [/* @__PURE__ */ U(pi, {}), k.map((e) => /* @__PURE__ */ W(mi, {
@@ -3047,8 +3047,8 @@ var G = B(e)`
 		]
 	});
 }, _i = (e) => {
-	let { isMobile: t } = h();
-	return U(t ? gi : vi, { ...e });
+	let { isMobile: t, isTablet: n } = h();
+	return U(t || n ? gi : vi, { ...e });
 }, vi = ({ asks: e, bids: t, baseAsset: n, quoteAsset: r, tickSize: i, pricePrecision: a = 2, lastPrice: o = 0, lastPriceDirection: s = "flat", markPrice: c, view: l, onViewChange: u, priceStep: d, onPriceStepChange: f, sizeUnit: p, onSizeUnitChange: m, hidden: h, embedded: g, t: _ = Yr }) => {
 	let v = V(), y = p === "QUOTE" ? r : n, { targetRef: b, tooltip: x } = T(_("The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes."), { placement: "top" }), S = F(() => Ur(i, o), [i, o]), C = I(void 0);
 	M(() => {
@@ -3235,11 +3235,11 @@ var G = B(e)`
 	return g ? /* @__PURE__ */ U("div", {
 		style: h ? { display: "none" } : { display: "contents" },
 		children: N
-	}) : /* @__PURE__ */ U(G, {
+	}) : /* @__PURE__ */ U(K, {
 		style: h ? { display: "none" } : void 0,
 		children: N
 	});
-}, yi = B(G)`
+}, yi = B(K)`
   flex: 1;
   min-height: 200px;
 `, bi = B.div`
@@ -3749,8 +3749,8 @@ var G = B(e)`
     cursor: default;
   }
 `, ta = (e) => {
-	let { isMobile: t } = h();
-	return e.isMobile ?? t ? /* @__PURE__ */ U(Ba, { ...e }) : /* @__PURE__ */ U(na, { ...e });
+	let { isMobile: t, isTablet: n } = h();
+	return e.isMobile ?? (t || n) ? /* @__PURE__ */ U(Ba, { ...e }) : /* @__PURE__ */ U(na, { ...e });
 }, na = ({ tab: e, onTabChange: t, positions: n, openOrders: a, orderHistory: o = [], tradeHistory: s = [], transactionHistory: c = [], onShareTrade: u, useMarkPriceForSymbol: d, computeLiqPrice: f, onClosePosition: p, onEditTpSl: m, onCancelOrder: h, closingSymbol: _ = null, cancellingOrderId: v = null, hideOtherSymbols: y = !1, onHideOtherSymbolsChange: b, onCloseAll: x, onSharePnl: C, sizeUnit: w = "QUOTE", t: D = qi }) => {
 	let O = V(), k = [
 		"positions",
@@ -4287,7 +4287,7 @@ var G = B(e)`
 	}
 ], La = ({ open: e, onClose: t, tab: n, onTabChange: r, orderHistory: i, tradeHistory: a, transactionHistory: o, t: s }) => {
 	let c = V();
-	return !e || typeof document > "u" ? null : ee(/* @__PURE__ */ W(Ca, {
+	return !e || typeof document > "u" ? null : G(/* @__PURE__ */ W(Ca, {
 		role: "dialog",
 		"aria-modal": "true",
 		"aria-label": s("History"),
@@ -4928,17 +4928,17 @@ var no = B(E)`
   align-self: stretch;
   width: 100%;
 `, wo = (e) => e, To = ({ isOpen: e, symbol: t, positionSide: n, qty: a, leverage: o, baseAsset: s, quoteAsset: c = "USDT", sizeUnit: l = "BASE", entryPrice: u, markPrice: d, pricePrecision: f = 4, initialTpPrice: p, initialSlPrice: m, initialTriggerSource: h, onCancelTpOrder: _, onCancelSlOrder: v, onConfirm: y, onClose: b, t: x = wo }) => {
-	let C = n === "LONG" ? 1 : -1, [w, T] = L(""), [D, O] = L(""), [k, A] = L(""), [j, N] = L(""), [P, I] = L(""), [R, z] = L(""), [B, V] = L(!1), [H, ee] = L(!1), [G, K] = L(!1), [te, q] = L("Last"), [J, ne] = L("%"), [re, Y] = L("%"), [X, ie] = L(100), [ae, oe] = L(""), se = a * X / 100, ce = l === "QUOTE" && Number.isFinite(d) && d > 0, le = (e) => ce ? e * d : e, ue = (e) => ce ? e / d : e, de = le(se), fe = ce ? 2 : 4, pe = t.replace(/USDT$|USDC$|USD1$/i, "") || t, me = ce ? c : s ?? pe;
+	let C = n === "LONG" ? 1 : -1, [w, T] = L(""), [D, O] = L(""), [k, A] = L(""), [j, N] = L(""), [P, I] = L(""), [R, z] = L(""), [B, V] = L(!1), [H, G] = L(!1), [K, ee] = L(!1), [te, q] = L("Last"), [J, ne] = L("%"), [Y, re] = L("%"), [X, Z] = L(100), [ie, ae] = L(""), oe = a * X / 100, se = l === "QUOTE" && Number.isFinite(d) && d > 0, ce = (e) => se ? e * d : e, le = (e) => se ? e / d : e, ue = ce(oe), de = se ? 2 : 4, fe = t.replace(/USDT$|USDC$|USD1$/i, "") || t, pe = se ? c : s ?? fe;
 	M(() => {
 		if (!e) {
-			T(""), O(""), I(""), A(""), N(""), z(""), ie(100), oe(""), q(h ?? "Last");
+			T(""), O(""), I(""), A(""), N(""), z(""), Z(100), ae(""), q(h ?? "Last");
 			return;
 		}
 		q(h ?? "Last");
 		let t = p !== void 0 && p !== "" ? String(p) : "", n = m !== void 0 && m !== "" ? String(m) : "";
 		if (T(t), A(n), a > 0 && Number.isFinite(u)) {
 			let e = Number(t), r = Number(n), i = t && Number.isFinite(e) ? C * (e - u) * a : NaN, o = n && Number.isFinite(r) ? C * (r - u) * a : NaN;
-			O(Number.isFinite(i) ? i.toFixed(4) : ""), N(Number.isFinite(o) ? o.toFixed(4) : ""), I(Number.isFinite(i) ? be(i, J) : ""), z(Number.isFinite(o) ? Se(o, re) : "");
+			O(Number.isFinite(i) ? i.toFixed(4) : ""), N(Number.isFinite(o) ? o.toFixed(4) : ""), I(Number.isFinite(i) ? ye(i, J) : ""), z(Number.isFinite(o) ? xe(o, Y) : "");
 		} else O(""), N(""), I(""), z("");
 	}, [
 		e,
@@ -4951,51 +4951,51 @@ var no = B(E)`
 	]), M(() => {
 		if (!e || a <= 0) return;
 		let t = a * X / 100;
-		oe(t > 0 ? le(t).toFixed(fe) : "");
+		ae(t > 0 ? ce(t).toFixed(de) : "");
 	}, [
 		e,
 		l,
 		a,
 		d
 	]);
-	let he = (e) => {
-		if (oe(e), e === "" || a <= 0) return;
+	let me = (e) => {
+		if (ae(e), e === "" || a <= 0) return;
 		let t = Number(e);
 		if (!Number.isFinite(t)) return;
-		let n = ue(t);
-		ie(Math.max(0, Math.min(100, n / a * 100)));
-	}, ge = (e) => {
-		ie(e), a > 0 && oe(le(a * e / 100).toFixed(fe));
-	}, _e = (e) => a > 0 ? u + C * e / a : NaN, ve = (e) => a > 0 ? C * (e - u) * a : NaN, ye = o && o > 0 && a > 0 && Number.isFinite(u) ? a * u / o : NaN, be = (e, t) => {
+		let n = le(t);
+		Z(Math.max(0, Math.min(100, n / a * 100)));
+	}, he = (e) => {
+		Z(e), a > 0 && ae(ce(a * e / 100).toFixed(de));
+	}, ge = (e) => a > 0 ? u + C * e / a : NaN, _e = (e) => a > 0 ? C * (e - u) * a : NaN, ve = o && o > 0 && a > 0 && Number.isFinite(u) ? a * u / o : NaN, ye = (e, t) => {
 		if (!Number.isFinite(e)) return "";
 		let n = Math.abs(e);
-		return t === "USDT" ? n.toFixed(2) : !Number.isFinite(ye) || ye <= 0 ? "" : (n / ye * 100).toFixed(2);
-	}, xe = (e, t) => {
+		return t === "USDT" ? n.toFixed(2) : !Number.isFinite(ve) || ve <= 0 ? "" : (n / ve * 100).toFixed(2);
+	}, be = (e, t) => {
 		let n = Number(e);
-		return Number.isFinite(n) ? t === "USDT" ? Math.abs(n) : !Number.isFinite(ye) || ye <= 0 ? NaN : Math.abs(n) / 100 * ye : NaN;
-	}, Se = (e, t) => {
-		let n = be(e, t);
+		return Number.isFinite(n) ? t === "USDT" ? Math.abs(n) : !Number.isFinite(ve) || ve <= 0 ? NaN : Math.abs(n) / 100 * ve : NaN;
+	}, xe = (e, t) => {
+		let n = ye(e, t);
 		return n === "" ? "" : `-${n}`;
-	}, Z = (e, t) => Number.isFinite(e) ? e.toFixed(t) : "", Ce = (e) => {
+	}, Se = (e, t) => Number.isFinite(e) ? e.toFixed(t) : "", Ce = (e) => {
 		if (T(e), e === "") {
 			O(""), I("");
 			return;
 		}
 		let t = Number(e);
 		if (!Number.isFinite(t)) return;
-		let n = ve(t);
-		O(Z(n, 4)), I(be(n, J));
+		let n = _e(t);
+		O(Se(n, 4)), I(ye(n, J));
 	}, we = (e) => {
 		let t = e.replace(/^-/, "");
 		if (I(t), t === "") {
 			O(""), T("");
 			return;
 		}
-		let n = xe(t, J);
+		let n = be(t, J);
 		if (!Number.isFinite(n)) return;
-		O(Z(n, 4));
-		let r = _e(n);
-		T(Number.isFinite(r) ? Z(r, f) : "");
+		O(Se(n, 4));
+		let r = ge(n);
+		T(Number.isFinite(r) ? Se(r, f) : "");
 	}, Te = (e) => {
 		if (A(e), e === "") {
 			N(""), z("");
@@ -5003,8 +5003,8 @@ var no = B(E)`
 		}
 		let t = Number(e);
 		if (!Number.isFinite(t)) return;
-		let n = ve(t);
-		N(Z(n, 4)), z(Se(n, re));
+		let n = _e(t);
+		N(Se(n, 4)), z(xe(n, Y));
 	}, Ee = (e) => {
 		if (e === "" || e === "-") {
 			z(e), N(""), A("");
@@ -5016,22 +5016,22 @@ var no = B(E)`
 			return;
 		}
 		z(`-${t}`);
-		let n = xe(t, re);
+		let n = be(t, Y);
 		if (!Number.isFinite(n)) return;
 		let r = -n;
-		N(Z(r, 4));
-		let i = _e(r);
-		A(Number.isFinite(i) ? Z(i, f) : "");
+		N(Se(r, 4));
+		let i = ge(r);
+		A(Number.isFinite(i) ? Se(i, f) : "");
 	};
 	M(() => {
 		if (D === "" || D === "-") return;
 		let e = Number(D);
-		Number.isFinite(e) && I(be(e, J));
+		Number.isFinite(e) && I(ye(e, J));
 	}, [J]), M(() => {
 		if (j === "" || j === "-") return;
 		let e = Number(j);
-		Number.isFinite(e) && z(Se(e, re));
-	}, [re]);
+		Number.isFinite(e) && z(xe(e, Y));
+	}, [Y]);
 	let De = F(() => {
 		let e = Number(w), t = Number(k), r = w !== "" && Number.isFinite(e), i = k !== "" && Number.isFinite(t);
 		if (n === "LONG") {
@@ -5056,7 +5056,7 @@ var no = B(E)`
 					closeSide: n === "LONG" ? "SELL" : "BUY",
 					tpPrice: w,
 					slPrice: k,
-					qty: String(se),
+					qty: String(oe),
 					closePosition: X >= 100,
 					triggerSource: te
 				}), b();
@@ -5064,7 +5064,7 @@ var no = B(E)`
 				V(!1);
 			}
 		}
-	}, Ae = () => q((e) => e === "Last" ? "Mark" : "Last"), je = () => ne((e) => e === "%" ? "USDT" : "%"), Me = () => Y((e) => e === "%" ? "USDT" : "%"), Ne = (e) => Number.isFinite(e) ? Qa(e.toFixed(2)) : "—", Pe = x(w === "" ? `When the price reaches 0.0 ${c}, the market order will be triggered, expect profit is -- ${c}` : `When the price reaches ${w} ${c}, the market order will be triggered, expect profit is ${D || "--"} ${c}`), Fe = x(k === "" ? `When the price reaches 0.0 ${c}, the market order will be triggered, expect loss is -- ${c}` : `When the price reaches ${k} ${c}, the market order will be triggered, expect loss is ${j || "--"} ${c}`);
+	}, Ae = () => q((e) => e === "Last" ? "Mark" : "Last"), je = () => ne((e) => e === "%" ? "USDT" : "%"), Me = () => re((e) => e === "%" ? "USDT" : "%"), Ne = (e) => Number.isFinite(e) ? Qa(e.toFixed(2)) : "—", Pe = x(w === "" ? `When the price reaches 0.0 ${c}, the market order will be triggered, expect profit is -- ${c}` : `When the price reaches ${w} ${c}, the market order will be triggered, expect profit is ${D || "--"} ${c}`), Fe = x(k === "" ? `When the price reaches 0.0 ${c}, the market order will be triggered, expect loss is -- ${c}` : `When the price reaches ${k} ${c}, the market order will be triggered, expect loss is ${j || "--"} ${c}`);
 	return /* @__PURE__ */ U(S, {
 		isOpen: e,
 		onDismiss: b,
@@ -5129,11 +5129,11 @@ var no = B(E)`
 								type: "button",
 								onClick: async () => {
 									if (!H) {
-										ee(!0);
+										G(!0);
 										try {
 											await _(), T(""), O(""), I("");
 										} finally {
-											ee(!1);
+											G(!1);
 										}
 									}
 								},
@@ -5159,7 +5159,7 @@ var no = B(E)`
 						}), /* @__PURE__ */ W(vo, {
 							type: "button",
 							onClick: Me,
-							children: [re, /* @__PURE__ */ U(fo, {})]
+							children: [Y, /* @__PURE__ */ U(fo, {})]
 						})] })] }), /* @__PURE__ */ W(E, {
 							justifyContent: "space-between",
 							alignItems: "center",
@@ -5170,17 +5170,17 @@ var no = B(E)`
 							children: [/* @__PURE__ */ U(yo, { children: Fe }), m && v ? /* @__PURE__ */ U(go, {
 								type: "button",
 								onClick: async () => {
-									if (!G) {
-										K(!0);
+									if (!K) {
+										ee(!0);
 										try {
 											await v(), A(""), N(""), z("");
 										} finally {
-											K(!1);
+											ee(!1);
 										}
 									}
 								},
-								disabled: G,
-								children: x(G ? "Cancelling…" : "Cancel Order")
+								disabled: K,
+								children: x(K ? "Cancelling…" : "Cancel Order")
 							}) : null]
 						})]
 					})
@@ -5192,22 +5192,22 @@ var no = B(E)`
 						children: x("Amount")
 					}),
 					/* @__PURE__ */ W(bo, { children: [/* @__PURE__ */ U(So, {
-						value: ae,
-						onChange: (e) => he(e.target.value),
+						value: ie,
+						onChange: (e) => me(e.target.value),
 						placeholder: x("Quantity"),
 						inputMode: "decimal"
-					}), /* @__PURE__ */ U(xo, { children: me })] }),
+					}), /* @__PURE__ */ U(xo, { children: pe })] }),
 					/* @__PURE__ */ U(Co, { children: /* @__PURE__ */ U(Wa, {
 						min: 0,
 						max: 100,
 						step: 1,
 						value: X,
-						onValueChanged: ge
+						onValueChanged: he
 					}) }),
 					/* @__PURE__ */ W(io, { children: [/* @__PURE__ */ U(ao, { children: x("Position amount") }), /* @__PURE__ */ W(oo, { children: [
-						Qa(de.toFixed(fe)),
+						Qa(ue.toFixed(de)),
 						" ",
-						me
+						pe
 					] })] })
 				] }),
 				De && /* @__PURE__ */ U(r, {
@@ -5423,7 +5423,7 @@ var no = B(E)`
 	"1h",
 	"4h",
 	"1d"
-], Xo = B(G)`
+], Xo = B(K)`
   flex: 1;
   min-height: ${({ $minHeight: e }) => e};
 `, Zo = (e) => typeof e == "number" ? `${e}px` : e, Qo = B.div`
@@ -5500,14 +5500,14 @@ var no = B(E)`
 		})]
 	});
 }, as = (e) => {
-	let { isMobile: t } = h();
-	if (t) return /* @__PURE__ */ U(is, { ...e });
-	let { children: n, minHeight: r = "420px" } = e;
+	let { isMobile: t, isTablet: n } = h();
+	if (t || n) return /* @__PURE__ */ U(is, { ...e });
+	let { children: r, minHeight: i = "420px" } = e;
 	return /* @__PURE__ */ U(Xo, {
-		$minHeight: Zo(r),
-		children: n
+		$minHeight: Zo(i),
+		children: r
 	});
-}, os = B(G)`
+}, os = B(K)`
   height: 100%;
 `, ss = B.div`
   flex: 1;
@@ -5655,7 +5655,7 @@ var no = B(E)`
 			}) })
 		]
 	});
-}, _s = B(G)`
+}, _s = B(K)`
   & > div {
     padding: 0 12px 12px;
     gap: 12px;
@@ -5903,7 +5903,7 @@ var no = B(E)`
 			bottom: window.innerHeight - n.top + 8,
 			arrowLeft: r - o
 		});
-	}, [e, t]), !e || !r || typeof document > "u" ? null : ee(/* @__PURE__ */ U(Fs, {
+	}, [e, t]), !e || !r || typeof document > "u" ? null : G(/* @__PURE__ */ U(Fs, {
 		role: "tooltip",
 		style: {
 			left: r.left,
@@ -6277,11 +6277,11 @@ var no = B(E)`
 		...n,
 		sizeUnit: n.sizeUnit === "BASE" ? "QUOTE" : "BASE",
 		quantity: ""
-	}), z = I(null), B = I(null), [V, H] = L(!1), [G, K] = L(null);
+	}), z = I(null), B = I(null), [V, H] = L(!1), [K, ee] = L(null);
 	M(() => {
 		if (!V || !z.current) return;
 		let e = z.current.getBoundingClientRect();
-		K({
+		ee({
 			top: e.bottom + 4,
 			left: e.left,
 			width: e.width
@@ -6326,13 +6326,13 @@ var no = B(E)`
 				})
 			]
 		}),
-		V && G && typeof document < "u" && ee(/* @__PURE__ */ U(_c, {
+		V && K && typeof document < "u" && G(/* @__PURE__ */ U(_c, {
 			ref: B,
 			role: "listbox",
 			style: {
-				top: G.top,
-				left: G.left,
-				width: G.width
+				top: K.top,
+				left: K.left,
+				width: K.width
 			},
 			children: yc.map((e) => /* @__PURE__ */ U(vc, {
 				role: "option",
@@ -6510,181 +6510,181 @@ var no = B(E)`
 		}) : null
 	] });
 }, xc = (e) => {
-	let { isMobile: t } = h(), { baseAsset: n, quoteAsset: i, draft: a, onDraftChange: o, typeKey: s, onTypeKeyChange: c, availableBalanceText: m, preview: g, feeText: _, sizePercent: v, onSizePercentChange: y, cta: b, canSubmit: x, isSubmitting: S = !1, marginSubmitting: C = !1, authReady: w = !0, hasAddress: T = !0, errorSlot: D, onSubmit: O, onLeverageClick: k, onMarginModeToggle: A, onDepositClick: j, extraControls: N, markPrice: P, priceDecimals: F = 2, t: R = rc } = e, z = a.sizeUnit === "QUOTE" ? i : n, B = (e) => o({
-		...a,
+	let { isMobile: t, isTablet: n } = h(), i = t || n, { baseAsset: a, quoteAsset: o, draft: s, onDraftChange: c, typeKey: m, onTypeKeyChange: g, availableBalanceText: _, preview: v, feeText: y, sizePercent: b, onSizePercentChange: x, cta: S, canSubmit: C, isSubmitting: w = !1, marginSubmitting: T = !1, authReady: D = !0, hasAddress: O = !0, errorSlot: k, onSubmit: A, onLeverageClick: j, onMarginModeToggle: N, onDepositClick: P, extraControls: F, markPrice: R, priceDecimals: z = 2, t: B = rc } = e, V = s.sizeUnit === "QUOTE" ? o : a, K = (e) => c({
+		...s,
 		side: e
-	}), V = () => o({
-		...a,
-		sizeUnit: a.sizeUnit === "BASE" ? "QUOTE" : "BASE",
+	}), ee = () => c({
+		...s,
+		sizeUnit: s.sizeUnit === "BASE" ? "QUOTE" : "BASE",
 		quantity: ""
-	}), G = () => o({
-		...a,
-		tpSlEnabled: !a.tpSlEnabled
-	}), K = Number(a.price) || (typeof P == "number" ? P : 0), te = (() => {
-		let e = Number(a.quantity);
-		return !Number.isFinite(e) || e <= 0 ? 0 : a.sizeUnit === "BASE" ? e : K > 0 ? e / K : 0;
-	})(), q = a.side === "BUY" ? 1 : -1, J = K > 0 && te > 0, ne = (e) => Number.isFinite(e) ? e.toFixed(2) : "", re = (e) => Number.isFinite(e) ? e.toFixed(F) : "", Y = (e) => e.replace(/,/g, ""), X = (e) => {
-		let t = Number(Y(e));
-		return !Number.isFinite(t) || !J ? "" : ne((t - K) * te * q);
-	}, ie = (e) => {
-		let t = Number(Y(e));
-		return !Number.isFinite(t) || !J ? "" : re(K + t * q / te);
+	}), te = () => c({
+		...s,
+		tpSlEnabled: !s.tpSlEnabled
+	}), q = Number(s.price) || (typeof R == "number" ? R : 0), J = (() => {
+		let e = Number(s.quantity);
+		return !Number.isFinite(e) || e <= 0 ? 0 : s.sizeUnit === "BASE" ? e : q > 0 ? e / q : 0;
+	})(), ne = s.side === "BUY" ? 1 : -1, Y = q > 0 && J > 0, re = (e) => Number.isFinite(e) ? e.toFixed(2) : "", X = (e) => Number.isFinite(e) ? e.toFixed(z) : "", Z = (e) => e.replace(/,/g, ""), ie = (e) => {
+		let t = Number(Z(e));
+		return !Number.isFinite(t) || !Y ? "" : re((t - q) * J * ne);
 	}, ae = (e) => {
-		let t = Y(e);
-		if (t === "") return o({
-			...a,
+		let t = Number(Z(e));
+		return !Number.isFinite(t) || !Y ? "" : X(q + t * ne / J);
+	}, oe = (e) => {
+		let t = Z(e);
+		if (t === "") return c({
+			...s,
 			takeProfitPrice: "",
 			takeProfitPnl: ""
 		});
-		o({
-			...a,
+		c({
+			...s,
 			takeProfitPrice: t,
-			takeProfitPnl: X(t)
+			takeProfitPnl: ie(t)
 		});
-	}, oe = (e) => {
-		let t = $a(Y(e));
-		if (t === "" || t === "-") return o({
-			...a,
+	}, se = (e) => {
+		let t = $a(Z(e));
+		if (t === "" || t === "-") return c({
+			...s,
 			takeProfitPnl: "",
 			takeProfitPrice: ""
 		});
-		o({
-			...a,
+		c({
+			...s,
 			takeProfitPnl: t,
-			takeProfitPrice: ie(t)
+			takeProfitPrice: ae(t)
 		});
-	}, se = (e) => {
-		let t = Y(e);
-		if (t === "") return o({
-			...a,
+	}, ce = (e) => {
+		let t = Z(e);
+		if (t === "") return c({
+			...s,
 			stopLossPrice: "",
 			stopLossPnl: ""
 		});
-		o({
-			...a,
+		c({
+			...s,
 			stopLossPrice: t,
-			stopLossPnl: X(t)
+			stopLossPnl: ie(t)
 		});
-	}, ce = (e) => {
-		let t = eo(Y(e));
-		if (t === "" || t === "-") return o({
-			...a,
+	}, le = (e) => {
+		let t = eo(Z(e));
+		if (t === "" || t === "-") return c({
+			...s,
 			stopLossPnl: "",
 			stopLossPrice: ""
 		});
-		o({
-			...a,
+		c({
+			...s,
 			stopLossPnl: t,
-			stopLossPrice: ie(t)
+			stopLossPrice: ae(t)
 		});
-	}, le = s === "stop-limit" || s === "stop-market", ue = s === "limit" || s === "stop-limit", de = le, fe = I(null), pe = I(null), [me, he] = L(!1), [ge, _e] = L({
+	}, ue = m === "stop-limit" || m === "stop-market", de = m === "limit" || m === "stop-limit", fe = ue, pe = I(null), me = I(null), [he, ge] = L(!1), [_e, ve] = L({
 		top: 0,
 		left: 0
-	}), [ve, ye] = L(!1), [be, xe] = L(!1), [Se, Z] = L(null), Ce = I(null), we = I(null), Te = I(null), Ee = I(null), De = I(null);
+	}), [ye, be] = L(!1), [xe, Se] = L(!1), [Ce, we] = L(null), Te = I(null), Ee = I(null), De = I(null), Oe = I(null), ke = I(null);
 	if (M(() => {
-		if (!me || !fe.current || !pe.current) return;
-		let e = fe.current.getBoundingClientRect(), t = pe.current.getBoundingClientRect(), n = e.bottom + 4, r = window.innerWidth - t.width - 8;
-		_e({
+		if (!he || !pe.current || !me.current) return;
+		let e = pe.current.getBoundingClientRect(), t = me.current.getBoundingClientRect(), n = e.bottom + 4, r = window.innerWidth - t.width - 8;
+		ve({
 			top: n,
 			left: Math.max(8, Math.min(e.left, r))
 		});
-	}, [me]), M(() => {
-		if (!me) return;
+	}, [he]), M(() => {
+		if (!he) return;
 		let e = (e) => {
 			let t = e.target;
-			fe.current && !fe.current.contains(t) && pe.current && !pe.current.contains(t) && he(!1);
+			pe.current && !pe.current.contains(t) && me.current && !me.current.contains(t) && ge(!1);
 		};
 		return document.addEventListener("click", e), () => document.removeEventListener("click", e);
-	}, [me]), t) return /* @__PURE__ */ U(bc, { ...e });
-	let Oe = le, ke = s === "stop-market" ? `${R("Stop Market")} ▾` : `${R("Stop Limit")} ▾`, Ae = () => {
-		he((e) => !e);
-	}, je = (e) => {
-		c(e), he(!1);
+	}, [he]), i) return /* @__PURE__ */ U(bc, { ...e });
+	let Ae = ue, je = m === "stop-market" ? `${B("Stop Market")} ▾` : `${B("Stop Limit")} ▾`, Me = () => {
+		ge((e) => !e);
+	}, Ne = (e) => {
+		g(e), ge(!1);
 	};
 	return /* @__PURE__ */ W(_s, { children: [
 		/* @__PURE__ */ W(vs, { children: [
 			["market", "limit"].map((e) => /* @__PURE__ */ U(ys, {
-				$active: s === e,
-				onClick: () => c(e),
-				children: R(e === "market" ? "Market" : "Limit")
+				$active: m === e,
+				onClick: () => g(e),
+				children: B(e === "market" ? "Market" : "Limit")
 			}, e)),
 			/* @__PURE__ */ U(ys, {
-				ref: fe,
-				$active: Oe,
-				onClick: Ae,
-				"aria-haspopup": "menu",
-				"aria-expanded": me,
-				children: ke
-			}),
-			me && typeof document < "u" && ee(/* @__PURE__ */ W(Hs, {
 				ref: pe,
+				$active: Ae,
+				onClick: Me,
+				"aria-haspopup": "menu",
+				"aria-expanded": he,
+				children: je
+			}),
+			he && typeof document < "u" && G(/* @__PURE__ */ W(Hs, {
+				ref: me,
 				style: {
-					top: ge.top,
-					left: ge.left
+					top: _e.top,
+					left: _e.left
 				},
 				role: "menu",
 				children: [/* @__PURE__ */ U(Us, {
-					$active: s === "stop-limit",
+					$active: m === "stop-limit",
 					role: "menuitem",
-					onClick: () => je("stop-limit"),
-					children: R("Stop Limit")
+					onClick: () => Ne("stop-limit"),
+					children: B("Stop Limit")
 				}), /* @__PURE__ */ U(Us, {
-					$active: s === "stop-market",
+					$active: m === "stop-market",
 					role: "menuitem",
-					onClick: () => je("stop-market"),
-					children: R("Stop Market")
+					onClick: () => Ne("stop-market"),
+					children: B("Stop Market")
 				})]
 			}), document.body)
 		] }),
 		/* @__PURE__ */ W(Ss, { children: [
 			/* @__PURE__ */ U(xs, {
-				$side: a.side,
+				$side: s.side,
 				"aria-hidden": !0
 			}),
 			/* @__PURE__ */ U(Cs, {
-				$active: a.side === "BUY",
+				$active: s.side === "BUY",
 				$side: "BUY",
-				onClick: () => B("BUY"),
-				children: R("Buy / Long")
+				onClick: () => K("BUY"),
+				children: B("Buy / Long")
 			}),
 			/* @__PURE__ */ U(Cs, {
-				$active: a.side === "SELL",
+				$active: s.side === "SELL",
 				$side: "SELL",
-				onClick: () => B("SELL"),
-				children: R("Sell / Short")
+				onClick: () => K("SELL"),
+				children: B("Sell / Short")
 			})
 		] }),
 		/* @__PURE__ */ W(E, {
 			style: { gap: 8 },
 			children: [
 				/* @__PURE__ */ U(ws, {
-					disabled: C,
-					onClick: A,
-					title: R("Margin mode"),
-					children: /* @__PURE__ */ U(Ts, { children: a.marginMode === "CROSS" ? R("Cross") : R("Isolated") })
+					disabled: T,
+					onClick: N,
+					title: B("Margin mode"),
+					children: /* @__PURE__ */ U(Ts, { children: s.marginMode === "CROSS" ? B("Cross") : B("Isolated") })
 				}),
 				/* @__PURE__ */ U(ws, {
-					onClick: k,
-					title: R("Leverage"),
-					children: /* @__PURE__ */ W(Ts, { children: [a.leverage, "x"] })
+					onClick: j,
+					title: B("Leverage"),
+					children: /* @__PURE__ */ W(Ts, { children: [s.leverage, "x"] })
 				}),
-				N
+				F
 			]
 		}),
-		/* @__PURE__ */ W(Es, { children: [/* @__PURE__ */ U(Ds, { children: R("Avbl") }), /* @__PURE__ */ W(Os, { children: [/* @__PURE__ */ W(r, {
+		/* @__PURE__ */ W(Es, { children: [/* @__PURE__ */ U(Ds, { children: B("Avbl") }), /* @__PURE__ */ W(Os, { children: [/* @__PURE__ */ W(r, {
 			fontSize: "14px",
 			style: { fontVariantNumeric: "tabular-nums" },
 			children: [
-				m,
+				_,
 				" ",
-				i
+				o
 			]
 		}), /* @__PURE__ */ U(p, {
 			variant: "text",
 			scale: "xs",
-			onClick: j,
-			title: R("Deposit"),
-			"aria-label": R("Deposit"),
+			onClick: P,
+			title: B("Deposit"),
+			"aria-label": B("Deposit"),
 			style: {
 				width: 22,
 				height: 22,
@@ -6696,85 +6696,85 @@ var no = B(E)`
 				width: "14px"
 			})
 		})] })] }),
-		de && /* @__PURE__ */ W(zs, { children: [
-			/* @__PURE__ */ U(As, { children: R("Stop") }),
+		fe && /* @__PURE__ */ W(zs, { children: [
+			/* @__PURE__ */ U(As, { children: B("Stop") }),
 			/* @__PURE__ */ U(Bs, {
-				value: a.stopPrice,
-				onChange: (e) => o({
-					...a,
+				value: s.stopPrice,
+				onChange: (e) => c({
+					...s,
 					stopPrice: e.target.value
 				}),
 				placeholder: "0",
 				inputMode: "decimal",
-				"aria-label": R("Stop price")
+				"aria-label": B("Stop price")
 			}),
 			/* @__PURE__ */ W(Vs, {
 				type: "button",
-				onClick: () => o({
-					...a,
-					stopPriceSource: a.stopPriceSource === "MARK" ? "LAST" : "MARK"
+				onClick: () => c({
+					...s,
+					stopPriceSource: s.stopPriceSource === "MARK" ? "LAST" : "MARK"
 				}),
-				title: R("Trigger source"),
-				children: [a.stopPriceSource === "MARK" ? R("Mark") : R("Last"), " ▾"]
+				title: B("Trigger source"),
+				children: [s.stopPriceSource === "MARK" ? B("Mark") : B("Last"), " ▾"]
 			})
 		] }),
-		ue && /* @__PURE__ */ W(zs, { children: [
-			/* @__PURE__ */ U(As, { children: R("Price") }),
+		de && /* @__PURE__ */ W(zs, { children: [
+			/* @__PURE__ */ U(As, { children: B("Price") }),
 			/* @__PURE__ */ U(Bs, {
-				value: a.price,
-				onChange: (e) => o({
-					...a,
+				value: s.price,
+				onChange: (e) => c({
+					...s,
 					price: e.target.value
 				}),
 				placeholder: "0",
 				inputMode: "decimal",
-				"aria-label": R("Limit price")
+				"aria-label": B("Limit price")
 			}),
 			/* @__PURE__ */ U(Ms, {
 				as: "div",
 				onClick: void 0,
 				style: { cursor: "default" },
-				children: i
+				children: o
 			})
 		] }),
-		s === "stop-limit" && /* @__PURE__ */ W(zs, { children: [
-			/* @__PURE__ */ U(As, { children: R("TIF") }),
+		m === "stop-limit" && /* @__PURE__ */ W(zs, { children: [
+			/* @__PURE__ */ U(As, { children: B("TIF") }),
 			/* @__PURE__ */ U(E, { flex: 1 }),
 			/* @__PURE__ */ U(Gs, { children: /* @__PURE__ */ U(gs, {
 				options: Ws.map((e) => ({
 					...e,
-					description: R(e.description ?? "")
+					description: B(e.description ?? "")
 				})),
-				defaultOptionIndex: Ws.findIndex((e) => e.value === (a.timeInForce === "GTX" ? "GTC" : a.timeInForce)) >= 0 ? Ws.findIndex((e) => e.value === (a.timeInForce === "GTX" ? "GTC" : a.timeInForce)) : 0,
-				onOptionChange: (e) => o({
-					...a,
+				defaultOptionIndex: Ws.findIndex((e) => e.value === (s.timeInForce === "GTX" ? "GTC" : s.timeInForce)) >= 0 ? Ws.findIndex((e) => e.value === (s.timeInForce === "GTX" ? "GTC" : s.timeInForce)) : 0,
+				onOptionChange: (e) => c({
+					...s,
 					timeInForce: e.value
 				})
 			}) })
 		] }),
 		/* @__PURE__ */ W(ks, { children: [
-			/* @__PURE__ */ U(As, { children: R("Size") }),
+			/* @__PURE__ */ U(As, { children: B("Size") }),
 			/* @__PURE__ */ U(js, {
-				value: a.quantity,
-				onChange: (e) => o({
-					...a,
+				value: s.quantity,
+				onChange: (e) => c({
+					...s,
 					quantity: e.target.value
 				}),
 				placeholder: "0",
 				inputMode: "decimal"
 			}),
 			/* @__PURE__ */ W(Ms, {
-				onClick: V,
-				title: R("Toggle unit"),
-				children: [z, /* @__PURE__ */ U(Rs, {})]
+				onClick: ee,
+				title: B("Toggle unit"),
+				children: [V, /* @__PURE__ */ U(Rs, {})]
 			})
 		] }),
 		/* @__PURE__ */ U(Js, { children: /* @__PURE__ */ U(d, {
 			variant: "dotted",
 			min: 0,
 			max: 100,
-			value: v,
-			onValueChanged: y,
+			value: b,
+			onValueChanged: x,
 			name: "perp-size-percent"
 		}) }),
 		/* @__PURE__ */ W(E, {
@@ -6783,22 +6783,22 @@ var no = B(E)`
 			children: [
 				/* @__PURE__ */ U(l, {
 					scale: "sm",
-					checked: a.reduceOnly,
-					onChange: (e) => o({
-						...a,
+					checked: s.reduceOnly,
+					onChange: (e) => c({
+						...s,
 						reduceOnly: e.target.checked
 					})
 				}),
 				/* @__PURE__ */ U(Ns, {
-					ref: Ce,
-					onMouseEnter: () => ye(!0),
-					onMouseLeave: () => ye(!1),
-					children: /* @__PURE__ */ U(Ps, { children: R("Reduce Only") })
+					ref: Te,
+					onMouseEnter: () => be(!0),
+					onMouseLeave: () => be(!1),
+					children: /* @__PURE__ */ U(Ps, { children: B("Reduce Only") })
 				}),
 				/* @__PURE__ */ U(Is, {
-					open: ve,
-					anchorRef: Ce,
-					children: R("Reduce-Only order will only reduce your position, not increase it.")
+					open: ye,
+					anchorRef: Te,
+					children: B("Reduce-Only order will only reduce your position, not increase it.")
 				})
 			]
 		}),
@@ -6808,23 +6808,23 @@ var no = B(E)`
 			children: [
 				/* @__PURE__ */ U(l, {
 					scale: "sm",
-					checked: a.tpSlEnabled,
-					onChange: G
+					checked: s.tpSlEnabled,
+					onChange: te
 				}),
 				/* @__PURE__ */ U(Ns, {
-					ref: we,
-					onMouseEnter: () => xe(!0),
-					onMouseLeave: () => xe(!1),
-					children: /* @__PURE__ */ U(Ps, { children: R("Take Profit / Stop Loss") })
+					ref: Ee,
+					onMouseEnter: () => Se(!0),
+					onMouseLeave: () => Se(!1),
+					children: /* @__PURE__ */ U(Ps, { children: B("Take Profit / Stop Loss") })
 				}),
 				/* @__PURE__ */ U(Is, {
-					open: be,
-					anchorRef: we,
-					children: R("Set Take Profit or Stop Loss before opening. It activates after entry. Choose Last or Mark price as the trigger.")
+					open: xe,
+					anchorRef: Ee,
+					children: B("Set Take Profit or Stop Loss before opening. It activates after entry. Choose Last or Mark price as the trigger.")
 				})
 			]
 		}),
-		a.tpSlEnabled && /* @__PURE__ */ W(E, {
+		s.tpSlEnabled && /* @__PURE__ */ W(E, {
 			flexDirection: "column",
 			style: { gap: 12 },
 			children: [/* @__PURE__ */ W(f, { children: [/* @__PURE__ */ W(E, {
@@ -6835,11 +6835,11 @@ var no = B(E)`
 					fontSize: "13px",
 					bold: !0,
 					color: "success",
-					children: R("Take Profit")
+					children: B("Take Profit")
 				}), /* @__PURE__ */ U(Qs, {
-					value: a.takeProfitSource ?? "LAST",
-					onChange: (e) => o({
-						...a,
+					value: s.takeProfitSource ?? "LAST",
+					onChange: (e) => c({
+						...s,
 						takeProfitSource: e
 					})
 				})]
@@ -6849,10 +6849,10 @@ var no = B(E)`
 					fontSize: "12px",
 					color: "textSubtle",
 					mb: "4px",
-					children: R("Trigger Price")
+					children: B("Trigger Price")
 				}), /* @__PURE__ */ U(qs, {
-					rawValue: a.takeProfitPrice,
-					onRawChange: ae
+					rawValue: s.takeProfitPrice,
+					onRawChange: oe
 				})]
 			}), /* @__PURE__ */ W(f, {
 				style: { flex: 1 },
@@ -6860,10 +6860,10 @@ var no = B(E)`
 					fontSize: "12px",
 					color: "textSubtle",
 					mb: "4px",
-					children: R("PnL (USDT)")
+					children: B("PnL (USDT)")
 				}), /* @__PURE__ */ U(qs, {
-					rawValue: a.takeProfitPnl ?? "",
-					onRawChange: oe
+					rawValue: s.takeProfitPnl ?? "",
+					onRawChange: se
 				})]
 			})] })] }), /* @__PURE__ */ W(f, { children: [/* @__PURE__ */ W(E, {
 				alignItems: "center",
@@ -6873,11 +6873,11 @@ var no = B(E)`
 					fontSize: "13px",
 					bold: !0,
 					color: "failure",
-					children: R("Stop Loss")
+					children: B("Stop Loss")
 				}), /* @__PURE__ */ U(Qs, {
-					value: a.stopLossSource ?? "LAST",
-					onChange: (e) => o({
-						...a,
+					value: s.stopLossSource ?? "LAST",
+					onChange: (e) => c({
+						...s,
 						stopLossSource: e
 					})
 				})]
@@ -6887,10 +6887,10 @@ var no = B(E)`
 					fontSize: "12px",
 					color: "textSubtle",
 					mb: "4px",
-					children: R("Trigger Price")
+					children: B("Trigger Price")
 				}), /* @__PURE__ */ U(qs, {
-					rawValue: a.stopLossPrice,
-					onRawChange: se
+					rawValue: s.stopLossPrice,
+					onRawChange: ce
 				})]
 			}), /* @__PURE__ */ W(f, {
 				style: { flex: 1 },
@@ -6898,68 +6898,68 @@ var no = B(E)`
 					fontSize: "12px",
 					color: "textSubtle",
 					mb: "4px",
-					children: R("PnL (USDT)")
+					children: B("PnL (USDT)")
 				}), /* @__PURE__ */ U(qs, {
-					rawValue: a.stopLossPnl ?? "",
-					onRawChange: ce
+					rawValue: s.stopLossPnl ?? "",
+					onRawChange: le
 				})]
 			})] })] })]
 		}),
-		D,
-		w ? /* @__PURE__ */ U($s, {
-			onClick: () => O(),
-			disabled: !x,
-			isLoading: S,
+		k,
+		D ? /* @__PURE__ */ U($s, {
+			onClick: () => A(),
+			disabled: !C,
+			isLoading: w,
 			scale: "md",
-			$side: a.side,
-			children: b
+			$side: s.side,
+			children: S
 		}) : /* @__PURE__ */ U($s, {
-			$side: a.side,
-			onClick: () => O(),
+			$side: s.side,
+			onClick: () => A(),
 			scale: "md",
-			disabled: !T,
-			children: b
+			disabled: !O,
+			children: S
 		}),
 		/* @__PURE__ */ W(ec, { children: [
 			/* @__PURE__ */ U(Ns, {
-				ref: Te,
-				onMouseEnter: () => Z("cost"),
-				onMouseLeave: () => Z(null),
-				children: /* @__PURE__ */ U(tc, { children: R("Margin") })
+				ref: De,
+				onMouseEnter: () => we("cost"),
+				onMouseLeave: () => we(null),
+				children: /* @__PURE__ */ U(tc, { children: B("Margin") })
 			}),
 			/* @__PURE__ */ U(Is, {
-				open: Se === "cost",
-				anchorRef: Te,
-				children: R("Total margin required to open this position.")
+				open: Ce === "cost",
+				anchorRef: De,
+				children: B("Total margin required to open this position.")
 			}),
-			/* @__PURE__ */ U(nc, { children: g.cost }),
-			!le && /* @__PURE__ */ W(H, { children: [
+			/* @__PURE__ */ U(nc, { children: v.cost }),
+			!ue && /* @__PURE__ */ W(H, { children: [
 				/* @__PURE__ */ U(Ns, {
-					ref: Ee,
-					onMouseEnter: () => Z("liq"),
-					onMouseLeave: () => Z(null),
-					children: /* @__PURE__ */ U(tc, { children: R("Est. Liq. Price") })
+					ref: Oe,
+					onMouseEnter: () => we("liq"),
+					onMouseLeave: () => we(null),
+					children: /* @__PURE__ */ U(tc, { children: B("Est. Liq. Price") })
 				}),
 				/* @__PURE__ */ U(Is, {
-					open: Se === "liq",
-					anchorRef: Ee,
-					children: R("Estimated price at which this position will be liquidated.")
+					open: Ce === "liq",
+					anchorRef: Oe,
+					children: B("Estimated price at which this position will be liquidated.")
 				}),
-				/* @__PURE__ */ U(nc, { children: g.liq })
+				/* @__PURE__ */ U(nc, { children: v.liq })
 			] }),
-			_ ? /* @__PURE__ */ W(H, { children: [
+			y ? /* @__PURE__ */ W(H, { children: [
 				/* @__PURE__ */ U(Ns, {
-					ref: De,
-					onMouseEnter: () => Z("fees"),
-					onMouseLeave: () => Z(null),
-					children: /* @__PURE__ */ U(tc, { children: R("Fees") })
+					ref: ke,
+					onMouseEnter: () => we("fees"),
+					onMouseLeave: () => we(null),
+					children: /* @__PURE__ */ U(tc, { children: B("Fees") })
 				}),
 				/* @__PURE__ */ U(Is, {
-					open: Se === "fees",
-					anchorRef: De,
-					children: R("Trading and funding fees applied to this position.")
+					open: Ce === "fees",
+					anchorRef: ke,
+					children: B("Trading and funding fees applied to this position.")
 				}),
-				/* @__PURE__ */ U(nc, { children: _ })
+				/* @__PURE__ */ U(nc, { children: y })
 			] }) : null
 		] })
 	] });
@@ -7713,7 +7713,7 @@ var no = B(E)`
 		d: "M4.10361 15.4524C3.67261 15.4524 3.30549 15.3008 3.00224 14.9975C2.69899 14.6943 2.54736 14.3272 2.54736 13.8962V4.1038C2.54736 3.6728 2.69899 3.30567 3.00224 3.00242C3.30549 2.69917 3.67261 2.54755 4.10361 2.54755H13.896C14.327 2.54755 14.6941 2.69917 14.9974 3.00242C15.3006 3.30567 15.4522 3.6728 15.4522 4.1038H9.4588C8.72668 4.1038 8.10111 4.3633 7.58211 4.8823C7.06311 5.4013 6.80361 6.02686 6.80361 6.75898V11.25C6.80361 11.9821 7.06311 12.6062 7.58211 13.1222C8.10111 13.6382 8.72668 13.8962 9.4588 13.8962H15.4522C15.4522 14.3309 15.3006 14.699 14.9974 15.0004C14.6941 15.3017 14.327 15.4524 13.896 15.4524H4.10361ZM9.4588 12.6C9.09055 12.6 8.77199 12.467 8.50311 12.2012C8.23424 11.9353 8.0998 11.6182 8.0998 11.25V6.75898C8.0998 6.39073 8.23424 6.07217 8.50311 5.8033C8.77199 5.53442 9.09055 5.39998 9.4588 5.39998H14.9932C15.3615 5.39998 15.6801 5.53442 15.9489 5.8033C16.2178 6.07217 16.3522 6.39073 16.3522 6.75898V11.25C16.3522 11.6182 16.2178 11.9353 15.9489 12.2012C15.6801 12.467 15.3615 12.6 14.9932 12.6H9.4588ZM12.1498 10.125C12.4623 10.125 12.7279 10.0156 12.9467 9.79686C13.1654 9.57811 13.2748 9.31248 13.2748 8.99998C13.2748 8.68748 13.1654 8.42186 12.9467 8.20311C12.7279 7.98436 12.4623 7.87498 12.1498 7.87498C11.8373 7.87498 11.5717 7.98436 11.3529 8.20311C11.1342 8.42186 11.0248 8.68748 11.0248 8.99998C11.0248 9.31248 11.1342 9.57811 11.3529 9.79686C11.5717 10.0156 11.8373 10.125 12.1498 10.125Z",
 		fill: "currentColor"
 	})
-}), ll = B(G)`
+}), ll = B(K)`
   display: flex;
   width: 506px;
   flex-shrink: 0;
@@ -8600,9 +8600,9 @@ var no = B(E)`
 		}) : null]
 	});
 }, pu = ({ symbol: e, baseAsset: t, pair: n, price: r, pricePnlPct: i, onSymbolClick: a, bet: o, onBetChange: s, betError: c, leverage: l, onLeverageChange: u, isApplyingLeverage: d = !1, maxLeverage: f = Xc, presets: p = Yc, quoteAsset: m, onQuoteAssetClick: h, assetOptions: g, onAssetChange: _, fundBalanceText: v, onTopUpFund: y, onPercentClick: b, estimatedEntry: x, liqIfLong: S, marginRequired: C, openingFee: w, canSubmit: E, isSubmittingUp: D = !1, isSubmittingDown: k = !1, onUp: A, onDown: j, onDeposit: M, onWithdraw: N, connectWalletLabel: P, onConnectWallet: F, unrealizedPnl: I }) => {
-	let [L, R] = O.useState(null), z = L ?? l, B = Math.min(100, Math.max(0, z / f * 100)), V = Zc(z), ee = Qc(z), G = $c(z), K = D || k, te = !E || K, q = !E || K, { targetRef: J, tooltip: ne } = T(nl(V), { placement: "top" }), re = O.useRef(null), Y = O.useCallback((e) => {
+	let [L, R] = O.useState(null), z = L ?? l, B = Math.min(100, Math.max(0, z / f * 100)), V = Zc(z), G = Qc(z), K = $c(z), ee = D || k, te = !E || ee, q = !E || ee, { targetRef: J, tooltip: ne } = T(nl(V), { placement: "top" }), Y = O.useRef(null), re = O.useCallback((e) => {
 		if (d) return;
-		let t = re.current;
+		let t = Y.current;
 		if (!t) return;
 		e.preventDefault();
 		let n = t.getBoundingClientRect(), r = (e) => {
@@ -8702,12 +8702,12 @@ var no = B(E)`
 				]
 			})] }),
 			/* @__PURE__ */ W(Vl, { children: [/* @__PURE__ */ W(Hl, {
-				ref: re,
+				ref: Y,
 				$fillPct: B,
 				$zone: V,
 				"aria-hidden": !0,
 				"aria-disabled": d || void 0,
-				onPointerDown: Y,
+				onPointerDown: re,
 				children: [/* @__PURE__ */ U(ql, {
 					type: "range",
 					min: 1,
@@ -8718,8 +8718,8 @@ var no = B(E)`
 					"aria-label": "Leverage"
 				}), /* @__PURE__ */ U(Ul, {
 					$fillPct: B,
-					$variant: ee ? "triple" : G ? "double" : "single",
-					children: U(ee ? Kl : G ? Gl : Wl, {})
+					$variant: G ? "triple" : K ? "double" : "single",
+					children: U(G ? Kl : K ? Gl : Wl, {})
 				})]
 			}), /* @__PURE__ */ W(Jl, {
 				role: "tablist",
@@ -9193,7 +9193,7 @@ var no = B(E)`
 			})]
 		})
 	] });
-}, Bu = B(G)`
+}, Bu = B(K)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -9355,7 +9355,7 @@ var ed = "\n  M 0 290\n  C 60 290, 110 280, 170 250\n  C 230 220, 290 175, 360 1
 		"aria-hidden": !0,
 		children: o.map((e, t) => /* @__PURE__ */ U("span", { children: e }, `${e}-${t}`))
 	})] })] });
-}, id = B(G)`
+}, id = B(K)`
   background: ${({ theme: e }) => e.colors.card};
   border: 1px solid ${({ theme: e }) => e.colors.cardBorder};
   border-bottom-width: 2px;
@@ -11382,7 +11382,7 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			...O?.pnlSuffix
 		},
 		bucketEmptyMessage: O?.bucketEmptyMessage ?? of.bucketEmptyMessage
-	}), [O]), ee = S ?? O?.heroTitle ?? "My Wallet", G = F(() => {
+	}), [O]), G = S ?? O?.heroTitle ?? "My Wallet", K = F(() => {
 		let t = e.buckets.spot.state ?? "data", n = e.buckets.perp.state ?? "data", r = t === "data" ? e.buckets.spot.amount ?? 0 : 0, i = n === "data" ? e.buckets.perp.amount ?? 0 : 0, a = r + i, o = a === 0 ? 1 : a;
 		return {
 			spot: r,
@@ -11391,15 +11391,15 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			spotPct: r / o * 100,
 			perpPct: i / o * 100
 		};
-	}, [e]), K = F(() => {
-		if (G.total === 0) return 0;
+	}, [e]), ee = F(() => {
+		if (K.total === 0) return 0;
 		let t = e.buckets.spot.pnl?.[P] ?? 0, n = e.buckets.perp.pnl?.[P] ?? 0;
-		return (t * G.spot + n * G.perp) / G.total;
+		return (t * K.spot + n * K.perp) / K.total;
 	}, [
 		e,
 		P,
-		G
-	]), te = G.total * (K / 100), q = V.pnlSuffix[P], J = lf(G.total), ne = [
+		K
+	]), te = K.total * (ee / 100), q = V.pnlSuffix[P], J = lf(K.total), ne = [
 		{
 			value: "24h",
 			label: "24H"
@@ -11412,7 +11412,7 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			value: "all",
 			label: "All"
 		}
-	], re = [
+	], Y = [
 		{
 			value: "assets",
 			label: V.tabs.assets
@@ -11427,7 +11427,7 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 		}
 	].filter((e) => b.includes(e.value));
 	if (t === "data" && L !== null && M === "assets" && !x?.assets) {
-		let t = L === "spot" ? e.buckets.spot : e.buckets.perp, n = L === "spot" ? G.spotPct : G.perpPct;
+		let t = L === "spot" ? e.buckets.spot : e.buckets.perp, n = L === "spot" ? K.spotPct : K.perpPct;
 		return /* @__PURE__ */ U(Cf, {
 			"aria-label": "Wallet",
 			$embedded: v,
@@ -11452,9 +11452,9 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			})
 		});
 	}
-	let Y = () => _ ? null : /* @__PURE__ */ W(wf, { children: [h ?? /* @__PURE__ */ U(dm, {}), g ?? /* @__PURE__ */ U(fm, {})] }), X = () => re.length === 0 ? null : /* @__PURE__ */ U(Af, {
+	let re = () => _ ? null : /* @__PURE__ */ W(wf, { children: [h ?? /* @__PURE__ */ U(dm, {}), g ?? /* @__PURE__ */ U(fm, {})] }), X = () => Y.length === 0 ? null : /* @__PURE__ */ U(Af, {
 		role: "tablist",
-		children: re.map((e) => /* @__PURE__ */ U(jf, {
+		children: Y.map((e) => /* @__PURE__ */ U(jf, {
 			type: "button",
 			role: "tab",
 			"aria-selected": M === e.value,
@@ -11463,8 +11463,8 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			onClick: () => N(e.value),
 			children: e.label
 		}, e.value))
-	}), ie = (e, n) => /* @__PURE__ */ W(Mf, { children: [
-		/* @__PURE__ */ W(Nf, { children: [/* @__PURE__ */ U(Pf, { children: ee }), C && /* @__PURE__ */ U(nm, {
+	}), Z = (e, n) => /* @__PURE__ */ W(Mf, { children: [
+		/* @__PURE__ */ W(Nf, { children: [/* @__PURE__ */ U(Pf, { children: G }), C && /* @__PURE__ */ U(nm, {
 			value: P,
 			onChange: I,
 			options: ne,
@@ -11475,12 +11475,12 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			$h: "32px",
 			$br: "8px"
 		}) : /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(Rf, { children: [/* @__PURE__ */ U(zf, { children: e.whole }), /* @__PURE__ */ U(Bf, { children: e.dec })] }), w && t === "data" && /* @__PURE__ */ U(tm, {
-			value: K,
+			value: ee,
 			lg: !0
 		})] }) }),
 		!n && w && t === "data" && /* @__PURE__ */ W(Vf, { children: [/* @__PURE__ */ W(Hf, {
-			$up: K >= 0,
-			children: [K >= 0 ? "+" : "-", sf(Math.abs(te)).replace("-", "")]
+			$up: ee >= 0,
+			children: [ee >= 0 ? "+" : "-", sf(Math.abs(te)).replace("-", "")]
 		}), /* @__PURE__ */ U(Uf, { children: ` ${q}` })] })
 	] });
 	if (t === "loading") {
@@ -11490,9 +11490,9 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			"aria-busy": "true",
 			$embedded: v,
 			children: [
-				Y(),
+				re(),
 				X(),
-				ie(t, !0),
+				Z(t, !0),
 				/* @__PURE__ */ W(Kf, { children: [
 					/* @__PURE__ */ W(Jf, { children: [
 						/* @__PURE__ */ U(qf, { children: V.overview }),
@@ -11566,9 +11566,9 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			"aria-label": "Wallet",
 			$embedded: v,
 			children: [
-				Y(),
+				re(),
 				X(),
-				ie(e, !1),
+				Z(e, !1),
 				/* @__PURE__ */ U(Sf, { children: n ?? V.emptyMessage }),
 				T && /* @__PURE__ */ W(em, {
 					type: "button",
@@ -11581,26 +11581,26 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 			]
 		});
 	}
-	let ae = M === "assets" ? x?.assets : x?.[M === "tx" ? "transactions" : "gift"];
+	let ie = M === "assets" ? x?.assets : x?.[M === "tx" ? "transactions" : "gift"];
 	return /* @__PURE__ */ W(Cf, {
 		"aria-label": "Wallet",
 		$embedded: v,
 		children: [
-			Y(),
+			re(),
 			X(),
-			ie(J, !1),
-			ae || /* @__PURE__ */ W(Kf, { children: [
+			Z(J, !1),
+			ie || /* @__PURE__ */ W(Kf, { children: [
 				/* @__PURE__ */ W(Jf, { children: [
 					/* @__PURE__ */ U(qf, { children: V.overview }),
 					/* @__PURE__ */ W(ap, { children: [/* @__PURE__ */ U(op, {}), /* @__PURE__ */ U(sp, {})] }),
 					/* @__PURE__ */ W(cp, { children: [/* @__PURE__ */ W(lp, { children: [
 						/* @__PURE__ */ U(up, { $kind: "spot" }),
 						/* @__PURE__ */ U(dp, { children: V.spotLabel }),
-						/* @__PURE__ */ W(fp, { children: [G.spotPct.toFixed(0), "%"] })
+						/* @__PURE__ */ W(fp, { children: [K.spotPct.toFixed(0), "%"] })
 					] }), /* @__PURE__ */ W(lp, { children: [
 						/* @__PURE__ */ U(up, { $kind: "perp" }),
 						/* @__PURE__ */ U(dp, { children: V.perpLabel }),
-						/* @__PURE__ */ W(fp, { children: [G.perpPct.toFixed(0), "%"] })
+						/* @__PURE__ */ W(fp, { children: [K.perpPct.toFixed(0), "%"] })
 					] })] })
 				] }),
 				/* @__PURE__ */ U(lm, {
@@ -11628,6 +11628,6 @@ function pm({ data: e = af, variant: t = "data", emptyContent: n, initialTab: r 
 	});
 }
 //#endregion
-export { me as AccountPanel, De as AssetModeButton, we as AssetModeModal, us as BookTradesPanel, as as ChartPanel, Kc as DepositModal, Jc as EnableTradingModal, be as LeverageModal, je as MarginModeModal, An as MarketsDropdown, _i as OrderBook, sn as OrderConfirmModal, xc as OrderForm, We as PerpsErrorMessage, G as PerpsPanel, ta as PositionsPanel, Be as RecentTrades, Jo as SharePnlModal, pu as SimpleBetPanel, rd as SimpleChartCard, rf as SimplePositionsCard, zu as SimpleTickerCard, or as SymbolHeader, To as TpSlModal, q as UnderlineTab, J as UnderlineTabs, pm as WalletPanel, dt as WithdrawModal, Yt as WithdrawModal12, Fo as tierFromPnlPct };
+export { pe as AccountPanel, De as AssetModeButton, we as AssetModeModal, us as BookTradesPanel, as as ChartPanel, Kc as DepositModal, Jc as EnableTradingModal, ye as LeverageModal, je as MarginModeModal, An as MarketsDropdown, _i as OrderBook, sn as OrderConfirmModal, xc as OrderForm, We as PerpsErrorMessage, K as PerpsPanel, ta as PositionsPanel, Be as RecentTrades, Jo as SharePnlModal, pu as SimpleBetPanel, rd as SimpleChartCard, rf as SimplePositionsCard, zu as SimpleTickerCard, or as SymbolHeader, To as TpSlModal, q as UnderlineTab, J as UnderlineTabs, pm as WalletPanel, dt as WithdrawModal, Yt as WithdrawModal12, Fo as tierFromPnlPct };
 
 //# sourceMappingURL=widgets.js.map
