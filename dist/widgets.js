@@ -5501,7 +5501,7 @@ var no = B(E)`
 	});
 }, as = (e) => {
 	let { isMobile: t, isTablet: n } = h();
-	if (t || n) return /* @__PURE__ */ U(is, { ...e });
+	if ((e.variant ?? (t || n ? "mobile" : "desktop")) === "mobile") return /* @__PURE__ */ U(is, { ...e });
 	let { children: r, minHeight: i = "420px" } = e;
 	return /* @__PURE__ */ U(Xo, {
 		$minHeight: Zo(i),

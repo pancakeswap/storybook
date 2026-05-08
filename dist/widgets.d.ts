@@ -187,6 +187,16 @@ export declare interface ChartPanelProps {
      * 220 to match the original mobile-perps mockup.
      */
     mobileMinHeight?: number;
+    /**
+     * Lock the rendered variant instead of switching on viewport. Use this
+     * when the parent already owns the desktop↔mobile decision and needs
+     * the chart's React subtree to stay stable across viewport changes —
+     * critical for chart libraries that don't survive an unmount/remount
+     * cycle (e.g. TradingView's paid Charting Library, whose module-level
+     * state breaks after `widget.remove()`). When omitted, falls back to
+     * `useMatchBreakpoints()` and switches automatically.
+     */
+    variant?: 'mobile' | 'desktop';
 }
 
 /**
