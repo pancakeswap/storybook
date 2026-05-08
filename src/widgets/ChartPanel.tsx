@@ -42,6 +42,16 @@ export interface ChartPanelProps {
    * 220 to match the original mobile-perps mockup.
    */
   mobileMinHeight?: number
+  /**
+   * Lock the rendered variant instead of switching on viewport. Use this
+   * when the parent already owns the desktop↔mobile decision and needs
+   * the chart's React subtree to stay stable across viewport changes —
+   * critical for chart libraries that don't survive an unmount/remount
+   * cycle (e.g. TradingView's paid Charting Library, whose module-level
+   * state breaks after `widget.remove()`). When omitted, falls back to
+   * `useMatchBreakpoints()` and switches automatically.
+   */
+  variant?: 'mobile' | 'desktop'
 }
 
 const Panel = styled(PerpsPanel)<{ $minHeight: string }>`
@@ -175,9 +185,13 @@ const MobileChartPanel: React.FC<ChartPanelProps> = ({
  * the original `children` + `minHeight` API untouched.
  */
 export const ChartPanel: React.FC<ChartPanelProps> = (props) => {
-  // Mobile variant covers both mobile and tablet (below uikit's xl/968px).
+  // Explicit `variant` wins so callers that already decide layout at a
+  // higher level can keep their chart subtree stable across viewport
+  // changes (see prop docs). Otherwise auto-switch: mobile variant covers
+  // both mobile and tablet (below uikit's xl/968px).
   const { isMobile, isTablet } = useMatchBreakpoints()
-  if (isMobile || isTablet) return <MobileChartPanel {...props} />
+  const variant = props.variant ?? (isMobile || isTablet ? 'mobile' : 'desktop')
+  if (variant === 'mobile') return <MobileChartPanel {...props} />
   const { children, minHeight = '420px' } = props
   return <Panel $minHeight={toCss(minHeight)}>{children}</Panel>
 }
