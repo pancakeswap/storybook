@@ -1140,6 +1140,11 @@ export declare interface PositionRow {
      *  When omitted the tag is hidden — older consumers stay backward-
      *  compatible. PAN-11866. */
     marginType?: 'CROSS' | 'ISOLATED';
+    /** Aster `/fapi/v3/adlQuantile` value for this position's side
+     *  (0–4, low → imminent ADL). Drives the lit-bar count in the ADL
+     *  gauge. When undefined the gauge falls back to a single red marker
+     *  (Aster's resting state). PAN-11867. */
+    adlQuantile?: number;
 }
 
 /** History sheet inner-tab (mobile only). */
