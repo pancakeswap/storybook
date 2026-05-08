@@ -5673,6 +5673,7 @@ var no = B(E)`
 `, Ds = B.span`
   position: relative;
   display: inline-flex;
+  width: fit-content;
 `, Os = B.span`
   display: flex;
   flex-direction: column;
@@ -6817,7 +6818,7 @@ var no = B(E)`
 				onMouseLeave: () => Z(null),
 				children: [/* @__PURE__ */ U(Zs, { children: R("Est. Liq. Price") }), Se === "liq" && /* @__PURE__ */ U(ks, {
 					role: "tooltip",
-					children: R("Total margin required to open this position.")
+					children: R("Estimated price at which this position will be liquidated.")
 				})]
 			}), /* @__PURE__ */ U(Qs, { children: g.liq })] }),
 			_ ? /* @__PURE__ */ W(H, { children: [/* @__PURE__ */ W(Ds, {
