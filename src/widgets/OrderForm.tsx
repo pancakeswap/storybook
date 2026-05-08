@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { styled } from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
@@ -387,12 +387,14 @@ const DashedLabel = styled.span`
  * mode, inverted to dark surface (#08060B bg, light text) in dark mode.
  * Shadow strengthens from light to dark to keep readable elevation
  * against the darker page bg.
+ *
+ * Rendered via PortaledHoverTip → document.body so `position: fixed`
+ * (top/left set inline) escapes PerpsPanel's overflow:hidden. The arrow
+ * x-offset comes from `--tooltip-arrow-left` set per anchor so the
+ * notch points at the label even when the bubble is clamped to viewport.
  */
 const ReduceOnlyTooltip = styled.div`
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  position: fixed;
   display: flex;
   width: 200px;
   padding: 16px;
@@ -423,7 +425,7 @@ const ReduceOnlyTooltip = styled.div`
     content: '';
     position: absolute;
     top: 100%;
-    left: 50%;
+    left: var(--tooltip-arrow-left, 50%);
     transform: translateX(-50%);
     width: 0;
     height: 0;
@@ -433,6 +435,55 @@ const ReduceOnlyTooltip = styled.div`
     color: ${({ theme }) => theme.colors.tooltipInverseBg};
   }
 `
+
+/**
+ * Portals a hover tooltip to document.body, escaping overflow:hidden on
+ * PerpsPanel. Position is computed from the anchor's bounding rect:
+ * tooltip is centered on the anchor horizontally, then clamped 8px from
+ * either viewport edge; the arrow x-offset compensates so the notch
+ * still lines up with the anchor's center after clamping.
+ */
+const PortaledHoverTip: React.FC<{
+  open: boolean
+  anchorRef: React.RefObject<HTMLElement>
+  children: React.ReactNode
+}> = ({ open, anchorRef, children }) => {
+  const [pos, setPos] = useState<{ left: number; bottom: number; arrowLeft: number } | null>(null)
+
+  /* useLayoutEffect runs after DOM mutation but before paint, so the
+   * computed position is applied in the same frame the tooltip mounts —
+   * no flash at a stale location. Match the stop-menu pattern: only
+   * setState when we have a real measurement to commit; closing leaves
+   * pos stale, which is fine because the render guard below skips it. */
+  useLayoutEffect(() => {
+    if (!open || !anchorRef.current) return
+    const r = anchorRef.current.getBoundingClientRect()
+    const tooltipWidth = 200
+    const labelCenter = r.left + r.width / 2
+    const idealLeft = labelCenter - tooltipWidth / 2
+    const left = Math.max(8, Math.min(idealLeft, window.innerWidth - tooltipWidth - 8))
+    const bottom = window.innerHeight - r.top + 8
+    const arrowLeft = labelCenter - left
+    setPos({ left, bottom, arrowLeft })
+  }, [open, anchorRef])
+
+  if (!open || !pos || typeof document === 'undefined') return null
+  return createPortal(
+    <ReduceOnlyTooltip
+      role="tooltip"
+      style={
+        {
+          left: pos.left,
+          bottom: pos.bottom,
+          '--tooltip-arrow-left': `${pos.arrowLeft}px`,
+        } as React.CSSProperties
+      }
+    >
+      {children}
+    </ReduceOnlyTooltip>,
+    document.body,
+  )
+}
 
 const UnitPickerChevronWrap = styled.span`
   display: inline-flex;
@@ -1290,6 +1341,11 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
   const [reduceOnlyTipOpen, setReduceOnlyTipOpen] = useState(false)
   const [tpSlTipOpen, setTpSlTipOpen] = useState(false)
   const [summaryTip, setSummaryTip] = useState<'cost' | 'liq' | 'fees' | null>(null)
+  const reduceOnlyAnchorRef = useRef<HTMLSpanElement>(null)
+  const tpSlAnchorRef = useRef<HTMLSpanElement>(null)
+  const marginAnchorRef = useRef<HTMLSpanElement>(null)
+  const liqAnchorRef = useRef<HTMLSpanElement>(null)
+  const feesAnchorRef = useRef<HTMLSpanElement>(null)
 
 
   useEffect(() => {
@@ -1521,33 +1577,31 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
           onChange={(e) => onDraftChange({ ...draft, reduceOnly: e.target.checked })}
         />
         <DashedLabelWrap
+          ref={reduceOnlyAnchorRef}
           onMouseEnter={() => setReduceOnlyTipOpen(true)}
           onMouseLeave={() => setReduceOnlyTipOpen(false)}
         >
           <DashedLabel>{t('Reduce Only')}</DashedLabel>
-          {reduceOnlyTipOpen && (
-            <ReduceOnlyTooltip role="tooltip">
-              {t('Reduce-Only order will only reduce your position, not increase it.')}
-            </ReduceOnlyTooltip>
-          )}
         </DashedLabelWrap>
+        <PortaledHoverTip open={reduceOnlyTipOpen} anchorRef={reduceOnlyAnchorRef}>
+          {t('Reduce-Only order will only reduce your position, not increase it.')}
+        </PortaledHoverTip>
       </Flex>
 
       <Flex alignItems="center" style={{ gap: 8 }}>
         <Checkbox scale="sm" checked={draft.tpSlEnabled} onChange={toggleTpSl} />
         <DashedLabelWrap
+          ref={tpSlAnchorRef}
           onMouseEnter={() => setTpSlTipOpen(true)}
           onMouseLeave={() => setTpSlTipOpen(false)}
         >
           <DashedLabel>{t('Take Profit / Stop Loss')}</DashedLabel>
-          {tpSlTipOpen && (
-            <ReduceOnlyTooltip role="tooltip">
-              {t(
-                'Set Take Profit or Stop Loss before opening. It activates after entry. Choose Last or Mark price as the trigger.',
-              )}
-            </ReduceOnlyTooltip>
-          )}
         </DashedLabelWrap>
+        <PortaledHoverTip open={tpSlTipOpen} anchorRef={tpSlAnchorRef}>
+          {t(
+            'Set Take Profit or Stop Loss before opening. It activates after entry. Choose Last or Mark price as the trigger.',
+          )}
+        </PortaledHoverTip>
       </Flex>
 
       {draft.tpSlEnabled && (
@@ -1628,46 +1682,43 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
 
       <SummaryGrid>
         <DashedLabelWrap
+          ref={marginAnchorRef}
           onMouseEnter={() => setSummaryTip('cost')}
           onMouseLeave={() => setSummaryTip(null)}
         >
           <SK>{t('Margin')}</SK>
-          {summaryTip === 'cost' && (
-            <ReduceOnlyTooltip role="tooltip">
-              {t('Total margin required to open this position.')}
-            </ReduceOnlyTooltip>
-          )}
         </DashedLabelWrap>
+        <PortaledHoverTip open={summaryTip === 'cost'} anchorRef={marginAnchorRef}>
+          {t('Total margin required to open this position.')}
+        </PortaledHoverTip>
         <SV>{preview.cost}</SV>
         {!isStopOrder && (
           <>
             <DashedLabelWrap
+              ref={liqAnchorRef}
               onMouseEnter={() => setSummaryTip('liq')}
               onMouseLeave={() => setSummaryTip(null)}
             >
               <SK>{t('Est. Liq. Price')}</SK>
-              {summaryTip === 'liq' && (
-                <ReduceOnlyTooltip role="tooltip">
-                  {t('Estimated price at which this position will be liquidated.')}
-                </ReduceOnlyTooltip>
-              )}
             </DashedLabelWrap>
+            <PortaledHoverTip open={summaryTip === 'liq'} anchorRef={liqAnchorRef}>
+              {t('Estimated price at which this position will be liquidated.')}
+            </PortaledHoverTip>
             <SV>{preview.liq}</SV>
           </>
         )}
         {feeText ? (
           <>
             <DashedLabelWrap
+              ref={feesAnchorRef}
               onMouseEnter={() => setSummaryTip('fees')}
               onMouseLeave={() => setSummaryTip(null)}
             >
               <SK>{t('Fees')}</SK>
-              {summaryTip === 'fees' && (
-                <ReduceOnlyTooltip role="tooltip">
-                  {t('Trading and funding fees applied to this position.')}
-                </ReduceOnlyTooltip>
-              )}
             </DashedLabelWrap>
+            <PortaledHoverTip open={summaryTip === 'fees'} anchorRef={feesAnchorRef}>
+              {t('Trading and funding fees applied to this position.')}
+            </PortaledHoverTip>
             <SV>{feeText}</SV>
           </>
         ) : null}
