@@ -6,6 +6,7 @@ import { AssetModeModal } from './AssetModeModal';
 import { AssetModeModalProps } from './AssetModeModal';
 import { Bucket } from './WalletPanel';
 import { default as default_2 } from 'react';
+import { IsolatedPositionMigration } from './AssetModeModal';
 import { IStyledComponent } from 'styled-components';
 import { MarginModeModal } from './MarginModeModal';
 import { MarginModeModalProps } from './MarginModeModal';
@@ -351,6 +352,8 @@ export declare interface EnableTradingModalProps {
  * consumer maps its provider state machine to one of these phases.
  */
 export declare type EnableTradingPhase = 'link-wallet' | 'authorize-agent' | 'checking-status' | 'done';
+
+export { IsolatedPositionMigration }
 
 export declare const LeverageModal: default_2.FC<LeverageModalProps>;
 
@@ -1400,6 +1403,8 @@ export declare interface SymbolHeaderProps {
     change24h?: string;
     /** Raw 24h quote volume. */
     volume24h?: string;
+    /** Raw open-interest in USDT notional (consumer multiplies base × mark). */
+    openInterestUsd?: string;
     favorited?: boolean;
     onToggleFavorite?: () => void;
     /**
