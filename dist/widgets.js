@@ -3434,7 +3434,7 @@ var G = B(e)`
   width: 2px;
   height: 8px;
   background: ${({ $variant: e, theme: t }) => e === "destructive" ? t.colors.failure : t.colors.text};
-`, Ii = (e) => e === void 0 || !Number.isFinite(e) ? 1 : Math.min(Math.max(0, Math.min(4, Math.floor(e))) + 1, 4), Li = B.div`
+`, Ii = (e) => e === void 0 || !Number.isFinite(e) ? 0 : Math.max(0, Math.min(4, Math.floor(e))), Li = B.div`
   display: flex;
   flex-direction: column;
   gap: 0;
