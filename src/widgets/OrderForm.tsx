@@ -8,6 +8,7 @@ import { Input } from '../primitives/Input'
 import Slider from '../primitives/Slider/Slider'
 import { Text } from '../primitives/Text'
 import { AddIcon, ChevronDownIcon, InfoIcon } from '../primitives/Icons'
+import { Select, type SelectOption } from '../primitives/Select'
 import { useMatchBreakpoints } from '../contexts'
 import { BunnySlider } from './BunnySlider'
 import { PerpsPanel } from './primitives'
@@ -550,68 +551,21 @@ const StopPanelItem = styled.button<{ $active: boolean }>`
   }
 `
 
-// TIF picker — custom popover. Native <select> rendered the system-styled
-// browser dropdown, which jars against the rest of the order form
-// (PAN-11856). The trigger keeps the short label (GTC) while the popover
-// expands each row with the long form ("Good till canceled" / etc).
-const TifTrigger = styled.button`
+type TifValue = 'GTC' | 'IOC' | 'FOK'
+const TIF_OPTIONS: ReadonlyArray<SelectOption<TifValue>> = [
+  { value: 'GTC', label: 'GTC', description: 'Good till canceled' },
+  { value: 'IOC', label: 'IOC', description: 'Immediate or canceled' },
+  { value: 'FOK', label: 'FOK', description: 'Fill or Kill' },
+]
+
+const TifSelectWrap = styled.div`
   flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
-  border: 0;
-  outline: 0;
-  padding: 0;
-  color: ${({ theme }) => theme.colors.text};
-  font-size: 14px;
-  font-weight: 600;
-  font-family: Kanit, sans-serif;
-  cursor: pointer;
+  width: 240px;
+  /* The shared Select primitive renders the styled brand-chrome trigger.
+   * The closed trigger displays the terse label ('GTC') so the row stays
+   * compact; the open dropdown shows each option with its long-form
+   * description appended. */
 `
-
-const TifMenu = styled.div`
-  position: fixed;
-  z-index: 200;
-  min-width: 220px;
-  background: ${({ theme }) => theme.colors.card};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 12px;
-  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6);
-  padding: 4px;
-`
-
-const TifMenuItem = styled.button<{ $active: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border: 0;
-  border-radius: 8px;
-  background: ${({ $active, theme }) => ($active ? theme.colors.input : 'transparent')};
-  color: ${({ theme }) => theme.colors.text};
-  font-family: Kanit, sans-serif;
-  font-size: 13px;
-  cursor: pointer;
-  &:hover {
-    background: ${({ theme }) => theme.colors.input};
-  }
-`
-
-const TifCheck = styled.span<{ $visible: boolean }>`
-  display: inline-flex;
-  width: 12px;
-  visibility: ${({ $visible }) => ($visible ? 'visible' : 'hidden')};
-  color: ${({ theme }) => theme.colors.secondary};
-`
-
-const TIF_OPTIONS = [
-  { key: 'GTC', long: 'Good till canceled' },
-  { key: 'IOC', long: 'Immediate or canceled' },
-  { key: 'FOK', long: 'Fill or Kill' },
-] as const
 
 const InputTight = styled(Input)`
   height: 36px;
@@ -1337,34 +1291,6 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
   const [tpSlTipOpen, setTpSlTipOpen] = useState(false)
   const [summaryTip, setSummaryTip] = useState<'cost' | 'liq' | 'fees' | null>(null)
 
-  // TIF popover (PAN-11856) — same pattern as the stop-tab dropdown.
-  const tifBtnRef = useRef<HTMLButtonElement>(null)
-  const tifMenuRef = useRef<HTMLDivElement>(null)
-  const [tifMenuOpen, setTifMenuOpen] = useState(false)
-  const [tifMenuPos, setTifMenuPos] = useState<{ top: number; left: number } | null>(null)
-  useEffect(() => {
-    if (!tifMenuOpen || !tifBtnRef.current) return
-    const r = tifBtnRef.current.getBoundingClientRect()
-    // Anchor the menu's right edge to the trigger's right edge so the
-    // long-form labels read naturally and don't hang off-screen.
-    setTifMenuPos({ top: r.bottom + 4, left: Math.max(8, r.right - 220) })
-  }, [tifMenuOpen])
-  useEffect(() => {
-    if (!tifMenuOpen) return
-    const onDown = (e: MouseEvent) => {
-      const target = e.target as Node
-      if (
-        tifBtnRef.current &&
-        !tifBtnRef.current.contains(target) &&
-        tifMenuRef.current &&
-        !tifMenuRef.current.contains(target)
-      ) {
-        setTifMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [tifMenuOpen])
 
   useEffect(() => {
     if (!stopMenuOpen || !stopTabRef.current || !stopPanelRef.current) return
@@ -1536,49 +1462,30 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
         <PriceInputRow>
           <SizeLabel>{t('TIF')}</SizeLabel>
           <Flex flex={1} />
-          <TifTrigger
-            ref={tifBtnRef}
-            type="button"
-            onClick={() => setTifMenuOpen((v) => !v)}
-            aria-haspopup="listbox"
-            aria-expanded={tifMenuOpen}
-            aria-label={t('Time in force')}
-          >
-            {draft.timeInForce === 'GTX' ? 'GTC' : draft.timeInForce}
-            <UnitPickerChevron />
-          </TifTrigger>
-          {tifMenuOpen &&
-            tifMenuPos &&
-            createPortal(
-              <TifMenu
-                ref={tifMenuRef}
-                role="listbox"
-                style={{ top: tifMenuPos.top, left: tifMenuPos.left }}
-              >
-                {TIF_OPTIONS.map((opt) => {
-                  const active =
-                    draft.timeInForce === opt.key ||
-                    (opt.key === 'GTC' && draft.timeInForce === 'GTX')
-                  return (
-                    <TifMenuItem
-                      key={opt.key}
-                      type="button"
-                      role="option"
-                      aria-selected={active}
-                      $active={active}
-                      onClick={() => {
-                        onDraftChange({ ...draft, timeInForce: opt.key })
-                        setTifMenuOpen(false)
-                      }}
-                    >
-                      <TifCheck $visible={active}>✓</TifCheck>
-                      {opt.key} ({t(opt.long)})
-                    </TifMenuItem>
-                  )
-                })}
-              </TifMenu>,
-              document.body,
-            )}
+          <TifSelectWrap>
+            <Select
+              options={TIF_OPTIONS.map((o) => ({
+                ...o,
+                description: t(o.description ?? ''),
+              }))}
+              defaultOptionIndex={
+                TIF_OPTIONS.findIndex(
+                  (o) =>
+                    o.value ===
+                    (draft.timeInForce === 'GTX' ? 'GTC' : (draft.timeInForce as TifValue)),
+                ) >= 0
+                  ? TIF_OPTIONS.findIndex(
+                      (o) =>
+                        o.value ===
+                        (draft.timeInForce === 'GTX' ? 'GTC' : (draft.timeInForce as TifValue)),
+                    )
+                  : 0
+              }
+              onOptionChange={(opt) =>
+                onDraftChange({ ...draft, timeInForce: opt.value as TifValue })
+              }
+            />
+          </TifSelectWrap>
         </PriceInputRow>
       )}
 
