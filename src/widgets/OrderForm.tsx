@@ -10,6 +10,7 @@ import { Text } from '../primitives/Text'
 import { AddIcon, ChevronDownIcon, InfoIcon } from '../primitives/Icons'
 import { type SelectOption } from '../primitives/Select'
 import { useMatchBreakpoints } from '../contexts'
+import { useTooltip } from '../hooks/useTooltip'
 import { BunnySlider } from './BunnySlider'
 import { PerpsPanel } from './primitives'
 import { ensureNegative, ensurePositive, useSeparatedNumberInput } from './separatedNumberInput'
@@ -603,11 +604,58 @@ const MenuPanelItem = styled.button<{ $active: boolean }>`
 `
 
 type TifValue = 'GTC' | 'IOC' | 'FOK'
-const TIF_OPTIONS: ReadonlyArray<SelectOption<TifValue>> = [
-  { value: 'GTC', label: 'GTC', description: 'Good till canceled' },
-  { value: 'IOC', label: 'IOC', description: 'Immediate or canceled' },
-  { value: 'FOK', label: 'FOK', description: 'Fill or Kill' },
+type TifOption = SelectOption<TifValue> & { tooltip: string }
+const TIF_OPTIONS: ReadonlyArray<TifOption> = [
+  {
+    value: 'GTC',
+    label: 'GTC',
+    description: 'Good till canceled',
+    tooltip:
+      "Time in force · GTC (Good 'Til Canceled): The order will continue to work until the order fills or is canceled.",
+  },
+  {
+    value: 'IOC',
+    label: 'IOC',
+    description: 'Immediate or canceled',
+    tooltip:
+      'Time in force · IOC (Immediate or Cancel): The order will execute all or part immediately and cancel any unfilled portion of the order.',
+  },
+  {
+    value: 'FOK',
+    label: 'FOK',
+    description: 'Fill or Kill',
+    tooltip:
+      'Time in force · FOK (Fill or Kill): The order must be filled immediately in its entirety or not executed at all.',
+  },
 ]
+
+/**
+ * Single TIF option row inside the dropdown. Pulled out so each row can
+ * own its own `useTooltip` instance — the hook can't be called inside a
+ * `.map()` body, and the tooltip body comes straight from the ticket
+ * screenshot (PAN-11856).
+ */
+const TifMenuItem: React.FC<{
+  option: TifOption
+  active: boolean
+  onSelect: (value: TifValue) => void
+  t: (key: string, options?: Record<string, string | number | undefined>) => string
+}> = ({ option, active, onSelect, t }) => {
+  const { targetRef, tooltip } = useTooltip(t(option.tooltip), { placement: 'left' })
+  return (
+    <>
+      <MenuPanelItem
+        ref={targetRef as React.Ref<HTMLButtonElement>}
+        $active={active}
+        role="menuitem"
+        onClick={() => onSelect(option.value)}
+      >
+        {option.description ? `${option.label} (${t(option.description)})` : option.label}
+      </MenuPanelItem>
+      {tooltip}
+    </>
+  )
+}
 
 /* TIF dropdown trigger — minimal text+chevron button living inside the
  * PriceInputRow chrome. The dropdown menu itself uses the shared MenuPanel
@@ -1582,17 +1630,16 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
               createPortal(
                 <MenuPanel ref={tifPanelRef} style={{ top: tifMenuPos.top, left: tifMenuPos.left }} role="menu">
                   {TIF_OPTIONS.map((opt) => (
-                    <MenuPanelItem
+                    <TifMenuItem
                       key={opt.value}
-                      $active={currentTif === opt.value}
-                      role="menuitem"
-                      onClick={() => {
-                        onDraftChange({ ...draft, timeInForce: opt.value })
+                      option={opt}
+                      active={currentTif === opt.value}
+                      t={t}
+                      onSelect={(v) => {
+                        onDraftChange({ ...draft, timeInForce: v })
                         setTifMenuOpen(false)
                       }}
-                    >
-                      {opt.description ? `${opt.label} (${t(opt.description)})` : opt.label}
-                    </MenuPanelItem>
+                    />
                   ))}
                 </MenuPanel>,
                 document.body,
