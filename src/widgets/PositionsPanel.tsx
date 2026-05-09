@@ -467,40 +467,13 @@ const CloseAllBtn = styled.button`
 `
 
 /* ── Close-All confirm modal ─────────────────────────────────
- * Big amber warning glyph centered above the message, with a
- * soft radial halo behind it. Two pseudo-elements stack a
- * filled-warning10 disc (the "puck") under a blurred warning20
- * bloom (the glow). The icon itself is rendered on top in the
- * brighter `warning60` to pop against the disc. */
+ * Plain warning glyph in `warning60` centered above the message —
+ * no disc, no halo. */
 const WarningGlow = styled.div`
-  position: relative;
-  width: 64px;
-  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${({ theme }) => theme.colors.warning60};
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: ${({ theme }) => theme.colors.warning10};
-  }
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -16px;
-    border-radius: 50%;
-    background: ${({ theme }) => theme.colors.warning20};
-    opacity: 0.35;
-    filter: blur(14px);
-    z-index: -1;
-  }
-  svg {
-    position: relative;
-    z-index: 1;
-  }
 `
 
 const ActionCell = styled(Flex)`
@@ -1432,13 +1405,14 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
         title=""
         hideCloseButton
         headerPadding="0px"
+        headerBorderColor="transparent"
         bodyPadding="32px 24px 24px"
         minHeight="0px"
         onDismiss={() => setCloseAllConfirmOpen(false)}
       >
         <Flex flexDirection="column" alignItems="center" style={{ gap: 24, minWidth: 360, maxWidth: 420 }}>
           <WarningGlow aria-hidden>
-            <WarningIcon width="32px" />
+            <WarningIcon width="40px" />
           </WarningGlow>
           <Text fontSize="16px" textAlign="center" px="8px">
             {t(
