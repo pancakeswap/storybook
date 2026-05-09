@@ -334,7 +334,14 @@ export function MobilePerpsPage({ initialPair: _initialPair = 'BTCUSDT' }: Mobil
         isOpen={leverageOpen}
         symbol={activeSymbol}
         currentLeverage={draft.leverage}
-        availableBalance={11.24}
+        remainingOpenableAtLeverage={(lev) => {
+          // Stub matching production formula: min(bracketCap, oiRemaining).
+          // At high lev bracket cap binds; at low lev the OI budget binds.
+          if (lev > 200) return undefined
+          const bracketCap = lev > 100 ? 300_000 : lev > 50 ? 1_000_000 : 5_000_000
+          const oi = lev > 100 ? 4_754_310 : lev > 25 ? 52_700_554 : 75_318_870
+          return Math.min(bracketCap, oi)
+        }}
         onConfirm={(v) => {
           setDraft((d) => ({ ...d, leverage: v }))
           setLeverageOpen(false)

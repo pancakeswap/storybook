@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { styled } from 'styled-components'
-import { Box, Flex } from '../primitives/Box'
+import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Slider } from '../primitives/Slider'
 import { Text } from '../primitives/Text'
@@ -17,10 +17,23 @@ export interface LeverageModalProps {
   minLeverage?: number
   maxLeverage?: number
   /**
-   * USDT (or quote) balance available for new positions. Used to display
-   * the "Maximum position at current leverage" preview line.
+   * Returns the maximum new notional (USDT) the user can open at the
+   * given draft leverage — the "Remaining openable notional value" line.
+   * Called with the current slider value as the user drags so the
+   * preview stays in sync; return `undefined` while inputs (brackets,
+   * positions, open orders, OI map) are still loading.
+   *
+   * Caller-owned formula. Aster's UI uses two clamps:
+   *   `min(bracketCap − usedNotional, oiRemaining[ceil(leverage)])`
+   * where `bracketCap` is the per-tier `notionalCap` for the chosen
+   * leverage (binds at HIGH leverage), `usedNotional` is existing
+   * position + unfilled open-order notional on the symbol, and
+   * `oiRemaining` is a platform-wide open-interest budget per leverage
+   * tier (binds at LOW leverage where bracket caps are huge). Wallet
+   * balance is intentionally NOT factored in — this preview describes
+   * venue risk-control headroom, not margin sufficiency. PAN-11910.
    */
-  availableBalance: number
+  remainingOpenableAtLeverage: (leverage: number) => number | undefined
   /**
    * Called when the user clicks Confirm with their chosen leverage. The
    * consumer is responsible for the async write back to the venue, error
@@ -79,6 +92,16 @@ const ValueBox = styled(Flex)`
   font-variant-numeric: tabular-nums;
 `
 
+const RemainingBox = styled(Flex)`
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 12px;
+`
+
 /**
  * Mirror PancakeSwap localization's `%placeholder%` substitution shape so
  * the widget is useful out-of-the-box in storybook (without a real `t`)
@@ -103,7 +126,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
   currentLeverage,
   minLeverage = 1,
   maxLeverage = 100,
-  availableBalance,
+  remainingOpenableAtLeverage,
   onConfirm,
   onClose,
   isSubmitting = false,
@@ -121,7 +144,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
   }, [isOpen, currentLeverage])
 
   const clamp = (n: number) => Math.max(minLeverage, Math.min(maxLeverage, Math.round(n)))
-  const maxNotional = availableBalance * value
+  const remainingOpenable = remainingOpenableAtLeverage(value)
 
   return (
     <ModalV2 isOpen={isOpen} onDismiss={onClose} closeOnOverlayClick>
@@ -160,16 +183,25 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
             width="100%"
           />
 
-          <Box>
+          <RemainingBox>
             <Text fontSize="14px" color="textSubtle">
-              {t('Maximum position at current leverage:')}
+              {t('Remaining openable notional value')}
             </Text>
-            <Text fontSize="18px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {Number.isFinite(maxNotional) && maxNotional > 0
-                ? `${maxNotional.toLocaleString(undefined, { maximumFractionDigits: 0 })} USDT`
+            <Text fontSize="20px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {Number.isFinite(remainingOpenable) && (remainingOpenable as number) > 0
+                ? `${(remainingOpenable as number).toLocaleString(undefined, { maximumFractionDigits: 0 })} USDT`
                 : '—'}
             </Text>
-          </Box>
+            <Text fontSize="12px" color="textSubtle">
+              {t(
+                'The maximum notional value you can open under your current leverage and system risk control limits.',
+              )}
+            </Text>
+          </RemainingBox>
+
+          <Text fontSize="12px" color="textSubtle">
+            {t('Please note that leverage changing will also apply for open positions and open orders.')}
+          </Text>
 
           <Text fontSize="12px" color="textSubtle">
             {t('Please note that setting higher leverage increases the risk of liquidation.')}
