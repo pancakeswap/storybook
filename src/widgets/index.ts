@@ -22,6 +22,15 @@ export type { AccountPanelProps, AccountPanelState } from './AccountPanel'
 export { LeverageModal } from './LeverageModal'
 export type { LeverageModalProps } from './LeverageModal'
 
+export { AssetModeModal } from './AssetModeModal'
+export type { AssetMode, AssetModeModalProps, IsolatedPositionMigration } from './AssetModeModal'
+
+export { AssetModeButton } from './AssetModeButton'
+export type { AssetModeButtonProps } from './AssetModeButton'
+
+export { MarginModeModal } from './MarginModeModal'
+export type { MarginModeModalProps } from './MarginModeModal'
+
 export { RecentTrades } from './RecentTrades'
 export type { RecentTradeRow, RecentTradesProps } from './RecentTrades'
 
@@ -30,6 +39,9 @@ export type { PerpsErrorMessageProps, PerpsErrorVariant } from './PerpsErrorMess
 
 export { WithdrawModal } from './WithdrawModal'
 export type { WithdrawModalProps, WithdrawStep, WithdrawTokenRow } from './WithdrawModal'
+
+export { WithdrawModal12 } from './WithdrawModal12'
+export type { WithdrawModal12Props, WithdrawAssetRow } from './WithdrawModal12'
 
 export { OrderConfirmModal } from './OrderConfirmModal'
 export type { OrderConfirmModalProps, OrderConfirmDetails, OrderSide, OrderType } from './OrderConfirmModal'
@@ -47,12 +59,19 @@ export { PositionsPanel } from './PositionsPanel'
 export type {
   PositionsPanelProps,
   PositionsPanelTab,
+  PositionsHistoryTab,
   PositionRow,
   OpenOrderRow,
+  OrderHistoryRow,
+  TradeHistoryRow,
+  TransactionHistoryRow,
 } from './PositionsPanel'
 
 export { TpSlModal } from './TpSlModal'
 export type { TpSlModalProps, TpSlIntent, PositionSide } from './TpSlModal'
+
+export { SharePnlModal, tierFromPnlPct } from './SharePnlModal'
+export type { SharePnlModalProps, SharePnlTier } from './SharePnlModal'
 
 export { ChartPanel } from './ChartPanel'
 export type { ChartPanelProps } from './ChartPanel'
@@ -94,8 +113,18 @@ export { SimplePositionsCard } from './SimplePositionsCard'
 export type {
   SimplePositionsCardProps,
   SimplePositionRow,
-  SimpleOpenOrderRow,
+  SimpleHistoryRow,
   SimplePositionsTab,
   SimplePositionDirection,
   SimplePositionLiqStatus,
 } from './SimplePositionsCard'
+
+export { WalletPanel } from './WalletPanel'
+export type {
+  WalletPanelProps,
+  WalletPanelLabels,
+  Bucket,
+  WalletData,
+  ActionItem,
+  PerpStatsData,
+} from './WalletPanel'

@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import styled, { useTheme } from 'styled-components'
+import { styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Text } from '../primitives/Text'
-import { ChevronDownIcon } from '../primitives/Icons'
+import { ChartDisableIcon, ChartIcon, ChevronDownIcon, StarFillIcon, StarLineIcon } from '../primitives/Icons'
+import { useMatchBreakpoints } from '../contexts'
+import { useTooltip } from '../hooks/useTooltip'
 
 export interface SymbolHeaderProps {
   /** Full venue symbol — used as React key + aria labels. */
@@ -25,6 +27,12 @@ export interface SymbolHeaderProps {
   // ── Live stats (raw strings; widget formats) ──────────────────
   /** Last traded price (unformatted). */
   lastPrice?: string
+  /**
+   * Direction of the most recent tick — drives the color of the last-price
+   * display. `'flat'` (or unset) keeps the neutral text color so a fresh
+   * mount or paused stream doesn't flash green/red without a real signal.
+   */
+  lastPriceDirection?: 'up' | 'down' | 'flat'
   markPrice?: string
   indexPrice?: string
   /** Signed fraction funding rate (e.g. "0.0001" = 0.01%). */
@@ -35,10 +43,21 @@ export interface SymbolHeaderProps {
   change24h?: string
   /** Raw 24h quote volume. */
   volume24h?: string
+  /** Raw open-interest in USDT notional (consumer multiplies base × mark). */
+  openInterestUsd?: string
 
   // ── Favorite ──────────────────────────────────────────────────
   favorited?: boolean
   onToggleFavorite?: () => void
+
+  // ── Chart toggle (mobile only) ────────────────────────────────
+  /**
+   * Mobile variant only — controls the chart-icon toggle button shown
+   * in the mobile symbol row. When `onChartToggle` is undefined the
+   * button is not rendered (desktop has its own chart panel).
+   */
+  chartOpen?: boolean
+  onChartToggle?: () => void
 
   // ── Markets dropdown ──────────────────────────────────────────
   /**
@@ -48,6 +67,18 @@ export interface SymbolHeaderProps {
    * Omit to make the pair pill non-interactive (no dropdown).
    */
   renderMarketsDropdown?: (close: () => void) => React.ReactNode
+
+  /**
+   * Controlled open state. Pass alongside `onMarketsOpenChange` to lift
+   * the dropdown's open/close lifecycle out of the widget — useful when
+   * the consumer needs a single source of truth (e.g. another markets
+   * trigger lives elsewhere on the page and would otherwise pop a
+   * second dropdown). When `marketsOpen` is omitted the widget falls
+   * back to its own `useState` for backward compatibility.
+   */
+  marketsOpen?: boolean
+  /** Fired on every internal request to open / close the dropdown. */
+  onMarketsOpenChange?: (open: boolean) => void
 
   /** Translator. */
   t?: (key: string) => string
@@ -115,6 +146,7 @@ const StarBtn = styled.button`
   flex-shrink: 0;
 `
 
+// eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
 const CoinBadge = styled.span<{ $bg?: string }>`
   width: 24px;
   height: 24px;
@@ -144,25 +176,21 @@ const PairName = styled(Text)`
   line-height: 1.5;
 `
 
-const LevPill = styled.span`
-  font-size: 12px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: ${({ theme }) => theme.colors.tertiary};
-  color: ${({ theme }) => theme.colors.secondary};
-  flex-shrink: 0;
-`
-
-const Price = styled.div`
+const Price = styled.div<{ $direction?: 'up' | 'down' | 'flat' }>`
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.2px;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ $direction, theme }) =>
+    $direction === 'up'
+      ? theme.colors.success
+      : $direction === 'down'
+      ? theme.colors.failure
+      : theme.colors.text};
   white-space: nowrap;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
+  transition: color 0.15s ease;
 `
 
 const Stats = styled(Flex)`
@@ -214,6 +242,60 @@ const FundingSep = styled.span`
   padding: 0 2px;
 `
 
+/* Funding/Countdown tooltip — light surface (white bg, dark text)
+   regardless of theme, per Figma spec. Anchored to its Stat (which is
+   position: relative). */
+
+const FundingTipAnchor = styled.span`
+  position: relative;
+  display: inline-flex;
+`
+
+const FundingTipBubble = styled.div`
+  position: fixed;
+  transform: translateX(-50%);
+  display: flex;
+  width: 254px;
+  padding: 16px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 8px;
+  border-radius: 16px;
+  background: ${({ theme }) => theme.colors.tooltipInverseBg};
+  color: ${({ theme }) => theme.colors.tooltipInverseText};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+  z-index: 100;
+  white-space: normal;
+`
+
+const FundingTipRow = styled.div`
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 8px;
+`
+
+const FundingTipDirSpan = styled.span<{ $color: 'long' | 'short' | 'plain' }>`
+  color: ${({ $color, theme }) =>
+    $color === 'long' ? theme.colors.success : $color === 'short' ? theme.colors.failure : 'inherit'};
+`
+
+const FundingTipDesc = styled.p`
+  margin: 0;
+  align-self: stretch;
+`
+
 const formatPct = (v?: string, digits = 4) => {
   if (!v) return '—'
   const n = Number(v) * 100
@@ -235,6 +317,23 @@ const formatCountdown = (nextTimeMs?: number) => {
   const m = Math.floor((diff % 3_600_000) / 60_000)
   const s = Math.floor((diff % 60_000) / 1000)
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
+
+/**
+ * Drives a 1Hz re-render so the funding countdown ticks every second
+ * regardless of WebSocket cadence. Asterdex.com does the same — they
+ * coalesce WS pushes into 100–250 ms render batches but keep a separate
+ * `setInterval(..., 1000)` for the clock so it never stutters when the
+ * stream slows. Returns nothing — the act of `setState` re-renders the
+ * caller.
+ */
+const useTick = (active: boolean): void => {
+  const [, setN] = useState(0)
+  useEffect(() => {
+    if (!active) return undefined
+    const id = setInterval(() => setN((x) => x + 1), 1000)
+    return () => clearInterval(id)
+  }, [active])
 }
 
 const formatVolume = (v?: string) => {
@@ -275,25 +374,55 @@ const identity = (s: string) => s
  * can drop in without the widget knowing about data sources. Portal
  * anchoring + outside-click / Escape dismissal stay here.
  */
-export const SymbolHeader: React.FC<SymbolHeaderProps> = ({
+export const SymbolHeader: React.FC<SymbolHeaderProps> = (props) => {
+  // Auto-responsive: switch to mobile layout for both mobile and tablet
+  // viewports (everything below uikit's xl/968px). Desktop call sites
+  // don't need to pass any flag.
+  const { isMobile, isTablet } = useMatchBreakpoints()
+  if (isMobile || isTablet) return <MobileSymbolHeader {...props} />
+  return <DesktopSymbolHeader {...props} />
+}
+
+const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   symbol,
   pairLabel,
   logoUrl,
-  leverage,
   lastPrice,
+  lastPriceDirection = 'flat',
   markPrice,
   indexPrice,
   fundingRate,
   nextFundingTime,
   change24h,
   volume24h,
+  openInterestUsd,
   favorited = false,
   onToggleFavorite,
   renderMarketsDropdown,
+  marketsOpen,
+  onMarketsOpenChange,
   t = identity,
 }) => {
   const theme = useTheme()
-  const [open, setOpen] = useState(false)
+  // 1Hz re-render so the funding countdown ticks every second even when
+  // the upstream `@markPrice@1s` WS frame slows or stalls. PAN-11804.
+  // eslint-disable-next-line react-hooks/purity -- intentional: re-check active state each render so the tick stops once the deadline passes
+  useTick(nextFundingTime !== undefined && nextFundingTime > Date.now())
+  // Controlled when the consumer provides `marketsOpen`; otherwise fall
+  // back to local state so existing call sites (no controlled prop) keep
+  // working. `setOpen` writes to whichever side is active so the rest of
+  // the component reads `open` uniformly.
+  const isControlled = marketsOpen !== undefined
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = isControlled ? marketsOpen : internalOpen
+  const setOpen = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)) => {
+      const nextOpen = typeof next === 'function' ? next(open) : next
+      if (!isControlled) setInternalOpen(nextOpen)
+      onMarketsOpenChange?.(nextOpen)
+    },
+    [isControlled, open, onMarketsOpenChange],
+  )
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -334,12 +463,37 @@ export const SymbolHeader: React.FC<SymbolHeaderProps> = ({
       window.removeEventListener('mousedown', onDown)
       window.removeEventListener('keydown', onKey)
     }
-  }, [open])
+  }, [open, setOpen])
 
-  const close = useCallback(() => setOpen(false), [])
+  const close = useCallback(() => setOpen(false), [setOpen])
 
   const fundingNegative = Number(fundingRate) < 0
   const change24hNegative = Number(change24h) < 0
+
+  const { targetRef: markTipRef, tooltip: markTipNode } = useTooltip(
+    t(
+      'The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes.',
+    ),
+    { placement: 'bottom' },
+  )
+
+  const [fundingTipOpen, setFundingTipOpen] = useState(false)
+  const [fundingTipPos, setFundingTipPos] = useState<{ top: number; left: number } | null>(null)
+  const fundingAnchorRef = useRef<HTMLSpanElement>(null)
+  const fundingPctNumeric = (() => {
+    const n = Number(fundingRate)
+    return Number.isFinite(n) ? n * 100 : null
+  })()
+  const fundingAnnualized =
+    fundingPctNumeric != null ? `${(fundingPctNumeric * 3 * 365).toFixed(4)}%` : '—'
+
+  const openFundingTip = () => {
+    const a = fundingAnchorRef.current
+    if (!a) return
+    const r = a.getBoundingClientRect()
+    setFundingTipPos({ top: r.bottom + 8, left: r.left + r.width / 2 })
+    setFundingTipOpen(true)
+  }
 
   return (
     <Root aria-label={`${symbol} ticker`}>
@@ -380,21 +534,65 @@ export const SymbolHeader: React.FC<SymbolHeaderProps> = ({
           )
         : null}
 
-      <Price aria-label={`Last price: ${lastPrice ?? ''}`}>{lastPrice ?? '—'}</Price>
+      <Price aria-label={`Last price: ${lastPrice ?? ''}`} $direction={lastPriceDirection}>
+        {lastPrice ?? '—'}
+      </Price>
 
       <Stats role="list">
         <Stat role="listitem">
-          <StatLabel $dashed>{t('Mark')}</StatLabel>
+          <StatLabel ref={markTipRef} $dashed>{t('Mark')}</StatLabel>
           <StatValue>{markPrice ?? '—'}</StatValue>
+          {markTipNode}
         </Stat>
 
         <Stat role="listitem">
-          <StatLabel $dashed>{t('Index')}</StatLabel>
+          <StatLabel>{t('Index')}</StatLabel>
           <StatValue>{indexPrice ?? '—'}</StatValue>
         </Stat>
 
         <Stat role="listitem">
-          <StatLabel $dashed>{t('Funding / Countdown')}</StatLabel>
+          <FundingTipAnchor
+            ref={fundingAnchorRef}
+            onMouseEnter={openFundingTip}
+            onMouseLeave={() => setFundingTipOpen(false)}
+          >
+            <StatLabel $dashed>{t('Funding / Countdown')}</StatLabel>
+          </FundingTipAnchor>
+          {fundingTipOpen && fundingTipPos && typeof document !== 'undefined'
+            ? createPortal(
+                <FundingTipBubble
+                  role="tooltip"
+                  style={{ top: fundingTipPos.top, left: fundingTipPos.left }}
+                >
+                  <FundingTipRow>
+                    <span>{t('Interval')}</span>
+                    <span>8h</span>
+                  </FundingTipRow>
+                  <FundingTipRow>
+                    <span>{t('Direction')}</span>
+                    <span>
+                      <FundingTipDirSpan $color="long">{t('Long')}</FundingTipDirSpan>{' '}
+                      <FundingTipDirSpan $color="plain">{t('Pays')}</FundingTipDirSpan>{' '}
+                      <FundingTipDirSpan $color="short">{t('Short')}</FundingTipDirSpan>
+                    </span>
+                  </FundingTipRow>
+                  <FundingTipRow>
+                    <span>{t('Funding rate')}</span>
+                    <span>{formatPct(fundingRate)}</span>
+                  </FundingTipRow>
+                  <FundingTipRow>
+                    <span>{t('Annualized')}</span>
+                    <span>{fundingAnnualized}</span>
+                  </FundingTipRow>
+                  <FundingTipDesc>
+                    {t(
+                      'Funding rate for the next period. If positive, longs pay shorts. If negative, shorts pay longs.',
+                    )}
+                  </FundingTipDesc>
+                </FundingTipBubble>,
+                document.body,
+              )
+            : null}
           <FundingValue>
             <FundingRate $negative={fundingNegative}>{formatPct(fundingRate)}</FundingRate>
             <FundingSep>/</FundingSep>
@@ -415,7 +613,279 @@ export const SymbolHeader: React.FC<SymbolHeaderProps> = ({
           <StatLabel>{t('24h Volume (USDT)')}</StatLabel>
           <StatValue>{formatVolume(volume24h)}</StatValue>
         </Stat>
+
+        {openInterestUsd ? (
+          <Stat role="listitem">
+            <StatLabel>{t('Open Interest (USDT)')}</StatLabel>
+            <StatValue>{formatVolume(openInterestUsd)}</StatValue>
+          </Stat>
+        ) : null}
       </Stats>
     </Root>
   )
 }
+
+// ════════════════════════════════════════════════════════════════
+// Mobile variant
+// ════════════════════════════════════════════════════════════════
+
+const MobileRoot = styled(Flex)`
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.backgroundAlt};
+  font-variant-numeric: tabular-nums;
+`
+
+const MobileSymBtn = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  &[aria-disabled='true'] {
+    cursor: default;
+  }
+`
+
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee + brand SVG illustration */
+const MobileCoinBadge = styled.span<{ $bg?: string }>`
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  background: ${({ $bg }) => $bg ?? '#F7931A'};
+  overflow: hidden;
+`
+/* eslint-enable no-restricted-syntax */
+
+const MobilePairText = styled.span`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const MobilePerpTag = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: ${({ theme }) => theme.colors.input};
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 11px;
+`
+
+const MobileChev = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  display: inline-flex;
+  align-items: center;
+`
+
+const MobileChange = styled.span<{ $negative?: boolean }>`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ $negative, theme }) => ($negative ? theme.colors.failure : theme.colors.success)};
+`
+
+const MobileSpacer = styled.span`
+  flex: 1;
+`
+
+const MobileIconBtn = styled.button<{ $starred?: boolean; $active?: boolean }>`
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: ${({ $starred, $active, theme }) => {
+    if ($starred) return theme.colors.warning
+    if ($active) return theme.colors.primary
+    return theme.colors.textSubtle
+  }};
+  &:hover {
+    color: ${({ $starred, $active, theme }) => {
+      if ($starred) return theme.colors.warning
+      if ($active) return theme.colors.primary
+      return theme.colors.text
+    }};
+  }
+`
+
+// Full-width sheet anchored under the symbol pill — matches the page's
+// previous `.mp-markets-pop` behaviour: 12px side margin, capped at 480px.
+const MobileDropdownPortal = styled.div`
+  position: fixed;
+  z-index: 1000;
+`
+
+/**
+ * Mobile-optimised symbol row — single line: coin badge, pair text,
+ * "Perp" tag, chevron (whole left cluster opens the markets dropdown),
+ * 24h % change, spacer, favorite + chart-toggle icon buttons.
+ *
+ * Visually mirrors the legacy `.mp-sym` row in MobilePerpsPage so the
+ * page can drop its inline implementation without a layout shift.
+ */
+const MobileSymbolHeader: React.FC<SymbolHeaderProps> = ({
+  symbol,
+  pairLabel,
+  logoUrl,
+  change24h,
+  favorited = false,
+  onToggleFavorite,
+  chartOpen = false,
+  onChartToggle,
+  renderMarketsDropdown,
+  marketsOpen,
+  onMarketsOpenChange,
+  t = identity,
+}) => {
+  const isControlled = marketsOpen !== undefined
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = isControlled ? marketsOpen : internalOpen
+  const setOpen = useCallback(
+    (next: boolean | ((prev: boolean) => boolean)) => {
+      const nextOpen = typeof next === 'function' ? next(open) : next
+      if (!isControlled) setInternalOpen(nextOpen)
+      onMarketsOpenChange?.(nextOpen)
+    },
+    [isControlled, open, onMarketsOpenChange],
+  )
+
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null)
+
+  // Anchor the markets sheet under the trigger, full body width minus
+  // 12px gutters, capped at 480px (same contract as the legacy page).
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return undefined
+    const place = () => {
+      const r = triggerRef.current!.getBoundingClientRect()
+      const margin = 12
+      const left = Math.max(margin, r.left)
+      const width = Math.min(window.innerWidth - margin * 2, 480)
+      setPos({ top: r.bottom + 4, left, width })
+    }
+    place()
+    window.addEventListener('resize', place)
+    window.addEventListener('scroll', place, true)
+    return () => {
+      window.removeEventListener('resize', place)
+      window.removeEventListener('scroll', place, true)
+    }
+  }, [open])
+
+  // Outside-click + Escape close.
+  useEffect(() => {
+    if (!open) return undefined
+    const onDown = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (triggerRef.current?.contains(target)) return
+      if (panelRef.current?.contains(target)) return
+      setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open, setOpen])
+
+  const close = useCallback(() => setOpen(false), [setOpen])
+  const change24hNegative = Number(change24h) < 0
+  const baseAsset = pairLabel.split(/[- ]/)[0] ?? pairLabel
+
+  const trigger = !!renderMarketsDropdown
+
+  return (
+    <MobileRoot aria-label={`${symbol} ticker`}>
+      <MobileSymBtn
+        ref={triggerRef}
+        role="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-disabled={!trigger}
+        tabIndex={trigger ? 0 : -1}
+        onClick={() => trigger && setOpen((o) => !o)}
+        onKeyDown={(e) => {
+          if (!trigger) return
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setOpen((o) => !o)
+          }
+        }}
+      >
+        <MobileCoinBadge $bg={logoUrl ? 'transparent' : undefined}>
+          {logoUrl ? <CoinImg src={logoUrl} alt={pairLabel} /> : baseAsset}
+        </MobileCoinBadge>
+        <MobilePairText>{symbol}</MobilePairText>
+        <MobilePerpTag>{t('Perp')}</MobilePerpTag>
+        <MobileChev>
+          <ChevronDownIcon width="16px" color="textSubtle" />
+        </MobileChev>
+      </MobileSymBtn>
+
+      {change24h !== undefined && (
+        <MobileChange $negative={change24hNegative}>{formatPctRaw(change24h)}</MobileChange>
+      )}
+
+      <MobileSpacer />
+
+      {onToggleFavorite && (
+        <MobileIconBtn
+          type="button"
+          $starred={favorited}
+          aria-label={favorited ? t('Unfavorite') : t('Favorite')}
+          aria-pressed={favorited}
+          onClick={onToggleFavorite}
+        >
+          {favorited ? (
+            <StarFillIcon width="20px" aria-hidden="true" />
+          ) : (
+            <StarLineIcon width="20px" aria-hidden="true" />
+          )}
+        </MobileIconBtn>
+      )}
+
+      {onChartToggle && (
+        <MobileIconBtn
+          type="button"
+          $active={chartOpen}
+          aria-label={chartOpen ? t('Hide chart') : t('Show chart')}
+          aria-pressed={chartOpen}
+          onClick={onChartToggle}
+        >
+          {chartOpen ? <ChartDisableIcon width="20px" /> : <ChartIcon width="20px" />}
+        </MobileIconBtn>
+      )}
+
+      {open && pos && typeof document !== 'undefined' && renderMarketsDropdown
+        ? createPortal(
+            <MobileDropdownPortal
+              ref={panelRef}
+              style={{ top: pos.top, left: pos.left, width: pos.width }}
+            >
+              {renderMarketsDropdown(close)}
+            </MobileDropdownPortal>,
+            document.body,
+          )
+        : null}
+    </MobileRoot>
+  )
+}
+

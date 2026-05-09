@@ -28,6 +28,7 @@ const getOutlineStyles = ({ outline, theme, variant: variantKey = variants.PRIMA
 export const StyledTag = styled.div.withConfig({
   shouldForwardProp: (prop) =>
     !["variant", "scale", "outline", "textTransform", "startIcon", "endIcon"].includes(prop),
+  // eslint-disable-next-line no-restricted-syntax -- on colored bg, contrast guarantee
 })<ThemedProps>`
   align-items: center;
   border-radius: 16px;

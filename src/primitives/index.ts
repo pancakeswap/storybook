@@ -49,3 +49,9 @@ export { Toast, ToastsProvider, useToast, toastTypes } from './Toast'
 
 export { pcsTheme } from './theme'
 export type { PcsTheme } from './theme'
+
+export { useTooltip, StyledTooltipContent, StyledTooltipArrow } from '../hooks/useTooltip'
+export type { Placement, TooltipOptions, TooltipRefs, TriggerType } from '../hooks/useTooltip'
+
+export { Select } from './Select'
+export type { SelectOption, SelectProps } from './Select'

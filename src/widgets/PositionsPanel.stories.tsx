@@ -4,11 +4,14 @@ import { fn } from 'storybook/test'
 import {
   PositionsPanel,
   type OpenOrderRow,
+  type OrderHistoryRow,
   type PositionRow,
+  type PositionsHistoryTab,
   type PositionsPanelTab,
   type TradeHistoryRow,
   type TransactionHistoryRow,
 } from './PositionsPanel'
+import { SharePnlModal } from './SharePnlModal'
 
 const MOCK_POSITIONS: PositionRow[] = [
   {
@@ -94,6 +97,8 @@ const meta = {
     onEditTpSl: fn(),
     onCancelOrder: fn(),
     onShareTrade: fn(),
+    onCloseAll: fn(),
+    onHideOtherSymbolsChange: fn(),
     useMarkPriceForSymbol: mockMarkPrice,
     computeLiqPrice: ({ side, entryPrice, leverage }) => {
       const maintMargin = 1 / leverage - 0.005
@@ -117,10 +122,94 @@ export const TransactionHistory: Story = { args: { tab: 'transactions' } }
 
 export const EmptyPositions: Story = { args: { positions: [] } }
 
-/** Interactive — tab state managed locally. */
+/** Interactive — tab state + desktop filter state + share-pnl modal
+ *  managed locally. Clicking the share-arrow icon in a position's
+ *  PNL cell opens {@link SharePnlModal} with that position's
+ *  snapshot. */
 export const Interactive: Story = {
   render: (args) => {
     const [tab, setTab] = useState<PositionsPanelTab>('positions')
-    return <PositionsPanel {...args} tab={tab} onTabChange={setTab} />
+    const [hideOther, setHideOther] = useState(false)
+    const [sharing, setSharing] = useState<PositionRow | null>(null)
+    // ROE% = ((markPrice - entryPrice) / entryPrice) × side × 100 × leverage
+    // Side flips the sign for shorts; multiplying by leverage scales the
+    // raw price move into the equity-relative return that's actually
+    // displayed in the share card.
+    const sharingPnlPct = sharing
+      ? ((mockMarkPrice(sharing.symbol) - sharing.entryPrice) /
+          sharing.entryPrice) *
+        (sharing.positionAmt >= 0 ? 1 : -1) *
+        100 *
+        sharing.leverage
+      : 0
+    return (
+      <>
+        <PositionsPanel
+          {...args}
+          tab={tab}
+          onTabChange={setTab}
+          hideOtherSymbols={hideOther}
+          onHideOtherSymbolsChange={setHideOther}
+          onSharePnl={setSharing}
+        />
+        <SharePnlModal
+          isOpen={sharing !== null}
+          onClose={() => setSharing(null)}
+          pnlPct={sharingPnlPct}
+          onCopyImage={fn()}
+          onShareX={fn()}
+        />
+      </>
+    )
+  },
+}
+
+const MOCK_ORDER_HISTORY: OrderHistoryRow[] = [
+  {
+    id: 'oh1', date: '2025-04-17', time: '01:37:26', symbol: 'BTCUSDT', side: 'BUY',
+    type: 'Limit', price: '86,000', origQty: '0.01 BTC', executedQty: '0.01 BTC', status: 'FILLED',
+  },
+  {
+    id: 'oh2', date: '2025-04-16', time: '22:14:08', symbol: 'ETHUSDT', side: 'SELL',
+    type: 'Stop Market', price: 'Market / Trig 3,210', origQty: '0.5 ETH', executedQty: '0', status: 'CANCELED',
+  },
+]
+
+/**
+ * Mobile variant — same widget, narrow viewport. Renders the
+ * `Open Orders | Positions | Assets | TWAP` tab strip, the filters row,
+ * and an empty-state body, plus the History sheet portal opened from
+ * the clock icon.
+ */
+export const Mobile: Story = {
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+    layout: 'fullscreen',
+  },
+  render: (args) => {
+    const [tab, setTab] = useState<PositionsPanelTab>('positions')
+    const [hideOther, setHideOther] = useState(false)
+    const [historyOpen, setHistoryOpen] = useState(false)
+    const [historyTab, setHistoryTab] = useState<PositionsHistoryTab>('orders')
+    return (
+      <PositionsPanel
+        {...args}
+        isMobile
+        tab={tab}
+        onTabChange={setTab}
+        positionsCount={1}
+        hideOtherSymbols={hideOther}
+        onHideOtherSymbolsChange={setHideOther}
+        instrumentFilterLabel="All instruments"
+        onInstrumentFilterClick={fn()}
+        historyOpen={historyOpen}
+        onHistoryToggle={setHistoryOpen}
+        historyTab={historyTab}
+        onHistoryTabChange={setHistoryTab}
+        orderHistory={MOCK_ORDER_HISTORY}
+        tradeHistory={MOCK_TRADES}
+        transactionHistory={MOCK_TXS}
+      />
+    )
   },
 }

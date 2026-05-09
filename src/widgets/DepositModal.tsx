@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
@@ -19,6 +19,8 @@ export interface DepositTokenRow {
   displayName?: string
   /** Pre-formatted balance string (e.g. "1234.56"). */
   balanceText: string
+  /** Pre-formatted USD value, e.g. "$999,999.99". Optional. */
+  usdValueText?: string
   /** Whether the wallet has any non-zero balance for this asset. */
   hasBalance: boolean
   /** Optional logo URL — consumer's responsibility to resolve. */
@@ -44,6 +46,12 @@ export interface DepositReceipt {
   assetSymbol: string
   /** Pre-truncated source address for the success screen. */
   sourceAddress?: string
+  /**
+   * Block-explorer URL for the tx. Consumer builds it from chain context
+   * (BSC scan, Solana explorer, etc.). When supplied, the truncated hash
+   * is rendered as a link.
+   */
+  explorerUrl?: string
 }
 
 export interface DepositModalProps {
@@ -57,6 +65,9 @@ export interface DepositModalProps {
   evmAddress?: string
   /** Pre-truncated Solana address. */
   solanaAddress?: string
+  /** Pre-formatted current Perp balance shown in the summary card
+   *  (e.g. "$0"). Defaults to "$0" when omitted. */
+  perpBalanceText?: string
 
   // ── Step: select ───────────────────────────────────────
   isLoadingAssets?: boolean
@@ -100,31 +111,48 @@ const ModalBody = styled(Flex)`
   gap: 20px;
   min-width: 380px;
   max-width: 420px;
+
+  /* On mobile/tablet the modal renders as a bottom-sheet — let the body
+     fill the full sheet width so prices line up with the right edge
+     instead of hugging the left half. */
+  @media (max-width: 967.98px) {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
 `
 
-const WalletCard = styled.div`
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 16px;
-  overflow: hidden;
-`
-
-const WalletRow = styled(Flex)`
-  padding: 12px 16px;
+/** Minimal back link — small arrow + "Back" text in primary teal,
+ *  no Button chrome so it aligns with the other ModalBody content
+ *  on the left edge. */
+const BackLink = styled.button`
+  align-self: flex-start;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: ${({ theme }) => theme.colors.backgroundAlt};
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s;
+  &:hover { filter: brightness(1.1); }
 `
 
-const WalletAddress = styled(Text).attrs({ fontSize: '14px', bold: true })`
-  font-variant-numeric: tabular-nums;
-`
-
-const BalanceRow = styled(Flex)`
-  padding: 12px 16px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  background: ${({ theme }) => theme.colors.background};
-  justify-content: space-between;
+/** Perps Balance summary card — Figma 47:866. */
+const PerpBalanceCard = styled(Flex)`
   align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  padding: 16px;
+  gap: 10px;
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom-width: 2px;
+  border-radius: 16px;
 `
 
 const Pretitle = styled(Text).attrs({ fontSize: '12px', bold: true })`
@@ -163,23 +191,70 @@ const TokenMeta = styled(Flex)`
   flex-direction: column;
 `
 
+/* Wrapper that keeps the available-balance header tight to the field
+ * (8 px gap inside the 20 px ModalBody rhythm). */
+const AmountGroup = styled(Flex)`
+  flex-direction: column;
+  gap: 8px;
+`
+
+/* Available + percent-shortcut header row above the field. */
+const AmountHeader = styled(Flex)`
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 24px;
+`
+
+/* AmountField — Figma 39:797. 80 px tall, 24 px radius, input-primary
+ * bg + input-secondary border + inset top shadow + secondary focus ring. */
 const AmountField = styled(Flex)`
   align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 16px;
+  justify-content: center;
+  gap: 16px;
+  height: 80px;
+  padding: 0 16px;
+  border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
+  border-radius: 24px;
   background: ${({ theme }) => theme.colors.input};
+  box-shadow: ${({ theme }) =>
+    `inset 0px 2px 0px -1px ${theme.colors.cardBorder}`};
+  transition: border-color 0.12s, box-shadow 0.12s;
+  &:focus-within {
+    border-color: ${({ theme }) => theme.colors.secondary};
+    box-shadow:
+      inset 0px 2px 0px -1px ${({ theme }) => theme.colors.cardBorder},
+      0 0 0 4px ${({ theme }) =>
+        `color-mix(in srgb, ${theme.colors.secondary} 20%, transparent)`};
+  }
+`
+
+/* Token select chip on the left of the amount field. */
+const TokenSelectButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: inherit;
+  &:hover { filter: brightness(1.05); }
 `
 
 const AmountInput = styled.input`
   background: transparent;
   border: 0;
   outline: 0;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   text-align: right;
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: -0.24px;
   color: ${({ theme }) => theme.colors.text};
   font-variant-numeric: tabular-nums;
   &::placeholder {
@@ -187,23 +262,31 @@ const AmountInput = styled.input`
   }
 `
 
+/* Text-only percent shortcuts in primary teal with 1 px vertical
+ * card-border dividers between them. */
 const PercentRow = styled(Flex)`
-  gap: 6px;
-  margin-top: 4px;
+  align-items: center;
+  gap: 8px;
 `
 
 const PercentChip = styled.button`
   background: transparent;
-  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border: 0;
   color: ${({ theme }) => theme.colors.primary};
-  border-radius: 999px;
-  font-size: 11px;
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 600;
-  padding: 2px 8px;
+  letter-spacing: 0.12px;
+  padding: 4px 0;
   cursor: pointer;
-  &:hover {
-    background: ${({ theme }) => theme.colors.tertiary};
-  }
+  &:hover { filter: brightness(1.1); }
+`
+
+const PercentDivider = styled.span`
+  display: inline-block;
+  width: 1px;
+  height: 16px;
+  background: ${({ theme }) => theme.colors.cardBorder};
 `
 
 const SummaryCard = styled.div`
@@ -232,6 +315,7 @@ const CheckingStep = styled(Flex)<{ $state: 'done' | 'active' | 'pending' }>`
   opacity: ${({ $state }) => ($state === 'pending' ? 0.5 : 1)};
 `
 
+/* eslint-disable no-restricted-syntax -- on colored bg, contrast guarantee */
 const StepIndicator = styled.div<{ $state: 'done' | 'active' | 'pending' }>`
   width: 22px;
   height: 22px;
@@ -243,6 +327,7 @@ const StepIndicator = styled.div<{ $state: 'done' | 'active' | 'pending' }>`
     $state === 'done' ? theme.colors.success : theme.colors.input};
   color: ${({ $state, theme }) => ($state === 'done' ? '#fff' : theme.colors.text)};
 `
+/* eslint-enable no-restricted-syntax */
 
 const SuccessHeading = styled(Text).attrs({ fontSize: '32px', bold: true })`
   text-align: center;
@@ -290,6 +375,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
   step,
   evmAddress,
   solanaAddress,
+  perpBalanceText,
   isLoadingAssets = false,
   assets,
   selectedAssetId,
@@ -320,7 +406,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
       ? t('Processing Deposit')
       : step === 'failed'
       ? t('Deposit Failed')
-      : t('Fund your Account')
+      : t('Fund Your Perps Account')
 
   const submitLabel = (() => {
     switch (submitState) {
@@ -381,66 +467,35 @@ export const DepositModal: React.FC<DepositModalProps> = ({
       <Modal title={title} onDismiss={onClose}>
         <ModalBody>
           {step === 'amount' && (
-            <Flex justifyContent="flex-start">
-              <Button
-                scale="sm"
-                variant="text"
-                onClick={onBack}
-                aria-label="back"
-                startIcon={<ArrowBackIcon width="18px" />}
-              >
-                {t('Back')}
-              </Button>
-            </Flex>
+            <BackLink type="button" onClick={onBack} aria-label="back">
+              <ArrowBackIcon width="14px" color="primary" />
+              <span>{t('Back')}</span>
+            </BackLink>
           )}
 
           {step === 'select' && (
             <>
-              <WalletCard>
-                {evmAddress && (
-                  <WalletRow>
-                    <div
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 999,
-                        background: 'linear-gradient(135deg, #f0b90b, #fd621d)',
-                      }}
-                    />
-                    <WalletAddress>{evmAddress}</WalletAddress>
-                    <Text fontSize="11px" color="textSubtle" style={{ marginLeft: 'auto' }}>
-                      EVM
-                    </Text>
-                  </WalletRow>
-                )}
-                {solanaAddress && (
-                  <WalletRow style={{ borderTop: evmAddress ? '1px solid var(--colors-cardBorder)' : undefined }}>
-                    <div
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 999,
-                        background: 'linear-gradient(135deg, #14f195, #9945ff)',
-                      }}
-                    />
-                    <WalletAddress>{solanaAddress}</WalletAddress>
-                    <Text fontSize="11px" color="textSubtle" style={{ marginLeft: 'auto' }}>
-                      Solana
-                    </Text>
-                  </WalletRow>
-                )}
-                <BalanceRow>
-                  <div>
-                    <Pretitle color="textSubtle">{t('Balance')}</Pretitle>
-                    <Text fontSize="12px" color="textSubtle">
-                      {t('In your wallet')}
-                    </Text>
-                  </div>
-                  <Text fontSize="14px" bold>
-                    {assets.some((a) => a.hasBalance) ? t('Ready') : '—'}
+              {/* Perp balance summary card — Figma 47:866. */}
+              <PerpBalanceCard>
+                <Flex flexDirection="column" style={{ gap: 2 }}>
+                  <Pretitle>{t('Perps Balance')}</Pretitle>
+                  <Text fontSize="12px" color="textSubtle">
+                    {t('In Aster Contract')}
                   </Text>
-                </BalanceRow>
-              </WalletCard>
+                </Flex>
+                <Text fontSize="20px" bold style={{ letterSpacing: '-0.2px' }}>
+                  {perpBalanceText ?? '$0'}
+                </Text>
+              </PerpBalanceCard>
+
+              {/* Top-up source line — addresses where the EOA tokens live. */}
+              {(evmAddress || solanaAddress) && (
+                <Text fontSize="12px" color="textSubtle">
+                  {t('Top up from your connected EOA wallet (%addr%)', {
+                    addr: evmAddress ?? solanaAddress ?? '',
+                  })}
+                </Text>
+              )}
 
               {isLoadingAssets && <Text fontSize="12px">{t('Loading tokens...')}</Text>}
 
@@ -481,16 +536,26 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                       title={asset.displayName}
                     >
                       <Flex alignItems="center" style={{ gap: 12 }}>
-                        {tokenIcon(asset, 32)}
+                        {tokenIcon(asset, 40)}
                         <TokenMeta>
                           <Text fontSize="14px" bold>
-                            {asset.displayName || asset.symbol}
+                            {asset.symbol}
                           </Text>
-                          <Text fontSize="12px" color="textSubtle">
-                            {asset.balanceText} {asset.symbol}
-                          </Text>
+                          <Flex alignItems="center" style={{ gap: 4, fontSize: 12 }}>
+                            <Text fontSize="12px" color="textSubtle">
+                              {asset.balanceText}
+                            </Text>
+                            <Text fontSize="12px" bold color="textSubtle">
+                              {asset.symbol}
+                            </Text>
+                          </Flex>
                         </TokenMeta>
                       </Flex>
+                      {asset.usdValueText && (
+                        <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+                          {asset.usdValueText}
+                        </Text>
+                      )}
                     </TokenRow>
                   ))}
                 </TokenList>
@@ -506,35 +571,43 @@ export const DepositModal: React.FC<DepositModalProps> = ({
 
           {step === 'amount' && selectedAsset && (
             <>
-              <AmountField>
-                <Flex alignItems="center" style={{ gap: 12 }}>
-                  {tokenIcon(selectedAsset, 40)}
-                  <Flex flexDirection="column">
+              <AmountGroup>
+                {/* Available + percent shortcuts above the field
+                 * (Figma 39:797). */}
+                <AmountHeader>
+                  <Text fontSize="12px" bold color="textSubtle">
+                    {t('Available: %amt% %sym%', {
+                      amt: selectedAsset.balanceText,
+                      sym: selectedAsset.symbol,
+                    })}
+                  </Text>
+                  <PercentRow>
+                    {PERCENTS.map((p, i) => (
+                      <React.Fragment key={p}>
+                        {i > 0 && <PercentDivider />}
+                        <PercentChip onClick={() => onPercentClick(p)}>{p}%</PercentChip>
+                      </React.Fragment>
+                    ))}
+                    <PercentDivider />
+                    <PercentChip onClick={() => onPercentClick(100)}>{t('MAX')}</PercentChip>
+                  </PercentRow>
+                </AmountHeader>
+
+                <AmountField>
+                  <TokenSelectButton type="button">
+                    {tokenIcon(selectedAsset, 40)}
                     <Text fontSize="14px" bold>
                       {selectedAsset.displayName || selectedAsset.symbol}
                     </Text>
-                    <Text fontSize="12px" color="textSubtle">
-                      {selectedAsset.balanceText}
-                    </Text>
-                  </Flex>
-                </Flex>
-                <Flex flexDirection="column" alignItems="flex-end" style={{ minWidth: 0, flex: 1 }}>
+                  </TokenSelectButton>
                   <AmountInput
                     value={amount}
                     onChange={(e) => onAmountChange(e.target.value)}
-                    placeholder="0"
+                    placeholder="0.0"
                     inputMode="decimal"
                   />
-                  <PercentRow>
-                    {PERCENTS.map((p) => (
-                      <PercentChip key={p} onClick={() => onPercentClick(p)}>
-                        {p}%
-                      </PercentChip>
-                    ))}
-                    <PercentChip onClick={() => onPercentClick(100)}>{t('MAX')}</PercentChip>
-                  </PercentRow>
-                </Flex>
-              </AmountField>
+                </AmountField>
+              </AmountGroup>
 
               <SummaryCard>
                 <SummaryRow>
@@ -602,9 +675,27 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                 </SummaryRow>
                 <SummaryRow>
                   <Pretitle color="textSubtle">{t('Tx hash')}</Pretitle>
-                  <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-                    {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
-                  </Text>
+                  {receipt.explorerUrl ? (
+                    <a
+                      href={receipt.explorerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'underline' }}
+                    >
+                      <Text
+                        fontSize="14px"
+                        bold
+                        color="primary"
+                        style={{ fontVariantNumeric: 'tabular-nums' }}
+                      >
+                        {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
+                      </Text>
+                    </a>
+                  ) : (
+                    <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
+                    </Text>
+                  )}
                 </SummaryRow>
                 <SummaryRow>
                   <Pretitle color="textSubtle">{t('Elapsed')}</Pretitle>
@@ -656,19 +747,32 @@ export const DepositModal: React.FC<DepositModalProps> = ({
                   <Text fontSize="14px" color="textSubtle">
                     {t('Tx hash')}
                   </Text>
-                  <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-                    {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
-                  </Text>
+                  {receipt.explorerUrl ? (
+                    <a
+                      href={receipt.explorerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'underline' }}
+                    >
+                      <Text
+                        fontSize="14px"
+                        bold
+                        color="primary"
+                        style={{ fontVariantNumeric: 'tabular-nums' }}
+                      >
+                        {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
+                      </Text>
+                    </a>
+                  ) : (
+                    <Text fontSize="14px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {receipt.hash.slice(0, 10)}…{receipt.hash.slice(-8)}
+                    </Text>
+                  )}
                 </SummaryRow>
               </SummaryCard>
-              <Flex style={{ gap: 8 }}>
-                <Button style={{ flex: 1 }} scale="md" onClick={onClose}>
-                  {t('View Balance')}
-                </Button>
-                <Button style={{ flex: 1 }} scale="md" variant="secondary" onClick={onDepositAgain}>
-                  {t('Deposit Again')}
-                </Button>
-              </Flex>
+              <Button scale="md" variant="secondary" onClick={onDepositAgain}>
+                {t('Deposit Again')}
+              </Button>
             </>
           )}
 

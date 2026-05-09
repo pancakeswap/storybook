@@ -37,6 +37,19 @@ const meta = {
   title: 'Widgets/Simple Bet Panel',
   component: SimpleBetPanel,
   parameters: { layout: 'centered' },
+  // The widget's Root uses `align-self: stretch` to fill its parent's
+  // cross-axis. Production hosts it in a `flex-direction: row +
+  // align-items: stretch` body (SimpleDesktop), so the cross-axis is
+  // vertical and the panel grows to the row's height. A column parent
+  // (or no flex parent) collapses it to 3 px. Mirror the production
+  // shape with a sized row decorator.
+  decorators: [
+    (Story) => (
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch', height: 800 }}>
+        <Story />
+      </div>
+    ),
+  ],
   args: baseArgs,
 } satisfies Meta<typeof SimpleBetPanel>
 

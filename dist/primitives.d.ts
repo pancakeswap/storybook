@@ -34,11 +34,13 @@ import { LegacyRef } from 'react';
 import { MouseEvent as MouseEvent_2 } from 'react';
 import { MouseEventHandler } from 'react';
 import { PointerEventHandler } from 'react';
+import * as Popover from '@radix-ui/react-popover';
 import { PositionProps } from 'styled-system';
 import { PropsWithChildren } from 'react';
 import { ReactElement } from 'react';
 import { ReactEventHandler } from 'react';
 import { ReactNode } from 'react';
+import { RefAttributes } from 'react';
 import { RefObject } from 'react';
 import { ResponsiveValue } from 'styled-system';
 import { SpaceProps } from 'styled-system';
@@ -1016,6 +1018,8 @@ export declare function PancakesIcon(p: IconProps): JSX_2.Element;
 
 export declare function PauseCircleIcon(p: IconProps): JSX_2.Element;
 
+export declare const PCS_THEME_CSS: string;
+
 export declare type PcsTheme = typeof pcsTheme;
 
 /**
@@ -1055,6 +1059,22 @@ export declare const pcsTheme: {
         primary10: string;
         primary20: string;
         primary60: string;
+        positive10: string;
+        positive60: string;
+        negative60: string;
+        negativeSubtle: string;
+        v2Inverse: string;
+        v2Default: string;
+        tooltipInverseBg: string;
+        tooltipInverseText: string;
+        walletChipSpotBg: string;
+        walletChipSpotBorder: string;
+        walletChipPerpBg: string;
+        walletChipPerpBorder: string;
+        timeframeBg: string;
+        timeframeBorder: string;
+        levTrackBg: string;
+        inputPrimary: string;
         gradientBubblegum: string;
         white: string;
         transparent: string;
@@ -1074,6 +1094,8 @@ export declare const pcsTheme: {
         focus: string;
         inset: string;
         tooltip: string;
+        sunken: string;
+        sunkenStrong: string;
     };
     toggle: {
         handleBackground: string;
@@ -1099,6 +1121,11 @@ export declare const pcsTheme: {
     alert: {
         background: string;
     };
+    tooltip: {
+        background: string;
+        text: string;
+        boxShadow: string;
+    };
     breakpoints: string[];
     zIndices: {
         dropdown: number;
@@ -1119,6 +1146,21 @@ export declare const pcsTheme: {
     };
 };
 
+/**
+ * PCS design-system CSS-variable emitter.
+ *
+ * Replaces the previous Chakra-v3-based system. Emits `--pcs-colors-*` and
+ * `--pcs-shadows-*` vars under `[data-theme="light"]` / `[data-theme="dark"]`
+ * (matching `packages/uikit/src/css/vars.css.ts` in pancake-frontend) so the
+ * same widgets can render under either repo's theme switching without
+ * pulling in Chakra.
+ *
+ * `.light` / `.dark` class selectors are kept as co-selectors so storybook
+ * stories that wrap a subtree in `<div className="light">` (e.g.
+ * `SideBySideThemes`) continue to scope the vars locally.
+ */
+export declare type PcsThemeMode = 'dark' | 'light';
+
 export declare function PencilIcon(p: IconProps): JSX_2.Element;
 
 export declare function PetraWalletIcon(p: IconProps): JSX_2.Element;
@@ -1130,6 +1172,8 @@ export declare function PieChartIcon(p: IconProps): JSX_2.Element;
  * Recreated from the Figma Wallet design. Uses PCS primary (#1FC7D4) and failure (#ED4B9E).
  */
 export declare function PixelAvatarIcon({ size, ...props }: IconProps): JSX_2.Element;
+
+export declare type Placement = 'auto' | 'auto-start' | 'auto-end' | 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'right' | 'right-start' | 'right-end' | 'left' | 'left-start' | 'left-end';
 
 export declare function PlayCircleOutlineIcon(p: IconProps): JSX_2.Element;
 
@@ -1633,6 +1677,22 @@ export declare function StarFillIcon(p: IconProps): JSX_2.Element;
 
 export declare function StarLineIcon(p: IconProps): JSX_2.Element;
 
+/**
+ * Provider-free `useMatchBreakpoints`.
+ *
+ * Returns the same shape as the uikit hook
+ * (`{ isMobile, isTablet, isDesktop, isXs, isSm, isMd, isLg, isXl, isXxl }`)
+ * but each call subscribes directly to `window.matchMedia`. We don't
+ * read from `MatchBreakpointsContext` because hosts that consume our
+ * widget bundle (e.g. pancake-frontend) wrap their app in their own
+ * uikit Provider — never ours — so a context-backed hook would always
+ * fall back to its default `{ isMobile:false, ... }` and dispatch the
+ * desktop variant on mobile viewports.
+ *
+ * `MatchBreakpointsProvider` is still exported (and used by the
+ * storybook canvas decorator) for backward compat, but its state is
+ * no longer read here.
+ */
 declare type State = {
     [key: string]: boolean;
 };
@@ -1926,6 +1986,500 @@ ref?: ((instance: HTMLDivElement | null) => void | default_2.DO_NOT_USE_OR_YOU_W
 children?: default_2.ReactNode | undefined;
 }, LinkProps>>;
 
+export declare const StyledTooltipArrow: IStyledComponent<"web", {
+string?: number | string | undefined | undefined;
+children?: ReactNode;
+viewBox?: string | undefined | undefined;
+"aria-label"?: string | undefined | undefined;
+suppressHydrationWarning?: boolean | undefined | undefined;
+className?: string | undefined | undefined;
+color?: string | undefined | undefined;
+height?: number | string | undefined | undefined;
+id?: string | undefined | undefined;
+lang?: string | undefined | undefined;
+max?: number | string | undefined | undefined;
+media?: string | undefined | undefined;
+method?: string | undefined | undefined;
+min?: number | string | undefined | undefined;
+name?: string | undefined | undefined;
+style?: CSSProperties | undefined;
+target?: string | undefined | undefined;
+type?: string | undefined | undefined;
+width?: number | string | undefined | undefined;
+role?: AriaRole | undefined;
+tabIndex?: number | undefined | undefined;
+crossOrigin?: "" | "anonymous" | "use-credentials" | undefined;
+accentHeight?: number | string | undefined | undefined;
+accumulate?: "none" | "sum" | undefined | undefined;
+additive?: "replace" | "sum" | undefined | undefined;
+alignmentBaseline?: "auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "inherit" | undefined | undefined;
+allowReorder?: "no" | "yes" | undefined | undefined;
+alphabetic?: number | string | undefined | undefined;
+amplitude?: number | string | undefined | undefined;
+arabicForm?: "initial" | "medial" | "terminal" | "isolated" | undefined | undefined;
+ascent?: number | string | undefined | undefined;
+attributeName?: string | undefined | undefined;
+attributeType?: string | undefined | undefined;
+autoReverse?: (boolean | "true" | "false") | undefined;
+azimuth?: number | string | undefined | undefined;
+baseFrequency?: number | string | undefined | undefined;
+baselineShift?: number | string | undefined | undefined;
+baseProfile?: number | string | undefined | undefined;
+bbox?: number | string | undefined | undefined;
+begin?: number | string | undefined | undefined;
+bias?: number | string | undefined | undefined;
+by?: number | string | undefined | undefined;
+calcMode?: number | string | undefined | undefined;
+capHeight?: number | string | undefined | undefined;
+clip?: number | string | undefined | undefined;
+clipPath?: string | undefined | undefined;
+clipPathUnits?: number | string | undefined | undefined;
+clipRule?: number | string | undefined | undefined;
+colorInterpolation?: number | string | undefined | undefined;
+colorInterpolationFilters?: "auto" | "sRGB" | "linearRGB" | "inherit" | undefined | undefined;
+colorProfile?: number | string | undefined | undefined;
+colorRendering?: number | string | undefined | undefined;
+contentScriptType?: number | string | undefined | undefined;
+contentStyleType?: number | string | undefined | undefined;
+cursor?: number | string | undefined | undefined;
+cx?: number | string | undefined | undefined;
+cy?: number | string | undefined | undefined;
+d?: string | undefined | undefined;
+decelerate?: number | string | undefined | undefined;
+descent?: number | string | undefined | undefined;
+diffuseConstant?: number | string | undefined | undefined;
+direction?: number | string | undefined | undefined;
+display?: number | string | undefined | undefined;
+divisor?: number | string | undefined | undefined;
+dominantBaseline?: "auto" | "use-script" | "no-change" | "reset-size" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "central" | "middle" | "text-after-edge" | "text-before-edge" | "inherit" | undefined | undefined;
+dur?: number | string | undefined | undefined;
+dx?: number | string | undefined | undefined;
+dy?: number | string | undefined | undefined;
+edgeMode?: number | string | undefined | undefined;
+elevation?: number | string | undefined | undefined;
+enableBackground?: number | string | undefined | undefined;
+end?: number | string | undefined | undefined;
+exponent?: number | string | undefined | undefined;
+externalResourcesRequired?: (boolean | "true" | "false") | undefined;
+fill?: string | undefined | undefined;
+fillOpacity?: number | string | undefined | undefined;
+fillRule?: "nonzero" | "evenodd" | "inherit" | undefined | undefined;
+filter?: string | undefined | undefined;
+filterRes?: number | string | undefined | undefined;
+filterUnits?: number | string | undefined | undefined;
+floodColor?: number | string | undefined | undefined;
+floodOpacity?: number | string | undefined | undefined;
+focusable?: (boolean | "true" | "false") | "auto" | undefined;
+fontFamily?: string | undefined | undefined;
+fontSize?: number | string | undefined | undefined;
+fontSizeAdjust?: number | string | undefined | undefined;
+fontStretch?: number | string | undefined | undefined;
+fontStyle?: number | string | undefined | undefined;
+fontVariant?: number | string | undefined | undefined;
+fontWeight?: number | string | undefined | undefined;
+format?: number | string | undefined | undefined;
+fr?: number | string | undefined | undefined;
+from?: number | string | undefined | undefined;
+fx?: number | string | undefined | undefined;
+fy?: number | string | undefined | undefined;
+g1?: number | string | undefined | undefined;
+g2?: number | string | undefined | undefined;
+glyphName?: number | string | undefined | undefined;
+glyphOrientationHorizontal?: number | string | undefined | undefined;
+glyphOrientationVertical?: number | string | undefined | undefined;
+glyphRef?: number | string | undefined | undefined;
+gradientTransform?: string | undefined | undefined;
+gradientUnits?: string | undefined | undefined;
+hanging?: number | string | undefined | undefined;
+horizAdvX?: number | string | undefined | undefined;
+horizOriginX?: number | string | undefined | undefined;
+href?: string | undefined | undefined;
+ideographic?: number | string | undefined | undefined;
+imageRendering?: number | string | undefined | undefined;
+in2?: number | string | undefined | undefined;
+in?: string | undefined | undefined;
+intercept?: number | string | undefined | undefined;
+k1?: number | string | undefined | undefined;
+k2?: number | string | undefined | undefined;
+k3?: number | string | undefined | undefined;
+k4?: number | string | undefined | undefined;
+k?: number | string | undefined | undefined;
+kernelMatrix?: number | string | undefined | undefined;
+kernelUnitLength?: number | string | undefined | undefined;
+kerning?: number | string | undefined | undefined;
+keyPoints?: number | string | undefined | undefined;
+keySplines?: number | string | undefined | undefined;
+keyTimes?: number | string | undefined | undefined;
+lengthAdjust?: number | string | undefined | undefined;
+letterSpacing?: number | string | undefined | undefined;
+lightingColor?: number | string | undefined | undefined;
+limitingConeAngle?: number | string | undefined | undefined;
+local?: number | string | undefined | undefined;
+markerEnd?: string | undefined | undefined;
+markerHeight?: number | string | undefined | undefined;
+markerMid?: string | undefined | undefined;
+markerStart?: string | undefined | undefined;
+markerUnits?: number | string | undefined | undefined;
+markerWidth?: number | string | undefined | undefined;
+mask?: string | undefined | undefined;
+maskContentUnits?: number | string | undefined | undefined;
+maskUnits?: number | string | undefined | undefined;
+mathematical?: number | string | undefined | undefined;
+mode?: number | string | undefined | undefined;
+numOctaves?: number | string | undefined | undefined;
+offset?: number | string | undefined | undefined;
+opacity?: number | string | undefined | undefined;
+operator?: number | string | undefined | undefined;
+order?: number | string | undefined | undefined;
+orient?: number | string | undefined | undefined;
+orientation?: number | string | undefined | undefined;
+origin?: number | string | undefined | undefined;
+overflow?: number | string | undefined | undefined;
+overlinePosition?: number | string | undefined | undefined;
+overlineThickness?: number | string | undefined | undefined;
+paintOrder?: number | string | undefined | undefined;
+panose1?: number | string | undefined | undefined;
+path?: string | undefined | undefined;
+pathLength?: number | string | undefined | undefined;
+patternContentUnits?: string | undefined | undefined;
+patternTransform?: number | string | undefined | undefined;
+patternUnits?: string | undefined | undefined;
+pointerEvents?: number | string | undefined | undefined;
+points?: string | undefined | undefined;
+pointsAtX?: number | string | undefined | undefined;
+pointsAtY?: number | string | undefined | undefined;
+pointsAtZ?: number | string | undefined | undefined;
+preserveAlpha?: (boolean | "true" | "false") | undefined;
+preserveAspectRatio?: string | undefined | undefined;
+primitiveUnits?: number | string | undefined | undefined;
+r?: number | string | undefined | undefined;
+radius?: number | string | undefined | undefined;
+refX?: number | string | undefined | undefined;
+refY?: number | string | undefined | undefined;
+renderingIntent?: number | string | undefined | undefined;
+repeatCount?: number | string | undefined | undefined;
+repeatDur?: number | string | undefined | undefined;
+requiredExtensions?: number | string | undefined | undefined;
+requiredFeatures?: number | string | undefined | undefined;
+restart?: number | string | undefined | undefined;
+result?: string | undefined | undefined;
+rotate?: number | string | undefined | undefined;
+rx?: number | string | undefined | undefined;
+ry?: number | string | undefined | undefined;
+scale?: number | string | undefined | undefined;
+seed?: number | string | undefined | undefined;
+shapeRendering?: number | string | undefined | undefined;
+slope?: number | string | undefined | undefined;
+spacing?: number | string | undefined | undefined;
+specularConstant?: number | string | undefined | undefined;
+specularExponent?: number | string | undefined | undefined;
+speed?: number | string | undefined | undefined;
+spreadMethod?: string | undefined | undefined;
+startOffset?: number | string | undefined | undefined;
+stdDeviation?: number | string | undefined | undefined;
+stemh?: number | string | undefined | undefined;
+stemv?: number | string | undefined | undefined;
+stitchTiles?: number | string | undefined | undefined;
+stopColor?: string | undefined | undefined;
+stopOpacity?: number | string | undefined | undefined;
+strikethroughPosition?: number | string | undefined | undefined;
+strikethroughThickness?: number | string | undefined | undefined;
+stroke?: string | undefined | undefined;
+strokeDasharray?: string | number | undefined | undefined;
+strokeDashoffset?: string | number | undefined | undefined;
+strokeLinecap?: "butt" | "round" | "square" | "inherit" | undefined | undefined;
+strokeLinejoin?: "miter" | "round" | "bevel" | "inherit" | undefined | undefined;
+strokeMiterlimit?: number | string | undefined | undefined;
+strokeOpacity?: number | string | undefined | undefined;
+strokeWidth?: number | string | undefined | undefined;
+surfaceScale?: number | string | undefined | undefined;
+systemLanguage?: number | string | undefined | undefined;
+tableValues?: number | string | undefined | undefined;
+targetX?: number | string | undefined | undefined;
+targetY?: number | string | undefined | undefined;
+textAnchor?: "start" | "middle" | "end" | "inherit" | undefined | undefined;
+textDecoration?: number | string | undefined | undefined;
+textLength?: number | string | undefined | undefined;
+textRendering?: number | string | undefined | undefined;
+to?: number | string | undefined | undefined;
+transform?: string | undefined | undefined;
+transformOrigin?: string | undefined | undefined;
+u1?: number | string | undefined | undefined;
+u2?: number | string | undefined | undefined;
+underlinePosition?: number | string | undefined | undefined;
+underlineThickness?: number | string | undefined | undefined;
+unicode?: number | string | undefined | undefined;
+unicodeBidi?: number | string | undefined | undefined;
+unicodeRange?: number | string | undefined | undefined;
+unitsPerEm?: number | string | undefined | undefined;
+vAlphabetic?: number | string | undefined | undefined;
+values?: string | undefined | undefined;
+vectorEffect?: number | string | undefined | undefined;
+version?: string | undefined | undefined;
+vertAdvY?: number | string | undefined | undefined;
+vertOriginX?: number | string | undefined | undefined;
+vertOriginY?: number | string | undefined | undefined;
+vHanging?: number | string | undefined | undefined;
+vIdeographic?: number | string | undefined | undefined;
+viewTarget?: number | string | undefined | undefined;
+visibility?: number | string | undefined | undefined;
+vMathematical?: number | string | undefined | undefined;
+widths?: number | string | undefined | undefined;
+wordSpacing?: number | string | undefined | undefined;
+writingMode?: number | string | undefined | undefined;
+x1?: number | string | undefined | undefined;
+x2?: number | string | undefined | undefined;
+x?: number | string | undefined | undefined;
+xChannelSelector?: string | undefined | undefined;
+xHeight?: number | string | undefined | undefined;
+xlinkActuate?: string | undefined | undefined;
+xlinkArcrole?: string | undefined | undefined;
+xlinkHref?: string | undefined | undefined;
+xlinkRole?: string | undefined | undefined;
+xlinkShow?: string | undefined | undefined;
+xlinkTitle?: string | undefined | undefined;
+xlinkType?: string | undefined | undefined;
+xmlBase?: string | undefined | undefined;
+xmlLang?: string | undefined | undefined;
+xmlns?: string | undefined | undefined;
+xmlnsXlink?: string | undefined | undefined;
+xmlSpace?: string | undefined | undefined;
+y1?: number | string | undefined | undefined;
+y2?: number | string | undefined | undefined;
+y?: number | string | undefined | undefined;
+yChannelSelector?: string | undefined | undefined;
+z?: number | string | undefined | undefined;
+zoomAndPan?: string | undefined | undefined;
+"aria-activedescendant"?: string | undefined | undefined;
+"aria-atomic"?: (boolean | "true" | "false") | undefined;
+"aria-autocomplete"?: "none" | "inline" | "list" | "both" | undefined | undefined;
+"aria-braillelabel"?: string | undefined | undefined;
+"aria-brailleroledescription"?: string | undefined | undefined;
+"aria-busy"?: (boolean | "true" | "false") | undefined;
+"aria-checked"?: boolean | "false" | "mixed" | "true" | undefined | undefined;
+"aria-colcount"?: number | undefined | undefined;
+"aria-colindex"?: number | undefined | undefined;
+"aria-colindextext"?: string | undefined | undefined;
+"aria-colspan"?: number | undefined | undefined;
+"aria-controls"?: string | undefined | undefined;
+"aria-current"?: boolean | "false" | "true" | "page" | "step" | "location" | "date" | "time" | undefined | undefined;
+"aria-describedby"?: string | undefined | undefined;
+"aria-description"?: string | undefined | undefined;
+"aria-details"?: string | undefined | undefined;
+"aria-disabled"?: (boolean | "true" | "false") | undefined;
+"aria-dropeffect"?: "none" | "copy" | "execute" | "link" | "move" | "popup" | undefined | undefined;
+"aria-errormessage"?: string | undefined | undefined;
+"aria-expanded"?: (boolean | "true" | "false") | undefined;
+"aria-flowto"?: string | undefined | undefined;
+"aria-grabbed"?: (boolean | "true" | "false") | undefined;
+"aria-haspopup"?: boolean | "false" | "true" | "menu" | "listbox" | "tree" | "grid" | "dialog" | undefined | undefined;
+"aria-hidden"?: (boolean | "true" | "false") | undefined;
+"aria-invalid"?: boolean | "false" | "true" | "grammar" | "spelling" | undefined | undefined;
+"aria-keyshortcuts"?: string | undefined | undefined;
+"aria-labelledby"?: string | undefined | undefined;
+"aria-level"?: number | undefined | undefined;
+"aria-live"?: "off" | "assertive" | "polite" | undefined | undefined;
+"aria-modal"?: (boolean | "true" | "false") | undefined;
+"aria-multiline"?: (boolean | "true" | "false") | undefined;
+"aria-multiselectable"?: (boolean | "true" | "false") | undefined;
+"aria-orientation"?: "horizontal" | "vertical" | undefined | undefined;
+"aria-owns"?: string | undefined | undefined;
+"aria-placeholder"?: string | undefined | undefined;
+"aria-posinset"?: number | undefined | undefined;
+"aria-pressed"?: boolean | "false" | "mixed" | "true" | undefined | undefined;
+"aria-readonly"?: (boolean | "true" | "false") | undefined;
+"aria-relevant"?: "additions" | "additions removals" | "additions text" | "all" | "removals" | "removals additions" | "removals text" | "text" | "text additions" | "text removals" | undefined | undefined;
+"aria-required"?: (boolean | "true" | "false") | undefined;
+"aria-roledescription"?: string | undefined | undefined;
+"aria-rowcount"?: number | undefined | undefined;
+"aria-rowindex"?: number | undefined | undefined;
+"aria-rowindextext"?: string | undefined | undefined;
+"aria-rowspan"?: number | undefined | undefined;
+"aria-selected"?: (boolean | "true" | "false") | undefined;
+"aria-setsize"?: number | undefined | undefined;
+"aria-sort"?: "none" | "ascending" | "descending" | "other" | undefined | undefined;
+"aria-valuemax"?: number | undefined | undefined;
+"aria-valuemin"?: number | undefined | undefined;
+"aria-valuenow"?: number | undefined | undefined;
+"aria-valuetext"?: string | undefined | undefined;
+dangerouslySetInnerHTML?: {
+__html: string | TrustedHTML;
+} | undefined | undefined;
+onCopy?: ClipboardEventHandler<SVGSVGElement> | undefined;
+onCopyCapture?: ClipboardEventHandler<SVGSVGElement> | undefined;
+onCut?: ClipboardEventHandler<SVGSVGElement> | undefined;
+onCutCapture?: ClipboardEventHandler<SVGSVGElement> | undefined;
+onPaste?: ClipboardEventHandler<SVGSVGElement> | undefined;
+onPasteCapture?: ClipboardEventHandler<SVGSVGElement> | undefined;
+onCompositionEnd?: CompositionEventHandler<SVGSVGElement> | undefined;
+onCompositionEndCapture?: CompositionEventHandler<SVGSVGElement> | undefined;
+onCompositionStart?: CompositionEventHandler<SVGSVGElement> | undefined;
+onCompositionStartCapture?: CompositionEventHandler<SVGSVGElement> | undefined;
+onCompositionUpdate?: CompositionEventHandler<SVGSVGElement> | undefined;
+onCompositionUpdateCapture?: CompositionEventHandler<SVGSVGElement> | undefined;
+onFocus?: FocusEventHandler<SVGSVGElement> | undefined;
+onFocusCapture?: FocusEventHandler<SVGSVGElement> | undefined;
+onBlur?: FocusEventHandler<SVGSVGElement> | undefined;
+onBlurCapture?: FocusEventHandler<SVGSVGElement> | undefined;
+onChange?: FormEventHandler<SVGSVGElement> | undefined;
+onChangeCapture?: FormEventHandler<SVGSVGElement> | undefined;
+onBeforeInput?: InputEventHandler<SVGSVGElement> | undefined;
+onBeforeInputCapture?: FormEventHandler<SVGSVGElement> | undefined;
+onInput?: FormEventHandler<SVGSVGElement> | undefined;
+onInputCapture?: FormEventHandler<SVGSVGElement> | undefined;
+onReset?: FormEventHandler<SVGSVGElement> | undefined;
+onResetCapture?: FormEventHandler<SVGSVGElement> | undefined;
+onSubmit?: FormEventHandler<SVGSVGElement> | undefined;
+onSubmitCapture?: FormEventHandler<SVGSVGElement> | undefined;
+onInvalid?: FormEventHandler<SVGSVGElement> | undefined;
+onInvalidCapture?: FormEventHandler<SVGSVGElement> | undefined;
+onLoad?: ReactEventHandler<SVGSVGElement> | undefined;
+onLoadCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onError?: ReactEventHandler<SVGSVGElement> | undefined;
+onErrorCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onKeyDown?: KeyboardEventHandler<SVGSVGElement> | undefined;
+onKeyDownCapture?: KeyboardEventHandler<SVGSVGElement> | undefined;
+onKeyPress?: KeyboardEventHandler<SVGSVGElement> | undefined;
+onKeyPressCapture?: KeyboardEventHandler<SVGSVGElement> | undefined;
+onKeyUp?: KeyboardEventHandler<SVGSVGElement> | undefined;
+onKeyUpCapture?: KeyboardEventHandler<SVGSVGElement> | undefined;
+onAbort?: ReactEventHandler<SVGSVGElement> | undefined;
+onAbortCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onCanPlay?: ReactEventHandler<SVGSVGElement> | undefined;
+onCanPlayCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onCanPlayThrough?: ReactEventHandler<SVGSVGElement> | undefined;
+onCanPlayThroughCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onDurationChange?: ReactEventHandler<SVGSVGElement> | undefined;
+onDurationChangeCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onEmptied?: ReactEventHandler<SVGSVGElement> | undefined;
+onEmptiedCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onEncrypted?: ReactEventHandler<SVGSVGElement> | undefined;
+onEncryptedCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onEnded?: ReactEventHandler<SVGSVGElement> | undefined;
+onEndedCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onLoadedData?: ReactEventHandler<SVGSVGElement> | undefined;
+onLoadedDataCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onLoadedMetadata?: ReactEventHandler<SVGSVGElement> | undefined;
+onLoadedMetadataCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onLoadStart?: ReactEventHandler<SVGSVGElement> | undefined;
+onLoadStartCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onPause?: ReactEventHandler<SVGSVGElement> | undefined;
+onPauseCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onPlay?: ReactEventHandler<SVGSVGElement> | undefined;
+onPlayCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onPlaying?: ReactEventHandler<SVGSVGElement> | undefined;
+onPlayingCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onProgress?: ReactEventHandler<SVGSVGElement> | undefined;
+onProgressCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onRateChange?: ReactEventHandler<SVGSVGElement> | undefined;
+onRateChangeCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onSeeked?: ReactEventHandler<SVGSVGElement> | undefined;
+onSeekedCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onSeeking?: ReactEventHandler<SVGSVGElement> | undefined;
+onSeekingCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onStalled?: ReactEventHandler<SVGSVGElement> | undefined;
+onStalledCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onSuspend?: ReactEventHandler<SVGSVGElement> | undefined;
+onSuspendCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onTimeUpdate?: ReactEventHandler<SVGSVGElement> | undefined;
+onTimeUpdateCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onVolumeChange?: ReactEventHandler<SVGSVGElement> | undefined;
+onVolumeChangeCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onWaiting?: ReactEventHandler<SVGSVGElement> | undefined;
+onWaitingCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onAuxClick?: MouseEventHandler<SVGSVGElement> | undefined;
+onAuxClickCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onClick?: MouseEventHandler<SVGSVGElement> | undefined;
+onClickCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onContextMenu?: MouseEventHandler<SVGSVGElement> | undefined;
+onContextMenuCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onDoubleClick?: MouseEventHandler<SVGSVGElement> | undefined;
+onDoubleClickCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onDrag?: DragEventHandler<SVGSVGElement> | undefined;
+onDragCapture?: DragEventHandler<SVGSVGElement> | undefined;
+onDragEnd?: DragEventHandler<SVGSVGElement> | undefined;
+onDragEndCapture?: DragEventHandler<SVGSVGElement> | undefined;
+onDragEnter?: DragEventHandler<SVGSVGElement> | undefined;
+onDragEnterCapture?: DragEventHandler<SVGSVGElement> | undefined;
+onDragExit?: DragEventHandler<SVGSVGElement> | undefined;
+onDragExitCapture?: DragEventHandler<SVGSVGElement> | undefined;
+onDragLeave?: DragEventHandler<SVGSVGElement> | undefined;
+onDragLeaveCapture?: DragEventHandler<SVGSVGElement> | undefined;
+onDragOver?: DragEventHandler<SVGSVGElement> | undefined;
+onDragOverCapture?: DragEventHandler<SVGSVGElement> | undefined;
+onDragStart?: DragEventHandler<SVGSVGElement> | undefined;
+onDragStartCapture?: DragEventHandler<SVGSVGElement> | undefined;
+onDrop?: DragEventHandler<SVGSVGElement> | undefined;
+onDropCapture?: DragEventHandler<SVGSVGElement> | undefined;
+onMouseDown?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseDownCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseEnter?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseLeave?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseMove?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseMoveCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseOut?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseOutCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseOver?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseOverCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseUp?: MouseEventHandler<SVGSVGElement> | undefined;
+onMouseUpCapture?: MouseEventHandler<SVGSVGElement> | undefined;
+onSelect?: ReactEventHandler<SVGSVGElement> | undefined;
+onSelectCapture?: ReactEventHandler<SVGSVGElement> | undefined;
+onTouchCancel?: TouchEventHandler<SVGSVGElement> | undefined;
+onTouchCancelCapture?: TouchEventHandler<SVGSVGElement> | undefined;
+onTouchEnd?: TouchEventHandler<SVGSVGElement> | undefined;
+onTouchEndCapture?: TouchEventHandler<SVGSVGElement> | undefined;
+onTouchMove?: TouchEventHandler<SVGSVGElement> | undefined;
+onTouchMoveCapture?: TouchEventHandler<SVGSVGElement> | undefined;
+onTouchStart?: TouchEventHandler<SVGSVGElement> | undefined;
+onTouchStartCapture?: TouchEventHandler<SVGSVGElement> | undefined;
+onPointerDown?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerDownCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerMove?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerMoveCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerUp?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerUpCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerCancel?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerCancelCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerEnter?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerLeave?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerOver?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerOverCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerOut?: PointerEventHandler<SVGSVGElement> | undefined;
+onPointerOutCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onGotPointerCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onGotPointerCaptureCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onLostPointerCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onLostPointerCaptureCapture?: PointerEventHandler<SVGSVGElement> | undefined;
+onScroll?: UIEventHandler<SVGSVGElement> | undefined;
+onScrollCapture?: UIEventHandler<SVGSVGElement> | undefined;
+onWheel?: WheelEventHandler<SVGSVGElement> | undefined;
+onWheelCapture?: WheelEventHandler<SVGSVGElement> | undefined;
+onAnimationStart?: AnimationEventHandler<SVGSVGElement> | undefined;
+onAnimationStartCapture?: AnimationEventHandler<SVGSVGElement> | undefined;
+onAnimationEnd?: AnimationEventHandler<SVGSVGElement> | undefined;
+onAnimationEndCapture?: AnimationEventHandler<SVGSVGElement> | undefined;
+onAnimationIteration?: AnimationEventHandler<SVGSVGElement> | undefined;
+onAnimationIterationCapture?: AnimationEventHandler<SVGSVGElement> | undefined;
+onTransitionEnd?: TransitionEventHandler<SVGSVGElement> | undefined;
+onTransitionEndCapture?: TransitionEventHandler<SVGSVGElement> | undefined;
+key?: Key | null | undefined;
+asChild?: boolean | undefined;
+ref?: ((instance: SVGSVGElement | null) => void | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<SVGSVGElement> | null | undefined;
+}>;
+
+/**
+ * High-contrast tooltip — dark surface in light mode, light surface in
+ * dark mode (per Figma 391:39212-style direction). Theme-flip is driven
+ * by the `tooltipInverse*` semantic tokens (CSS vars), so styled-components
+ * does not need to know about the dark class.
+ */
+export declare const StyledTooltipContent: IStyledComponent<"web", Substitute<Omit<Popover.PopoverContentProps & RefAttributes<HTMLDivElement>, "ref"> & {
+ref?: ((instance: HTMLDivElement | null) => void | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_CALLBACK_REF_RETURN_VALUES]) | RefObject<HTMLDivElement> | null | undefined;
+}, {
+$oneLine?: boolean;
+}>>;
+
 export declare function SunIcon(p: IconProps): JSX_2.Element;
 
 export declare function SwapFillIcon(p: IconProps): JSX_2.Element;
@@ -2072,6 +2626,44 @@ export declare type ToggleScales = (typeof scales_3)[keyof typeof scales_3];
 export declare function TokenPocketIcon(p: IconProps): JSX_2.Element;
 
 export declare function TokensOnPCSIcon(p: IconProps): JSX_2.Element;
+
+export declare interface TooltipOptions {
+    placement?: Placement;
+    trigger?: TriggerType;
+    /** Distance in px from the anchor along the chosen side. Pass a single
+     * number or a popper-style `[skid, distance]` tuple — the second value
+     * is what Radix calls `sideOffset`. */
+    tooltipOffset?: [number, number] | number;
+    /** Padding from the viewport edge for collision avoidance. */
+    tooltipPadding?: number | {
+        top?: number;
+        right?: number;
+        bottom?: number;
+        left?: number;
+    };
+    /** Hover-trigger delay before hiding (ms). */
+    hideTimeout?: number;
+    /** Force the tooltip open regardless of trigger. */
+    manualVisible?: boolean;
+    /** When true, target-element events bubble normally (default false). */
+    avoidToStopPropagation?: boolean;
+    /** Render the tooltip in `document.body` (default true). */
+    isInPortal?: boolean;
+    /** Hug the content on a single line instead of the default 200px column. */
+    oneLine?: boolean;
+}
+
+export declare interface TooltipRefs {
+    /** Callback ref — attach to the trigger element. */
+    targetRef: (node: HTMLElement | null) => void;
+    /** ReactNode the consumer must render somewhere; self-portals when
+     * `isInPortal !== false`. */
+    tooltip: ReactNode;
+    tooltipVisible: boolean;
+    /** Kept for API parity with the uikit hook. Radix repositions
+     * automatically, so this is a no-op (typed as nullable for parity). */
+    forceUpdate: (() => void) | null;
+}
 
 export declare const TooltipText: IStyledComponent<"web", Substitute<    {
 "aria-label"?: string | undefined | undefined;
@@ -2372,6 +2964,8 @@ export declare function TrendingDownIcon(p: IconProps): JSX_2.Element;
 
 export declare function TrendingUpIcon(p: IconProps): JSX_2.Element;
 
+export declare type TriggerType = 'click' | 'hover' | 'focus';
+
 export declare function TrophyFillIcon(p: IconProps): JSX_2.Element;
 
 export declare function TrophyGoldIcon(p: IconProps): JSX_2.Element;
@@ -2402,6 +2996,8 @@ export declare function useModalV2(): {
 export declare type UseModalV2Props = ReturnType<typeof useModalV2>;
 
 export declare const useToast: () => ToastContextApi;
+
+export declare const useTooltip: (content: React.ReactNode, options?: TooltipOptions) => TooltipRefs;
 
 export declare type Variant = (typeof variants)[keyof typeof variants];
 

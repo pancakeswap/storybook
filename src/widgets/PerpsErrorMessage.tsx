@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Box } from '../primitives/Box'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
@@ -92,6 +92,11 @@ export const PerpsErrorMessage: React.FC<PerpsErrorMessageProps> = ({
     )
   }
 
+  // Hide the disclosure when details are missing or just repeat the
+  // user-visible message (happens when an Aster code has no override
+  // in ASTER_ERROR_COPY and the raw `err.message` flows into both).
+  const hasExtraDetails = !!details && details.trim() !== '' && details.trim() !== message.trim()
+
   return (
     <Message variant={variant}>
       <Flex flexDirection="column">
@@ -103,7 +108,7 @@ export const PerpsErrorMessage: React.FC<PerpsErrorMessageProps> = ({
         <MessageText>
           <Text fontSize="12px">{message}</Text>
         </MessageText>
-        {details && (
+        {hasExtraDetails && (
           <>
             <DetailsToggle onClick={() => setExpanded((v) => !v)}>
               {expanded ? t('Hide details') : t('Show details')}

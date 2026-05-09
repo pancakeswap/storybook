@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import styled, { useTheme } from 'styled-components'
+import { createPortal } from 'react-dom'
+import { styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
+import { ChevronDownIcon } from '../primitives/Icons'
+import { useMatchBreakpoints } from '../contexts'
+import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel } from './primitives'
 
 export type OrderBookView = 'both' | 'bids' | 'asks'
@@ -24,6 +28,17 @@ export interface OrderBookProps {
   pricePrecision?: number
   /** Last traded price — drives which aggregation step options are offered. */
   lastPrice?: number
+  /**
+   * Direction of the most recent tick relative to the prior one. Drives the
+   * color and arrow shown on the desktop mid-row. `'flat'` (or unset) renders
+   * the last price in the neutral text color with no arrow.
+   */
+  lastPriceDirection?: 'up' | 'down' | 'flat'
+  /**
+   * Mark price shown beside the last price on the desktop mid-row. Optional —
+   * if omitted the mid-row falls back to last price only.
+   */
+  markPrice?: number
 
   // ── Controlled view-state (consumer persists in its store) ────
   view: OrderBookView
@@ -42,6 +57,22 @@ export interface OrderBookProps {
   embedded?: boolean
   /** Translator. */
   t?: (key: string) => string
+
+  // ── Mobile-only datums (optional; ignored on desktop) ─────────
+  /** "Funding (8h) / Countdown" stat — first line shown above the ladder. */
+  fundingRateText?: string
+  /** Countdown "05:06:37" string — paired with `fundingRateText`. */
+  fundingCountdownText?: string
+  /** Big mid-price displayed between asks and bids on mobile. */
+  midPriceText?: string
+  /** Sub-price under `midPriceText` (e.g. "$77,824.4"). */
+  midSubText?: string
+  /**
+   * Tick-size dropdown options on mobile. Defaults to
+   * `['0.1','0.5','1','5','10','50','100']`. The selected value is
+   * driven by `priceStep`; selection emits `onPriceStepChange`.
+   */
+  priceStepOptions?: string[]
 }
 
 const MAX_VISIBLE_ROWS = 10
@@ -192,7 +223,7 @@ const Row = styled.div<{ $side: 'bid' | 'ask' }>`
 const Price = styled.span<{ $side: 'bid' | 'ask' }>`
   position: relative;
   z-index: 1;
-  color: ${({ $side, theme }) => ($side === 'bid' ? '#129E7D' : theme.colors.failure)};
+  color: ${({ $side, theme }) => ($side === 'bid' ? theme.colors.positive60 : theme.colors.failure)};
 `
 
 const Cell = styled.span<{ $align?: 'center' | 'right' }>`
@@ -201,30 +232,55 @@ const Cell = styled.span<{ $align?: 'center' | 'right' }>`
   text-align: ${({ $align }) => $align ?? 'right'};
 `
 
-const Spread = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+/**
+ * Mid-row between asks and bids. Aster's design shows the last trade
+ * price (large, colored by tick direction) on the left and the mark
+ * price (smaller, dotted underline) on the right — replacing the
+ * older "Spread / abs / pct" row, which the QA team flagged as
+ * uninformative because % rounded to "0.000%" for most majors.
+ */
+const MidRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 4px 16px;
-  gap: 4px;
+  gap: 8px;
   background: ${({ theme }) => theme.colors.input};
-  font-size: 14px;
-  font-weight: 400;
   font-variant-numeric: tabular-nums;
-  color: ${({ theme }) => theme.colors.text};
   flex-shrink: 0;
 `
 
-const SpreadLabel = styled.span`
-  color: ${({ theme }) => theme.colors.textSubtle};
+const LastPrice = styled.span<{ $direction: 'up' | 'down' | 'flat' }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: ${({ $direction, theme }) =>
+    $direction === 'up'
+      ? theme.colors.success
+      : $direction === 'down'
+      ? theme.colors.failure
+      : theme.colors.text};
 `
 
-const SpreadValue = styled.span`
-  text-align: center;
+const DirectionArrow = styled.span<{ $direction: 'up' | 'down' }>`
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  ${({ $direction, theme }) =>
+    $direction === 'up'
+      ? `border-bottom: 5px solid ${theme.colors.success};`
+      : `border-top: 5px solid ${theme.colors.failure};`}
 `
 
-const SpreadPct = styled.span`
-  text-align: right;
+const MarkPriceText = styled.span`
+  font-size: 14px;
   color: ${({ theme }) => theme.colors.textSubtle};
+  border-bottom: 1px dotted ${({ theme }) => theme.colors.textSubtle};
+  cursor: help;
 `
 
 /**
@@ -260,14 +316,19 @@ const aggregateLevels = (
 
 /**
  * Aster's own dropdown-option algorithm: offer integer steps
- * [100, 50, 10, 1] when `price > step × 10`, plus decimal steps down
+ * [1, 10, 50, 100] when `price > step × 10`, plus decimal steps down
  * to the native tickSize. Consumers don't need to compute this — we
  * derive it from `tickSize + lastPrice` at render time.
  *
- *   BTCUSDT   tickSize=0.1,    price=78000 → ["100","50","10","1","0.1"]
- *   ASTERUSDT tickSize=0.0001, price=0.67  → ["0.1","0.01","0.001","0.0001"]
+ * Returned in ASCENDING order (smallest first) so the dropdown reads
+ * fine→coarse and `stepOptions[0]` is always the symbol's native
+ * tickSize — which the snap-on-symbol-change logic uses as the
+ * default since the finest step shows the most depth rows.
+ *
+ *   BTCUSDT   tickSize=0.1,    price=78000 → ["0.1","1","10","50","100"]
+ *   ASTERUSDT tickSize=0.0001, price=0.67  → ["0.0001","0.001","0.01","0.1"]
  */
-const INTEGER_LEVELS = [100, 50, 10, 1] as const
+const INTEGER_LEVELS = [1, 10, 50, 100] as const
 
 const decimalStep = (n: number): string => (n === 0 ? '1' : `0.${'0'.repeat(n - 1)}1`)
 
@@ -278,9 +339,9 @@ const getDecimals = (tickSize: number): number => {
 
 const getStepOptions = (tickSize: number, lastPrice: number): string[] => {
   const opts: string[] = []
-  for (const l of INTEGER_LEVELS) if (lastPrice > l * 10) opts.push(String(l))
   const decimals = getDecimals(tickSize)
-  for (let i = 1; i <= decimals; i++) opts.push(decimalStep(i))
+  for (let i = decimals; i >= 1; i--) opts.push(decimalStep(i))
+  for (const l of INTEGER_LEVELS) if (lastPrice > l * 10) opts.push(String(l))
   return opts
 }
 
@@ -365,6 +426,378 @@ const AsksIcon: React.FC<{ askColor: string; listColor: string }> = ({ askColor,
 
 const identity = (s: string) => s
 
+/* ── Mobile variant ────────────────────────────────────────── */
+
+const MOBILE_PRICE_STEPS_DEFAULT = ['0.1', '0.5', '1', '5', '10', '50', '100']
+
+const MWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 8px 8px 0;
+  font-size: 12px;
+  height: 100%;
+  width: 100%;
+  background: ${({ theme }) => theme.colors.card};
+`
+
+const MFunding = styled.div`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  margin-bottom: 8px;
+  strong {
+    color: ${({ theme }) => theme.colors.text};
+    font-weight: 400;
+  }
+`
+
+const MHead = styled.div`
+  display: flex;
+  justify-content: space-between;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 11px;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+`
+
+const MHeadSize = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+`
+
+const MRow = styled.div<{ $side: 'bid' | 'ask' }>`
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+  color: ${({ $side, theme }) => ($side === 'bid' ? theme.colors.positive60 : theme.colors.failure)};
+`
+
+const MBar = styled.span`
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -1;
+  pointer-events: none;
+`
+
+const MMid = styled.div`
+  text-align: center;
+  padding: 8px 0;
+`
+
+const MMidPrice = styled.div`
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const MMidSub = styled.div`
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+`
+
+const MFoot = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 4px;
+  /* Sit directly below the last bid row in normal flow. Earlier we used
+     margin-top: auto to glue this to the column bottom, but when the
+     adjacent OrderForm column is taller than the order book the grid row
+     stretches MWrap and the footer ends up below the iPhone viewport. */
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+`
+
+const MIconBtn = styled.button`
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: pointer;
+  padding: 0;
+`
+
+const MStepBtn = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 12px;
+  font-family: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+`
+
+const MStepMenu = styled.div`
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  min-width: 80px;
+  background: ${({ theme }) => theme.colors.card};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 8px;
+  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  z-index: 50;
+`
+
+const MStepItem = styled.button<{ $active: boolean }>`
+  display: block;
+  width: 100%;
+  text-align: right;
+  padding: 8px 12px;
+  border: 0;
+  background: ${({ $active, theme }) => ($active ? theme.colors.input : 'transparent')};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+`
+
+/* Bottom-sheet view selector (Both / Asks only / Bids only) */
+const SheetBackdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 250;
+`
+
+const Sheet = styled.div`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 260;
+  background: ${({ theme }) => theme.colors.card};
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  padding: 8px 0 16px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+`
+
+const SheetHandle = styled.div`
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.textSubtle};
+  opacity: 0.4;
+  margin: 4px auto 12px;
+`
+
+const SheetItem = styled.button<{ $active: boolean }>`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border: 0;
+  background: ${({ $active, theme }) => ($active ? theme.colors.input : 'transparent')};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  text-align: left;
+`
+
+const SheetCheck = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 16px;
+`
+
+const MobileOrderBook: React.FC<OrderBookProps> = ({
+  asks,
+  bids,
+  baseAsset,
+  quoteAsset,
+  tickSize,
+  pricePrecision = 2,
+  view,
+  onViewChange,
+  priceStep,
+  onPriceStepChange,
+  hidden,
+  t = identity,
+  fundingRateText,
+  fundingCountdownText,
+  midPriceText,
+  midSubText,
+  priceStepOptions = MOBILE_PRICE_STEPS_DEFAULT,
+}) => {
+  const theme = useTheme()
+  const [stepOpen, setStepOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const stepWrapRef = useRef<HTMLDivElement>(null)
+  useClickOutside(stepWrapRef, () => setStepOpen(false))
+
+  // Reuse the desktop aggregator + cumulator pipeline so depth bars, price
+  // bucketing and bid/ask ordering are consistent across breakpoints.
+  // `aggregateLevels` early-returns the input untouched when multiplier is 1,
+  // so we cannot rely on its sort order — normalise both sides explicitly
+  // (asks ascending by price, bids descending) before slicing/reversing for
+  // the desired top-down display order: highest ask first, then mid, then
+  // highest bid.
+  const rows = useMemo(() => {
+    const stepValue = Math.max(tickSize, Number(priceStep) || tickSize)
+    const aggMultiplier = Math.max(1, Math.round(stepValue / tickSize))
+    const aggAsks = aggregateLevels(asks, 'ask', tickSize, aggMultiplier, pricePrecision)
+    const aggBids = aggregateLevels(bids, 'bid', tickSize, aggMultiplier, pricePrecision)
+    const sortedAsks = [...aggAsks].sort(([a], [b]) => Number(a) - Number(b))
+    const sortedBids = [...aggBids].sort(([a], [b]) => Number(b) - Number(a))
+    return {
+      asks: sortedAsks.slice(0, MAX_VISIBLE_ROWS).reverse(),
+      bids: sortedBids.slice(0, MAX_VISIBLE_ROWS),
+    }
+  }, [asks, bids, priceStep, tickSize, pricePrecision])
+
+  const maxQty = useMemo(() => {
+    let m = 0
+    for (const [, q] of rows.asks) m = Math.max(m, Number(q) || 0)
+    for (const [, q] of rows.bids) m = Math.max(m, Number(q) || 0)
+    return m || 1
+  }, [rows])
+
+  const askBg = `color-mix(in srgb, ${theme.colors.failure} 18%, transparent)`
+  const bidBg = `color-mix(in srgb, ${theme.colors.positive60} 18%, transparent)`
+
+  const renderRow = (price: string, qty: string, side: 'bid' | 'ask') => {
+    const pct = Math.max(6, Math.min(100, (Number(qty) / maxQty) * 100))
+    return (
+      <MRow key={`${side}-${price}`} $side={side}>
+        <MBar style={{ width: `${pct}%`, background: side === 'ask' ? askBg : bidBg }} />
+        <span>{price}</span>
+        <span>{Number(qty).toFixed(3)}</span>
+      </MRow>
+    )
+  }
+
+  const VIEW_OPTIONS: ReadonlyArray<{ key: OrderBookView; label: string }> = [
+    { key: 'both', label: t('Both') },
+    { key: 'asks', label: t('Asks only') },
+    { key: 'bids', label: t('Bids only') },
+  ]
+
+  const askColor = theme.colors.failure
+  const bidColor = theme.colors.positive60
+  const listColor = theme.colors.textSubtle
+
+  return (
+    <MWrap style={hidden ? { display: 'none' } : undefined}>
+      {(fundingRateText || fundingCountdownText) && (
+        <MFunding>
+          {t('Funding (8h) / Countdown')}
+          <strong>
+            {fundingRateText ?? '—'} / {fundingCountdownText ?? '—'}
+          </strong>
+        </MFunding>
+      )}
+      <MHead>
+        <span>
+          {t('Price')}
+          <br />({quoteAsset})
+        </span>
+        <MHeadSize>
+          {t('Size')}
+          <br />({baseAsset}) <ChevronDownIcon width="14px" aria-hidden="true" />
+        </MHeadSize>
+      </MHead>
+
+      {view !== 'bids' && rows.asks.map(([p, q]) => renderRow(p, q, 'ask'))}
+
+      {view === 'both' && (
+        <MMid>
+          <MMidPrice>{midPriceText ?? rows.bids[0]?.[0] ?? '—'}</MMidPrice>
+          {midSubText && <MMidSub>{midSubText}</MMidSub>}
+        </MMid>
+      )}
+
+      {view !== 'asks' && rows.bids.map(([p, q]) => renderRow(p, q, 'bid'))}
+
+      <MFoot>
+        <MIconBtn
+          type="button"
+          aria-label={t('Choose view')}
+          aria-haspopup="dialog"
+          onClick={() => setSheetOpen(true)}
+        >
+          {view === 'both' && <BothIcon bidColor={bidColor} askColor={askColor} listColor={listColor} />}
+          {view === 'asks' && <AsksIcon askColor={askColor} listColor={listColor} />}
+          {view === 'bids' && <BidsIcon bidColor={bidColor} listColor={listColor} />}
+        </MIconBtn>
+
+        <div ref={stepWrapRef} style={{ position: 'relative' }}>
+          <MStepBtn
+            type="button"
+            aria-haspopup="listbox"
+            aria-expanded={stepOpen}
+            onClick={() => setStepOpen((v) => !v)}
+          >
+            {priceStep} <ChevronDownIcon width="14px" aria-hidden="true" />
+          </MStepBtn>
+          {stepOpen && (
+            <MStepMenu role="listbox">
+              {priceStepOptions.map((s) => (
+                <MStepItem
+                  key={s}
+                  type="button"
+                  role="option"
+                  aria-selected={s === priceStep}
+                  $active={s === priceStep}
+                  onClick={() => {
+                    onPriceStepChange(s)
+                    setStepOpen(false)
+                  }}
+                >
+                  {s}
+                </MStepItem>
+              ))}
+            </MStepMenu>
+          )}
+        </div>
+      </MFoot>
+
+      {sheetOpen &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <>
+            <SheetBackdrop onClick={() => setSheetOpen(false)} />
+            <Sheet role="dialog" aria-label={t('Choose view')}>
+              <SheetHandle />
+              {VIEW_OPTIONS.map((o) => (
+                <SheetItem
+                  key={o.key}
+                  type="button"
+                  $active={view === o.key}
+                  onClick={() => {
+                    onViewChange(o.key)
+                    setSheetOpen(false)
+                  }}
+                >
+                  <span>{o.label}</span>
+                  {view === o.key && <SheetCheck>✓</SheetCheck>}
+                </SheetItem>
+              ))}
+            </Sheet>
+          </>,
+          document.body,
+        )}
+    </MWrap>
+  )
+}
+
 /**
  * Live depth book — bid/ask ladder with heatbar backgrounds, price-step
  * aggregation dropdown, size-unit toggle, and view-mode toggle
@@ -376,7 +809,14 @@ const identity = (s: string) => s
  * had "100" from BTCUSDT and switched to ASTER) — the widget snaps to
  * the finest available option and emits a change.
  */
-export const OrderBook: React.FC<OrderBookProps> = ({
+export const OrderBook: React.FC<OrderBookProps> = (props) => {
+  // Mobile variant covers both mobile and tablet (below uikit's xl/968px).
+  const { isMobile, isTablet } = useMatchBreakpoints()
+  if (isMobile || isTablet) return <MobileOrderBook {...props} />
+  return <DesktopOrderBook {...props} />
+}
+
+const DesktopOrderBook: React.FC<OrderBookProps> = ({
   asks,
   bids,
   baseAsset,
@@ -384,6 +824,8 @@ export const OrderBook: React.FC<OrderBookProps> = ({
   tickSize,
   pricePrecision = 2,
   lastPrice = 0,
+  lastPriceDirection = 'flat',
+  markPrice,
   view,
   onViewChange,
   priceStep,
@@ -397,16 +839,38 @@ export const OrderBook: React.FC<OrderBookProps> = ({
   const theme = useTheme()
   const sizeUnitAsset = sizeUnit === 'QUOTE' ? quoteAsset : baseAsset
 
+  // Mark-price tooltip — same copy as the SymbolHeader's mark stat so
+  // users get a consistent explanation wherever the mark figure appears.
+  const { targetRef: markTipRef, tooltip: markTipNode } = useTooltip(
+    t(
+      'The Mark Price is a calculated value from multiple sources, mainly used for liquidations to prevent price spikes.',
+    ),
+    { placement: 'top' },
+  )
+
   const stepOptions = useMemo(() => getStepOptions(tickSize, lastPrice), [tickSize, lastPrice])
 
-  // Persisted step may not be offered on the current symbol. Snap to the
-  // finest decimal option (native tickSize).
+  // Snap to the smallest (finest, native-tickSize) option on every
+  // symbol change. PAN-11848: switching from BTCUSDT to ASTERUSDT
+  // shouldn't carry over BTC's persisted "0.1" step — the same number
+  // means "show every level" on BTC but collapses ASTERUSDT (~$0.67)
+  // into 2-3 buckets. Defaulting to `stepOptions[0]` (the smallest =
+  // tickSize) keeps the most price rows visible on every symbol.
+  // Manual user selections persist within the same symbol since
+  // tickSize stays the same.
+  const prevTickSizeRef = useRef<number | undefined>(undefined)
   useEffect(() => {
     if (stepOptions.length === 0) return
     if (!stepOptions.includes(priceStep)) {
-      onPriceStepChange(stepOptions[stepOptions.length - 1])
+      onPriceStepChange(stepOptions[0])
+      prevTickSizeRef.current = tickSize
+      return
     }
-  }, [stepOptions, priceStep, onPriceStepChange])
+    if (prevTickSizeRef.current !== tickSize) {
+      prevTickSizeRef.current = tickSize
+      onPriceStepChange(stepOptions[0])
+    }
+  }, [stepOptions, priceStep, onPriceStepChange, tickSize])
 
   const rows = useMemo(() => {
     // `priceStep` is an absolute value like "0.01" / "1" / "100". Aggregator
@@ -419,11 +883,7 @@ export const OrderBook: React.FC<OrderBookProps> = ({
     const maxRows = MAX_VISIBLE_ROWS * 2
     const slicedAsks = aggAsks.slice(0, maxRows).reverse()
     const slicedBids = aggBids.slice(0, maxRows)
-    const bestAsk = asks[0] ? Number(asks[0][0]) : undefined
-    const bestBid = bids[0] ? Number(bids[0][0]) : undefined
-    const spread = bestAsk && bestBid ? bestAsk - bestBid : undefined
-    const spreadPct = bestAsk && bestBid ? ((bestAsk - bestBid) / bestAsk) * 100 : undefined
-    return { asks: slicedAsks, bids: slicedBids, spread, spreadPct }
+    return { asks: slicedAsks, bids: slicedBids }
   }, [asks, bids, priceStep, tickSize, pricePrecision])
 
   // qty is always the base amount. For QUOTE display we convert per-level at
@@ -558,11 +1018,21 @@ export const OrderBook: React.FC<OrderBookProps> = ({
           </Half>
         )}
         {view === 'both' && (
-          <Spread role="row" aria-label={t('Spread')}>
-            <SpreadLabel>{t('Spread')}</SpreadLabel>
-            <SpreadValue>{rows.spread !== undefined ? rows.spread.toFixed(2) : '—'}</SpreadValue>
-            <SpreadPct>{rows.spreadPct !== undefined ? `${rows.spreadPct.toFixed(3)}%` : ''}</SpreadPct>
-          </Spread>
+          <MidRow role="row" aria-label={t('Last price')}>
+            <LastPrice $direction={lastPriceDirection}>
+              {lastPrice ? lastPrice.toFixed(pricePrecision) : '—'}
+              {lastPriceDirection === 'up' && <DirectionArrow $direction="up" />}
+              {lastPriceDirection === 'down' && <DirectionArrow $direction="down" />}
+            </LastPrice>
+            {markPrice !== undefined && (
+              <>
+                <MarkPriceText ref={markTipRef as React.RefObject<HTMLSpanElement>}>
+                  {markPrice.toFixed(pricePrecision)}
+                </MarkPriceText>
+                {markTipNode}
+              </>
+            )}
+          </MidRow>
         )}
         {view !== 'asks' && (
           <Half $size={view === 'bids' ? 'full' : 'half'}>

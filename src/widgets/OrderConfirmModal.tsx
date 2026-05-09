@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Checkbox } from '../primitives/Checkbox'
@@ -195,7 +195,7 @@ export const OrderConfirmModal: React.FC<OrderConfirmModalProps> = ({
             <Val>{details.leverage}x</Val>
           </Row>
           <Row>
-            <Key>{t('Cost')}</Key>
+            <Key>{t('Margin')}</Key>
             <Val>{details.costUsdt ? `${details.costUsdt.toFixed(2)} ${details.quoteAsset}` : '—'}</Val>
           </Row>
           <Row>

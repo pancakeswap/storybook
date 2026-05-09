@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
@@ -102,6 +102,15 @@ const ModalBody = styled(Flex)`
   gap: 20px;
   min-width: 380px;
   max-width: 420px;
+
+  /* On mobile/tablet the modal renders as a bottom-sheet — let the body
+     fill the full sheet width so prices line up with the right edge
+     instead of hugging the left half. */
+  @media (max-width: 967.98px) {
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+  }
 `
 
 const Pretitle = styled(Text).attrs({ fontSize: '12px', bold: true })`
@@ -154,15 +163,52 @@ const TokenGlyph = styled.div<{ $size?: number }>`
   overflow: hidden;
 `
 
-/* AmountField — styled to match the PCS swap-page input field
+/* Minimal back link — matches the Figma 29:2 design (small arrow +
+ * "Back" text in primary teal, no button chrome). */
+const BackLink = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s;
+  &:hover { filter: brightness(1.1); }
+`
+
+/* Wrapper that groups the Withdrawable header + AmountField. Modal
+ * body gap is 20 px; this overrides it to 16 px so the header sits
+ * tighter to the input. */
+const AmountGroup = styled(Flex)`
+  flex-direction: column;
+  gap: 8px;
+`
+
+/* Withdrawable + percent-shortcut header that sits above the field
+ * (Figma 36:5698). */
+const AmountHeader = styled(Flex)`
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 24px;
+`
+
+/* AmountField — taller, rounder version that matches Figma 36:5698
  * (input-primary bg + input-secondary border + inset top shadow,
  * focus glows with the secondary purple ring). */
 const AmountField = styled(Flex)`
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  justify-content: center;
+  gap: 16px;
+  height: 80px;
+  padding: 0 16px;
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
-  border-radius: 16px;
+  border-radius: 24px;
   background: ${({ theme }) => theme.colors.input};
   box-shadow: ${({ theme }) =>
     `inset 0px 2px 0px -1px ${theme.colors.cardBorder}`};
@@ -176,14 +222,32 @@ const AmountField = styled(Flex)`
   }
 `
 
+/* Token select chip on the left of the amount field. */
+const TokenSelectButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: inherit;
+  &:hover { filter: brightness(1.05); }
+`
+
 const AmountInput = styled.input`
   background: transparent;
   border: 0;
   outline: 0;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   text-align: right;
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: -0.24px;
   color: ${({ theme }) => theme.colors.text};
   font-variant-numeric: tabular-nums;
   &::placeholder {
@@ -191,23 +255,31 @@ const AmountInput = styled.input`
   }
 `
 
+/* Percent shortcuts above the field. Text-only buttons in primary60
+ * with vertical 1px dividers between them (matches Figma). */
 const PercentRow = styled(Flex)`
-  gap: 6px;
-  margin-top: 4px;
+  align-items: center;
+  gap: 8px;
 `
 
 const PercentChip = styled.button`
   background: transparent;
-  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border: 0;
   color: ${({ theme }) => theme.colors.primary};
-  border-radius: 999px;
-  font-size: 11px;
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 600;
-  padding: 2px 8px;
+  letter-spacing: 0.12px;
+  padding: 4px 0;
   cursor: pointer;
-  &:hover {
-    background: ${({ theme }) => theme.colors.tertiary};
-  }
+  &:hover { filter: brightness(1.1); }
+`
+
+const PercentDivider = styled.span`
+  display: inline-block;
+  width: 1px;
+  height: 16px;
+  background: ${({ theme }) => theme.colors.cardBorder};
 `
 
 const SummaryCard = styled.div`
@@ -281,15 +353,10 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
         <ModalBody>
           {step === 'amount' && (
             <Flex justifyContent="flex-start">
-              <Button
-                scale="sm"
-                variant="text"
-                onClick={onBack}
-                aria-label="back"
-                startIcon={<ArrowBackIcon width="18px" />}
-              >
-                {t('Back')}
-              </Button>
+              <BackLink type="button" onClick={onBack} aria-label="back">
+                <ArrowBackIcon width="14px" color="primary" />
+                <span>{t('Back')}</span>
+              </BackLink>
             </Flex>
           )}
 
@@ -353,40 +420,46 @@ export const WithdrawModal: React.FC<WithdrawModalProps> = ({
 
           {step === 'amount' && selectedAsset && (
             <>
+              {/* Header row above the field — withdrawable on the left,
+               * percent shortcuts on the right (Figma 36:5698). The
+               * grouping wrapper tightens the gap to the field below. */}
+              <AmountGroup>
+              <AmountHeader>
+                <Text fontSize="12px" bold color="textSubtle">
+                  {t('Withdrawable: %amt% %sym%', {
+                    amt: selectedAsset.withdrawableText,
+                    sym: selectedAsset.symbol,
+                  })}
+                </Text>
+                {onPercentClick && (
+                  <PercentRow>
+                    {PERCENTS.map((p, i) => (
+                      <React.Fragment key={p}>
+                        {i > 0 && <PercentDivider />}
+                        <PercentChip onClick={() => onPercentClick(p)}>{p}%</PercentChip>
+                      </React.Fragment>
+                    ))}
+                    <PercentDivider />
+                    <PercentChip onClick={() => onPercentClick(100)}>{t('MAX')}</PercentChip>
+                  </PercentRow>
+                )}
+              </AmountHeader>
+
               <AmountField>
-                <Flex alignItems="center" style={{ gap: 12 }}>
+                <TokenSelectButton type="button">
                   {tokenIcon(selectedAsset, 40)}
-                  <Flex flexDirection="column">
-                    <Text fontSize="14px" bold>
-                      {selectedAsset.displayName || selectedAsset.symbol}
-                    </Text>
-                    <Text fontSize="12px" color="textSubtle">
-                      {t('Withdrawable: %amt% %sym%', {
-                        amt: selectedAsset.withdrawableText,
-                        sym: selectedAsset.symbol,
-                      })}
-                    </Text>
-                  </Flex>
-                </Flex>
-                <Flex flexDirection="column" alignItems="flex-end" style={{ minWidth: 0, flex: 1 }}>
-                  <AmountInput
-                    value={amount}
-                    onChange={(e) => onAmountChange(e.target.value)}
-                    placeholder="0"
-                    inputMode="decimal"
-                  />
-                  {onPercentClick && (
-                    <PercentRow>
-                      {PERCENTS.map((p) => (
-                        <PercentChip key={p} onClick={() => onPercentClick(p)}>
-                          {p}%
-                        </PercentChip>
-                      ))}
-                      <PercentChip onClick={() => onPercentClick(100)}>{t('MAX')}</PercentChip>
-                    </PercentRow>
-                  )}
-                </Flex>
+                  <Text fontSize="14px" bold>
+                    {selectedAsset.displayName || selectedAsset.symbol}
+                  </Text>
+                </TokenSelectButton>
+                <AmountInput
+                  value={amount}
+                  onChange={(e) => onAmountChange(e.target.value)}
+                  placeholder="0.0"
+                  inputMode="decimal"
+                />
               </AmountField>
+              </AmountGroup>
 
               <SummaryCard>
                 <SummaryRow>

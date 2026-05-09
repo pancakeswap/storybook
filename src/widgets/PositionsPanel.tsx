@@ -1,8 +1,15 @@
-import React from 'react'
-import styled, { useTheme } from 'styled-components'
+import React, { useState } from 'react'
+import { createPortal } from 'react-dom'
+import { css, styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
+import { Checkbox } from '../primitives/Checkbox'
 import { Text } from '../primitives/Text'
+import { ChevronDownIcon, CloseIcon, HistoryIcon, WarningIcon } from '../primitives/Icons'
+import Modal from '../primitives/Modal/Modal'
+import { ModalV2 } from '../primitives/Modal/ModalV2'
+import { useMatchBreakpoints } from '../contexts'
+import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel, UnderlineTab, UnderlineTabs } from './primitives'
 
 export interface PositionRow {
@@ -22,6 +29,16 @@ export interface PositionRow {
   /** Existing TP / SL trigger-order prices for this symbol, if any. */
   tpStopPrice?: string
   slStopPrice?: string
+  /** Per-position margin scheme. Rendered as a `(Cross)` / `(Isolated)`
+   *  tag under the Margin amount, matching Aster's positions table.
+   *  When omitted the tag is hidden — older consumers stay backward-
+   *  compatible. PAN-11866. */
+  marginType?: 'CROSS' | 'ISOLATED'
+  /** Aster `/fapi/v3/adlQuantile` value for this position's side
+   *  (0–4, low → imminent ADL). Drives the lit-bar count in the ADL
+   *  gauge. When undefined the gauge falls back to a single red marker
+   *  (Aster's resting state). PAN-11867. */
+  adlQuantile?: number
 }
 
 export interface OpenOrderRow {
@@ -69,12 +86,40 @@ export interface TransactionHistoryRow {
   symbol: string
 }
 
+export interface OrderHistoryRow {
+  /** Stable React key — typically the orderId. */
+  id: string | number
+  /** Local date string, e.g. '2025-04-17'. */
+  date: string
+  /** Local time string, e.g. '01:37:26'. */
+  time: string
+  symbol: string
+  side: 'BUY' | 'SELL'
+  /** Humanized order type, e.g. 'Limit', 'Stop Market (Reduce)'. */
+  type: string
+  /** Pre-formatted price (or 'Market' / 'Market / Trig <price>'). */
+  price: string
+  /** Pre-formatted original quantity. */
+  origQty: string
+  /** Pre-formatted executed quantity. */
+  executedQty: string
+  /** Wire status — 'FILLED' / 'CANCELED' / 'EXPIRED' / 'REJECTED' etc. */
+  status: string
+}
+
 export type PositionsPanelTab =
   | 'positions'
   | 'orders'
   | 'history'
   | 'trades'
   | 'transactions'
+  /** Mobile-only — list of holdings, no desktop equivalent yet. */
+  | 'assets'
+  /** Mobile-only — TWAP orders, no desktop equivalent yet. */
+  | 'twap'
+
+/** History sheet inner-tab (mobile only). */
+export type PositionsHistoryTab = 'orders' | 'trades' | 'tx'
 
 export interface PositionsPanelProps {
   /** Controlled active tab. */
@@ -82,12 +127,20 @@ export interface PositionsPanelProps {
   onTabChange: (tab: PositionsPanelTab) => void
   positions: PositionRow[]
   openOrders: OpenOrderRow[]
+  /** Past orders (filled / canceled / expired). */
+  orderHistory?: OrderHistoryRow[]
   /** Fills the user has executed (settled trades). */
   tradeHistory?: TradeHistoryRow[]
   /** Account ledger entries — funding, realized PnL, deposits, etc. */
   transactionHistory?: TransactionHistoryRow[]
   /** Share-to-social callback for a trade row (optional). */
   onShareTrade?: (trade: TradeHistoryRow) => void
+  /**
+   * Fires when the user clicks the share-arrow icon in a position row's
+   * PNL cell. Consumer typically opens {@link SharePnlModal} with the
+   * position snapshot. Hidden when undefined.
+   */
+  onSharePnl?: (position: PositionRow) => void
   /**
    * Hook-like function called inside each position row to get the live
    * mark price for that symbol. MUST obey the rules of hooks (always
@@ -129,6 +182,54 @@ export interface PositionsPanelProps {
   cancellingOrderId?: OpenOrderRow['id'] | null
   /** Translator. */
   t?: (key: string) => string
+
+  // ── Mobile-only props ────────────────────────────────────────
+  /**
+   * Force the mobile layout. Defaults to `useMatchBreakpoints().isMobile`
+   * — same auto-detection pattern as `OrderForm`.
+   */
+  isMobile?: boolean
+  /**
+   * Optional positions count override. The mobile tab strip renders
+   * `Positions (N)` and consumers may want to pass a server-derived
+   * count rather than `positions.length`.
+   */
+  positionsCount?: number
+  /**
+   * "Hide other symbols" filter — wired on both desktop (right side of
+   * the tabs row) and mobile (filter strip below the tabs).
+   */
+  hideOtherSymbols?: boolean
+  onHideOtherSymbolsChange?: (next: boolean) => void
+  /**
+   * Desktop-only: invoked when the user clicks "Close All" in the top
+   * tabs row. Consumer is responsible for confirmation + the bulk close.
+   * Hidden when the callback isn't provided.
+   */
+  onCloseAll?: () => void
+  /** Mobile filter row — instrument filter button label (default `All instruments`). */
+  instrumentFilterLabel?: string
+  /** Mobile filter row — invoked when the instrument-filter button is clicked. */
+  onInstrumentFilterClick?: () => void
+  /**
+   * Mobile-only: open state of the full-page History sheet portal. The
+   * sheet covers the viewport and renders the orderHistory / tradeHistory
+   * / transactionHistory tabs.
+   */
+  historyOpen?: boolean
+  onHistoryToggle?: (open: boolean) => void
+  /** Mobile-only: active sub-tab inside the History sheet. */
+  historyTab?: PositionsHistoryTab
+  onHistoryTabChange?: (tab: PositionsHistoryTab) => void
+
+  /**
+   * Display unit for the Size column. `'QUOTE'` (default) shows the
+   * USDT notional (|base| × markPrice, falling back to entry); `'BASE'`
+   * shows the raw base-asset quantity. Consumer typically syncs this
+   * with the order form's size-unit toggle so the user sees one
+   * denomination across the whole perps view.
+   */
+  sizeUnit?: 'BASE' | 'QUOTE'
 }
 
 const Card = styled(PerpsPanel)`
@@ -138,8 +239,34 @@ const Card = styled(PerpsPanel)`
 
 const Body = styled.div`
   padding: 8px 12px 12px;
+  /* Horizontal scroll appears once the table body is wider than the
+   * panel — at that point the trailing TP/SL + Close action group is
+   * pushed off-screen and the user can scroll right to reach it. The
+   * scrollbar styling matches Figma 76:12504: a 4px thin pill, sized
+   * down from the browser default (12–17px) so it sits unobtrusively
+   * at the bottom of the panel. */
   overflow-x: auto;
   flex: 1;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: ${({ theme }) => theme.colors.textSubtle} transparent;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+    /* appearance:none opts out of macOS overlay scrollbars (which
+     * auto-hide unless the cursor is moving over them). With our
+     * styled track and thumb the scrollbar paints inset, so users
+     * always see a clear "more content to the right" affordance when
+     * the table overflows. */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.colors.textSubtle};
+    border-radius: 999px;
+  }
 `
 
 const Empty = styled(Flex)`
@@ -148,17 +275,40 @@ const Empty = styled(Flex)`
   min-height: 120px;
 `
 
+/*
+ * Positions table — desktop layout.
+ *
+ * Symbol pin column keeps the "BTCUSDT / Buy 93x" stack at 108px (its
+ * two-line content needs a known minimum), the 7 numeric data columns
+ * flex with `minmax(min-content, 1fr)` so the row spans the full panel
+ * width like the history tables, and the trailing TP/SL + Close action
+ * group stays `auto`-sized at the right edge.
+ *
+ * Header `<Th>` cells live inside this same grid (above the row groups
+ * in JSX) — that's load-bearing for `1fr` alignment, since two
+ * separate grids would each compute column widths from their own
+ * cell-content min-contents and drift out of sync. Mirrors the pattern
+ * used by `OrdersTable` / `OrderHistoryTable` below.
+ *
+ * The 16px content gap between columns lives on the cells (8px each
+ * side) instead of `column-gap`, so the hover-active strip can paint
+ * every cell with no transparent slits in between. Body cells receive
+ * their 8px from `RowGroup`; header `<Th>` cells receive theirs from
+ * the `& > *` rule below (RowGroup is display:contents so this
+ * selector lands on Th + RowGroup, and the no-box RowGroup ignores it).
+ */
 const PositionsTable = styled.div`
   display: grid;
-  grid-template-columns: repeat(8, minmax(min-content, 1fr)) auto;
-  /* Cells sit flush horizontally so the row-hover background reads as
-   * one continuous strip. Per-cell horizontal padding (applied below)
-   * keeps content from touching. */
+  grid-template-columns: 108px repeat(7, minmax(min-content, 1fr)) auto;
   column-gap: 0;
-  row-gap: 6px;
+  /* Row gap is 0 so the active/hover bg of one row sits flush against
+   * the next row — matches the responsive Figma 75:12034 where the
+   * card-secondary bg of the active row directly touches the next
+   * row, with no visible breathing strip between them. */
+  row-gap: 0;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
 `
 
@@ -168,10 +318,15 @@ const PositionsTable = styled.div`
 const RowGroup = styled.div`
   display: contents;
   /* Padding lives on the cells (RowGroup is display:contents so any
-   * padding set here would be dropped) — gives the hover strip visible
-   * breathing room around the content, matching the MarketsDropdown row. */
+   * padding set here would be dropped). 16px vertical / 12px horizontal
+   * matches the wrapping table's child rule (used by OrdersTable,
+   * OrderHistoryTable, TradesTable, TxTable, PositionsTable) so the
+   * header strip and body rows share the same row height + the 24px
+   * horizontal gap between cells reads consistent across both. Keeping
+   * cells flush against each other (no column-gap) is what lets the
+   * hover-active strip paint as one continuous bg. */
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
     transition: background 0.12s;
   }
   &:hover > * {
@@ -188,21 +343,244 @@ const RowGroup = styled.div`
   }
 `
 
-const ActionCell = styled(Flex)`
-  gap: 6px;
+
+/* Wraps the tabs row + the right-side controls (Hide Other Symbols,
+ * Close All). Owns the bottom border so it spans the whole panel
+ * width even though the tabs primitive sits on the left. The
+ * `container-type: inline-size` declaration enables container queries
+ * inside — that's how TabsChevronOverlay decides to fade in when the
+ * panel is too narrow to fit all five tabs alongside the right
+ * controls (see comment on TabsChevronOverlay). */
+const TabsHeader = styled.div`
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  padding-right: 12px;
+  gap: 12px;
+  container-type: inline-size;
+  container-name: positions-tabs-header;
 `
 
-const TpSlCell = styled.div`
+/* Flex parent for the tabs primitive — clips overflow so the
+ * chevron-fade overlay can sit on top of the trailing tabs. `flex: 1`
+ * lets it shrink under HeaderRightControls; `min-width: 0` is the
+ * canonical "let me shrink even with non-shrinking children" trick.
+ *
+ * The inner UnderlineTabsWrapper is forced to keep its natural width
+ * (`flex-shrink: 0`) so it overflows TabsLeft cleanly — otherwise the
+ * wrapper would compress, hiding the overflow we want to detect via
+ * `scrollWidth > clientWidth`. */
+const TabsLeft = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+
+  & > *:not([data-overlay]) {
+    flex-shrink: 0;
+  }
+`
+
+/* 48px overlay anchored to TabsLeft's right edge. Becomes visible when
+ * the parent header container is narrower than 1024px — at that
+ * point the five tabs (~615px natural width) collide with the
+ * Hide-Other / Close-All controls (~290px) plus padding/gaps, leaving
+ * <2px of breathing room. The fade gradient masks the clipped tab so
+ * the cut doesn't read as a truncation glitch, and the chevron hints
+ * "more tabs to the right". Pointer-events disabled so clicks pass
+ * through to the underlying tab area.
+ *
+ * Container query (instead of JS measurement) because Storybook's
+ * iframe + Chromium occasionally throttle setInterval / batch
+ * ResizeObserver fires across iframe boundaries — leaving the JS
+ * state stuck. CSS responds to layout deterministically. */
+const TabsChevronOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    ${({ theme }) => theme.colors.backgroundAlt} 60%,
+    ${({ theme }) => theme.colors.backgroundAlt} 100%
+  );
+  color: ${({ theme }) => theme.colors.textSubtle};
+  opacity: 0;
+  transition: opacity 0.12s;
+
+  @container positions-tabs-header (max-width: 1024px) {
+    opacity: 1;
+  }
+`
+
+const HeaderRightControls = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+`
+
+/* "Hide Other Symbols" — Figma renders the label inline next to a 20px
+ * checkbox. Both elements sit on the same row, gap 8px. The label uses
+ * the primary60 (teal) color so it pulls slightly toward the action
+ * tone of the Close All affordance to its right. */
+const HideOtherChip = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-family: Kanit;
   font-size: 14px;
-  line-height: 1.2;
+  font-weight: 400;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.primary60};
+  font-feature-settings: 'liga' off;
+`
+
+const CloseAllBtn = styled.button`
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.primary60};
+  font-feature-settings: 'liga' off;
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+`
+
+/* ── Close-All confirm modal ─────────────────────────────────
+ * Plain warning glyph in `warning60` centered above the message —
+ * no disc, no halo. */
+const WarningGlow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.warning60};
+`
+
+const ActionCell = styled(Flex)`
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+`
+
+/* Two-line stacked cell — used for symbol/side, size/unit, pnl/percent,
+ * tp/sl. The outer cell already gets row padding from RowGroup, so this
+ * is just a vertical flex with no padding of its own. */
+const StackCell = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  white-space: nowrap;
+`
+
+const StackSub = styled.span<{ $color?: string; $size?: string }>`
+  font-size: ${({ $size }) => $size ?? '12px'};
+  letter-spacing: 0.12px;
+  color: ${({ $color, theme }) => $color ?? theme.colors.textSubtle};
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+`
+
+/* "Buy 20x" badge — positive60 / negative60 text per side, 12px Kanit
+ * Regular. Sits inline with the leverage-tier indicator bars. */
+const SideLevText = styled.span<{ $up: boolean }>`
+  color: ${({ $up, theme }) => ($up ? theme.colors.positive60 : theme.colors.negative60)};
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.12px;
+  font-feature-settings: 'liga' off;
+  white-space: nowrap;
+`
+
+/* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Mirrors
+ * Aster's ADL ("auto-deleverage") gauge: lit count is driven by the
+ * server-pushed `adlQuantile` field (`/fapi/v3/adlQuantile`, 0–4 from
+ * low → imminent ADL). Lit bars are the destructive color, unlit are
+ * the neutral fill. When the consumer hasn't loaded the quantile yet
+ * we light just the leftmost bar — Aster's resting chrome.
+ * PAN-11867. */
+const LevBarRow = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding-top: 2px;
+  cursor: help;
+`
+
+const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
+  width: 2px;
+  height: 8px;
+  background: ${({ $variant, theme }) =>
+    $variant === 'destructive' ? theme.colors.failure : theme.colors.text};
+`
+
+/**
+ * Map Aster's 0–4 ADL quantile to the 4-bar gauge. Confirmed against
+ * Asterdex's own JS bundle: the gauge component renders
+ * `Array(adl).fill().map(...filled)` followed by
+ * `Array(4 - adl).fill().map(...empty)` — i.e. `lit = adl` straight
+ * identity. Quantile 0 leaves every bar empty; quantile 4 fills all
+ * four. We clamp defensively in case the server ever returns an
+ * out-of-range value, and treat unknown / not-yet-loaded as 0 lit.
+ */
+const litFromAdlQuantile = (q: number | undefined): 0 | 1 | 2 | 3 | 4 => {
+  if (q === undefined || !Number.isFinite(q)) return 0
+  const clamped = Math.max(0, Math.min(4, Math.floor(q)))
+  return clamped as 0 | 1 | 2 | 3 | 4
+}
+
+const TpSlCell = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: ${({ theme }) => theme.colors.text};
+  white-space: nowrap;
 `
 
-const TpSlValue = styled.span<{ $kind: 'tp' | 'sl' }>`
-  color: ${({ $kind, theme }) => ($kind === 'tp' ? theme.colors.success : theme.colors.failure)};
+/** Small leverage chip rendered next to a position's symbol — purple
+ *  text on the tertiary surface (mirrors SymbolHeader's old LevPill).
+/* Header column-help anchor — picks up the inherited textSubtle color
+ * and lets the shared useTooltip hook drive the popover. cursor:help so
+ * the affordance reads as informational (no underline / button shape). */
+const HeaderHelp = styled.span`
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  color: inherit;
+  margin-left: 4px;
 `
 
 const OrdersTable = styled.div`
@@ -214,8 +592,19 @@ const OrdersTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
+`
+
+/* Shared scroll mixin for the history tabs. Without this each history
+ * table grew to fit every row — a 100-entry history pushed the whole
+ * page-bottom panel below the fold. The grid stays intact (rather than
+ * splitting headers + body into separate scroll containers, which
+ * would desync column widths) and `Th` cells use `position: sticky`
+ * so the header row anchors to the top while rows scroll under it. */
+const historyTableScroll = css`
+  max-height: 360px;
+  overflow-y: auto;
 `
 
 const TradesTable = styled.div`
@@ -225,8 +614,9 @@ const TradesTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
+  ${historyTableScroll}
 `
 
 const TxTable = styled.div`
@@ -236,8 +626,21 @@ const TxTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
+  ${historyTableScroll}
+`
+
+const OrderHistoryTable = styled.div`
+  display: grid;
+  grid-template-columns: 148px 156px minmax(min-content, 0.6fr) repeat(5, minmax(min-content, 1fr));
+  column-gap: 0;
+  row-gap: 6px;
+  font-variant-numeric: tabular-nums;
+  & > * {
+    padding: 6px 12px;
+  }
+  ${historyTableScroll}
 `
 
 /** Stacked date / time cell — the figma renders these on two lines. */
@@ -270,20 +673,64 @@ const ShareBtn = styled.button`
   justify-content: center;
   width: 21px;
   height: 21px;
-  color: ${({ theme }) => theme.colors.textSubtle};
-  &:hover { color: ${({ theme }) => theme.colors.text}; }
+  color: ${({ theme }) => theme.colors.text};
+  transition: opacity 0.12s;
+  &:hover:not(:disabled) {
+    opacity: 0.7;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
 `
 
-const Th = styled(Text).attrs({ fontSize: '10px', color: 'textSubtle' })`
+/* Column header label — Figma 72:12968 etc. 12px Kanit SemiBold, 60%
+ * opacity on textSubtle, uppercase, 0.12px tracking, 14px line-height.
+ * Sticky-anchored so when the body of the history tables scrolls the
+ * row of labels stays pinned at the top. */
+const Th = styled(Text).attrs({ fontSize: '12px', color: 'textSubtle' })`
+  font-family: Kanit;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.12px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  /* Anchor the header row when the history tables overflow + scroll.
+     position: sticky is a no-op when the parent doesn't scroll, so
+     this is also safe on the Positions / Open Orders tables (which
+     don't use the scroll mixin today). The opaque card bg + z-index
+     are load-bearing: the previous 0.6 opacity made the whole element
+     translucent, so scrolled body rows bled through the header strip
+     (PAN-perps trade-history bug). textSubtle alone gives the muted
+     reading we want without making the bg see-through. */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: ${({ theme }) => theme.colors.card};
 `
 
 const Td = styled(Text).attrs({ fontSize: '14px' })`
   font-variant-numeric: tabular-nums;
+  font-family: Kanit;
+  line-height: 1.5;
+  white-space: nowrap;
 `
 
 const identity = (s: string) => s
+
+// TP/SL stopPrice arrives from Aster as a string with the symbol's
+// tick-size precision baked in (e.g. "1.49900"). Routing through Number()
+// collapses trailing zeros, so we keep the raw precision and only add
+// thousand-separators around the integer part.
+const fmtStopPrice = (raw: string) => {
+  const trimmed = raw.replace(/^0+(?=\d)/, '') || '0'
+  const [intPart, fracPart] = trimmed.split('.')
+  const withSeparators = Number(intPart).toLocaleString(undefined, {
+    maximumFractionDigits: 0,
+  })
+  return fracPart ? `${withSeparators}.${fracPart}` : withSeparators
+}
 
 /**
  * Single positions-table row. Split out as a component so
@@ -297,9 +744,11 @@ const PositionTableRow: React.FC<{
   computeLiqPrice?: PositionsPanelProps['computeLiqPrice']
   onClose: (p: PositionRow) => void
   onEditTpSl: (p: PositionRow, markPrice: number) => void
+  onShare?: (p: PositionRow) => void
   closingSymbol?: string | null
+  sizeUnit: 'BASE' | 'QUOTE'
   t: (key: string) => string
-}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, closingSymbol, t }) => {
+}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, onShare, closingSymbol, sizeUnit, t }) => {
   const theme = useTheme()
   const markPrice = useMarkPriceForSymbol?.(p.symbol)
   const side: 'BUY' | 'SELL' = p.positionAmt >= 0 ? 'BUY' : 'SELL'
@@ -319,49 +768,261 @@ const PositionTableRow: React.FC<{
 
   const isClosing = closingSymbol === p.symbol
 
+  // Aster's positions table reports Size as the *USDT notional* of the
+  // open position (|base| × markPrice, falling back to entryPrice when
+  // mark hasn't streamed in yet) — not the raw base-asset quantity.
+  // Mirrors the screenshot at https://www.asterdex.com/positions where
+  // a 0.001 BTC long @ ~81k reads as "81.0 USDT". The previous render
+  // showed `0.001` labelled `USDT`, which is the BTC quantity with the
+  // wrong unit. Margin is still notional ÷ leverage with a USDT suffix.
+  const sizeBase = Math.abs(p.positionAmt)
+  const entryNotional = Number.isFinite(p.entryPrice) ? sizeBase * p.entryPrice : NaN
+  const markNotional = Number.isFinite(markPrice) ? sizeBase * (markPrice as number) : NaN
+  const sizeNotional = Number.isFinite(markNotional) ? markNotional : entryNotional
+  const margin =
+    Number.isFinite(entryNotional) && p.leverage > 0 ? entryNotional / p.leverage : NaN
+
+  // Live uPnL %: gain / margin × 100. Falls back to '—' when we can't
+  // compute either side. Matches the ROE% the design hints at next to
+  // the absolute PNL value.
+  const pnlPct =
+    Number.isFinite(livePnl) && Number.isFinite(margin) && margin > 0
+      ? (livePnl / margin) * 100
+      : NaN
+
+  const pnlUp = Number.isFinite(livePnl) ? livePnl >= 0 : true
+  const pnlColor = pnlUp ? theme.colors.success : theme.colors.failure
+
+  const fmtPrice = (v: number) =>
+    v.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 1 })
+
+  const { targetRef: adlTipRef, tooltip: adlTipNode } = useTooltip(
+    t(
+      'This indicator shows your position in the auto-deleverage queue. If all lights are lit, in the event of a liquidation, your position may be reduced.',
+    ),
+    { placement: 'top' },
+  )
+
   return (
     <>
-      <Td bold>{p.symbol}</Td>
-      <Td style={{ color: side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
-        {p.positionAmt}
+      {/* Symbol cell — symbol name on top, side+lev pill + tier bars below */}
+      <StackCell>
+        <span>{p.symbol}</span>
+        <StackSub>
+          <SideLevText $up={side === 'BUY'}>
+            {side === 'BUY' ? t('Buy') : t('Sell')} {p.leverage}x
+          </SideLevText>
+          <LevBarRow ref={adlTipRef as React.RefObject<HTMLSpanElement>}>
+            {(() => {
+              const lit = litFromAdlQuantile(p.adlQuantile)
+              return [0, 1, 2, 3].map((i) => (
+                <LevBar key={i} $variant={i < lit ? 'destructive' : 'fill'} />
+              ))
+            })()}
+          </LevBarRow>
+          {adlTipNode}
+        </StackSub>
+      </StackCell>
+
+      {/* Size cell — unit follows the order-form toggle. QUOTE (default)
+          shows USDT notional (|base| × mark, fallback to entry); BASE
+          shows the raw base-asset quantity. Asset suffix derived from
+          the symbol (e.g. BTCUSDT → BTC / USDT). */}
+      {(() => {
+        const baseAsset = p.symbol.replace(/USDT$|USDC$|USD1$/i, '') || p.symbol
+        const quoteAsset = p.symbol.endsWith('USDC') ? 'USDC' : p.symbol.endsWith('USD1') ? 'USD1' : 'USDT'
+        const useBase = sizeUnit === 'BASE'
+        const value = useBase ? sizeBase : sizeNotional
+        const decimals = useBase ? 4 : 2
+        const label = useBase ? baseAsset : quoteAsset
+        return (
+          <StackCell>
+            <span>{Number.isFinite(value) ? value.toFixed(decimals) : '—'}</span>
+            <StackSub>{label}</StackSub>
+          </StackCell>
+        )
+      })()}
+
+      <Td as="div">
+        {Number.isFinite(p.entryPrice) ? fmtPrice(p.entryPrice) : '—'}
       </Td>
-      <Td>{Number.isFinite(p.entryPrice) ? p.entryPrice.toFixed(2) : '—'}</Td>
-      <Td>{markPrice !== undefined && Number.isFinite(markPrice) ? markPrice.toFixed(2) : '—'}</Td>
-      <Td>{p.leverage}x</Td>
-      <Td>{liq ? liq.toFixed(2) : '—'}</Td>
-      <Td style={{ color: livePnl >= 0 ? theme.colors.success : theme.colors.failure }}>
-        {Number.isFinite(livePnl) ? livePnl.toFixed(4) : '—'}
+      <Td as="div">
+        {markPrice !== undefined && Number.isFinite(markPrice) ? fmtPrice(markPrice) : '—'}
       </Td>
+      <StackCell>
+        <span>{Number.isFinite(margin) ? `${margin.toFixed(2)} USDT` : '—'}</span>
+        {p.marginType ? (
+          <StackSub>{p.marginType === 'ISOLATED' ? `(${t('Isolated')})` : `(${t('Cross')})`}</StackSub>
+        ) : null}
+      </StackCell>
+      <Td as="div">{Number.isFinite(liq) ? fmtPrice(liq as number) : '—'}</Td>
+
+      {/* PNL (ROE%) cell — abs uPnL + share trigger on top, ROE % below */}
+      <StackCell>
+        <Flex alignItems="center" style={{ gap: 8 }}>
+          <span style={{ color: pnlColor }}>
+            {Number.isFinite(livePnl)
+              ? `${livePnl >= 0 ? '+' : ''}${livePnl.toFixed(2)} USDT`
+              : '—'}
+          </span>
+          <ShareBtn
+            type="button"
+            aria-label={t('Share position')}
+            onClick={() => onShare?.(p)}
+            disabled={!onShare}
+          >
+            <ShareGlyph />
+          </ShareBtn>
+        </Flex>
+        <span style={{ color: pnlColor, fontSize: 14, lineHeight: 1.5 }}>
+          {Number.isFinite(pnlPct)
+            ? `${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%`
+            : '—'}
+        </span>
+      </StackCell>
+
+      {/* TP/SL cell — two muted lines, dashes when not set */}
       <TpSlCell>
-        <TpSlValue $kind="tp">
-          {t('TP')}: {p.tpStopPrice ? Number(p.tpStopPrice).toFixed(2) : '—'}
-        </TpSlValue>
-        <TpSlValue $kind="sl">
-          {t('SL')}: {p.slStopPrice ? Number(p.slStopPrice).toFixed(2) : '—'}
-        </TpSlValue>
+        <span>{p.tpStopPrice ? fmtStopPrice(p.tpStopPrice) : '--'}</span>
+        <span>{p.slStopPrice ? fmtStopPrice(p.slStopPrice) : '--'}</span>
       </TpSlCell>
+
       <ActionCell>
-        <Button
-          scale="xs"
-          variant="tertiary"
+        <TpSlChip
+          type="button"
           onClick={() => onEditTpSl(p, markPrice ?? NaN)}
           disabled={!Number.isFinite(p.positionAmt) || p.positionAmt === 0}
         >
-          {t('TP/SL')}
-        </Button>
-        <Button
-          scale="xs"
-          variant="secondary"
+          {t('TP / SL')}
+        </TpSlChip>
+        <CloseChip
+          type="button"
           onClick={() => onClose(p)}
           disabled={isClosing || !Number.isFinite(p.positionAmt) || p.positionAmt === 0}
-          isLoading={isClosing}
         >
-          {t('Close')}
-        </Button>
+          {isClosing ? '…' : t('Close')}
+        </CloseChip>
       </ActionCell>
     </>
   )
 }
+
+/* Three-node "share network" glyph, sized 21×21 to fill its slot in the
+ * PNL (ROE%) cell. Single-color so it picks up the surrounding text
+ * color via currentColor. */
+const ShareGlyph = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="21"
+    height="21"
+    viewBox="0 0 21 21"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M14.5833 13.3927C14.0661 13.3927 13.6033 13.6035 13.2494 13.9338L8.39708 11.0172C8.43111 10.8555 8.45833 10.6939 8.45833 10.5252C8.45833 10.3565 8.43111 10.1949 8.39708 10.0332L13.195 7.14466C13.5625 7.49607 14.0457 7.71394 14.5833 7.71394C15.7131 7.71394 16.625 6.77217 16.625 5.6055C16.625 4.43884 15.7131 3.49707 14.5833 3.49707C13.4536 3.49707 12.5417 4.43884 12.5417 5.6055C12.5417 5.77418 12.5689 5.93583 12.6029 6.09747L7.805 8.98603C7.4375 8.63462 6.95431 8.41675 6.41667 8.41675C5.28694 8.41675 4.375 9.35852 4.375 10.5252C4.375 11.6918 5.28694 12.6336 6.41667 12.6336C6.95431 12.6336 7.4375 12.4157 7.805 12.0643L12.6506 14.988C12.6165 15.1356 12.5961 15.2902 12.5961 15.4449C12.5961 16.5764 13.4876 17.4971 14.5833 17.4971C15.679 17.4971 16.5706 16.5764 16.5706 15.4449C16.5706 14.3133 15.679 13.3927 14.5833 13.3927Z"
+      fill="currentColor"
+    />
+  </svg>
+)
+
+/* Chevron-forward glyph for the tabs-overflow indicator. 21×21 to
+ * match the Figma 75:12323 slot. */
+const ChevronForwardGlyph = () => (
+  <svg width="21" height="21" viewBox="0 0 21 21" fill="none" aria-hidden="true">
+    <path
+      d="M7.875 4.375L13.7813 10.5L7.875 16.625"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+/* Help / question-mark glyph used in the PNL (ROE%) column header.
+ * Stroked outline matches the lightweight 14×14 icon in Figma. */
+const HelpGlyph = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle cx="12" cy="12" r="9.25" stroke="currentColor" strokeWidth="1.5" />
+    <path
+      d="M9.5 9.5a2.5 2.5 0 015 0c0 1.4-1 1.9-1.7 2.4-.5.4-.8.7-.8 1.3v.4"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <circle cx="12" cy="17" r="0.9" fill="currentColor" />
+  </svg>
+)
+
+/* TP/SL action chip — Figma 72:13294. Tertiary surface with a 2px
+ * inset bottom edge, primary60 label, 12px Kanit SemiBold. Built local
+ * to avoid bending the shared Button primitive — the trading-row chip
+ * is dimensionally smaller (h ≈ 24px) than any of Button's scales.
+ *
+ * Fixed `min-width` so the chip stays the same size across rows even
+ * when its label renders through a translator (e.g. localized "TP/SL"
+ * variants) — the parent ActionCell otherwise lets each row's chip
+ * shrink to its own content. */
+const TpSlChip = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 3px 8px 5px;
+  border-radius: 8px;
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  background: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.primary60};
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.12px;
+  cursor: pointer;
+  transition: opacity 0.12s, transform 0.04s;
+
+  &:hover:not(:disabled) {
+    opacity: 0.85;
+  }
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+    border-bottom-width: 1px;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+`
+
+/* Outlined Close button — Figma 72:13213. 2px primary stroke, no fill,
+ * primary60 label. Same dimensions as TpSlChip so the pair lines up. */
+const CloseChip = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 2px solid ${({ theme }) => theme.colors.primary};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.primary60};
+  font-family: Kanit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.12px;
+  cursor: pointer;
+  transition: opacity 0.12s, background 0.12s;
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.primary}1A;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+`
 
 /**
  * Bottom-panel tabs: Positions / Open Orders / History. Stateless apart
@@ -371,12 +1032,27 @@ const PositionTableRow: React.FC<{
  * Per-row business actions (Close / Cancel / TP+SL editor) fire
  * callbacks — consumer owns the signed API calls + toast + modal. The
  * widget just renders.
+ *
+ * Auto-responsive: dispatches to {@link MobilePositionsPanel} when the
+ * viewport is mobile (or when `isMobile` is forced via prop). The mobile
+ * variant exposes a different tab set (`Open Orders | Positions | Assets
+ * | TWAP`) and owns a full-page History sheet portal.
  */
-export const PositionsPanel: React.FC<PositionsPanelProps> = ({
+export const PositionsPanel: React.FC<PositionsPanelProps> = (props) => {
+  // Default mobile variant covers both mobile and tablet viewports
+  // (everything below uikit's xl/968px); explicit `isMobile` prop wins.
+  const { isMobile: isMobileBp, isTablet } = useMatchBreakpoints()
+  const isMobile = props.isMobile ?? (isMobileBp || isTablet)
+  if (isMobile) return <MobilePositionsPanel {...props} />
+  return <DesktopPositionsPanel {...props} />
+}
+
+const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   tab,
   onTabChange,
   positions,
   openOrders,
+  orderHistory = [],
   tradeHistory = [],
   transactionHistory = [],
   onShareTrade,
@@ -387,29 +1063,109 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
   onCancelOrder,
   closingSymbol = null,
   cancellingOrderId = null,
+  hideOtherSymbols = false,
+  onHideOtherSymbolsChange,
+  onCloseAll,
+  onSharePnl,
+  sizeUnit = 'QUOTE',
   t = identity,
 }) => {
   const theme = useTheme()
   const tabOrder: PositionsPanelTab[] = ['positions', 'orders', 'history', 'trades', 'transactions']
   const activeIndex = tabOrder.indexOf(tab)
 
+  // Close-All confirm modal — destructive, account-wide action, so we
+  // always gate it behind a confirmation step instead of firing onCloseAll
+  // directly on click. No "don't show again" toggle: every Close All run
+  // should require an intentional confirm.
+  const [closeAllConfirmOpen, setCloseAllConfirmOpen] = useState(false)
+
+  // Help-icon tooltip on the PNL (ROE%) column header. One-line variant
+  // because the copy is short — keeps the bubble tight around the text.
+  const { targetRef: pnlHelpRef, tooltip: pnlHelpNode } = useTooltip(
+    t('Return on equity — uPnL ÷ initial margin.'),
+    { placement: 'top', oneLine: true },
+  )
+
+  // Tabs-overflow chevron is driven by a CSS container query on
+  // TabsHeader (see TabsChevronOverlay). No JS measurement needed.
+
   return (
+    <>
     <Card>
-      <UnderlineTabs activeIndex={activeIndex} onItemClick={(i) => onTabChange(tabOrder[i])}>
-        <UnderlineTab>
-          {t('Positions')} ({positions.length})
-        </UnderlineTab>
-        <UnderlineTab>
-          {t('Open Orders')} ({openOrders.length})
-        </UnderlineTab>
-        <UnderlineTab>{t('Order History')}</UnderlineTab>
-        <UnderlineTab>
-          {t('Trade History')} ({tradeHistory.length})
-        </UnderlineTab>
-        <UnderlineTab>
-          {t('Transaction History')} ({transactionHistory.length})
-        </UnderlineTab>
-      </UnderlineTabs>
+      <TabsHeader>
+        <TabsLeft>
+          <UnderlineTabs
+            activeIndex={activeIndex}
+            onItemClick={(i) => onTabChange(tabOrder[i])}
+            noBorder
+          >
+            <UnderlineTab>
+              {t('Positions')} ({positions.length})
+            </UnderlineTab>
+            <UnderlineTab>
+              {t('Open Orders')} ({openOrders.length})
+            </UnderlineTab>
+            <UnderlineTab>
+              {t('Order History')} ({orderHistory.length})
+            </UnderlineTab>
+            <UnderlineTab>
+              {t('Trade History')} ({tradeHistory.length})
+            </UnderlineTab>
+            <UnderlineTab>
+              {t('Transaction History')} ({transactionHistory.length})
+            </UnderlineTab>
+          </UnderlineTabs>
+          <TabsChevronOverlay data-overlay aria-hidden>
+            <ChevronForwardGlyph />
+          </TabsChevronOverlay>
+        </TabsLeft>
+        {tab === 'positions' && (
+          <HeaderRightControls>
+            <HideOtherChip
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                // Forward to the controlled state directly. Earlier we
+                // relied solely on the implicit `<label><input>` click
+                // association, but a sibling absolutely-positioned
+                // overlay (TabsChevronOverlay) was visually adjacent to
+                // the chip and intercepted some pointer events on
+                // narrow containers — even though it set
+                // `pointer-events: none`. Hooking the toggle here makes
+                // the label click work regardless of DOM stacking.
+                // PAN-11854.
+                if ((e.target as HTMLElement).tagName === 'INPUT') return
+                e.preventDefault()
+                onHideOtherSymbolsChange?.(!hideOtherSymbols)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                  e.preventDefault()
+                  onHideOtherSymbolsChange?.(!hideOtherSymbols)
+                }
+              }}
+            >
+              <Checkbox
+                scale="sm"
+                checked={hideOtherSymbols}
+                onChange={(e) => onHideOtherSymbolsChange?.(e.target.checked)}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span>{t('Hide Other Symbols')}</span>
+            </HideOtherChip>
+            {onCloseAll && (
+              <CloseAllBtn
+                type="button"
+                onClick={() => setCloseAllConfirmOpen(true)}
+                disabled={positions.length === 0}
+              >
+                {t('Close All')}
+              </CloseAllBtn>
+            )}
+          </HeaderRightControls>
+        )}
+      </TabsHeader>
 
       <Body>
         {tab === 'positions' &&
@@ -420,30 +1176,40 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
               </Text>
             </Empty>
           ) : (
-            <PositionsTable>
-              <Th>{t('Symbol')}</Th>
-              <Th>{t('Size')}</Th>
-              <Th>{t('Entry')}</Th>
-              <Th>{t('Mark')}</Th>
-              <Th>{t('Lev')}</Th>
-              <Th>{t('Liq')}</Th>
-              <Th>{t('uPnL')}</Th>
-              <Th>{t('TP/SL')}</Th>
-              <Th />
-              {positions.map((p) => (
-                <RowGroup key={p.id}>
-                  <PositionTableRow
-                    p={p}
-                    useMarkPriceForSymbol={useMarkPriceForSymbol}
-                    computeLiqPrice={computeLiqPrice}
-                    onClose={onClosePosition}
-                    onEditTpSl={onEditTpSl}
-                    closingSymbol={closingSymbol}
-                    t={t}
-                  />
-                </RowGroup>
-              ))}
-            </PositionsTable>
+            <>
+              <PositionsTable>
+                <Th>{t('Symbol')}</Th>
+                <Th>{t('Size')}</Th>
+                <Th>{t('Entry Price')}</Th>
+                <Th>{t('Mark Price')}</Th>
+                <Th>{t('Margin')}</Th>
+                <Th>{t('Liq Price')}</Th>
+                <Th>
+                  {t('PNL (ROE%)')}
+                  <HeaderHelp ref={pnlHelpRef} aria-label={t('PNL ROE% explanation')}>
+                    <HelpGlyph />
+                  </HeaderHelp>
+                  {pnlHelpNode}
+                </Th>
+                <Th>{t('TP/SL')}</Th>
+                <Th />
+                {positions.map((p) => (
+                  <RowGroup key={p.id}>
+                    <PositionTableRow
+                      p={p}
+                      useMarkPriceForSymbol={useMarkPriceForSymbol}
+                      computeLiqPrice={computeLiqPrice}
+                      onClose={onClosePosition}
+                      onEditTpSl={onEditTpSl}
+                      onShare={onSharePnl}
+                      closingSymbol={closingSymbol}
+                      sizeUnit={sizeUnit}
+                      t={t}
+                    />
+                  </RowGroup>
+                ))}
+              </PositionsTable>
+            </>
           ))}
 
         {tab === 'orders' &&
@@ -493,13 +1259,44 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
             </OrdersTable>
           ))}
 
-        {tab === 'history' && (
-          <Empty>
-            <Text fontSize="12px" color="textSubtle">
-              {t('Order history coming soon')}
-            </Text>
-          </Empty>
-        )}
+        {tab === 'history' &&
+          (orderHistory.length === 0 ? (
+            <Empty>
+              <Text fontSize="12px" color="textSubtle">
+                {t('No order history')}
+              </Text>
+            </Empty>
+          ) : (
+            <OrderHistoryTable>
+              <Th>{t('Time')}</Th>
+              <Th>{t('Symbol')}</Th>
+              <Th>{t('Side')}</Th>
+              <Th>{t('Type')}</Th>
+              <Th>{t('Price')}</Th>
+              <Th>{t('Size')}</Th>
+              <Th>{t('Filled')}</Th>
+              <Th>{t('Status')}</Th>
+              {orderHistory.map((o) => (
+                <RowGroup key={o.id}>
+                  <Td as="div">
+                    <StackedTime>
+                      <span>{o.date}</span>
+                      <span>{o.time}</span>
+                    </StackedTime>
+                  </Td>
+                  <Td bold>{o.symbol}</Td>
+                  <Td style={{ color: o.side === 'BUY' ? theme.colors.success : theme.colors.failure }}>
+                    {o.side}
+                  </Td>
+                  <Td>{o.type}</Td>
+                  <Td>{o.price}</Td>
+                  <Td>{o.origQty}</Td>
+                  <Td>{o.executedQty}</Td>
+                  <Td>{o.status}</Td>
+                </RowGroup>
+              ))}
+            </OrderHistoryTable>
+          ))}
 
         {tab === 'trades' &&
           (tradeHistory.length === 0 ? (
@@ -598,5 +1395,817 @@ export const PositionsPanel: React.FC<PositionsPanelProps> = ({
           ))}
       </Body>
     </Card>
+
+    <ModalV2
+      isOpen={closeAllConfirmOpen}
+      onDismiss={() => setCloseAllConfirmOpen(false)}
+      closeOnOverlayClick
+    >
+      <Modal
+        title=""
+        hideCloseButton
+        headerPadding="0px"
+        headerBorderColor="transparent"
+        bodyPadding="32px 24px 24px"
+        minHeight="0px"
+        onDismiss={() => setCloseAllConfirmOpen(false)}
+      >
+        <Flex flexDirection="column" alignItems="center" style={{ gap: 24, minWidth: 360, maxWidth: 420 }}>
+          <WarningGlow aria-hidden>
+            <WarningIcon width="40px" />
+          </WarningGlow>
+          <Text fontSize="16px" textAlign="center" px="8px">
+            {t(
+              'Are you sure you want to cancel all open orders, and close the all %count% position(s) by market orders?',
+              { count: positions.length },
+            )}
+          </Text>
+          <Flex style={{ gap: 12, width: '100%' }}>
+            <Button
+              variant="secondary"
+              scale="md"
+              style={{ flex: 1 }}
+              onClick={() => setCloseAllConfirmOpen(false)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="primary"
+              scale="md"
+              style={{ flex: 1 }}
+              onClick={() => {
+                setCloseAllConfirmOpen(false)
+                onCloseAll?.()
+              }}
+            >
+              {t('Confirm')}
+            </Button>
+          </Flex>
+        </Flex>
+      </Modal>
+    </ModalV2>
+    </>
+  )
+}
+
+/* ──────────────────────────────────────────────────────────────
+ * Mobile variant
+ * ──────────────────────────────────────────────────────────────
+ *
+ * Replaces the four legacy classes from MobilePerpsPage.css:
+ *   `mp-tabs`, `mp-tab`, `mp-filters`, `mp-empty` (+ their helpers)
+ * plus the inline full-page `History` portal that previously lived in
+ * MobilePerpsPage.tsx (~lines 587–792). All visuals are owned by the
+ * widget so consumers don't reach into mp-* class names.
+ */
+
+/** Mobile tab strip — top of the panel, white-active + 2px primary underline. */
+const MobileTabsBar = styled.nav`
+  display: flex;
+  align-items: center;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  padding: 0 12px;
+`
+
+const MobileTabBtn = styled.button<{ $active: boolean }>`
+  border: 0;
+  background: transparent;
+  padding: 12px 8px;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  position: relative;
+  color: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.textSubtle)};
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  &::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: -1px;
+    height: 2px;
+    background: ${({ theme }) => theme.colors.primary};
+    opacity: ${({ $active }) => ($active ? 1 : 0)};
+  }
+`
+
+const MobileTabsSpacer = styled.span`
+  flex: 1;
+`
+
+const MobileIconBtn = styled.button`
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`
+
+const MobileFiltersRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+`
+
+const MobileFiltersSep = styled.span`
+  width: 1px;
+  height: 16px;
+  background: ${({ theme }) => theme.colors.cardBorder};
+`
+
+const MobileInstrumentBtn = styled.button`
+  background: transparent;
+  border: 0;
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+`
+
+const MobileCheckLabel = styled.label`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+`
+
+const MobileEmpty = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 12px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 14px;
+`
+
+/* ── Mobile position / open-order cards ─────────────────────── */
+const MobileList = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const MobileCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  font-variant-numeric: tabular-nums;
+`
+
+const MobileCardHead = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+const MobileCardSymbol = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const MobileCardSide = styled.span<{ $side: 'BUY' | 'SELL' }>`
+  font-size: 12px;
+  font-weight: 500;
+  color: ${({ $side, theme }) => ($side === 'BUY' ? theme.colors.success : theme.colors.failure)};
+`
+
+const MobileCardSpacer = styled.span`
+  flex: 1;
+`
+
+const MobileCardPnl = styled.span<{ $up: boolean }>`
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ $up, theme }) => ($up ? theme.colors.success : theme.colors.failure)};
+`
+
+const MobileCardGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  font-size: 12px;
+`
+
+const MobileCardCell = styled.div`
+  display: flex;
+  justify-content: space-between;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  & > strong {
+    color: ${({ theme }) => theme.colors.text};
+    font-weight: 500;
+  }
+`
+
+const MobileCardActions = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+`
+
+/** Wrapper that strips the desktop card chrome — the mobile page already
+ *  separates this section visually with the tab strip's borders. */
+const MobileRoot = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.colors.card};
+`
+
+/* History portal */
+const HistorySheet = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: ${({ theme }) => theme.colors.card};
+  display: flex;
+  flex-direction: column;
+`
+
+const HistorySheetHeader = styled.header`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  flex-shrink: 0;
+`
+
+const HistorySheetTitle = styled.span`
+  flex: 1;
+  font-weight: 600;
+  font-size: 16px;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const HistorySheetClose = styled.button`
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  cursor: pointer;
+  border-radius: 8px;
+  &:hover {
+    color: ${({ theme }) => theme.colors.text};
+  }
+`
+
+const HistoryTabsBar = styled.nav`
+  display: flex;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  padding: 0 12px;
+  flex-shrink: 0;
+`
+
+const HistoryTabBtn = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: 12px 8px;
+  border: 0;
+  background: transparent;
+  color: ${({ $active, theme }) => ($active ? theme.colors.text : theme.colors.textSubtle)};
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: ${({ $active }) => ($active ? 600 : 400)};
+  cursor: pointer;
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: -1px;
+    height: 2px;
+    background: ${({ theme }) => theme.colors.primary};
+    opacity: ${({ $active }) => ($active ? 1 : 0)};
+  }
+`
+
+const HistoryBody = styled.div`
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+`
+
+const HistoryEmpty = styled.div`
+  text-align: center;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 14px;
+  padding: 48px 0;
+`
+
+const HistoryRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 12px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  gap: 12px;
+`
+
+const HistoryRowMain = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+`
+
+const HistoryRowTitle = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-weight: 600;
+`
+
+const HistoryRowMeta = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-size: 12px;
+`
+
+const HistoryRowAside = styled.div`
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+`
+
+interface MobileTabConfig {
+  key: PositionsPanelTab
+  label: string
+  count?: number
+  emptyText: string
+}
+
+const HISTORY_TABS: { key: PositionsHistoryTab; label: string; emptyKey: string }[] = [
+  { key: 'orders', label: 'Order History', emptyKey: 'No order history yet' },
+  { key: 'trades', label: 'Trade History', emptyKey: 'No trade history yet' },
+  { key: 'tx', label: 'Transactions', emptyKey: 'No transactions yet' },
+]
+
+/**
+ * Renders the History sheet portal — opened from the mobile tab strip's
+ * clock button. Shows the same data already passed via
+ * `orderHistory[]` / `tradeHistory[]` / `transactionHistory[]`,
+ * presented in a narrow stacked layout.
+ */
+const MobileHistorySheet: React.FC<{
+  open: boolean
+  onClose: () => void
+  tab: PositionsHistoryTab
+  onTabChange: (tab: PositionsHistoryTab) => void
+  orderHistory: OrderHistoryRow[]
+  tradeHistory: TradeHistoryRow[]
+  transactionHistory: TransactionHistoryRow[]
+  t: (key: string) => string
+}> = ({ open, onClose, tab, onTabChange, orderHistory, tradeHistory, transactionHistory, t }) => {
+  const theme = useTheme()
+  if (!open || typeof document === 'undefined') return null
+
+  return createPortal(
+    <HistorySheet role="dialog" aria-modal="true" aria-label={t('History')}>
+      <HistorySheetHeader>
+        <HistorySheetTitle>{t('History')}</HistorySheetTitle>
+        <HistorySheetClose type="button" aria-label={t('Close')} onClick={onClose}>
+          <CloseIcon width="20px" aria-hidden="true" />
+        </HistorySheetClose>
+      </HistorySheetHeader>
+
+      <HistoryTabsBar role="tablist">
+        {HISTORY_TABS.map((h) => (
+          <HistoryTabBtn
+            key={h.key}
+            type="button"
+            role="tab"
+            aria-selected={tab === h.key}
+            $active={tab === h.key}
+            onClick={() => onTabChange(h.key)}
+          >
+            {t(h.label)}
+          </HistoryTabBtn>
+        ))}
+      </HistoryTabsBar>
+
+      <HistoryBody>
+        {tab === 'orders' &&
+          (orderHistory.length === 0 ? (
+            <HistoryEmpty>{t('No order history yet')}</HistoryEmpty>
+          ) : (
+            orderHistory.map((o) => (
+              <HistoryRow key={o.id}>
+                <HistoryRowMain>
+                  <HistoryRowTitle>
+                    {o.symbol}{' '}
+                    <span
+                      style={{
+                        color: o.side === 'BUY' ? theme.colors.success : theme.colors.failure,
+                        fontWeight: 400,
+                      }}
+                    >
+                      {o.side === 'BUY' ? t('Buy') : t('Sell')}
+                    </span>
+                  </HistoryRowTitle>
+                  <HistoryRowMeta>
+                    {o.date} {o.time}
+                  </HistoryRowMeta>
+                  <HistoryRowMeta>
+                    {o.type} · {o.price} · {o.executedQty}/{o.origQty}
+                  </HistoryRowMeta>
+                </HistoryRowMain>
+                <HistoryRowAside>
+                  <span style={{ color: theme.colors.textSubtle, fontSize: 12 }}>{o.status}</span>
+                </HistoryRowAside>
+              </HistoryRow>
+            ))
+          ))}
+
+        {tab === 'trades' &&
+          (tradeHistory.length === 0 ? (
+            <HistoryEmpty>{t('No trade history yet')}</HistoryEmpty>
+          ) : (
+            tradeHistory.map((tr) => {
+              const profitUp = tr.realizedProfit.startsWith('+')
+              return (
+                <HistoryRow key={tr.id}>
+                  <HistoryRowMain>
+                    <HistoryRowTitle>
+                      {tr.symbol}{' '}
+                      <span
+                        style={{
+                          color: tr.side === 'BUY' ? theme.colors.success : theme.colors.failure,
+                          fontWeight: 400,
+                        }}
+                      >
+                        {tr.side === 'BUY' ? t('Buy') : t('Sell')}
+                      </span>
+                    </HistoryRowTitle>
+                    <HistoryRowMeta>
+                      {tr.date} {tr.time}
+                    </HistoryRowMeta>
+                    <HistoryRowMeta>
+                      {tr.price} · {tr.quantity} · {t('fee')} {tr.fee}
+                    </HistoryRowMeta>
+                  </HistoryRowMain>
+                  <HistoryRowAside>
+                    <span
+                      style={{
+                        color: profitUp ? theme.colors.success : theme.colors.failure,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {tr.realizedProfit}
+                    </span>
+                  </HistoryRowAside>
+                </HistoryRow>
+              )
+            })
+          ))}
+
+        {tab === 'tx' &&
+          (transactionHistory.length === 0 ? (
+            <HistoryEmpty>{t('No transactions yet')}</HistoryEmpty>
+          ) : (
+            transactionHistory.map((x) => {
+              const positive = x.amount.startsWith('+')
+              return (
+                <HistoryRow key={x.id}>
+                  <HistoryRowMain>
+                    <HistoryRowTitle>{x.type}</HistoryRowTitle>
+                    <HistoryRowMeta>
+                      {x.date} {x.time}
+                    </HistoryRowMeta>
+                  </HistoryRowMain>
+                  <HistoryRowAside>
+                    <span
+                      style={{
+                        color: positive ? theme.colors.success : theme.colors.failure,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {x.amount}
+                    </span>
+                    <HistoryRowMeta>{x.symbol}</HistoryRowMeta>
+                  </HistoryRowAside>
+                </HistoryRow>
+              )
+            })
+          ))}
+      </HistoryBody>
+    </HistorySheet>,
+    document.body,
+  )
+}
+
+/**
+ * Single position card — split out so `useMarkPriceForSymbol` can be
+ * called at a stable hook index per render (same reason as
+ * `PositionTableRow` for the desktop table).
+ */
+const MobilePositionCard: React.FC<{
+  p: PositionRow
+  useMarkPriceForSymbol?: PositionsPanelProps['useMarkPriceForSymbol']
+  computeLiqPrice?: PositionsPanelProps['computeLiqPrice']
+  onClose: (p: PositionRow) => void
+  onEditTpSl: (p: PositionRow, markPrice: number) => void
+  closingSymbol?: string | null
+  sizeUnit: 'BASE' | 'QUOTE'
+  t: (key: string) => string
+}> = ({ p, useMarkPriceForSymbol, computeLiqPrice, onClose, onEditTpSl, closingSymbol, sizeUnit, t }) => {
+  const markPrice = useMarkPriceForSymbol?.(p.symbol)
+  const side: 'BUY' | 'SELL' = p.positionAmt >= 0 ? 'BUY' : 'SELL'
+
+  const livePnl =
+    Number.isFinite(markPrice) && Number.isFinite(p.entryPrice)
+      ? (markPrice! - p.entryPrice) * p.positionAmt
+      : Number(p.unrealizedProfit)
+
+  const liq =
+    Number.isFinite(p.entryPrice) && Number.isFinite(p.leverage)
+      ? computeLiqPrice?.({ side, entryPrice: p.entryPrice, leverage: p.leverage })
+      : undefined
+
+  const isClosing = closingSymbol === p.symbol
+  // Size unit follows the desktop row: QUOTE shows USDT notional
+  // (|base| × mark, fallback entry); BASE shows raw base-asset qty.
+  const sizeBase = Math.abs(p.positionAmt)
+  const entryNotional = Number.isFinite(p.entryPrice) ? sizeBase * p.entryPrice : NaN
+  const markNotional = Number.isFinite(markPrice) ? sizeBase * (markPrice as number) : NaN
+  const sizeNotional = Number.isFinite(markNotional) ? markNotional : entryNotional
+  const sizeBaseAsset = p.symbol.replace(/USDT$|USDC$|USD1$/i, '') || p.symbol
+  const sizeQuoteAsset = p.symbol.endsWith('USDC') ? 'USDC' : p.symbol.endsWith('USD1') ? 'USD1' : 'USDT'
+  const sizeIsBase = sizeUnit === 'BASE'
+  const sizeValue = sizeIsBase ? sizeBase : sizeNotional
+  const sizeLabel = sizeIsBase ? sizeBaseAsset : sizeQuoteAsset
+  const sizeDecimals = sizeIsBase ? 4 : 2
+
+  return (
+    <MobileCard>
+      <MobileCardHead>
+        <MobileCardSymbol>{p.symbol}</MobileCardSymbol>
+        <MobileCardSide $side={side}>
+          {side === 'BUY' ? t('Long') : t('Short')} · {p.leverage}x
+          {p.marginType ? ` · ${p.marginType === 'ISOLATED' ? t('Isolated') : t('Cross')}` : ''}
+        </MobileCardSide>
+        <MobileCardSpacer />
+        <MobileCardPnl $up={livePnl >= 0}>
+          {Number.isFinite(livePnl) ? `${livePnl >= 0 ? '+' : ''}${livePnl.toFixed(4)}` : '—'}
+        </MobileCardPnl>
+      </MobileCardHead>
+      <MobileCardGrid>
+        <MobileCardCell>
+          <span>{t('Size')}</span>
+          <strong>
+            {Number.isFinite(sizeValue) ? `${sizeValue.toFixed(sizeDecimals)} ${sizeLabel}` : '—'}
+          </strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('Entry')}</span>
+          <strong>{Number.isFinite(p.entryPrice) ? p.entryPrice.toFixed(2) : '—'}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('Mark')}</span>
+          <strong>
+            {markPrice !== undefined && Number.isFinite(markPrice) ? markPrice.toFixed(2) : '—'}
+          </strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('Liq')}</span>
+          <strong>{liq ? liq.toFixed(2) : '—'}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('TP')}</span>
+          <strong>{p.tpStopPrice ? fmtStopPrice(p.tpStopPrice) : '—'}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('SL')}</span>
+          <strong>{p.slStopPrice ? fmtStopPrice(p.slStopPrice) : '—'}</strong>
+        </MobileCardCell>
+      </MobileCardGrid>
+      <MobileCardActions>
+        <Button
+          scale="xs"
+          variant="tertiary"
+          onClick={() => onEditTpSl(p, markPrice ?? NaN)}
+          disabled={!Number.isFinite(p.positionAmt) || p.positionAmt === 0}
+        >
+          {t('TP/SL')}
+        </Button>
+        <Button
+          scale="xs"
+          variant="secondary"
+          onClick={() => onClose(p)}
+          disabled={isClosing || !Number.isFinite(p.positionAmt) || p.positionAmt === 0}
+          isLoading={isClosing}
+        >
+          {t('Close')}
+        </Button>
+      </MobileCardActions>
+    </MobileCard>
+  )
+}
+
+const MobileOrderCard: React.FC<{
+  o: OpenOrderRow
+  onCancel: (o: OpenOrderRow) => void
+  cancellingOrderId?: OpenOrderRow['id'] | null
+  t: (key: string) => string
+}> = ({ o, onCancel, cancellingOrderId, t }) => {
+  const isCancelling = cancellingOrderId === o.id
+  return (
+    <MobileCard>
+      <MobileCardHead>
+        <MobileCardSymbol>{o.symbol}</MobileCardSymbol>
+        <MobileCardSide $side={o.side}>
+          {o.side === 'BUY' ? t('Buy') : t('Sell')} · {o.type}
+        </MobileCardSide>
+        <MobileCardSpacer />
+        <span style={{ fontSize: 12, color: 'inherit' }}>{o.status}</span>
+      </MobileCardHead>
+      <MobileCardGrid>
+        <MobileCardCell>
+          <span>{t('Price')}</span>
+          <strong>{o.price}</strong>
+        </MobileCardCell>
+        <MobileCardCell>
+          <span>{t('Filled')}</span>
+          <strong>
+            {o.executedQty}/{o.origQty}
+          </strong>
+        </MobileCardCell>
+      </MobileCardGrid>
+      <MobileCardActions>
+        <Button
+          scale="xs"
+          variant="secondary"
+          disabled={isCancelling}
+          isLoading={isCancelling}
+          onClick={() => onCancel(o)}
+        >
+          {t('Cancel')}
+        </Button>
+      </MobileCardActions>
+    </MobileCard>
+  )
+}
+
+const MobilePositionsPanel: React.FC<PositionsPanelProps> = ({
+  tab,
+  onTabChange,
+  positions,
+  openOrders,
+  orderHistory = [],
+  tradeHistory = [],
+  transactionHistory = [],
+  onClosePosition,
+  onEditTpSl,
+  onCancelOrder,
+  useMarkPriceForSymbol,
+  computeLiqPrice,
+  closingSymbol,
+  cancellingOrderId,
+  positionsCount,
+  hideOtherSymbols = false,
+  onHideOtherSymbolsChange,
+  instrumentFilterLabel,
+  onInstrumentFilterClick,
+  historyOpen = false,
+  onHistoryToggle,
+  historyTab = 'orders',
+  onHistoryTabChange,
+  sizeUnit = 'QUOTE',
+  t = identity,
+}) => {
+  // Mobile tab order — differs from desktop. Open Orders / Positions /
+  // Assets / TWAP. Desktop tabs (history/trades/transactions) live in
+  // the History sheet on mobile.
+  const tabs: MobileTabConfig[] = [
+    {
+      key: 'orders',
+      label: t('Open Orders'),
+      count: openOrders.length,
+      emptyText: t('No open order found'),
+    },
+    {
+      key: 'positions',
+      label: t('Positions'),
+      count: positionsCount ?? positions.length,
+      emptyText: t('No open positions'),
+    },
+    { key: 'assets', label: t('Assets'), emptyText: t('No assets to display') },
+    { key: 'twap', label: t('TWAP'), emptyText: t('No TWAP orders') },
+  ]
+
+  const active = tabs.find((x) => x.key === tab) ?? tabs[0]
+
+  const handleTabClick = (key: PositionsPanelTab) => {
+    if (key !== tab) onTabChange(key)
+  }
+
+  return (
+    <MobileRoot>
+      <MobileTabsBar role="tablist">
+        {tabs.map((c) => (
+          <MobileTabBtn
+            key={c.key}
+            type="button"
+            role="tab"
+            aria-selected={c.key === tab}
+            $active={c.key === tab}
+            onClick={() => handleTabClick(c.key)}
+          >
+            {c.label}
+            {typeof c.count === 'number' && c.count > 0 ? ` (${c.count})` : ''}
+          </MobileTabBtn>
+        ))}
+        <MobileTabsSpacer />
+        <MobileIconBtn
+          type="button"
+          aria-label={t('History')}
+          onClick={() => onHistoryToggle?.(true)}
+        >
+          <HistoryIcon width="20px" aria-hidden="true" />
+        </MobileIconBtn>
+      </MobileTabsBar>
+
+      <MobileFiltersRow>
+        <MobileInstrumentBtn type="button" onClick={onInstrumentFilterClick}>
+          {instrumentFilterLabel ?? t('All instruments')} <ChevronDownIcon width="14px" aria-hidden="true" />
+        </MobileInstrumentBtn>
+        <MobileFiltersSep />
+        <MobileCheckLabel>
+          <input
+            type="checkbox"
+            checked={hideOtherSymbols}
+            onChange={(e) => onHideOtherSymbolsChange?.(e.target.checked)}
+          />
+          <span>{t('Hide other symbols')}</span>
+        </MobileCheckLabel>
+      </MobileFiltersRow>
+
+      {/* Body: render rows when data exists for the active tab; fall
+       *  back to the tab's empty-state text otherwise. Assets / TWAP
+       *  data isn't surfaced through this widget yet — they always
+       *  render the empty state. */}
+      {tab === 'positions' && positions.length > 0 ? (
+        <MobileList>
+          {positions.map((p) => (
+            <MobilePositionCard
+              key={p.id}
+              p={p}
+              useMarkPriceForSymbol={useMarkPriceForSymbol}
+              computeLiqPrice={computeLiqPrice}
+              onClose={onClosePosition}
+              onEditTpSl={onEditTpSl}
+              closingSymbol={closingSymbol}
+              sizeUnit={sizeUnit}
+              t={t}
+            />
+          ))}
+        </MobileList>
+      ) : tab === 'orders' && openOrders.length > 0 ? (
+        <MobileList>
+          {openOrders.map((o) => (
+            <MobileOrderCard
+              key={o.id}
+              o={o}
+              onCancel={onCancelOrder}
+              cancellingOrderId={cancellingOrderId}
+              t={t}
+            />
+          ))}
+        </MobileList>
+      ) : (
+        <MobileEmpty>{active.emptyText}</MobileEmpty>
+      )}
+
+      <MobileHistorySheet
+        open={historyOpen}
+        onClose={() => onHistoryToggle?.(false)}
+        tab={historyTab}
+        onTabChange={(next) => onHistoryTabChange?.(next)}
+        orderHistory={orderHistory}
+        tradeHistory={tradeHistory}
+        transactionHistory={transactionHistory}
+        t={t}
+      />
+    </MobileRoot>
   )
 }

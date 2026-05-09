@@ -1,9 +1,9 @@
-import React from 'react'
-import styled from 'styled-components'
+import React, { useEffect, useRef, useState } from 'react'
+import { keyframes, styled } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Text } from '../primitives/Text'
-import { AddIcon, HelpIcon, WalletFilledIcon } from '../primitives/Icons'
+import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel } from './primitives'
 
 /**
@@ -29,10 +29,54 @@ export interface SimpleBetPanelProps {
   // ── Controlled draft ─────────────────────────────────────
   bet: string
   onBetChange: (next: string) => void
+  /**
+   * Inline validation message rendered under the bet input — typically
+   * the consumer's "Min: 4.25 USDT" hint when the entered bet would
+   * floor to a sub-lot-size qty. Suppresses naturally when omitted /
+   * empty string. Pair with `canSubmit={false}` so UP/DOWN are also
+   * disabled while the message is showing.
+   */
+  betError?: string
   leverage: number
+  /**
+   * Fired once per user gesture: a click on the bar, a drag-release on
+   * the slider, a keyboard arrow press, a preset-tab click, or a custom
+   * input edit. While the user is dragging the thumb, this is NOT
+   * fired — only the drop commits — so the consumer's signed
+   * `/fapi/v3/leverage` call runs once per drag, not once per tick.
+   */
   onLeverageChange: (next: number) => void
+  /**
+   * When true, the slider + preset tabs + custom input are all disabled
+   * to prevent overlapping `/fapi/v3/leverage` calls. The consumer flips
+   * this on while a leverage commit is in flight (PAN-11823).
+   */
+  isApplyingLeverage?: boolean
+  /**
+   * Per-symbol max leverage. Aster's `/fapi/v1/leverageBracket` defines
+   * tier caps per market, so this must be configurable. Defaults to the
+   * historical 1001 to keep the original story working.
+   */
+  maxLeverage?: number
+  /**
+   * Preset leverage chips below the slider. Default is the original
+   * [50, 250, 500, 1001] for max=1001; consumers passing a smaller max
+   * should also pass scaled presets (e.g. [10, 25, 50, 100] for max=100).
+   */
+  presets?: readonly number[]
   quoteAsset: string
   onQuoteAssetClick?: () => void
+  /**
+   * Optional list of denomination choices for the bet input — when
+   * provided with more than one entry, clicking the chip opens a
+   * dropdown rather than just firing `onQuoteAssetClick`. Use this to
+   * let the user denominate their bet in either the quote asset (USDT)
+   * or the base asset (BTC). The currently-selected `code` should match
+   * `quoteAsset`.
+   */
+  assetOptions?: readonly { code: string; logoUrl?: string; color?: string }[]
+  /** Fired when the user picks a different denomination from the dropdown. */
+  onAssetChange?: (next: string) => void
 
   // ── Fund display + actions ───────────────────────────────
   fundBalanceText: string
@@ -43,7 +87,8 @@ export interface SimpleBetPanelProps {
   estimatedEntry: string
   liqIfLong: string
   marginRequired: string
-  openingFee: string
+  /** Pre-formatted opening fee. Omit to hide the row entirely. */
+  openingFee?: string
 
   // ── CTA ──────────────────────────────────────────────────
   canSubmit: boolean
@@ -55,41 +100,83 @@ export interface SimpleBetPanelProps {
   onDeposit?: () => void
   onWithdraw?: () => void
 
+  /**
+   * When set, the Deposit/Withdraw row is replaced with a single
+   * full-width primary button rendering this label. The PnL value also
+   * dims to textDisabled. Pass an i18n-translated string from the
+   * consumer.
+   */
+  connectWalletLabel?: string
+  onConnectWallet?: () => void
+
   unrealizedPnl: string
 }
 
-const PRESETS = [50, 250, 500, 1001] as const
-const MAX_LEVERAGE = 1001
+const DEFAULT_PRESETS = [50, 250, 500, 1001] as const
+const DEFAULT_MAX_LEVERAGE = 1001
 
-type Zone = 'safe' | 'warn' | 'danger'
+type Zone = 'safe' | 'caution' | 'warn' | 'danger'
 
-const zoneFromLeverage = (lev: number): Zone =>
-  lev <= 50 ? 'safe' : lev <= 250 ? 'warn' : 'danger'
+/**
+ * Zones now use absolute leverage thresholds (per Figma spec) rather
+ * than ratios of maxLeverage. A 100×-cap symbol just won't reach the
+ * higher tiers — caution still kicks in at 25× regardless.
+ *   0–24x   → safe      (positive green)
+ *   25–99x  → caution   (primary teal)
+ *   100–499 → warn      (warning amber)
+ *   500x+   → danger    (destructive pink)
+ */
+const zoneFromLeverage = (lev: number): Zone => {
+  if (lev <= 24) return 'safe'
+  if (lev <= 99) return 'caution'
+  if (lev <= 499) return 'warn'
+  return 'danger'
+}
+const isDegen = (lev: number) => lev >= 500
+const isDouble = (lev: number) => lev >= 100
 
 const zoneLabel = (z: Zone) =>
-  z === 'safe' ? 'Safe zone' : z === 'warn' ? 'Caution' : 'Danger zone'
+  z === 'safe'
+    ? 'Gentle leverage'
+    : z === 'caution'
+      ? 'Amplified risk'
+      : z === 'warn'
+        ? 'High leverage'
+        : 'High-intensity leverage'
+
+const zoneEmoji = (z: Zone) =>
+  z === 'safe' ? '🌿' : z === 'caution' ? '❗' : z === 'warn' ? '🔥' : '🔥'
+
+const zoneTooltip = (z: Zone) =>
+  z === 'safe'
+    ? "A good place to start. You'll feel the market without getting rekt."
+    : z === 'caution'
+      ? 'Moves against you are magnified. Keep an eye on liquidation price.'
+      : z === 'warn'
+        ? 'Liquidation triggers around a 1% move. Set a stop loss.'
+        : '1% move against you liquidates. Only risk what you can afford to lose.'
 
 // Branded UP/DOWN arrows — kept inline because there's no 1:1 primitive.
 const UpArrow: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 4l-7 7h4v9h6v-9h4z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M10.9629 8.57864L6.79069 12.7509C6.58302 12.9586 6.33844 13.0634 6.05694 13.0654C5.77544 13.0674 5.5251 12.9628 5.30594 12.7516C5.1026 12.5403 5.00194 12.2939 5.00394 12.0124C5.00594 11.7309 5.1111 11.4861 5.31944 11.2781L11.2714 5.33339C11.3736 5.23139 11.4873 5.15456 11.6124 5.10289C11.7376 5.05122 11.8683 5.02539 12.0044 5.02539C12.1406 5.02539 12.2713 5.05122 12.3964 5.10289C12.5216 5.15456 12.6319 5.22797 12.7272 5.32314L18.6829 11.2791C18.8983 11.4945 19.0059 11.7367 19.0059 12.0059C19.0059 12.2751 18.9023 12.5153 18.6949 12.7266C18.4758 12.9378 18.225 13.0434 17.9427 13.0434C17.6604 13.0434 17.4164 12.9378 17.2107 12.7266L13.0379 8.57864V18.3664C13.0379 18.6571 12.9383 18.9025 12.7389 19.1026C12.5394 19.303 12.295 19.4031 12.0057 19.4031C11.7164 19.4031 11.4702 19.303 11.2672 19.1026C11.0644 18.9025 10.9629 18.6571 10.9629 18.3664V8.57864Z"
+      fill="currentColor"
+    />
   </svg>
 )
 const DownArrow: React.FC = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 20l7-7h-4V4h-6v9H5z" />
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M10.9997 5V16.17L6.11973 11.29C5.72973 10.9 5.08973 10.9 4.69973 11.29C4.30973 11.68 4.30973 12.31 4.69973 12.7L11.2897 19.29C11.6797 19.68 12.3097 19.68 12.6997 19.29L19.2897 12.7C19.6797 12.31 19.6797 11.68 19.2897 11.29C18.8997 10.9 18.2697 10.9 17.8797 11.29L12.9997 16.17V5C12.9997 4.45 12.5497 4 11.9997 4C11.4497 4 10.9997 4.45 10.9997 5Z"
+      fill="currentColor"
+    />
   </svg>
 )
-const TriangleUp: React.FC = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-    <path d="M6 2l5 8H1z" />
-  </svg>
-)
-
 const InfoCircleGlyph: React.FC = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ aspectRatio: '1 / 1' }}>
     <path
-      d="M7.99636 11.2598C8.18224 11.2598 8.3393 11.1966 8.46752 11.0702C8.59563 10.9436 8.65969 10.7869 8.65969 10.6V7.85984C8.65969 7.67284 8.5968 7.51612 8.47102 7.38967C8.34524 7.26323 8.18936 7.20001 8.00336 7.20001C7.81747 7.20001 7.66041 7.26323 7.53219 7.38967C7.40408 7.51612 7.34002 7.67284 7.34002 7.85984V10.6C7.34002 10.7869 7.40291 10.9436 7.52869 11.0702C7.65447 11.1966 7.81036 11.2598 7.99636 11.2598ZM7.99636 6.07968C8.18791 6.07968 8.34969 6.0149 8.48169 5.88534C8.61358 5.75567 8.67952 5.59506 8.67952 5.40351C8.67952 5.21195 8.61474 5.05018 8.48519 4.91818C8.35552 4.78629 8.19491 4.72034 8.00336 4.72034C7.8118 4.72034 7.65002 4.78512 7.51802 4.91467C7.38613 5.04434 7.32019 5.20495 7.32019 5.39651C7.32019 5.58806 7.38497 5.74984 7.51452 5.88184C7.64419 6.01373 7.8048 6.07968 7.99636 6.07968ZM8.00452 14.5355C7.10241 14.5355 6.25452 14.3654 5.46086 14.0252C4.66708 13.685 3.97263 13.2173 3.37752 12.6223C2.78252 12.0272 2.31491 11.3331 1.97469 10.5398C1.63447 9.74662 1.46436 8.89745 1.46436 7.99234C1.46436 7.08734 1.63447 6.24079 1.97469 5.45267C2.31491 4.66445 2.78252 3.97279 3.37752 3.37767C3.97263 2.78267 4.6668 2.31506 5.46002 1.97484C6.25324 1.63462 7.10241 1.46451 8.00752 1.46451C8.91252 1.46451 9.75908 1.63462 10.5472 1.97484C11.3354 2.31506 12.0271 2.78267 12.6222 3.37767C13.2172 3.97279 13.6848 4.66567 14.025 5.45634C14.3652 6.24701 14.5354 7.09334 14.5354 7.99534C14.5354 8.89745 14.3652 9.74534 14.025 10.539C13.6848 11.3328 13.2172 12.0272 12.6222 12.6223C12.0271 13.2173 11.3342 13.685 10.5435 14.0252C9.75286 14.3654 8.90652 14.5355 8.00452 14.5355ZM7.99986 13.1522C9.43363 13.1522 10.6508 12.652 11.6514 11.6515C12.6518 10.651 13.152 9.43379 13.152 8.00001C13.152 6.56623 12.6518 5.34906 11.6514 4.34851C10.6508 3.34806 9.43363 2.84784 7.99986 2.84784C6.56608 2.84784 5.34891 3.34806 4.34836 4.34851C3.34791 5.34906 2.84769 6.56623 2.84769 8.00001C2.84769 9.43379 3.34791 10.651 4.34836 11.6515C5.34891 12.652 6.56608 13.1522 7.99986 13.1522Z"
+      d="M7.99636 11.2602C8.18224 11.2602 8.3393 11.197 8.46752 11.0705C8.59563 10.944 8.65969 10.7872 8.65969 10.6003V7.86018C8.65969 7.67318 8.5968 7.51645 8.47102 7.39001C8.34524 7.26357 8.18936 7.20034 8.00336 7.20034C7.81747 7.20034 7.66041 7.26357 7.53219 7.39001C7.40408 7.51645 7.34002 7.67318 7.34002 7.86018V10.6003C7.34002 10.7872 7.40291 10.944 7.52869 11.0705C7.65447 11.197 7.81036 11.2602 7.99636 11.2602ZM7.99636 6.08001C8.18791 6.08001 8.34969 6.01523 8.48169 5.88568C8.61358 5.75601 8.67952 5.5954 8.67952 5.40384C8.67952 5.21229 8.61474 5.05051 8.48519 4.91851C8.35552 4.78662 8.19491 4.72068 8.00336 4.72068C7.8118 4.72068 7.65002 4.78546 7.51802 4.91501C7.38613 5.04468 7.32019 5.20529 7.32019 5.39684C7.32019 5.5884 7.38497 5.75018 7.51452 5.88218C7.64419 6.01407 7.8048 6.08001 7.99636 6.08001ZM8.00452 14.5358C7.10241 14.5358 6.25452 14.3657 5.46086 14.0255C4.66708 13.6853 3.97263 13.2177 3.37752 12.6227C2.78252 12.0276 2.31491 11.3334 1.97469 10.5402C1.63447 9.74696 1.46436 8.89779 1.46436 7.99268C1.46436 7.08768 1.63447 6.24112 1.97469 5.45301C2.31491 4.66479 2.78252 3.97312 3.37752 3.37801C3.97263 2.78301 4.6668 2.3154 5.46002 1.97518C6.25324 1.63495 7.10241 1.46484 8.00752 1.46484C8.91252 1.46484 9.75908 1.63495 10.5472 1.97518C11.3354 2.3154 12.0271 2.78301 12.6222 3.37801C13.2172 3.97312 13.6848 4.66601 14.025 5.45668C14.3652 6.24734 14.5354 7.09368 14.5354 7.99568C14.5354 8.89779 14.3652 9.74568 14.025 10.5393C13.6848 11.3331 13.2172 12.0276 12.6222 12.6227C12.0271 13.2177 11.3342 13.6853 10.5435 14.0255C9.75286 14.3657 8.90652 14.5358 8.00452 14.5358ZM7.99986 13.1525C9.43363 13.1525 10.6508 12.6523 11.6514 11.6518C12.6518 10.6513 13.152 9.43412 13.152 8.00034C13.152 6.56657 12.6518 5.3494 11.6514 4.34884C10.6508 3.3484 9.43363 2.84818 7.99986 2.84818C6.56608 2.84818 5.34891 3.3484 4.34836 4.34884C3.34791 5.3494 2.84769 6.56657 2.84769 8.00034C2.84769 9.43412 3.34791 10.6513 4.34836 11.6518C5.34891 12.6523 6.56608 13.1525 7.99986 13.1525Z"
       fill="currentColor"
     />
   </svg>
@@ -130,118 +217,92 @@ const Root = styled(PerpsPanel)`
   flex-shrink: 0;
   flex-direction: column;
   align-self: stretch;
+  border-radius: 0;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
   background: ${({ theme }) => theme.colors.card};
+  overflow: hidden;
   font-variant-numeric: tabular-nums;
+
   & > div {
     display: flex;
-    padding: 24px;
+    padding: 0;
+    border-radius: 0;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
     flex: 1 0 0;
     align-self: stretch;
     background: ${({ theme }) => theme.colors.card};
+  }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    width: 357px;
+  }
+
+  @media (max-width: 967.98px) {
+    width: auto;
+    align-self: stretch;
+    border-radius: 24px;
+    & > div {
+      flex: 0 0 auto;
+    }
   }
 `
 
 const TopCard = styled.div`
   display: flex;
-  flex: 1 0 0;
+  flex: 0 0 auto;
   flex-direction: column;
   align-self: stretch;
+  padding: 24px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 575.98px) {
+    padding: 16px;
+  }
 `
 
 const UpDownCard = styled.div`
-  display: flex;
-  width: 458px;
+  display: inline-flex;
   flex-direction: column;
-  align-items: flex-start;
   align-self: stretch;
-  border-radius: 24px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  background: ${({ theme }) => theme.colors.cardSecondary};
+  align-items: flex-start;
+  gap: 16px;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
 `
 
 const UpDownCardActions = styled.div`
   display: flex;
+  width: 458px;
+  height: 77px;
+  align-items: center;
   gap: 8px;
   align-self: stretch;
-  padding: 0 16px 16px 16px;
+  padding: 0;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    width: auto;
+    height: 56px;
+  }
+
+  @media (max-width: 967.98px) {
+    width: auto;
+  }
 `
 
 const TopCardInner = styled.div`
   display: flex;
   flex-direction: column;
   align-self: stretch;
-  flex: 1 0 0;
-  justify-content: space-between;
-  gap: 16px;
-`
-
-// Symbol header strip
-const Head = styled(Flex)`
-  padding: 16px 20px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
-`
-
-const HeadLeft = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  font-family: inherit;
-  color: ${({ theme }) => theme.colors.text};
-`
-
-const TokenChip = styled.span`
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: #f7931a;
-  color: #fff;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 700;
-  flex-shrink: 0;
-`
-
-const Pair = styled.span`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  padding: 0 6px;
-`
-
-const HeadRight = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-`
-
-const HeadPrice = styled.span`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  line-height: 1.2;
-`
-
-const HeadPnl = styled.span<{ $positive: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 12px;
-  color: ${({ theme, $positive }) => ($positive ? theme.colors.success : theme.colors.failure)};
+  flex: 0 0 auto;
+  gap: 64px;
 `
 
 // Body
@@ -273,18 +334,14 @@ const PreTitle = styled(Text).attrs({ fontSize: '12px' })`
 // Wallet / fund chip
 const FundChip = styled.button`
   display: flex;
-  padding: 8px;
   align-items: center;
   gap: 4px;
-  border-radius: 12px;
-  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
-  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  background: ${({ theme }) => theme.colors.cardSecondary};
+  padding: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
   font-family: inherit;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textSubtle};
   transition: filter 0.12s;
   &:hover {
     filter: brightness(0.98);
@@ -293,7 +350,7 @@ const FundChip = styled.button`
 
 const FundAmt = styled.span`
   overflow: hidden;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.textSubtle};
   text-align: right;
   text-overflow: ellipsis;
   font-family: Kanit;
@@ -308,7 +365,8 @@ const FundAmt = styled.span`
 `
 
 // Bet input field
-const BetField = styled.div`
+/* eslint-disable no-restricted-syntax -- brand primary, no theme variant */
+const BetField = styled.label`
   display: flex;
   min-width: 296px;
   padding: 16px;
@@ -320,7 +378,15 @@ const BetField = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
   box-shadow: 0 2px 0 -1px rgba(0, 0, 0, 0.06) inset;
+  cursor: text;
+  transition: box-shadow 0.12s;
+  &:focus-within {
+    box-shadow:
+      0 0 0 1px #7645D9,
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
 `
+/* eslint-enable no-restricted-syntax */
 
 const BetFieldRow = styled.div`
   display: flex;
@@ -328,6 +394,15 @@ const BetFieldRow = styled.div`
   justify-content: space-between;
   gap: 8px;
   align-self: stretch;
+`
+
+const BetErrorText = styled.span`
+  align-self: stretch;
+  color: ${({ theme }) => theme.colors.failure};
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  font-feature-settings: 'liga' off;
 `
 
 const BetLabel = styled.span`
@@ -353,7 +428,14 @@ const BetInputWrap = styled.span`
 `
 
 const BetInput = styled.input`
-  width: 90px;
+  /* field-sizing: content lets the input auto-grow to fit the typed
+     value (Chrome/Edge 123+, Safari 17.4+). Without it, the previous
+     fixed 90px width clipped after ~4 digits at 40px. min-width keeps
+     room for the placeholder "0" before any input; max-width clamps
+     it from overflowing the bet field on extreme inputs. */
+  field-sizing: content;
+  min-width: 22px;
+  max-width: 240px;
   border: 0;
   background: transparent;
   color: ${({ theme }) => theme.colors.text};
@@ -376,6 +458,12 @@ const BetInput = styled.input`
     -webkit-appearance: none;
     margin: 0;
   }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    color: ${({ theme }) => theme.colors.textSubtle};
+    font-size: 32px;
+    letter-spacing: -0.32px;
+  }
 `
 
 const BetTokenButton = styled.button`
@@ -392,6 +480,7 @@ const BetTokenButton = styled.button`
   color: ${({ theme }) => theme.colors.text};
 `
 
+// eslint-disable-next-line no-restricted-syntax -- brand SVG illustration + on colored bg, contrast guarantee
 const QuoteIcon = styled.span`
   width: 40px;
   height: 40px;
@@ -404,6 +493,17 @@ const QuoteIcon = styled.span`
   font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
+  overflow: hidden;
+  /* When the chip wraps a consumer-supplied logo image, fit it inside
+     the circle. Without this the raster either overflows or stretches. */
+  & > img,
+  & > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: #fff;
+  }
 `
 
 const QuoteArrowBox = styled.span`
@@ -424,10 +524,69 @@ const QuoteArrowBox = styled.span`
   flex-shrink: 0;
 `
 
-const QuoteSym = styled.span`
+/* Wrapper that anchors the asset-dropdown menu to the chip button. */
+const AssetDropdownAnchor = styled.span`
+  position: relative;
+  display: inline-flex;
+`
+
+const AssetDropdownMenu = styled.div`
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.card};
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+`
+
+const AssetDropdownItem = styled.button<{ $selected?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: ${({ $selected, theme }) => ($selected ? theme.colors.input : 'transparent')};
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
   font-size: 14px;
   font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  &:hover {
+    background: ${({ theme }) => theme.colors.input};
+  }
 `
+
+/* eslint-disable no-restricted-syntax -- brand SVG illustration + on colored bg, contrast guarantee */
+const AssetItemChip = styled.span<{ $color?: string }>`
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: ${({ $color }) => $color ?? '#26a17b'};
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  flex: 0 0 24px;
+  overflow: hidden;
+  & > img,
+  & > svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+`
+/* eslint-enable no-restricted-syntax */
 
 // % shortcut row
 const PctRow = styled(Flex)`
@@ -477,76 +636,117 @@ const LevValue = styled.span`
   font-weight: 600;
   line-height: 120%;
   letter-spacing: -0.4px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    font-size: 32px;
+    letter-spacing: -0.32px;
+  }
 `
 
 const ZonePill = styled.span<{ $zone: Zone }>`
   display: flex;
-  padding: 8px 12px;
+  padding: 2px 5px;
+  justify-content: center;
   align-items: center;
   gap: 4px;
-  border-radius: 16px;
-  border-top: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-right: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-bottom: 2px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  border-left: 1px solid
-    ${({ $zone }) => ($zone === 'safe' ? '#BCEFE2' : $zone === 'warn' ? '#F9D9B8' : '#F5BCD7')};
-  background: ${({ $zone }) =>
-    $zone === 'safe' ? '#EAFBF7' : $zone === 'warn' ? '#FBF2E7' : '#FCE7F1'};
+  border-radius: 999px;
+  background: ${({ $zone, theme }) =>
+    $zone === 'safe'
+      ? theme.colors.success
+      : $zone === 'caution'
+        ? theme.colors.primary
+        : $zone === 'warn'
+          ? theme.colors.warning
+          : theme.colors.failure};
+`
+
+const ZonePillText = styled.span`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.v2Default};
   font-feature-settings: 'liga' off;
   text-overflow: ellipsis;
   font-family: Kanit;
   font-size: 14px;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 150%;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+`
+
+const ZoneTipAnchor = styled.span`
+  display: inline-flex;
+  align-items: center;
+  color: ${({ theme }) => theme.colors.v2Default};
+  cursor: help;
 `
 
 // Hand-rolled leverage slider (the Slider primitive can't do a per-zone
-// gradient fill across the 1..MAX_LEVERAGE range — keeping range input).
+// gradient fill across the 1..maxLeverage range — keeping range input).
 const LevBar = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   align-self: stretch;
   gap: 16px;
-  margin-top: 16px;
+  margin-top: 8px;
 `
 
+/* PCS V1 decorative bubblegum-light gradient flips between modes via the
+   levTrackBg semantic token (light pastel → dark deep-purple). The
+   `::before` fill renders the leverage indicator as a slice of a
+   full-track gradient (sized via `background-size`) — so a 10x leverage
+   shows only the green-end of the gradient and 1001x sweeps through to
+   pink, mirroring Aster's Simple-version slider (PAN-11876). Track stays
+   `overflow: visible` because the LevThumb glyph protrudes above. */
 const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   position: relative;
   height: 21px;
+  flex-shrink: 0;
   align-self: stretch;
   border-radius: 24px;
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
-  background: linear-gradient(140deg, #E5FDFF 0%, #F3EFFF 100%);
-  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.06) inset;
+  background: ${({ theme }) => theme.colors.levTrackBg};
+  box-shadow: ${({ theme }) => theme.shadows.sunkenStrong};
   overflow: visible;
-`
+  cursor: pointer;
+  touch-action: none;
 
-const LevFill = styled.span<{ $fillPct: number; $zone: Zone; $degen?: boolean }>`
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: ${({ $fillPct }) => `${$fillPct}%`};
-  border-radius: 24px 0 0 24px;
-  background: ${({ theme, $zone, $degen }) =>
-    $degen
-      ? 'linear-gradient(90deg, #FAD658 0%, #ED4B9E 100%)'
-      : $zone === 'safe'
-        ? theme.colors.success
-        : $zone === 'warn'
-          ? theme.colors.warning
-          : theme.colors.failure};
-  box-shadow: ${({ $degen }) =>
-    $degen ? '0 2px 0 0 rgba(0, 0, 0, 0.06) inset' : 'none'};
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: ${({ $fillPct }) => Math.max(0, $fillPct)}%;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+    border-top-right-radius: ${({ $fillPct }) => ($fillPct >= 99.5 ? 24 : 0)}px;
+    border-bottom-right-radius: ${({ $fillPct }) => ($fillPct >= 99.5 ? 24 : 0)}px;
+    background: linear-gradient(
+      90deg,
+      ${({ theme }) => theme.colors.success} 0%,
+      ${({ theme }) => theme.colors.primary} 12%,
+      ${({ theme }) => theme.colors.warning} 50%,
+      ${({ theme }) => theme.colors.failure} 100%
+    );
+    background-size: ${({ $fillPct }) =>
+      $fillPct > 0 ? `${(100 / $fillPct) * 100}% 100%` : '0 0'};
+    background-position: left center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    height: 16px;
+  }
 `
 
 const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' | 'triple' }>`
@@ -562,11 +762,13 @@ const LevThumb = styled.span<{ $fillPct: number; $variant: 'single' | 'double' |
     $variant === 'triple' ? '44px' : $variant === 'double' ? '41.455px' : '38.004px'};
   height: ${({ $variant }) =>
     $variant === 'triple' ? '48px' : $variant === 'double' ? '42.549px' : '38.186px'};
+  /* Purely visual — every gesture is captured by the LevTrack pointer
+     handler, which decides whether the user is clicking or dragging. */
+  z-index: 2;
   pointer-events: none;
-  cursor: grab;
-  &:active { cursor: grabbing; }
 `
 
+/* eslint-disable no-restricted-syntax -- brand SVG illustration */
 const GrabberGlyph: React.FC = () => (
   <svg width="38" height="39" viewBox="0 0 38 39" fill="none" aria-hidden="true">
     <ellipse cx="19.0019" cy="19.6397" rx="19.0019" ry="18.5459" fill="#F9AF6C" />
@@ -596,6 +798,7 @@ const GrabberDegenGlyph: React.FC = () => (
     <rect x="21.8184" y="12" width="10.9091" height="10.9094" rx="2" fill="#FAD658" />
   </svg>
 )
+/* eslint-enable no-restricted-syntax */
 
 const LevRangeInput = styled.input`
   position: absolute;
@@ -603,8 +806,10 @@ const LevRangeInput = styled.input`
   width: 100%;
   height: calc(100% + 8px);
   opacity: 0;
-  cursor: pointer;
   margin: 0;
+  /* Mouse/touch is owned by LevTrack's pointer handler — keep this
+     element only for keyboard a11y (screen readers + Tab/arrow keys). */
+  pointer-events: none;
 `
 
 // Leverage tab row (preset values + custom field)
@@ -612,6 +817,8 @@ const LevTabs = styled(Flex)`
   display: flex;
   align-items: center;
   align-self: stretch;
+  gap: 4px;
+  padding: 0;
   border-radius: 16px;
   border: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   background: ${({ theme }) => theme.colors.input};
@@ -634,8 +841,12 @@ const LevTab = styled.button<{ $active: boolean }>`
   font-size: 13px;
   font-weight: ${({ $active }) => ($active ? 600 : 400)};
   cursor: pointer;
-  &:hover {
+  &:hover:not(:disabled) {
     color: ${({ $active, theme }) => ($active ? theme.colors.invertedContrast : theme.colors.text)};
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 `
 
@@ -681,28 +892,42 @@ const LevCustomSuffix = styled.span`
   padding-left: 4px;
 `
 
-// Duration row (static "Perpetual" placeholder — preserves layout)
-const DurationRow = styled(Flex)`
-  align-items: center;
-  justify-content: space-between;
-`
-
-// Stats summary
-const StatsCard = styled.div`
-  margin: 0 20px;
-  background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 16px;
-  overflow: hidden;
+/**
+ * Trade-info card mounts whenever the user has a non-empty bet. Animate
+ * it in instead of popping in — fades from 0 → 1 + slides up 8px so the
+ * arrival reads as a response to typing rather than an abrupt swap.
+ * 240ms / ease-out feels responsive without being slow.
+ */
+const statsListEnter = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 `
 
 const StatsList = styled.div`
   display: flex;
-  padding: 8px 16px 16px 16px;
+  width: 458px;
+  padding: 16px;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
   align-self: stretch;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  animation: ${statsListEnter} 0.24s ease-out;
+
+  @media (max-width: 1199.98px) {
+    width: auto;
+  }
 `
 
 const StatsRow = styled(Flex)`
@@ -729,29 +954,34 @@ const StatsValue = styled.span<{ $danger?: boolean }>`
 `
 
 // UP / DOWN buttons
-const DirectionRow = styled(Flex)`
-  align-self: stretch;
-  gap: 8px;
-`
-
 const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  padding: 8px;
   justify-content: center;
-  gap: 6px;
-  height: 56px;
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  border-bottom-width: 4px;
-  border-radius: 16px;
-  font-family: inherit;
-  font-size: 18px;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
+  border-top: 2px solid rgba(0, 0, 0, 0.2);
+  border-right: 2px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+  border-left: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 24px;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    border-radius: 16px;
+  }
+  font-family: Kanit;
+  font-size: 24px;
+  font-style: normal;
   font-weight: 600;
-  letter-spacing: -0.18px;
-  color: ${({ theme }) => theme.colors.invertedContrast};
+  line-height: 150%;
+  letter-spacing: -0.24px;
+  font-feature-settings: 'liga' off;
+  color: ${({ theme }) => theme.colors.v2Default};
   cursor: pointer;
   transition: filter 0.12s, transform 0.06s;
   background: ${({ theme, $variant }) => ($variant === 'up' ? theme.colors.success : theme.colors.failure)};
+
   &:hover:not(:disabled) {
     filter: brightness(1.08);
   }
@@ -761,8 +991,18 @@ const DirectionButton = styled.button<{ $variant: 'up' | 'down' }>`
   }
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.6;
+    background: ${({ theme }) => theme.colors.backgroundDisabled};
+    color: ${({ theme }) => theme.colors.textDisabled};
+    border-color: transparent;
   }
+`
+
+const DirectionButtonContent = styled.span`
+  display: flex;
+  padding: 0 8px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 `
 
 // Deposit / Withdraw bottom tabs
@@ -772,19 +1012,23 @@ const DwRow = styled(Flex)`
 `
 
 const DwButton = styled(Button)<{ $variant: 'primary' | 'secondary' }>`
-  flex: 1;
-  height: 40px;
+  display: flex;
+  padding: 11px 12px 13px 12px;
+  justify-content: center;
+  align-items: center;
+  flex: 1 0 0;
+  align-self: stretch;
   border: 0;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: 16px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: filter 0.12s;
-  background: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.primary : theme.colors.input)};
+  background: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.primary : theme.colors.tertiary)};
   color: ${({ theme, $variant }) => ($variant === 'primary' ? theme.colors.invertedContrast : theme.colors.primary)};
-  border-bottom-color: ${({ $variant }) => ($variant === 'primary' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)')};
+  border-bottom: 2px solid
+    ${({ $variant }) => ($variant === 'primary' ? 'rgba(0, 0, 0, 0.20)' : 'rgba(0, 0, 0, 0.10)')};
   &:hover {
     filter: brightness(1.08);
   }
@@ -796,52 +1040,186 @@ const Bottom = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-top: 16px;
+  padding: 24px;
   border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    padding: 24px 16px;
+  }
+
+  @media (max-width: 575.98px) {
+    padding: 16px;
+  }
 `
 
 const PnlCard = styled(Flex)`
-  align-self: stretch;
-  align-items: center;
+  display: flex;
+  padding: 16px;
   justify-content: space-between;
-  padding: 12px 14px;
-  background: ${({ theme }) => theme.colors.input};
-  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
-  border-radius: 16px;
+  align-items: center;
+  align-self: stretch;
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 24px;
 `
 
 const PnlLabel = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 14px;
-  font-weight: 600;
+  overflow: hidden;
   color: ${({ theme }) => theme.colors.textSubtle};
+  text-align: center;
+  font-feature-settings: 'liga' off;
+  text-overflow: ellipsis;
+  font-family: Kanit;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.2px;
 `
 
-const PnlValue = styled.span`
-  font-size: 22px;
+const PnlValue = styled.span<{ $zero?: boolean; $disabled?: boolean }>`
+  color: ${({ $zero, $disabled, theme }) =>
+    $disabled
+      ? theme.colors.textDisabled
+      : $zero
+        ? theme.colors.textSubtle
+        : theme.colors.text};
+  text-align: right;
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 32px;
+  font-style: normal;
   font-weight: 600;
-  letter-spacing: -0.22px;
-  color: ${({ theme }) => theme.colors.text};
+  line-height: 120%;
+  letter-spacing: -0.32px;
   font-variant-numeric: tabular-nums;
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    font-size: 24px;
+    line-height: 150%;
+    letter-spacing: -0.24px;
+  }
 `
+
+// ── Bet asset selector ────────────────────────────────────
+
+interface BetAssetSelectorProps {
+  selected: string
+  options?: readonly { code: string; logoUrl?: string; color?: string }[]
+  onSelect?: (next: string) => void
+  /** Used when no `options` (or only one) — restores the legacy chip-as-button behavior. */
+  onClickFallback?: () => void
+}
+
+const BetAssetSelector: React.FC<BetAssetSelectorProps> = ({
+  selected,
+  options,
+  onSelect,
+  onClickFallback,
+}) => {
+  const [open, setOpen] = useState(false)
+  const anchorRef = useRef<HTMLSpanElement | null>(null)
+
+  // Close on outside click / Escape so the menu doesn't strand if the
+  // user clicks elsewhere in the panel without picking an option.
+  useEffect(() => {
+    if (!open) return undefined
+    const onDown = (e: MouseEvent) => {
+      if (!anchorRef.current) return
+      if (!anchorRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const hasDropdown = !!options && options.length > 1
+  const selectedOption = options?.find((o) => o.code === selected)
+  const handleClick = () => {
+    if (hasDropdown) {
+      setOpen((v) => !v)
+    } else {
+      onClickFallback?.()
+    }
+  }
+
+  return (
+    <AssetDropdownAnchor ref={anchorRef}>
+      <BetTokenButton type="button" onClick={handleClick} aria-label="Choose bet denomination">
+        <QuoteIcon>
+          {selectedOption?.logoUrl ? (
+            <img src={selectedOption.logoUrl} alt={selected} loading="lazy" decoding="async" />
+          ) : (
+            selected
+          )}
+        </QuoteIcon>
+        <QuoteArrowBox>
+          <ArrowDropDownGlyph />
+        </QuoteArrowBox>
+      </BetTokenButton>
+      {hasDropdown && open ? (
+        <AssetDropdownMenu role="menu">
+          {options!.map((opt) => (
+            <AssetDropdownItem
+              key={opt.code}
+              type="button"
+              role="menuitemradio"
+              aria-checked={opt.code === selected}
+              $selected={opt.code === selected}
+              onClick={() => {
+                onSelect?.(opt.code)
+                setOpen(false)
+              }}
+            >
+              <AssetItemChip $color={opt.color}>
+                {opt.logoUrl ? (
+                  <img src={opt.logoUrl} alt={opt.code} loading="lazy" decoding="async" />
+                ) : (
+                  opt.code.slice(0, 1)
+                )}
+              </AssetItemChip>
+              {opt.code}
+            </AssetDropdownItem>
+          ))}
+        </AssetDropdownMenu>
+      ) : null}
+    </AssetDropdownAnchor>
+  )
+}
 
 // ── Component ─────────────────────────────────────────────
 
 export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   symbol,
-  baseAsset,
+  baseAsset: _baseAsset,
   pair,
-  price,
-  pricePnlPct,
-  onSymbolClick,
+  price: _price,
+  pricePnlPct: _pricePnlPct,
+  onSymbolClick: _onSymbolClick,
   bet,
   onBetChange,
+  betError,
   leverage,
   onLeverageChange,
+  isApplyingLeverage = false,
+  maxLeverage = DEFAULT_MAX_LEVERAGE,
+  presets = DEFAULT_PRESETS,
   quoteAsset,
   onQuoteAssetClick,
+  assetOptions,
+  onAssetChange,
   fundBalanceText,
   onTopUpFund,
   onPercentClick,
@@ -856,13 +1234,80 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
   onDown,
   onDeposit,
   onWithdraw,
+  connectWalletLabel,
+  onConnectWallet,
   unrealizedPnl,
 }) => {
-  const fillPct = Math.min(100, Math.max(0, (leverage / MAX_LEVERAGE) * 100))
-  const zone = zoneFromLeverage(leverage)
+  // While the thumb is being dragged we render the visual at `dragValue`
+  // and skip propagating to the consumer — only the drop commits. This
+  // gives a snappy local UI without firing one signed `/fapi/v3/leverage`
+  // call per pointermove tick (PAN-11823).
+  const [dragValue, setDragValue] = React.useState<number | null>(null)
+  const displayLeverage = dragValue ?? leverage
+  const fillPct = Math.min(100, Math.max(0, (displayLeverage / maxLeverage) * 100))
+  const zone = zoneFromLeverage(displayLeverage)
+  const degen = isDegen(displayLeverage)
+  const double = isDouble(displayLeverage)
   const submitting = isSubmittingUp || isSubmittingDown
   const upDisabled = !canSubmit || submitting
   const downDisabled = !canSubmit || submitting
+
+  // Hover tooltip on the leverage-zone info circle. Content text is
+  // zone-dependent — re-running the hook each render is fine, the
+  // returned `tooltip` ReactNode is stable for the same zone string.
+  const zoneTipText = zoneTooltip(zone)
+  const { targetRef: zoneTipTargetRef, tooltip: zoneTipNode } = useTooltip(zoneTipText, { placement: 'top' })
+
+  // Single pointer handler for the whole track — handles both clicks
+  // (commit immediately at the click point) and thumb drags (preview
+  // during pointermove, commit on pointerup). The native range input
+  // and the visual thumb both have `pointer-events: none` so every
+  // gesture lands here. While `isApplyingLeverage` is true (a previous
+  // commit's signed call is still in flight) we ignore new gestures
+  // outright — the LevTab/LevCustomInput are also `disabled`.
+  const trackRef = React.useRef<HTMLDivElement | null>(null)
+  const onTrackPointerDown = React.useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (isApplyingLeverage) return
+      const track = trackRef.current
+      if (!track) return
+      e.preventDefault()
+      const rect = track.getBoundingClientRect()
+      const compute = (clientX: number) => {
+        const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+        const next = Math.round(1 + pct * (maxLeverage - 1))
+        return Math.max(1, Math.min(maxLeverage, next))
+      }
+      track.setPointerCapture(e.pointerId)
+      let last = compute(e.clientX)
+      setDragValue(last)
+      const cleanup = () => {
+        track.removeEventListener('pointermove', onMove)
+        track.removeEventListener('pointerup', onPointerUp)
+        track.removeEventListener('pointercancel', onCancel)
+      }
+      const onMove = (ev: PointerEvent) => {
+        last = compute(ev.clientX)
+        setDragValue(last)
+      }
+      const onPointerUp = () => {
+        cleanup()
+        setDragValue(null)
+        // Skip the commit when the user clicked exactly where the thumb
+        // already sat — otherwise a benign click would still trigger
+        // a redundant signed call.
+        if (last !== leverage) onLeverageChange(last)
+      }
+      const onCancel = () => {
+        cleanup()
+        setDragValue(null)
+      }
+      track.addEventListener('pointermove', onMove)
+      track.addEventListener('pointerup', onPointerUp)
+      track.addEventListener('pointercancel', onCancel)
+    },
+    [isApplyingLeverage, leverage, maxLeverage, onLeverageChange],
+  )
 
   return (
     <Root aria-label={`Simple bet panel · ${pair || symbol}`}>
@@ -875,11 +1320,11 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           <SectionHead>
             <PreTitle>My Perp Fund</PreTitle>
             <FundChip type="button" onClick={onTopUpFund} aria-label="Top up fund">
-              <span style={{ display: 'inline-flex', color: 'var(--pcs-colors-text-subtle, #7A6EAA)' }}>
+              <span style={{ display: 'inline-flex' }}>
                 <WalletGlyph />
               </span>
               <FundAmt>{fundBalanceText}</FundAmt>
-              <span style={{ display: 'inline-flex', color: 'var(--pcs-colors-text, #280D5F)' }}>
+              <span style={{ display: 'inline-flex' }}>
                 <AddCircleGlyph />
               </span>
             </FundChip>
@@ -897,14 +1342,15 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
                   aria-label="Bet amount"
                   placeholder="0"
                 />
-                <BetTokenButton type="button" onClick={onQuoteAssetClick} aria-label="Choose quote asset">
-                  <QuoteIcon>{quoteAsset}</QuoteIcon>
-                  <QuoteArrowBox>
-                    <ArrowDropDownGlyph />
-                  </QuoteArrowBox>
-                </BetTokenButton>
+                <BetAssetSelector
+                  selected={quoteAsset}
+                  options={assetOptions}
+                  onSelect={onAssetChange}
+                  onClickFallback={onQuoteAssetClick}
+                />
               </BetInputWrap>
             </BetFieldRow>
+            {betError ? <BetErrorText role="alert">{betError}</BetErrorText> : null}
           </BetField>
 
           <PctRow>
@@ -929,38 +1375,52 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           <LevRow>
             <LevValue>{leverage}x</LevValue>
             <ZonePill $zone={zone}>
-              {zoneLabel(zone)}
-              <span style={{ display: 'inline-flex', color: 'var(--pcs-colors-text-subtle, #7A6EAA)' }}>
+              {zoneEmoji(zone) ? (
+                <ZonePillText as="span" aria-hidden>{zoneEmoji(zone)}</ZonePillText>
+              ) : null}
+              <ZonePillText>{zoneLabel(zone)}</ZonePillText>
+              <ZoneTipAnchor ref={zoneTipTargetRef} aria-label={`${zoneLabel(zone)} explanation`}>
                 <InfoCircleGlyph />
-              </span>
+              </ZoneTipAnchor>
+              {zoneTipNode}
             </ZonePill>
           </LevRow>
 
           <LevBar>
-          <LevTrack $fillPct={fillPct} $zone={zone} aria-hidden>
-            <LevFill $fillPct={fillPct} $zone={zone} $degen={leverage > 500} />
+          <LevTrack
+            ref={trackRef}
+            $fillPct={fillPct}
+            $zone={zone}
+            aria-hidden
+            aria-disabled={isApplyingLeverage || undefined}
+            onPointerDown={onTrackPointerDown}
+          >
+            {/* Native range input is kept ONLY for keyboard a11y — its
+                `pointer-events: none` means every mouse/touch gesture is
+                handled by the track's pointer handler instead. Disabled
+                while a commit is in flight so arrow keys don't queue up
+                a second signed call. */}
+            <LevRangeInput
+              type="range"
+              min={1}
+              max={maxLeverage}
+              value={displayLeverage}
+              disabled={isApplyingLeverage}
+              onChange={(e) => onLeverageChange(Number(e.target.value))}
+              aria-label="Leverage"
+            />
             <LevThumb
               $fillPct={fillPct}
-              $variant={
-                leverage > 500 ? 'triple' : leverage > 250 ? 'double' : 'single'
-              }
+              $variant={degen ? 'triple' : double ? 'double' : 'single'}
             >
-              {leverage > 500 ? (
+              {degen ? (
                 <GrabberDegenGlyph />
-              ) : leverage > 250 ? (
+              ) : double ? (
                 <GrabberDoubleGlyph />
               ) : (
                 <GrabberGlyph />
               )}
             </LevThumb>
-            <LevRangeInput
-              type="range"
-              min={1}
-              max={MAX_LEVERAGE}
-              value={leverage}
-              onChange={(e) => onLeverageChange(Number(e.target.value))}
-              aria-label="Leverage"
-            />
           </LevTrack>
 
           <LevTabs role="tablist">
@@ -968,22 +1428,24 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
               <LevCustomInput
                 type="number"
                 min={1}
-                max={MAX_LEVERAGE}
+                max={maxLeverage}
                 value={leverage}
+                disabled={isApplyingLeverage}
                 onChange={(e) =>
-                  onLeverageChange(Math.max(1, Math.min(MAX_LEVERAGE, Number(e.target.value) || 1)))
+                  onLeverageChange(Math.max(1, Math.min(maxLeverage, Number(e.target.value) || 1)))
                 }
                 aria-label="Custom leverage"
               />
               <LevCustomSuffix>x</LevCustomSuffix>
             </LevCustom>
-            {PRESETS.map((p) => (
+            {presets.map((p) => (
               <LevTab
                 key={p}
                 type="button"
                 role="tab"
                 aria-selected={leverage === p}
                 $active={leverage === p}
+                disabled={isApplyingLeverage}
                 onClick={() => onLeverageChange(p)}
               >
                 {p}x
@@ -993,19 +1455,16 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
           </LevBar>
         </Section>
 
-        {/* Duration (display-only placeholder — matches the original prototype) */}
-        <DurationRow>
-          <PreTitle>Duration</PreTitle>
-          <FundChip type="button" disabled>
-            <FundAmt style={{ fontSize: 14 }}>Perpetual</FundAmt>
-            <span aria-hidden>▾</span>
-          </FundChip>
-        </DurationRow>
+        {/* Aster's REST `/fapi/v3/order` perp API has no duration / auto-
+            settle field — only the separate on-chain `predictAndBet`
+            contract on `/trade/1001x/...` does. We submit through the
+            REST API, so the Duration row was dead UI; dropped. If we
+            ever wire the prediction product, restore it here. */}
       </Body>
 
-      {/* UP / DOWN — wrapped in card when bet is filled, otherwise plain */}
-      {bet && bet !== '0' ? (
-        <UpDownCard>
+      {/* UP / DOWN — always wrapped in card; stats only show when bet is filled */}
+      <UpDownCard>
+        {bet && bet !== '0' ? (
           <StatsList>
             <StatsRow>
               <StatsLabel>Estimated Entry</StatsLabel>
@@ -1019,36 +1478,15 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
               <StatsLabel>Margin required</StatsLabel>
               <StatsValue>{marginRequired}</StatsValue>
             </StatsRow>
-            <StatsRow>
-              <StatsLabel>Opening fee</StatsLabel>
-              <StatsValue>{openingFee}</StatsValue>
-            </StatsRow>
+            {openingFee ? (
+              <StatsRow>
+                <StatsLabel>Opening fee</StatsLabel>
+                <StatsValue>{openingFee}</StatsValue>
+              </StatsRow>
+            ) : null}
           </StatsList>
-          <UpDownCardActions>
-            <DirectionButton
-              type="button"
-              $variant="up"
-              disabled={upDisabled}
-              onClick={onUp}
-              aria-busy={isSubmittingUp}
-            >
-              <UpArrow />
-              {isSubmittingUp ? '...' : 'UP'}
-            </DirectionButton>
-            <DirectionButton
-              type="button"
-              $variant="down"
-              disabled={downDisabled}
-              onClick={onDown}
-              aria-busy={isSubmittingDown}
-            >
-              <DownArrow />
-              {isSubmittingDown ? '...' : 'DOWN'}
-            </DirectionButton>
-          </UpDownCardActions>
-        </UpDownCard>
-      ) : (
-        <DirectionRow>
+        ) : null}
+        <UpDownCardActions>
           <DirectionButton
             type="button"
             $variant="up"
@@ -1056,8 +1494,10 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
             onClick={onUp}
             aria-busy={isSubmittingUp}
           >
-            <UpArrow />
-            {isSubmittingUp ? '...' : 'UP'}
+            <DirectionButtonContent>
+              <UpArrow />
+              {isSubmittingUp ? '...' : 'UP'}
+            </DirectionButtonContent>
           </DirectionButton>
           <DirectionButton
             type="button"
@@ -1066,32 +1506,48 @@ export const SimpleBetPanel: React.FC<SimpleBetPanelProps> = ({
             onClick={onDown}
             aria-busy={isSubmittingDown}
           >
-            <DownArrow />
-            {isSubmittingDown ? '...' : 'DOWN'}
+            <DirectionButtonContent>
+              <DownArrow />
+              {isSubmittingDown ? '...' : 'DOWN'}
+            </DirectionButtonContent>
           </DirectionButton>
-        </DirectionRow>
-      )}
+        </UpDownCardActions>
+      </UpDownCard>
       </TopCardInner>
       </TopCard>
 
       {/* Bottom card: Deposit/Withdraw + Unrealized PnL */}
       <Bottom>
-      {/* Deposit / Withdraw */}
+      {/* Deposit / Withdraw — replaced by a single full-width Connect
+          wallet button when the consumer signals a disconnected state. */}
       <DwRow>
-        <DwButton $variant="primary" onClick={onDeposit} type="button">
-          Deposit
-        </DwButton>
-        <DwButton $variant="secondary" onClick={onWithdraw} type="button">
-          Withdraw
-        </DwButton>
+        {connectWalletLabel ? (
+          <DwButton $variant="primary" onClick={onConnectWallet} type="button">
+            {connectWalletLabel}
+          </DwButton>
+        ) : (
+          <>
+            <DwButton $variant="primary" onClick={onDeposit} type="button">
+              Deposit
+            </DwButton>
+            <DwButton $variant="secondary" onClick={onWithdraw} type="button">
+              Withdraw
+            </DwButton>
+          </>
+        )}
       </DwRow>
 
-      {/* Unrealized PnL */}
+      {/* Unrealized PnL — muted color when value is zero (no open
+          position to score). Strips currency symbols / commas / signs
+          before checking so e.g. "$0", "+$0.00", "0.00 USDT" all match. */}
       <PnlCard>
-        <PnlLabel>
-          Unrealized PnL <HelpIcon color="textSubtle" width="14px" />
-        </PnlLabel>
-        <PnlValue>{unrealizedPnl}</PnlValue>
+        <PnlLabel>Unrealized PnL</PnlLabel>
+        <PnlValue
+          $zero={Number(String(unrealizedPnl).replace(/[^\d.-]/g, '')) === 0}
+          $disabled={Boolean(connectWalletLabel)}
+        >
+          {unrealizedPnl}
+        </PnlValue>
       </PnlCard>
       </Bottom>
     </Root>

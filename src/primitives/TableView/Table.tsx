@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import type { ISortOrder } from "./SortArrowButton";
 import { SORT_ORDER, SortArrowButton } from "./SortArrowButton";
 

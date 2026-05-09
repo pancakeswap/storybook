@@ -1,9 +1,10 @@
 import React from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Button } from '../primitives/Button'
 import { Flex } from '../primitives/Box'
 import { Message, MessageText } from '../primitives/Message'
 import { Text } from '../primitives/Text'
+import { useMatchBreakpoints } from '../contexts'
 import { PerpsPanel } from './primitives'
 
 /**
@@ -50,6 +51,12 @@ export interface AccountPanelProps {
    * prop — widget defaults to identity.
    */
   t?: (key: string, options?: Record<string, string | number | undefined>) => string
+  /**
+   * Label shown to the left of the equity figure in the slim mobile-row
+   * variant. Defaults to "Perpetual Account". Translate at the call site
+   * (e.g. `mobileLabel={t('Perpetual Account')}`).
+   */
+  mobileLabel?: string
 }
 
 const Card = styled(PerpsPanel)`
@@ -125,16 +132,93 @@ const PnlValue = styled(Value)<{ $sign?: 'positive' | 'negative' | 'zero' }>`
 
 const identity = (s: string) => s
 
-export const AccountPanel: React.FC<AccountPanelProps> = ({
-  walletDisplay,
+/* ─── Mobile slim-row variant ─────────────────────────────────
+ * One horizontal row: "<label> <equity>" on the left, primary
+ * "Deposit" pill on the right. Matches MobilePerpsPage's
+ * .mp-account row spec (12px padding, 32px button height, primary
+ * fill with dark inset bottom border).
+ */
+const MobileRow = styled(Flex)`
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+`
+
+const MobileLabel = styled(Text).attrs({ fontSize: '14px' })`
+  flex: 1;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const MobileEquity = styled.strong`
+  margin-left: 8px;
+  font-weight: 600;
+`
+
+const MobileDepositButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 14px;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.invertedContrast};
+  border: 0;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s, transform 0.1s;
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`
+
+const MobileAccountPanel: React.FC<AccountPanelProps> = ({
   state,
   canDeposit = true,
-  canWithdraw = true,
   onDeposit,
-  onWithdraw,
-  onEnableTrading,
   t = identity,
+  mobileLabel,
 }) => {
+  const equity = state.kind === 'ready' && state.equity ? state.equity : '$0.00'
+  return (
+    <MobileRow>
+      <MobileLabel>
+        {mobileLabel ?? t('Perpetual Account')} <MobileEquity>{equity}</MobileEquity>
+      </MobileLabel>
+      <MobileDepositButton type="button" onClick={onDeposit} disabled={!canDeposit}>
+        {t('Deposit')}
+      </MobileDepositButton>
+    </MobileRow>
+  )
+}
+
+export const AccountPanel: React.FC<AccountPanelProps> = (props) => {
+  // Auto-responsive: switch to slim row layout for both mobile and tablet
+  // viewports (everything below uikit's xl/968px). Same pattern as OrderForm
+  // — consumer doesn't pass any flag.
+  const { isMobile, isTablet } = useMatchBreakpoints()
+  if (isMobile || isTablet) return <MobileAccountPanel {...props} />
+
+  const {
+    walletDisplay,
+    state,
+    canDeposit = true,
+    canWithdraw = true,
+    onDeposit,
+    onWithdraw,
+    onEnableTrading,
+    t = identity,
+  } = props
   return (
     <Card>
       <Flex style={{ gap: 8 }}>

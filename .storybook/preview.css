@@ -1,10 +1,9 @@
 /*
- * Global dark/light mode styles for the Storybook preview iframe.
- * Applied to body and the Storybook docs shell so the background
- * follows our theme when the toolbar switches dark ↔ light.
+ * Global styles for the Storybook preview iframe.
  *
- * Chakra v3 injects --pcs-colors-* at :root / .dark, so the vars
- * are available globally without a .perps-root wrapper.
+ * Chakra v3 emits --pcs-colors-* CSS variables that auto-flip between
+ * light/dark based on the theme toolbar. We reference those tokens
+ * directly so styles stay theme-aware without an `html.dark` selector.
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&display=swap');
@@ -12,76 +11,72 @@
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--pcs-colors-bg, #f0f2f5);
+  background: var(--pcs-colors-background);
+  color: var(--pcs-colors-text);
   /* Apply Kanit globally so portal content (Modal, DropdownMenu, Tooltip)
    * also renders with the PCS font, even when mounted outside .perps-root. */
   font-family: 'Kanit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
-html.dark, html.dark body {
-  background: var(--pcs-colors-bg, #1a2035);
+html.dark {
   color-scheme: dark;
 }
 
-/* ── Storybook docs page shell ───────────────────────────────── */
+/* ── Storybook docs page shell ─────────────────────────────────
+   These rules style the autodocs chrome (sbdocs-*, docblock-*).
+   Storybook ships its own light/dark variants; we override with PCS
+   tokens so the docs match the theme toolbar in both modes.        */
 
-/* Outer docs wrapper */
-html.dark .sbdocs-wrapper,
-html.dark #storybook-docs {
-  background: var(--pcs-colors-bg, #1a2035) !important;
+.sbdocs-wrapper,
+#storybook-docs {
+  background: var(--pcs-colors-background) !important;
 }
 
-/* Docs content area */
-html.dark .sbdocs-content {
-  background: var(--pcs-colors-bg, #1a2035) !important;
-  color: var(--pcs-colors-text, #e8edf5) !important;
+.sbdocs-content {
+  background: var(--pcs-colors-background) !important;
+  color: var(--pcs-colors-text) !important;
 }
 
-/* Story heading rows (h1/h2/h3 in autodocs) */
-html.dark .sbdocs-wrapper h1,
-html.dark .sbdocs-wrapper h2,
-html.dark .sbdocs-wrapper h3,
-html.dark .sbdocs-wrapper h4,
-html.dark .sbdocs-wrapper p {
-  color: var(--pcs-colors-text, #e8edf5) !important;
+.sbdocs-wrapper h1,
+.sbdocs-wrapper h2,
+.sbdocs-wrapper h3,
+.sbdocs-wrapper h4,
+.sbdocs-wrapper p {
+  color: var(--pcs-colors-text) !important;
 }
 
-/* "STORIES" section label */
-html.dark .sbdocs-wrapper .sb-section-title {
-  color: var(--pcs-colors-text-muted, #7d8ea8) !important;
+.sbdocs-wrapper .sb-section-title {
+  color: var(--pcs-colors-text-subtle) !important;
 }
 
-/* Args / props table */
-html.dark .docblock-argstable-body,
-html.dark .docblock-argstable {
-  background: var(--pcs-colors-surface-card, #1c2233) !important;
-  color: var(--pcs-colors-text, #e8edf5) !important;
+.docblock-argstable-body,
+.docblock-argstable {
+  background: var(--pcs-colors-card) !important;
+  color: var(--pcs-colors-text) !important;
 }
 
-html.dark .docblock-argstable-body tr,
-html.dark .docblock-argstable-body td,
-html.dark .docblock-argstable-body th {
+.docblock-argstable-body tr,
+.docblock-argstable-body td,
+.docblock-argstable-body th {
   background: transparent !important;
-  color: var(--pcs-colors-text, #e8edf5) !important;
-  border-color: var(--pcs-colors-border, #242d3f) !important;
+  color: var(--pcs-colors-text) !important;
+  border-color: var(--pcs-colors-card-border) !important;
 }
 
-html.dark .docblock-argstable-body span {
-  color: var(--pcs-colors-text, #e8edf5) !important;
+.docblock-argstable-body span {
+  color: var(--pcs-colors-text) !important;
 }
 
-/* Story canvas toolbar (show code / copy code buttons) */
-html.dark .docs-story > div:first-child {
-  background: var(--pcs-colors-surface-card, #1c2233) !important;
-  border-color: var(--pcs-colors-border, #242d3f) !important;
+.docs-story > div:first-child {
+  background: var(--pcs-colors-card) !important;
+  border-color: var(--pcs-colors-card-border) !important;
 }
 
-/* Story canvas area wrapper */
-html.dark .docs-story {
-  border-color: var(--pcs-colors-border, #242d3f) !important;
+.docs-story {
+  border-color: var(--pcs-colors-card-border) !important;
 }
 
-html.dark .docs-story .innerZoomElementWrapper {
-  background: var(--pcs-colors-bg, #1a2035) !important;
+.docs-story .innerZoomElementWrapper {
+  background: var(--pcs-colors-background) !important;
 }

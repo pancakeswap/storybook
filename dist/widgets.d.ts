@@ -1,11 +1,25 @@
+import { ActionItem } from './WalletPanel';
+import { AssetMode } from './AssetModeModal';
+import { AssetModeButton } from './AssetModeButton';
+import { AssetModeButtonProps } from './AssetModeButton';
+import { AssetModeModal } from './AssetModeModal';
+import { AssetModeModalProps } from './AssetModeModal';
+import { Bucket } from './WalletPanel';
 import { default as default_2 } from 'react';
+import { IsolatedPositionMigration } from './AssetModeModal';
 import { IStyledComponent } from 'styled-components';
+import { MarginModeModal } from './MarginModeModal';
+import { MarginModeModalProps } from './MarginModeModal';
+import { PerpStatsData } from './WalletPanel';
 import { ResponsiveValue } from 'styled-system';
+import { SharePnlModal } from './SharePnlModal';
+import { SharePnlModalProps } from './SharePnlModal';
+import { SharePnlTier } from './SharePnlModal';
 import { SimpleBetPanel } from './SimpleBetPanel';
 import { SimpleBetPanelProps } from './SimpleBetPanel';
 import { SimpleChartCard } from './SimpleChartCard';
 import { SimpleChartCardProps } from './SimpleChartCard';
-import { SimpleOpenOrderRow } from './SimplePositionsCard';
+import { SimpleHistoryRow } from './SimplePositionsCard';
 import { SimplePositionDirection } from './SimplePositionsCard';
 import { SimplePositionLiqStatus } from './SimplePositionsCard';
 import { SimplePositionRow } from './SimplePositionsCard';
@@ -15,7 +29,15 @@ import { SimplePositionsTab } from './SimplePositionsCard';
 import { SimpleTickerCard } from './SimpleTickerCard';
 import { SimpleTickerCardProps } from './SimpleTickerCard';
 import { Theme } from 'styled-system';
+import { tierFromPnlPct } from './SharePnlModal';
 import { TLengthStyledSystem } from 'styled-system';
+import { WalletData } from './WalletPanel';
+import { WalletPanel } from './WalletPanel';
+import { WalletPanelLabels } from './WalletPanel';
+import { WalletPanelProps } from './WalletPanel';
+import { WithdrawAssetRow } from './WithdrawModal12';
+import { WithdrawModal12 } from './WithdrawModal12';
+import { WithdrawModal12Props } from './WithdrawModal12';
 
 export declare const AccountPanel: default_2.FC<AccountPanelProps>;
 
@@ -40,6 +62,12 @@ export declare interface AccountPanelProps {
      * prop — widget defaults to identity.
      */
     t?: (key: string, options?: Record<string, string | number | undefined>) => string;
+    /**
+     * Label shown to the left of the equity figure in the slim mobile-row
+     * variant. Defaults to "Perpetual Account". Translate at the call site
+     * (e.g. `mobileLabel={t('Perpetual Account')}`).
+     */
+    mobileLabel?: string;
 }
 
 /**
@@ -66,6 +94,18 @@ export declare type AccountPanelState = {
     /** Defaults to "Cross". */
     marginMode?: string;
 };
+
+export { ActionItem }
+
+export { AssetMode }
+
+export { AssetModeButton }
+
+export { AssetModeButtonProps }
+
+export { AssetModeModal }
+
+export { AssetModeModalProps }
 
 /**
  * Tabbed container for Order Book + Recent Trades — one panel, one
@@ -95,12 +135,19 @@ export declare type BookTradesTab = 'book' | 'trades';
 
 declare type BoxProps = React.HTMLAttributes<HTMLDivElement>;
 
+export { Bucket }
+
 /**
  * Stylesheet shell for the perps chart. Owns the panel framing
  * (border, background, min-height) so visual updates flow through this
  * file; the actual chart implementation is provided by the consumer
  * via `children` (TradingView paid library in pancake-frontend, or
  * whatever else upstream wants).
+ *
+ * Auto-responsive: drops to `MobileChartPanel` when
+ * `useMatchBreakpoints().isMobile` is true. Mobile adds an inline
+ * timeframe tab row + an optional floating price pill — desktop keeps
+ * the original `children` + `minHeight` API untouched.
  */
 export declare const ChartPanel: default_2.FC<ChartPanelProps>;
 
@@ -108,16 +155,48 @@ export declare interface ChartPanelProps {
     /**
      * The actual chart widget. The consumer plugs in its
      * TradingView / lightweight-charts / etc. implementation here so
-     * this widget stays free of any chart-library dependency.
+     * this widget stays free of any chart-library dependency. On mobile,
+     * if `children` is empty the widget renders the storybook fixture
+     * gradient/line so the panel still has something to show.
      */
-    children: default_2.ReactNode;
+    children?: default_2.ReactNode;
     /**
-     * Minimum height for the chart area. Defaults to 420px (matches the
-     * pancake-frontend perps page). Pass a string ("60vh") or number
-     * (pixels). The panel grows to fill remaining space if the parent
-     * uses flex.
+     * Minimum height for the chart area (desktop). Defaults to 420px
+     * (matches the pancake-frontend perps page). Pass a string ("60vh")
+     * or number (pixels). The panel grows to fill remaining space if the
+     * parent uses flex.
      */
     minHeight?: string | number;
+    /**
+     * Timeframes shown in the mobile tab row. Defaults to
+     * `['1m','5m','15m','1h','4h','1d']`. Desktop ignores this — the
+     * desktop chart-library typically owns its own timeframe UI.
+     */
+    timeframes?: readonly string[];
+    /** Currently active timeframe (mobile). */
+    activeTimeframe?: string;
+    /** Fired when the user taps a timeframe tab (mobile). */
+    onTimeframeChange?: (tf: string) => void;
+    /**
+     * Optional small floating price pill rendered on the right edge of
+     * the mobile canvas. When undefined, no pill is rendered.
+     */
+    priceLabel?: string;
+    /**
+     * Minimum height of the mobile chart canvas in pixels. Defaults to
+     * 220 to match the original mobile-perps mockup.
+     */
+    mobileMinHeight?: number;
+    /**
+     * Lock the rendered variant instead of switching on viewport. Use this
+     * when the parent already owns the desktop↔mobile decision and needs
+     * the chart's React subtree to stay stable across viewport changes —
+     * critical for chart libraries that don't survive an unmount/remount
+     * cycle (e.g. TradingView's paid Charting Library, whose module-level
+     * state breaks after `widget.remove()`). When omitted, falls back to
+     * `useMatchBreakpoints()` and switches automatically.
+     */
+    variant?: 'mobile' | 'desktop';
 }
 
 /**
@@ -142,6 +221,9 @@ export declare interface DepositModalProps {
     evmAddress?: string;
     /** Pre-truncated Solana address. */
     solanaAddress?: string;
+    /** Pre-formatted current Perp balance shown in the summary card
+     *  (e.g. "$0"). Defaults to "$0" when omitted. */
+    perpBalanceText?: string;
     isLoadingAssets?: boolean;
     assets: DepositTokenRow[];
     selectedAssetId?: string;
@@ -178,6 +260,12 @@ export declare interface DepositReceipt {
     assetSymbol: string;
     /** Pre-truncated source address for the success screen. */
     sourceAddress?: string;
+    /**
+     * Block-explorer URL for the tx. Consumer builds it from chain context
+     * (BSC scan, Solana explorer, etc.). When supplied, the truncated hash
+     * is rendered as a link.
+     */
+    explorerUrl?: string;
 }
 
 export declare type DepositStep = 'select' | 'amount' | 'checking' | 'success' | 'failed';
@@ -195,6 +283,8 @@ export declare interface DepositTokenRow {
     displayName?: string;
     /** Pre-formatted balance string (e.g. "1234.56"). */
     balanceText: string;
+    /** Pre-formatted USD value, e.g. "$999,999.99". Optional. */
+    usdValueText?: string;
     /** Whether the wallet has any non-zero balance for this asset. */
     hasBalance: boolean;
     /** Optional logo URL — consumer's responsibility to resolve. */
@@ -273,6 +363,8 @@ export declare interface EnableTradingModalProps {
  */
 export declare type EnableTradingPhase = 'link-wallet' | 'authorize-agent' | 'checking-status' | 'done';
 
+export { IsolatedPositionMigration }
+
 export declare const LeverageModal: default_2.FC<LeverageModalProps>;
 
 export declare interface LeverageModalProps {
@@ -285,10 +377,23 @@ export declare interface LeverageModalProps {
     minLeverage?: number;
     maxLeverage?: number;
     /**
-     * USDT (or quote) balance available for new positions. Used to display
-     * the "Maximum position at current leverage" preview line.
+     * Returns the maximum new notional (USDT) the user can open at the
+     * given draft leverage — the "Remaining openable notional value" line.
+     * Called with the current slider value as the user drags so the
+     * preview stays in sync; return `undefined` while inputs (brackets,
+     * positions, open orders, OI map) are still loading.
+     *
+     * Caller-owned formula. Aster's UI uses two clamps:
+     *   `min(bracketCap − usedNotional, oiRemaining[ceil(leverage)])`
+     * where `bracketCap` is the per-tier `notionalCap` for the chosen
+     * leverage (binds at HIGH leverage), `usedNotional` is existing
+     * position + unfilled open-order notional on the symbol, and
+     * `oiRemaining` is a platform-wide open-interest budget per leverage
+     * tier (binds at LOW leverage where bracket caps are huge). Wallet
+     * balance is intentionally NOT factored in — this preview describes
+     * venue risk-control headroom, not margin sufficiency. PAN-11910.
      */
-    availableBalance: number;
+    remainingOpenableAtLeverage: (leverage: number) => number | undefined;
     /**
      * Called when the user clicks Confirm with their chosen leverage. The
      * consumer is responsible for the async write back to the venue, error
@@ -315,6 +420,10 @@ export declare interface LeverageModalProps {
 }
 
 export declare type MarginMode = 'CROSS' | 'ISOLATED';
+
+export { MarginModeModal }
+
+export { MarginModeModalProps }
 
 export declare interface MarketRow {
     /** Full venue symbol, e.g. 'BTCUSDT'. */
@@ -404,6 +513,17 @@ export declare interface OrderBookProps {
     pricePrecision?: number;
     /** Last traded price — drives which aggregation step options are offered. */
     lastPrice?: number;
+    /**
+     * Direction of the most recent tick relative to the prior one. Drives the
+     * color and arrow shown on the desktop mid-row. `'flat'` (or unset) renders
+     * the last price in the neutral text color with no arrow.
+     */
+    lastPriceDirection?: 'up' | 'down' | 'flat';
+    /**
+     * Mark price shown beside the last price on the desktop mid-row. Optional —
+     * if omitted the mid-row falls back to last price only.
+     */
+    markPrice?: number;
     view: OrderBookView;
     onViewChange: (v: OrderBookView) => void;
     priceStep: string;
@@ -419,6 +539,20 @@ export declare interface OrderBookProps {
     embedded?: boolean;
     /** Translator. */
     t?: (key: string) => string;
+    /** "Funding (8h) / Countdown" stat — first line shown above the ladder. */
+    fundingRateText?: string;
+    /** Countdown "05:06:37" string — paired with `fundingRateText`. */
+    fundingCountdownText?: string;
+    /** Big mid-price displayed between asks and bids on mobile. */
+    midPriceText?: string;
+    /** Sub-price under `midPriceText` (e.g. "$77,824.4"). */
+    midSubText?: string;
+    /**
+     * Tick-size dropdown options on mobile. Defaults to
+     * `['0.1','0.5','1','5','10','50','100']`. The selected value is
+     * driven by `priceStep`; selection emits `onPriceStepChange`.
+     */
+    priceStepOptions?: string[];
 }
 
 export declare type OrderBookSizeUnit = 'BASE' | 'QUOTE';
@@ -538,8 +672,11 @@ export declare interface OrderFormProps {
         cost: string;
         liq: string;
     };
-    /** Maker/taker fee bps for the summary footer (e.g. "0.02% / 0.05%"). */
-    feeText: string;
+    /**
+     * Maker/taker fee bps for the summary footer (e.g. "0.02% / 0.05%").
+     * Omit to hide the fee row entirely.
+     */
+    feeText?: string;
     /** Slider position 0-100 (consumer computes from quantity ÷ maxSize). */
     sizePercent: number;
     onSizePercentChange: (pct: number) => void;
@@ -557,16 +694,63 @@ export declare interface OrderFormProps {
     hasAddress?: boolean;
     /** Consumer renders its classified error here (e.g. PerpsErrorMessage). */
     errorSlot?: default_2.ReactNode;
-    /** Click submit — consumer routes via canSubmit (place order) or shows the deposit/auth modals. */
-    onSubmit: () => void;
+    /**
+     * Current mark price for the symbol. Used as the entry-price fallback
+     * for TP/SL PnL calculations when no limit price is set. Optional —
+     * if omitted, TP/SL inputs still accept manual values but the
+     * trigger ↔ PnL bidirectional sync is disabled.
+     */
+    markPrice?: number;
+    /**
+     * Decimal places used to format computed trigger prices (defaults to
+     * 2). Pass `meta.pricePrecision` for tick-aligned output.
+     */
+    priceDecimals?: number;
+    /**
+     * Click submit — consumer routes via canSubmit (place order) or shows
+     * the deposit/auth modals. Mobile renders two CTAs (Buy / Sell) that
+     * pass `sideOverride` so the consumer doesn't have to wait for the
+     * `draft.side` state update to flush before placing the order.
+     */
+    onSubmit: (opts?: {
+        sideOverride?: OrderSide_2;
+    }) => void;
     /** Open the leverage adjuster modal. */
     onLeverageClick: () => void;
     /** Toggle margin mode (consumer fires the signed setMarginType call). */
     onMarginModeToggle: () => void;
     /** Open the deposit modal (Avbl row + connector for not-yet-deposited users). */
     onDepositClick: () => void;
+    /**
+     * Optional extra controls rendered on the right of the Cross/Isolated +
+     * Leverage pills row. Used by consumers to drop in additional
+     * account-level mode toggles (e.g. AssetModeButton) without coupling
+     * the OrderForm widget to those concepts.
+     */
+    extraControls?: default_2.ReactNode;
     /** Translator. */
     t?: (key: string, options?: Record<string, string | number | undefined>) => string;
+}
+
+export declare interface OrderHistoryRow {
+    /** Stable React key — typically the orderId. */
+    id: string | number;
+    /** Local date string, e.g. '2025-04-17'. */
+    date: string;
+    /** Local time string, e.g. '01:37:26'. */
+    time: string;
+    symbol: string;
+    side: 'BUY' | 'SELL';
+    /** Humanized order type, e.g. 'Limit', 'Stop Market (Reduce)'. */
+    type: string;
+    /** Pre-formatted price (or 'Market' / 'Market / Trig <price>'). */
+    price: string;
+    /** Pre-formatted original quantity. */
+    origQty: string;
+    /** Pre-formatted executed quantity. */
+    executedQty: string;
+    /** Wire status — 'FILLED' / 'CANCELED' / 'EXPIRED' / 'REJECTED' etc. */
+    status: string;
 }
 
 export declare type OrderSide = 'BUY' | 'SELL';
@@ -955,6 +1139,8 @@ onTransitionEndCapture?: default_2.TransitionEventHandler<HTMLDivElement> | unde
 'data-pr-showondisabled'?: boolean | undefined | undefined;
 }>;
 
+export { PerpStatsData }
+
 export declare interface PositionRow {
     /** Stable React key — consumer typically uses `${symbol}-${positionSide}`. */
     id: string;
@@ -972,7 +1158,20 @@ export declare interface PositionRow {
     /** Existing TP / SL trigger-order prices for this symbol, if any. */
     tpStopPrice?: string;
     slStopPrice?: string;
+    /** Per-position margin scheme. Rendered as a `(Cross)` / `(Isolated)`
+     *  tag under the Margin amount, matching Aster's positions table.
+     *  When omitted the tag is hidden — older consumers stay backward-
+     *  compatible. PAN-11866. */
+    marginType?: 'CROSS' | 'ISOLATED';
+    /** Aster `/fapi/v3/adlQuantile` value for this position's side
+     *  (0–4, low → imminent ADL). Drives the lit-bar count in the ADL
+     *  gauge. When undefined the gauge falls back to a single red marker
+     *  (Aster's resting state). PAN-11867. */
+    adlQuantile?: number;
 }
+
+/** History sheet inner-tab (mobile only). */
+export declare type PositionsHistoryTab = 'orders' | 'trades' | 'tx';
 
 export declare type PositionSide = 'LONG' | 'SHORT';
 
@@ -984,6 +1183,11 @@ export declare type PositionSide = 'LONG' | 'SHORT';
  * Per-row business actions (Close / Cancel / TP+SL editor) fire
  * callbacks — consumer owns the signed API calls + toast + modal. The
  * widget just renders.
+ *
+ * Auto-responsive: dispatches to {@link MobilePositionsPanel} when the
+ * viewport is mobile (or when `isMobile` is forced via prop). The mobile
+ * variant exposes a different tab set (`Open Orders | Positions | Assets
+ * | TWAP`) and owns a full-page History sheet portal.
  */
 export declare const PositionsPanel: default_2.FC<PositionsPanelProps>;
 
@@ -993,12 +1197,20 @@ export declare interface PositionsPanelProps {
     onTabChange: (tab: PositionsPanelTab) => void;
     positions: PositionRow[];
     openOrders: OpenOrderRow[];
+    /** Past orders (filled / canceled / expired). */
+    orderHistory?: OrderHistoryRow[];
     /** Fills the user has executed (settled trades). */
     tradeHistory?: TradeHistoryRow[];
     /** Account ledger entries — funding, realized PnL, deposits, etc. */
     transactionHistory?: TransactionHistoryRow[];
     /** Share-to-social callback for a trade row (optional). */
     onShareTrade?: (trade: TradeHistoryRow) => void;
+    /**
+     * Fires when the user clicks the share-arrow icon in a position row's
+     * PNL cell. Consumer typically opens {@link SharePnlModal} with the
+     * position snapshot. Hidden when undefined.
+     */
+    onSharePnl?: (position: PositionRow) => void;
     /**
      * Hook-like function called inside each position row to get the live
      * mark price for that symbol. MUST obey the rules of hooks (always
@@ -1040,9 +1252,58 @@ export declare interface PositionsPanelProps {
     cancellingOrderId?: OpenOrderRow['id'] | null;
     /** Translator. */
     t?: (key: string) => string;
+    /**
+     * Force the mobile layout. Defaults to `useMatchBreakpoints().isMobile`
+     * — same auto-detection pattern as `OrderForm`.
+     */
+    isMobile?: boolean;
+    /**
+     * Optional positions count override. The mobile tab strip renders
+     * `Positions (N)` and consumers may want to pass a server-derived
+     * count rather than `positions.length`.
+     */
+    positionsCount?: number;
+    /**
+     * "Hide other symbols" filter — wired on both desktop (right side of
+     * the tabs row) and mobile (filter strip below the tabs).
+     */
+    hideOtherSymbols?: boolean;
+    onHideOtherSymbolsChange?: (next: boolean) => void;
+    /**
+     * Desktop-only: invoked when the user clicks "Close All" in the top
+     * tabs row. Consumer is responsible for confirmation + the bulk close.
+     * Hidden when the callback isn't provided.
+     */
+    onCloseAll?: () => void;
+    /** Mobile filter row — instrument filter button label (default `All instruments`). */
+    instrumentFilterLabel?: string;
+    /** Mobile filter row — invoked when the instrument-filter button is clicked. */
+    onInstrumentFilterClick?: () => void;
+    /**
+     * Mobile-only: open state of the full-page History sheet portal. The
+     * sheet covers the viewport and renders the orderHistory / tradeHistory
+     * / transactionHistory tabs.
+     */
+    historyOpen?: boolean;
+    onHistoryToggle?: (open: boolean) => void;
+    /** Mobile-only: active sub-tab inside the History sheet. */
+    historyTab?: PositionsHistoryTab;
+    onHistoryTabChange?: (tab: PositionsHistoryTab) => void;
+    /**
+     * Display unit for the Size column. `'QUOTE'` (default) shows the
+     * USDT notional (|base| × markPrice, falling back to entry); `'BASE'`
+     * shows the raw base-asset quantity. Consumer typically syncs this
+     * with the order form's size-unit toggle so the user sees one
+     * denomination across the whole perps view.
+     */
+    sizeUnit?: 'BASE' | 'QUOTE';
 }
 
-export declare type PositionsPanelTab = 'positions' | 'orders' | 'history' | 'trades' | 'transactions';
+export declare type PositionsPanelTab = 'positions' | 'orders' | 'history' | 'trades' | 'transactions'
+/** Mobile-only — list of holdings, no desktop equivalent yet. */
+| 'assets'
+/** Mobile-only — TWAP orders, no desktop equivalent yet. */
+| 'twap';
 
 export declare interface RecentTradeRow {
     /** Stable React key — usually the trade id from the venue. */
@@ -1088,6 +1349,12 @@ export declare interface RecentTradesProps {
     embedded?: boolean;
 }
 
+export { SharePnlModal }
+
+export { SharePnlModalProps }
+
+export { SharePnlTier }
+
 export { SimpleBetPanel }
 
 export { SimpleBetPanelProps }
@@ -1096,7 +1363,7 @@ export { SimpleChartCard }
 
 export { SimpleChartCardProps }
 
-export { SimpleOpenOrderRow }
+export { SimpleHistoryRow }
 
 export { SimplePositionDirection }
 
@@ -1148,6 +1415,12 @@ export declare interface SymbolHeaderProps {
     leverage: number;
     /** Last traded price (unformatted). */
     lastPrice?: string;
+    /**
+     * Direction of the most recent tick — drives the color of the last-price
+     * display. `'flat'` (or unset) keeps the neutral text color so a fresh
+     * mount or paused stream doesn't flash green/red without a real signal.
+     */
+    lastPriceDirection?: 'up' | 'down' | 'flat';
     markPrice?: string;
     indexPrice?: string;
     /** Signed fraction funding rate (e.g. "0.0001" = 0.01%). */
@@ -1158,8 +1431,17 @@ export declare interface SymbolHeaderProps {
     change24h?: string;
     /** Raw 24h quote volume. */
     volume24h?: string;
+    /** Raw open-interest in USDT notional (consumer multiplies base × mark). */
+    openInterestUsd?: string;
     favorited?: boolean;
     onToggleFavorite?: () => void;
+    /**
+     * Mobile variant only — controls the chart-icon toggle button shown
+     * in the mobile symbol row. When `onChartToggle` is undefined the
+     * button is not rendered (desktop has its own chart panel).
+     */
+    chartOpen?: boolean;
+    onChartToggle?: () => void;
     /**
      * Render-prop for the markets picker that pops below the pair pill.
      * Called with a `close` callback the consumer's onSelect handler
@@ -1167,9 +1449,22 @@ export declare interface SymbolHeaderProps {
      * Omit to make the pair pill non-interactive (no dropdown).
      */
     renderMarketsDropdown?: (close: () => void) => default_2.ReactNode;
+    /**
+     * Controlled open state. Pass alongside `onMarketsOpenChange` to lift
+     * the dropdown's open/close lifecycle out of the widget — useful when
+     * the consumer needs a single source of truth (e.g. another markets
+     * trigger lives elsewhere on the page and would otherwise pop a
+     * second dropdown). When `marketsOpen` is omitted the widget falls
+     * back to its own `useState` for backward compatibility.
+     */
+    marketsOpen?: boolean;
+    /** Fired on every internal request to open / close the dropdown. */
+    onMarketsOpenChange?: (open: boolean) => void;
     /** Translator. */
     t?: (key: string) => string;
 }
+
+export { tierFromPnlPct }
 
 export declare interface TpSlIntent {
     symbol: string;
@@ -1179,26 +1474,19 @@ export declare interface TpSlIntent {
     tpPrice: string;
     /** Trigger price for the SL leg. Empty string → skip SL leg. */
     slPrice: string;
-    /** Position size (absolute value), for order qty. */
+    /** Quantity to close (base asset, absolute). */
     qty: string;
     closePosition: boolean;
+    /**
+     * Which oracle the TP/SL trigger compares against:
+     *   - `'Last'` → last traded price (Aster `CONTRACT_PRICE`).
+     *   - `'Mark'` → mark price (Aster `MARK_PRICE`).
+     * Picked from the Last/Mark dropdown in the modal header. The
+     * consumer maps this onto `placeOrder`'s `workingType` field.
+     */
+    triggerSource: TriggerSource;
 }
 
-/**
- * TP/SL setup for an existing position.
- *
- * Price↔PnL sync is bidirectional but direction-aware:
- *   - LONG:  PnL = (exitPrice - entry) × qty    → TP price above entry
- *   - SHORT: PnL = (entry - exitPrice) × qty    → TP price below entry
- *
- * The widget tracks which input the user last typed into so it doesn't
- * fight the cursor — editing Price only propagates to PnL, and vice
- * versa.
- *
- * A direction sanity check surfaces an inline warning when the user
- * types a nonsensical value (e.g. TP below entry on a LONG). The server
- * would reject anyway, but surfacing it early is friendlier.
- */
 export declare const TpSlModal: default_2.FC<TpSlModalProps>;
 
 export declare interface TpSlModalProps {
@@ -1208,16 +1496,61 @@ export declare interface TpSlModalProps {
     positionSide: PositionSide;
     /** Absolute position size (base asset). */
     qty: number;
+    /** Position leverage shown in the summary row, e.g. 20 → "BTCUSDT 20x". */
+    leverage?: number;
+    /** Display symbol of the base asset, e.g. "BTC" — used as the amount-input suffix. */
+    baseAsset?: string;
+    /**
+     * Display unit for the Amount input + Position-amount summary.
+     *   - `'BASE'` (default) — input typed in base asset (e.g. BTC), suffix is `baseAsset`.
+     *   - `'QUOTE'` — input typed in quote asset (USDT), suffix is `quoteAsset`.
+     * The slider always represents 0–100% of the open position; switching
+     * just changes the displayed amount and the conversion. The signed
+     * `intent.qty` always returns base-asset units (the API requires it).
+     */
+    sizeUnit?: 'BASE' | 'QUOTE';
+    /**
+     * Quote asset symbol (e.g. "USDT", "USDC"). Suffixed onto the Entry /
+     * Mark summary rows, the price-summary suffix, and the PnL field
+     * labels so the user always sees which token the numbers are
+     * denominated in. Defaults to "USDT".
+     */
+    quoteAsset?: string;
     entryPrice: number;
     /** Resolved mark price — displayed in the summary row. */
     markPrice: number;
+    /**
+     * Display precision for the Entry / Mark figures and for the trigger
+     * price computed from a PnL input. Defaults to 4 to match Aster's UI;
+     * pass the symbol's actual `pricePrecision` for finer-grained tokens.
+     */
+    pricePrecision?: number;
+    /** Existing TP trigger price for this position, or undefined if none set. */
+    initialTpPrice?: number | string;
+    /** Existing SL trigger price for this position, or undefined if none set. */
+    initialSlPrice?: number | string;
+    /**
+     * Trigger source seed for the Last/Mark dropdown. When the user is
+     * editing an existing TP/SL, the consumer can pre-select the source
+     * the original order used (`CONTRACT_PRICE` → `'Last'`,
+     * `MARK_PRICE` → `'Mark'`). Defaults to `'Last'` when omitted.
+     */
+    initialTriggerSource?: TriggerSource;
+    /**
+     * Cancel the existing TP order for this position. Rendered as a
+     * "Cancel" link beside the Take Profit section header when an existing
+     * TP is in place. Omit to hide the affordance.
+     */
+    onCancelTpOrder?: () => Promise<void> | void;
+    /** Cancel the existing SL order for this position. */
+    onCancelSlOrder?: () => Promise<void> | void;
     onConfirm: (intent: TpSlIntent) => Promise<void> | void;
     onClose: () => void;
     /** Translator. */
     t?: (key: string) => string;
 }
 
-declare interface TradeHistoryRow {
+export declare interface TradeHistoryRow {
     /** Stable React key — typically the tradeId. */
     id: string | number;
     /** Local date string, e.g. '2025-04-17'. */
@@ -1236,7 +1569,7 @@ declare interface TradeHistoryRow {
     realizedProfit: string;
 }
 
-declare interface TransactionHistoryRow {
+export declare interface TransactionHistoryRow {
     /** Stable React key — typically the txId. */
     id: string | number;
     date: string;
@@ -1247,6 +1580,8 @@ declare interface TransactionHistoryRow {
     amount: string;
     symbol: string;
 }
+
+declare type TriggerSource = 'Last' | 'Mark';
 
 export declare const UnderlineTab: default_2.FC<UnderlineTabProps>;
 
@@ -1275,7 +1610,25 @@ export declare interface UnderlineTabsProps {
      * tight groups like the Positions panel's tab row.
      */
     fullWidth?: boolean;
+    /**
+     * Suppress the bottom border on the tabs row. Useful when the parent
+     * wraps the tabs in its own header strip that owns the divider — e.g.
+     * Positions Panel's desktop header where right-side controls share the
+     * same baseline.
+     */
+    noBorder?: boolean;
+    className?: string;
 }
+
+export { WalletData }
+
+export { WalletPanel }
+
+export { WalletPanelLabels }
+
+export { WalletPanelProps }
+
+export { WithdrawAssetRow }
 
 /**
  * Withdraw flow modal — multi-step (select asset → enter amount). The
@@ -1285,6 +1638,10 @@ export declare interface UnderlineTabsProps {
  * from the signed v3 withdraw call. This widget is presentation-only.
  */
 export declare const WithdrawModal: default_2.FC<WithdrawModalProps>;
+
+export { WithdrawModal12 }
+
+export { WithdrawModal12Props }
 
 export declare interface WithdrawModalProps {
     /** Controlled open state. */

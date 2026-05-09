@@ -1,17 +1,33 @@
 import { useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { SimpleBetPanel, type SimpleBetPanelProps } from '../widgets/SimpleBetPanel'
 import { SimpleTickerCard } from '../widgets/SimpleTickerCard'
 import { SimpleChartCard } from '../widgets/SimpleChartCard'
+import { BottomDrawer } from '../primitives/Modal'
 import {
   SimplePositionsCard,
   type SimplePositionRow,
+  type SimpleHistoryRow,
   type SimplePositionsTab,
 } from '../widgets/SimplePositionsCard'
-import { DepositModal } from '../widgets/DepositModal'
+import {
+  WithdrawModal12,
+  type WithdrawAssetRow,
+} from '../widgets/WithdrawModal12'
+import {
+  DepositModal,
+  type DepositStep,
+  type DepositTokenRow,
+} from '../widgets/DepositModal'
 
 export interface SimplePerpsPageProps {
   initialPair?: string
+  /**
+   * Renders the page in a disconnected-wallet state — the positions card
+   * shows the "connect your wallet" placeholder across all tabs. Used by
+   * the Apps/Disconnected Perps · Simple story.
+   */
+  disconnected?: boolean
 }
 
 const TFS = ['1d', '1h', '30m', '15m', '5m'] as const
@@ -37,13 +53,133 @@ const SAMPLE_POSITIONS: readonly SimplePositionRow[] = [
     chainLabel: 'BNB CHAIN',
     iconColor: '#F3BA2F',
     direction: 'up',
+    leverageText: '100X',
     unrealizedPnl: '+$10.09',
     pnlSign: 'positive',
+    size: '$10.09',
+    sizeCurrency: 'USDT',
     entryPrice: '$649.98',
     liqPrice: '$637.00',
     liqDistancePct: 90,
     liqStatus: 'safe',
     liqStatusLabel: 'Safe',
+  },
+  {
+    id: 'btc-long',
+    symbol: 'BTC',
+    chainLabel: 'BTC',
+    iconColor: '#F7931A',
+    direction: 'up',
+    leverageText: '50X',
+    unrealizedPnl: '+$420.55',
+    pnlSign: 'positive',
+    size: '$2,103.10',
+    sizeCurrency: 'USDT',
+    entryPrice: '$78,053.60',
+    liqPrice: '$76,489.40',
+    liqDistancePct: 72,
+    liqStatus: 'safe',
+    liqStatusLabel: 'Safe',
+  },
+  {
+    id: 'eth-short',
+    symbol: 'ETH',
+    chainLabel: 'ETH',
+    iconColor: '#627EEA',
+    direction: 'down',
+    leverageText: '25X',
+    unrealizedPnl: '-$57.12',
+    pnlSign: 'negative',
+    size: '$891.27',
+    sizeCurrency: 'USDT',
+    entryPrice: '$3,420.18',
+    liqPrice: '$3,565.04',
+    liqDistancePct: 38,
+    liqStatus: 'warn',
+    liqStatusLabel: 'Warn',
+  },
+  {
+    id: 'cake-long',
+    symbol: 'CAKE',
+    chainLabel: 'BNB CHAIN',
+    iconColor: '#23CAD5',
+    direction: 'up',
+    leverageText: '500X',
+    unrealizedPnl: '-$8.43',
+    pnlSign: 'negative',
+    size: '$152.04',
+    sizeCurrency: 'USDT',
+    entryPrice: '$2.149',
+    liqPrice: '$2.131',
+    liqDistancePct: 12,
+    liqStatus: 'danger',
+    liqStatusLabel: 'Danger',
+  },
+] as const
+
+const SAMPLE_WITHDRAW_ASSETS: readonly WithdrawAssetRow[] = [
+  {
+    id: 'BNB',
+    symbol: 'BNB',
+    chainLabel: 'BNB Chain',
+    chainBadgeColor: '#1E1E1E',
+    chainBadgeGlyph: 'B',
+    balanceText: '999,999.99',
+    usdText: '$999,999.99',
+    iconColor: '#F0B90B',
+  },
+  {
+    id: 'ETH-ETH',
+    symbol: 'ETH',
+    chainLabel: 'Ethereum',
+    chainBadgeColor: '#627EEA',
+    chainBadgeGlyph: 'E',
+    balanceText: '999,999.99',
+    usdText: '$999,999.99',
+    iconColor: '#627EEA',
+  },
+  {
+    id: 'USDC',
+    symbol: 'USDC',
+    chainLabel: 'Polygon',
+    chainBadgeColor: '#2D364D',
+    chainBadgeGlyph: 'P',
+    balanceText: '999,999.99',
+    usdText: '$999,999.99',
+    iconColor: '#2775CA',
+  },
+] as const
+
+const SAMPLE_HISTORY: readonly SimpleHistoryRow[] = [
+  {
+    id: 'history-1',
+    symbol: 'BNB',
+    iconColor: '#F3BA2F',
+    direction: 'up',
+    leverageText: '100X',
+    price: '$649.98',
+    quantity: '1.982',
+    fee: '-0.11412',
+    feeCurrency: 'USDT',
+    realizedProfit: '+200.091',
+    realizedProfitSign: 'positive',
+    realizedProfitCurrency: 'USDT',
+    time: '2026-05-05',
+  },
+  {
+    id: 'history-2',
+    symbol: 'BNB',
+    iconColor: '#F3BA2F',
+    direction: 'down',
+    leverageText: '50X',
+    price: '$651.42',
+    quantity: '0.815',
+    fee: '-0.04812',
+    feeCurrency: 'USDT',
+    realizedProfit: '-42.187',
+    realizedProfitSign: 'negative',
+    realizedProfitCurrency: 'USDT',
+    time: '2026-05-04',
   },
 ] as const
 
@@ -78,6 +214,14 @@ const Logo = styled.div`
   font-size: 16px;
   color: ${({ theme }) => theme.colors.text};
   margin-right: 32px;
+`
+
+/* Hide the "PancakeSwap" wordmark on tablet — only the bunny chip
+   remains, per Figma 375:7569. */
+const LogoText = styled.span`
+  @media (max-width: 967.98px) {
+    display: none;
+  }
 `
 
 const LogoBunny = styled.span`
@@ -145,6 +289,10 @@ const DepositPill = styled.button`
   font-weight: 600;
   cursor: pointer;
   &:hover { filter: brightness(1.05); }
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
 `
 
 const SettingsBtn = styled.button`
@@ -159,6 +307,10 @@ const SettingsBtn = styled.button`
   color: ${({ theme }) => theme.colors.textSubtle};
   cursor: pointer;
   &:hover { background: ${({ theme }) => theme.colors.input}; }
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
 `
 
 const WalletChip = styled.button`
@@ -189,17 +341,30 @@ const WalletAvatar = styled.span`
   font-size: 14px;
 `
 
+const WalletBalance = styled.span`
+  @media (max-width: 575.98px) {
+    display: none;
+  }
+`
+
 const Body = styled.div`
   display: flex;
   align-items: stretch;
   min-height: 0;
   flex: 1;
+
+  @media (max-width: 967.98px) {
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+    background: ${({ theme }) => theme.colors.background};
+  }
 `
 
 const LeftCol = styled.div`
   flex: 1;
   min-width: 0;
-  padding: 48px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -208,6 +373,144 @@ const LeftCol = styled.div`
     ${({ theme }) => theme.colors.card} 0%,
     ${({ theme }) => theme.colors.input} 100%
   );
+
+  @media (min-width: 968px) and (max-width: 1199.98px) {
+    padding: 24px;
+  }
+
+  @media (max-width: 967.98px) {
+    display: contents;
+  }
+`
+
+/* On phones and tablets the inline chart card collapses out of the
+   layout — the ticker exposes a graph button that opens the same chart
+   inside a bottom-sheet (Figma 621-29050 / 622-29522 / 623-30687), so
+   the body stays short above the fold. */
+const InlineChart = styled.div`
+  display: contents;
+
+  @media (max-width: 967.98px) {
+    display: none;
+  }
+`
+
+/* Bottom-sheet content for the mobile chart drawer (Figma 623-30687).
+   Token + price header sits above the chart with a divider; the chart
+   card's outer border is neutralised so it reads as a single sheet
+   instead of a card-within-a-card. */
+
+/* Reserves vertical space for the BottomDrawer's absolute-positioned
+   grabber (top: 16px, 4px tall) plus the 8px breathing room below it,
+   so the header doesn't sit underneath the grabber. */
+const ChartSheetGrabberSpacer = styled.div`
+  height: 28px;
+  flex-shrink: 0;
+  align-self: stretch;
+`
+
+const ChartSheetHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  align-self: stretch;
+`
+
+const ChartSheetSymbolRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
+const ChartSheetTokenIcon = styled.span`
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #F3BA2F;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  font-family: Kanit;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+`
+
+const ChartSheetSymbol = styled.span`
+  font-family: Kanit;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const ChartSheetPrice = styled.div`
+  font-family: Kanit;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.32px;
+  color: ${({ theme }) => theme.colors.text};
+  font-variant-numeric: tabular-nums;
+`
+
+const ChartSheetStatsRow = styled.div`
+  display: flex;
+  gap: 16px;
+  font-family: Kanit;
+  font-size: 14px;
+`
+
+const ChartSheetStat = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 80px;
+`
+
+const ChartSheetStatLabel = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-weight: 400;
+  line-height: 150%;
+`
+
+const ChartSheetStatValue = styled.span<{ $sign?: 'positive' | 'negative' }>`
+  color: ${({ $sign, theme }) =>
+    $sign === 'negative' ? '#ED4B9E' : $sign === 'positive' ? '#129E7D' : theme.colors.text};
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`
+
+/* Strips the inner SimpleChartCard's card border / background / fixed
+   height so it lays out flush on the drawer's white surface. 10px top
+   padding matches Figma 623-30687 — the chart sits closer to the
+   header divider than the standalone card variant. */
+const ChartSheetChart = styled.div`
+  align-self: stretch;
+  & > div {
+    border: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    padding: 10px 16px 16px !important;
+    height: 460px !important;
+  }
+`
+
+/* On tablet, LeftCol uses display:contents so its children become direct
+   flex items of Body. Bet panel + positions are then siblings, and we
+   nudge positions to last via order so the order matches Figma:
+   ticker → chart → bet panel → positions. */
+const TabletPositionsWrapper = styled.div`
+  display: contents;
+
+  @media (max-width: 967.98px) {
+    display: block;
+    align-self: stretch;
+    order: 1;
+  }
 `
 
 /* ── Collateral picker modal (opens when + is clicked on My Perp Fund) ── */
@@ -384,6 +687,326 @@ const TokenValue = styled.span`
   font-variant-numeric: tabular-nums;
 `
 
+/* ── Order Confirmation modal ──────────────────────────────────── */
+
+const ConfirmModalCard = styled.div`
+  display: flex;
+  width: 411px;
+  padding: 24px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  border-radius: 24px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.card};
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.08),
+    0 4px 8px 0 rgba(0, 0, 0, 0.16);
+`
+
+const ConfirmModalTitle = styled.h3`
+  margin: 0;
+  align-self: stretch;
+  color: ${({ theme }) => theme.colors.text};
+  font-feature-settings: 'liga' off;
+  font-family: Kanit;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+`
+
+const OrderRowsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-self: stretch;
+`
+
+const OrderTokenRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 12px;
+`
+
+const OrderTokenLeft = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+`
+
+const OrderTokenSymbol = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 150%;
+`
+
+const SidePill = styled.span<{ $up: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid
+    ${({ theme, $up }) => ($up ? theme.colors.success : theme.colors.failure)};
+  color: ${({ theme, $up }) => ($up ? theme.colors.success : theme.colors.failure)};
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+`
+
+const OrderRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 12px;
+`
+
+const OrderLabel = styled.span`
+  color: ${({ theme }) => theme.colors.textSubtle};
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+`
+
+const OrderValue = styled.span`
+  color: ${({ theme }) => theme.colors.text};
+  text-align: right;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 150%;
+  font-variant-numeric: tabular-nums;
+`
+
+const DontShowRow = styled.label`
+  display: flex;
+  padding: 8px 16px;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+  justify-content: space-between;
+  border-radius: 16px;
+  border-top: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-right: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  border-left: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  cursor: pointer;
+  font-family: Kanit;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const DontShowCheckbox = styled.input.attrs({ type: 'checkbox' })`
+  appearance: none;
+  display: flex;
+  width: 24px;
+  height: 24px;
+  padding: 1px 2px 3px 2px;
+  align-items: flex-start;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.20);
+  background: ${({ theme }) => theme.colors.success};
+  cursor: pointer;
+  position: relative;
+  &:after {
+    content: '';
+    display: block;
+    width: 14px;
+    height: 14px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.25 9.31 3 7.06l-.94.94L5.25 11.2 12 4.44l-.94-.94z" fill="white"/></svg>') no-repeat center;
+  }
+  &:not(:checked):after {
+    visibility: hidden;
+  }
+  &:not(:checked) {
+    background: ${({ theme }) => theme.colors.input};
+    border-bottom-color: rgba(0, 0, 0, 0.10);
+  }
+  &:focus-visible {
+    outline: 0;
+    box-shadow:
+      0 0 0 1px ${({ theme }) => theme.colors.secondary},
+      0 0 0 4px rgba(118, 69, 217, 0.20);
+  }
+`
+
+const ModalActions = styled.div`
+  display: flex;
+  gap: 8px;
+  align-self: stretch;
+`
+
+const ModalActionBtn = styled.button<{ $variant: 'primary' | 'secondary' }>`
+  display: flex;
+  flex: 1 0 0;
+  padding: 11px 12px 13px;
+  justify-content: center;
+  align-items: center;
+  border: 0;
+  border-radius: 16px;
+  font-family: Kanit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  background: ${({ theme, $variant }) =>
+    $variant === 'primary' ? theme.colors.primary : theme.colors.tertiary};
+  color: ${({ theme, $variant }) =>
+    $variant === 'primary' ? theme.colors.invertedContrast : theme.colors.primary};
+  border-bottom: 2px solid
+    ${({ $variant }) => ($variant === 'primary' ? 'rgba(0, 0, 0, 0.20)' : 'rgba(0, 0, 0, 0.10)')};
+  &:hover { filter: brightness(1.05); }
+`
+
+const OrderConfirmModal: React.FC<{
+  isOpen: boolean
+  side: 'up' | 'down'
+  pair: string
+  baseAsset: string
+  price: string
+  estLiqPrice: string
+  positionSize: string
+  duration: string
+  onConfirm: () => void
+  onClose: () => void
+}> = ({ isOpen, side, pair, baseAsset, price, estLiqPrice, positionSize, duration, onConfirm, onClose }) => {
+  if (!isOpen) return null
+  const isUp = side === 'up'
+  return (
+    <Overlay onClick={onClose}>
+      <ConfirmModalCard onClick={(e) => e.stopPropagation()}>
+        <ModalHeader>
+          <ConfirmModalTitle>Order Confirmation</ConfirmModalTitle>
+          <ModalCloseBtn type="button" onClick={onClose} aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            </svg>
+          </ModalCloseBtn>
+        </ModalHeader>
+        <OrderTokenRow>
+          <OrderTokenLeft>
+            <TokenIcon $color="#F0B90B">{baseAsset.slice(0, 1)}</TokenIcon>
+            <OrderTokenSymbol>{pair}</OrderTokenSymbol>
+          </OrderTokenLeft>
+          <SidePill $up={isUp}>
+            {isUp ? '↑' : '↓'} {isUp ? 'Up' : 'Down'}
+          </SidePill>
+        </OrderTokenRow>
+        <OrderRowsList>
+          <OrderRow><OrderLabel>Price</OrderLabel><OrderValue>{price}</OrderValue></OrderRow>
+          <OrderRow><OrderLabel>Est. Liquidation price</OrderLabel><OrderValue>{estLiqPrice}</OrderValue></OrderRow>
+          <OrderRow><OrderLabel>Position size</OrderLabel><OrderValue>{positionSize}</OrderValue></OrderRow>
+          <OrderRow><OrderLabel>Time duration</OrderLabel><OrderValue>{duration}</OrderValue></OrderRow>
+        </OrderRowsList>
+        <DontShowRow>
+          Don&apos;t show again
+          <DontShowCheckbox defaultChecked />
+        </DontShowRow>
+        <ModalActions>
+          <ModalActionBtn type="button" $variant="primary" onClick={onConfirm}>Confirm</ModalActionBtn>
+          <ModalActionBtn type="button" $variant="secondary" onClick={onClose}>Cancel</ModalActionBtn>
+        </ModalActions>
+      </ConfirmModalCard>
+    </Overlay>
+  )
+}
+
+/* ── Fund Your Perp Account modal ──────────────────────── */
+
+interface FundAsset {
+  symbol: string
+  chainLabel: string
+  amount: string
+  valueUsd: string
+  color: string
+}
+
+const FUND_ASSETS: FundAsset[] = [
+  { symbol: 'BNB',  chainLabel: 'BNB Chain',     amount: '999,999.99', valueUsd: '$999,999.99', color: '#F0B90B' },
+  { symbol: 'ETH',  chainLabel: 'Ethereum',      amount: '999,999.99', valueUsd: '$999,999.99', color: '#627EEA' },
+  { symbol: 'ETH',  chainLabel: 'Arbitrum One',  amount: '999,999.99', valueUsd: '$999,999.99', color: '#627EEA' },
+  { symbol: 'USDC', chainLabel: 'Ethereum',      amount: '999,999.99', valueUsd: '$999,999.99', color: '#2775CA' },
+]
+
+/* Maps the page's FUND_ASSETS to the DepositModal's row schema. */
+const FUND_DEPOSIT_ROWS: DepositTokenRow[] = FUND_ASSETS.map((a, i) => ({
+  id: `${a.symbol}-${i}`,
+  symbol: a.symbol,
+  displayName: a.symbol,
+  balanceText: a.amount,
+  usdValueText: a.valueUsd,
+  hasBalance: true,
+}))
+
+/**
+ * SimplePerpsPage's deposit-button entry-point now uses the real
+ * DepositModal widget — same controlled flow as the Interactive
+ * story (select asset → enter amount → checking → success).
+ */
+const FundAccountModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
+  isOpen,
+  onClose,
+}) => {
+  const [step, setStep] = useState<DepositStep>('select')
+  const [selected, setSelected] = useState<DepositTokenRow | undefined>()
+  const [amount, setAmount] = useState('')
+
+  const handleClose = () => {
+    setStep('select')
+    setSelected(undefined)
+    setAmount('')
+    onClose()
+  }
+
+  return (
+    <DepositModal
+      isOpen={isOpen}
+      step={step}
+      assets={FUND_DEPOSIT_ROWS}
+      selectedAssetId={selected?.id}
+      selectedAsset={selected}
+      evmAddress="0x…8989"
+      perpBalanceText="$0"
+      amount={amount}
+      onAmountChange={setAmount}
+      onSelectAsset={(id) => {
+        const a = FUND_DEPOSIT_ROWS.find((x) => x.id === id)
+        if (!a) return
+        setSelected(a)
+        setStep('amount')
+      }}
+      onPercentClick={(pct) => {
+        if (!selected) return
+        const max = parseFloat(selected.balanceText.replace(/,/g, ''))
+        if (!Number.isFinite(max)) return
+        setAmount(((max * pct) / 100).toFixed(4))
+      }}
+      onBack={() => setStep('select')}
+      submitState="idle"
+      canContinue={!!amount && Number(amount) > 0}
+      onContinue={() => {
+        setStep('checking')
+        setTimeout(() => setStep('success'), 1200)
+      }}
+      onClose={handleClose}
+    />
+  )
+}
+
 interface CollateralAsset {
   symbol: string
   name: string
@@ -448,7 +1071,7 @@ const ModeBar: React.FC<{ onDeposit?: () => void }> = ({ onDeposit }) => (
   <ModeBarRoot>
     <Logo>
       <LogoBunny aria-hidden>🐰</LogoBunny>
-      PancakeSwap
+      <LogoText>PancakeSwap</LogoText>
     </Logo>
     <ModeToggle role="tablist" aria-label="Trading mode">
       <ModeTab type="button" role="tab" aria-selected $active>
@@ -470,7 +1093,7 @@ const ModeBar: React.FC<{ onDeposit?: () => void }> = ({ onDeposit }) => (
       </SettingsBtn>
       <WalletChip type="button">
         <WalletAvatar aria-hidden>🦊</WalletAvatar>
-        $6,488.98
+        <WalletBalance>$6,488.98</WalletBalance>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
         </svg>
@@ -485,8 +1108,10 @@ const mockBetPanelArgs = (
   setBet: (s: string) => void,
   leverage: number,
   setLeverage: (n: number) => void,
-  onDeposit: () => void,
-  onTopUpFund: () => void,
+  onFundOpen: () => void,
+  onCollateralOpen: () => void,
+  onConfirmOpen: (side: 'up' | 'down') => void,
+  onWithdrawOpen: () => void,
 ): SimpleBetPanelProps => ({
   symbol: 'BTCUSDT',
   baseAsset: 'BTC',
@@ -498,31 +1123,43 @@ const mockBetPanelArgs = (
   leverage,
   onLeverageChange: setLeverage,
   quoteAsset: 'USDT',
+  /* Collateral picker opens via the dropdown arrow under the bet input's
+     token icon. The (+) on the My Perp Fund chip and the Deposit button
+     both open the Fund Your Perp Account modal instead. */
+  onQuoteAssetClick: onCollateralOpen,
   fundBalanceText: '20.00 USDT',
-  onTopUpFund,
+  onTopUpFund: onFundOpen,
   estimatedEntry: '$78,053.60',
   liqIfLong: '$66,092.23 (-2.0%)',
   marginRequired: '$400 USDT',
   openingFee: '$10.00 (0.05%)',
   canSubmit: true,
-  onUp: () => undefined,
-  onDown: () => undefined,
-  onDeposit,
-  onWithdraw: () => undefined,
+  onUp: () => onConfirmOpen('up'),
+  onDown: () => onConfirmOpen('down'),
+  onDeposit: onFundOpen,
+  onWithdraw: onWithdrawOpen,
   unrealizedPnl: '$0',
 })
 
-export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProps = {}) {
+export function SimplePerpsPage({
+  initialPair = 'BTC/USD',
+  disconnected = false,
+}: SimplePerpsPageProps = {}) {
   const [tf, setTf] = useState<Tf>('1d')
   const [positionsTab, setPositionsTab] = useState<SimplePositionsTab>('positions')
-  const [depositOpen, setDepositOpen] = useState(false)
+  const [fundOpen, setFundOpen] = useState(false)
   const [collateralOpen, setCollateralOpen] = useState(false)
+  const [orderConfirm, setOrderConfirm] = useState<'up' | 'down' | null>(null)
   const [bet, setBet] = useState('')
   const [leverage, setLeverage] = useState(10)
+  const [chartOpen, setChartOpen] = useState(false)
+  const [withdrawOpen, setWithdrawOpen] = useState(false)
+  const [withdrawAssetId, setWithdrawAssetId] = useState<string | undefined>(undefined)
+  const [withdrawAmount, setWithdrawAmount] = useState('')
 
   return (
     <Root aria-label={`Perpetuals · Simple mode · ${initialPair}`}>
-      <ModeBar onDeposit={() => setDepositOpen(true)} />
+      <ModeBar onDeposit={() => setFundOpen(true)} />
 
       <Body>
         {/* Left column: ticker + chart + positions */}
@@ -536,26 +1173,39 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
             openInterest="$2.13B"
             fundingRate="+0.010%"
             nextFunding="4h 12m"
+            onChartOpen={() => setChartOpen(true)}
           />
 
-          <SimpleChartCard
-            timeframe={tf}
-            timeframes={TFS}
-            onTimeframeChange={(next) => setTf(next as Tf)}
-            points={[]}
-            currentPriceLabel="640"
-            yTicks={Y_TICKS}
-            xTicks={X_TICKS}
-          />
+          <InlineChart>
+            <SimpleChartCard
+              timeframe={tf}
+              timeframes={TFS}
+              onTimeframeChange={(next) => setTf(next as Tf)}
+              points={[]}
+              currentPriceLabel="640"
+              yTicks={Y_TICKS}
+              xTicks={X_TICKS}
+            />
+          </InlineChart>
 
-          <SimplePositionsCard
-            tab={positionsTab}
-            onTabChange={setPositionsTab}
-            positions={SAMPLE_POSITIONS}
-            openOrders={[]}
-            historyEmpty
-            onClosePosition={() => undefined}
-          />
+          <TabletPositionsWrapper>
+            <SimplePositionsCard
+              tab={positionsTab}
+              onTabChange={setPositionsTab}
+              positions={disconnected ? [] : SAMPLE_POSITIONS}
+              history={disconnected ? [] : SAMPLE_HISTORY}
+              disconnectedMessage={
+                disconnected
+                  ? {
+                      positions: 'Connect your wallet to see your active positions',
+                      history: 'Connect your wallet to see your transaction history',
+                    }
+                  : undefined
+              }
+              onClosePosition={() => undefined}
+              onSharePnl={() => undefined}
+            />
+          </TabletPositionsWrapper>
         </LeftCol>
 
         {/* Right column: UP/DOWN bet panel */}
@@ -565,29 +1215,100 @@ export function SimplePerpsPage({ initialPair = 'BTC/USD' }: SimplePerpsPageProp
             setBet,
             leverage,
             setLeverage,
-            () => setDepositOpen(true),
+            () => setFundOpen(true),
             () => setCollateralOpen(true),
+            (side) => setOrderConfirm(side),
+            () => setWithdrawOpen(true),
           )}
+          canSubmit={!disconnected}
+          {...(disconnected && { fundBalanceText: '0 USDT' })}
+          connectWalletLabel={disconnected ? 'Connect wallet' : undefined}
+          onConnectWallet={() => undefined}
         />
       </Body>
 
+      <FundAccountModal isOpen={fundOpen} onClose={() => setFundOpen(false)} />
+
       <CollateralModal isOpen={collateralOpen} onClose={() => setCollateralOpen(false)} />
 
-      <DepositModal
-        isOpen={depositOpen}
-        onClose={() => setDepositOpen(false)}
-        step="select"
-        evmAddress="0x1234…abcd"
-        assets={[]}
-        onSelectAsset={() => undefined}
-        amount=""
-        onAmountChange={() => undefined}
-        onPercentClick={() => undefined}
-        submitState="idle"
-        canContinue={false}
-        onContinue={() => undefined}
-        onBack={() => setDepositOpen(false)}
+      <WithdrawModal12
+        isOpen={withdrawOpen}
+        onClose={() => {
+          setWithdrawOpen(false)
+          setWithdrawAssetId(undefined)
+          setWithdrawAmount('')
+        }}
+        perpsBalanceText="$1,000.98"
+        destinationAddress="0x...1234"
+        assets={SAMPLE_WITHDRAW_ASSETS}
+        selectedAssetId={withdrawAssetId}
+        onSelectAsset={setWithdrawAssetId}
+        amount={withdrawAmount}
+        onAmountChange={setWithdrawAmount}
+        amountUsdText="0.0"
+        onWithdraw={() => {
+          setWithdrawOpen(false)
+          setWithdrawAssetId(undefined)
+          setWithdrawAmount('')
+        }}
       />
+
+      <OrderConfirmModal
+        isOpen={!!orderConfirm}
+        side={orderConfirm ?? 'up'}
+        pair="BNB/USD"
+        baseAsset="BNB"
+        price="78,053.60 USDT"
+        estLiqPrice="$66,092.23"
+        positionSize="$100"
+        duration="Perpetual"
+        onConfirm={() => setOrderConfirm(null)}
+        onClose={() => setOrderConfirm(null)}
+      />
+
+      <BottomDrawer
+        isOpen={chartOpen}
+        setIsOpen={setChartOpen}
+        hideCloseButton
+        content={
+          <>
+            <ChartSheetGrabberSpacer />
+            <ChartSheetHeader>
+              <ChartSheetSymbolRow>
+                <ChartSheetTokenIcon>B</ChartSheetTokenIcon>
+                <ChartSheetSymbol>BTC</ChartSheetSymbol>
+              </ChartSheetSymbolRow>
+              <ChartSheetPrice>78,053.6</ChartSheetPrice>
+              <ChartSheetStatsRow>
+                <ChartSheetStat>
+                  <ChartSheetStatLabel>24h Change</ChartSheetStatLabel>
+                  <ChartSheetStatValue $sign="negative">-0.01%</ChartSheetStatValue>
+                </ChartSheetStat>
+                <ChartSheetStat>
+                  <ChartSheetStatLabel>24h High</ChartSheetStatLabel>
+                  <ChartSheetStatValue>0.0053863</ChartSheetStatValue>
+                </ChartSheetStat>
+                <ChartSheetStat>
+                  <ChartSheetStatLabel>24h Low</ChartSheetStatLabel>
+                  <ChartSheetStatValue>0.0051863</ChartSheetStatValue>
+                </ChartSheetStat>
+              </ChartSheetStatsRow>
+            </ChartSheetHeader>
+            <ChartSheetChart>
+              <SimpleChartCard
+                timeframe={tf}
+                timeframes={TFS}
+                onTimeframeChange={(next) => setTf(next as Tf)}
+                points={[]}
+                currentPriceLabel="640"
+                yTicks={Y_TICKS}
+                xTicks={X_TICKS}
+              />
+            </ChartSheetChart>
+          </>
+        }
+      />
+
     </Root>
   )
 }

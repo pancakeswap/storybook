@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import styled from 'styled-components'
+import { styled } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Text } from '../primitives/Text'
 import { SearchIcon } from '../primitives/Icons'
@@ -256,7 +256,8 @@ const fmtVol = (v?: string) => {
 }
 
 const baseAsset = (symbol: string) =>
-  symbol.toUpperCase().replace(/USDT$/, '').replace(/USDC$/, '').replace(/USD$/, '') || symbol.toUpperCase()
+  symbol.toUpperCase().replace(/USD1$/, '').replace(/USDT$/, '').replace(/USDC$/, '').replace(/USD$/, '') ||
+  symbol.toUpperCase()
 
 const glyph = (symbol: string) => baseAsset(symbol).slice(0, 1) || symbol.slice(0, 1)
 

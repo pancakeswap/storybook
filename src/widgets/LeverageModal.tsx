@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import styled from 'styled-components'
-import { Box, Flex } from '../primitives/Box'
+import { styled } from 'styled-components'
+import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
-import { BunnySlider } from './BunnySlider'
+import { Slider } from '../primitives/Slider'
 import { Text } from '../primitives/Text'
 import Modal from '../primitives/Modal/Modal'
 import { ModalV2 } from '../primitives/Modal/ModalV2'
@@ -17,10 +17,23 @@ export interface LeverageModalProps {
   minLeverage?: number
   maxLeverage?: number
   /**
-   * USDT (or quote) balance available for new positions. Used to display
-   * the "Maximum position at current leverage" preview line.
+   * Returns the maximum new notional (USDT) the user can open at the
+   * given draft leverage — the "Remaining openable notional value" line.
+   * Called with the current slider value as the user drags so the
+   * preview stays in sync; return `undefined` while inputs (brackets,
+   * positions, open orders, OI map) are still loading.
+   *
+   * Caller-owned formula. Aster's UI uses two clamps:
+   *   `min(bracketCap − usedNotional, oiRemaining[ceil(leverage)])`
+   * where `bracketCap` is the per-tier `notionalCap` for the chosen
+   * leverage (binds at HIGH leverage), `usedNotional` is existing
+   * position + unfilled open-order notional on the symbol, and
+   * `oiRemaining` is a platform-wide open-interest budget per leverage
+   * tier (binds at LOW leverage where bracket caps are huge). Wallet
+   * balance is intentionally NOT factored in — this preview describes
+   * venue risk-control headroom, not margin sufficiency. PAN-11910.
    */
-  availableBalance: number
+  remainingOpenableAtLeverage: (leverage: number) => number | undefined
   /**
    * Called when the user clicks Confirm with their chosen leverage. The
    * consumer is responsible for the async write back to the venue, error
@@ -46,6 +59,16 @@ export interface LeverageModalProps {
   t?: (key: string, options?: Record<string, string | number | undefined>) => string
 }
 
+const Body = styled(Flex)`
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  ${({ theme }) => theme.mediaQueries.lg} {
+    min-width: 340px;
+    max-width: 440px;
+  }
+`
+
 const Stepper = styled(Flex)`
   gap: 10px;
   align-items: stretch;
@@ -67,6 +90,16 @@ const ValueBox = styled(Flex)`
   font-size: 18px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+`
+
+const RemainingBox = styled(Flex)`
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 12px;
 `
 
 /**
@@ -93,7 +126,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
   currentLeverage,
   minLeverage = 1,
   maxLeverage = 100,
-  availableBalance,
+  remainingOpenableAtLeverage,
   onConfirm,
   onClose,
   isSubmitting = false,
@@ -106,16 +139,17 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
   // with a different `currentLeverage` (e.g. user closed without
   // confirming, then reopened after Aster updated their position lev).
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional draft re-sync on (re)open
     if (isOpen) setValue(currentLeverage)
   }, [isOpen, currentLeverage])
 
   const clamp = (n: number) => Math.max(minLeverage, Math.min(maxLeverage, Math.round(n)))
-  const maxNotional = availableBalance * value
+  const remainingOpenable = remainingOpenableAtLeverage(value)
 
   return (
     <ModalV2 isOpen={isOpen} onDismiss={onClose} closeOnOverlayClick>
       <Modal title={t('%symbol% Adjust Leverage', { symbol })} onDismiss={onClose}>
-        <Flex flexDirection="column" style={{ gap: 16, minWidth: 340, maxWidth: 440 }}>
+        <Body>
           <Stepper>
             <StepButton
               onClick={() => setValue((v) => clamp(v - 1))}
@@ -134,25 +168,40 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
             </StepButton>
           </Stepper>
 
-          <BunnySlider
+          <Slider
+            variant="dotted"
             name="perp-leverage"
-            min={minLeverage}
+            // min={0} (not minLeverage) so the default 4 stops land on
+            // round values: max=200 → 1/50/100/150/200, max=100 →
+            // 1/25/50/75/100. The leftmost stop sends 0 to
+            // onValueChanged; `clamp` lifts that to `minLeverage` so the
+            // user-facing minimum is still 1.
+            min={0}
             max={maxLeverage}
             value={value}
             onValueChanged={(v) => setValue(clamp(v))}
             width="100%"
           />
 
-          <Box>
+          <RemainingBox>
             <Text fontSize="14px" color="textSubtle">
-              {t('Maximum position at current leverage:')}
+              {t('Remaining openable notional value')}
             </Text>
-            <Text fontSize="18px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
-              {Number.isFinite(maxNotional) && maxNotional > 0
-                ? `${maxNotional.toLocaleString(undefined, { maximumFractionDigits: 0 })} USDT`
+            <Text fontSize="20px" bold style={{ fontVariantNumeric: 'tabular-nums' }}>
+              {Number.isFinite(remainingOpenable) && (remainingOpenable as number) > 0
+                ? `${(remainingOpenable as number).toLocaleString(undefined, { maximumFractionDigits: 0 })} USDT`
                 : '—'}
             </Text>
-          </Box>
+            <Text fontSize="12px" color="textSubtle">
+              {t(
+                'The maximum notional value you can open under your current leverage and system risk control limits.',
+              )}
+            </Text>
+          </RemainingBox>
+
+          <Text fontSize="12px" color="textSubtle">
+            {t('Please note that leverage changing will also apply for open positions and open orders.')}
+          </Text>
 
           <Text fontSize="12px" color="textSubtle">
             {t('Please note that setting higher leverage increases the risk of liquidation.')}
@@ -163,7 +212,7 @@ export const LeverageModal: React.FC<LeverageModalProps> = ({
           <Button scale="md" disabled={isSubmitting} onClick={() => onConfirm(value)}>
             {isSubmitting ? t('Confirming…') : t('Confirm')}
           </Button>
-        </Flex>
+        </Body>
       </Modal>
     </ModalV2>
   )

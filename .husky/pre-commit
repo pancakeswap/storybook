@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Husky pre-commit hook: runs lint-staged + preserves the existing
+# dist/ commit-block from .githooks/pre-commit.
+
+# 1. Block accidental commits of locally-built dist/. Carried over from
+#    .githooks/pre-commit so installing husky doesn't lose this guard.
+#    Why: dist/ is auto-built and committed by the GitHub Action
+#    (.github/workflows/rebuild-dist.yml). Local pnpm dev:lib watches and
+#    rewrites dist on every src save; if the dev `git add -A`s, those
+#    local builds end up in the commit and fight with the bot's clean,
+#    deterministic output.
+if git diff --cached --name-only | grep -qE '^dist/'; then
+  cat >&2 <<'MSG'
+
+✗ Refusing to commit: dist/ files are staged.
+
+  dist/ is auto-built and committed by the GitHub Action on push
+  (.github/workflows/rebuild-dist.yml). Don't ship local builds —
+  they cause hash drift and pollute the diff.
+
+  Un-stage with:
+    git reset HEAD dist/
+
+  If you really need to bypass (emergency, CI broken, etc.):
+    git commit --no-verify
+
+MSG
+  exit 1
+fi
+
+# 2. Run eslint (no-restricted-syntax + others) on staged TS/TSX files.
+#    Blocks commits that introduce hardcoded hex colors.
+pnpm exec lint-staged
