@@ -377,10 +377,23 @@ export declare interface LeverageModalProps {
     minLeverage?: number;
     maxLeverage?: number;
     /**
-     * USDT (or quote) balance available for new positions. Used to display
-     * the "Maximum position at current leverage" preview line.
+     * Returns the maximum new notional (USDT) the user can open at the
+     * given draft leverage — the "Remaining openable notional value" line.
+     * Called with the current slider value as the user drags so the
+     * preview stays in sync; return `undefined` while inputs (brackets,
+     * positions, open orders, OI map) are still loading.
+     *
+     * Caller-owned formula. Aster's UI uses two clamps:
+     *   `min(bracketCap − usedNotional, oiRemaining[ceil(leverage)])`
+     * where `bracketCap` is the per-tier `notionalCap` for the chosen
+     * leverage (binds at HIGH leverage), `usedNotional` is existing
+     * position + unfilled open-order notional on the symbol, and
+     * `oiRemaining` is a platform-wide open-interest budget per leverage
+     * tier (binds at LOW leverage where bracket caps are huge). Wallet
+     * balance is intentionally NOT factored in — this preview describes
+     * venue risk-control headroom, not margin sufficiency. PAN-11910.
      */
-    availableBalance: number;
+    remainingOpenableAtLeverage: (leverage: number) => number | undefined;
     /**
      * Called when the user clicks Confirm with their chosen leverage. The
      * consumer is responsible for the async write back to the venue, error
