@@ -8,7 +8,7 @@ import { Input } from '../primitives/Input'
 import Slider from '../primitives/Slider/Slider'
 import { Text } from '../primitives/Text'
 import { AddIcon, ChevronDownIcon, InfoIcon } from '../primitives/Icons'
-import { Select, type SelectOption } from '../primitives/Select'
+import { type SelectOption } from '../primitives/Select'
 import { useMatchBreakpoints } from '../contexts'
 import { BunnySlider } from './BunnySlider'
 import { PerpsPanel } from './primitives'
@@ -568,13 +568,13 @@ const StopSourceSelect = styled.button`
  * act as the active-state tab — keeps the underline / colored-border
  * cue consistent with the other tabs.
  */
-const StopPanel = styled.div`
+const MenuPanel = styled.div`
   position: fixed;
   z-index: 9999;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 160px;
+  min-width: 160px;
   background: ${({ theme }) => theme.colors.input};
   border-top: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   border-right: 1px solid ${({ theme }) => theme.colors.inputSecondary};
@@ -587,7 +587,7 @@ const StopPanel = styled.div`
   overflow: hidden;
 `
 
-const StopPanelItem = styled.button<{ $active: boolean }>`
+const MenuPanelItem = styled.button<{ $active: boolean }>`
   background: ${({ $active, theme }) => ($active ? theme.colors.tertiary : 'transparent')};
   border: 0;
   padding: 10px 14px;
@@ -609,13 +609,24 @@ const TIF_OPTIONS: ReadonlyArray<SelectOption<TifValue>> = [
   { value: 'FOK', label: 'FOK', description: 'Fill or Kill' },
 ]
 
-const TifSelectWrap = styled.div`
-  flex-shrink: 0;
-  width: 240px;
-  /* The shared Select primitive renders the styled brand-chrome trigger.
-   * The closed trigger displays the terse label ('GTC') so the row stays
-   * compact; the open dropdown shows each option with its long-form
-   * description appended. */
+/* TIF dropdown trigger — minimal text+chevron button living inside the
+ * PriceInputRow chrome. The dropdown menu itself uses the shared MenuPanel
+ * (same component as the Stop Limit / Stop Market type-tab dropdown) so
+ * the two selects look and feel identical. */
+const TifTrigger = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
 `
 
 const InputTight = styled(Input)`
@@ -1339,6 +1350,12 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
   const stopPanelRef = useRef<HTMLDivElement>(null)
   const [stopMenuOpen, setStopMenuOpen] = useState(false)
   const [stopMenuPos, setStopMenuPos] = useState({ top: 0, left: 0 })
+  // TIF dropdown — same MenuPanel chrome as the stop-tab dropdown, just
+  // with a different trigger living inside the form's PriceInputRow.
+  const tifTriggerRef = useRef<HTMLButtonElement>(null)
+  const tifPanelRef = useRef<HTMLDivElement>(null)
+  const [tifMenuOpen, setTifMenuOpen] = useState(false)
+  const [tifMenuPos, setTifMenuPos] = useState({ top: 0, left: 0 })
   const [reduceOnlyTipOpen, setReduceOnlyTipOpen] = useState(false)
   const [tpSlTipOpen, setTpSlTipOpen] = useState(false)
   const [summaryTip, setSummaryTip] = useState<'cost' | 'liq' | 'fees' | null>(null)
@@ -1375,6 +1392,35 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
   }, [stopMenuOpen])
+
+  useEffect(() => {
+    if (!tifMenuOpen || !tifTriggerRef.current || !tifPanelRef.current) return
+    const triggerRect = tifTriggerRef.current.getBoundingClientRect()
+    const panelRect = tifPanelRef.current.getBoundingClientRect()
+    const top = triggerRect.bottom + 4
+    // Right-align the panel to the trigger so it doesn't overflow when the
+    // trigger sits at the right edge of the row; clamp to the viewport.
+    const right = window.innerWidth - triggerRect.right
+    const left = Math.max(8, window.innerWidth - right - panelRect.width)
+    setTifMenuPos({ top, left })
+  }, [tifMenuOpen])
+
+  useEffect(() => {
+    if (!tifMenuOpen) return
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (
+        tifTriggerRef.current &&
+        !tifTriggerRef.current.contains(target) &&
+        tifPanelRef.current &&
+        !tifPanelRef.current.contains(target)
+      ) {
+        setTifMenuOpen(false)
+      }
+    }
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [tifMenuOpen])
 
   if (isMobile) return <MobileOrderForm {...props} />
 
@@ -1413,22 +1459,22 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
         {stopMenuOpen &&
           typeof document !== 'undefined' &&
           createPortal(
-            <StopPanel ref={stopPanelRef} style={{ top: stopMenuPos.top, left: stopMenuPos.left }} role="menu">
-              <StopPanelItem
+            <MenuPanel ref={stopPanelRef} style={{ top: stopMenuPos.top, left: stopMenuPos.left }} role="menu">
+              <MenuPanelItem
                 $active={typeKey === 'stop-limit'}
                 role="menuitem"
                 onClick={() => pickStopVariant('stop-limit')}
               >
                 {t('Stop Limit')}
-              </StopPanelItem>
-              <StopPanelItem
+              </MenuPanelItem>
+              <MenuPanelItem
                 $active={typeKey === 'stop-market'}
                 role="menuitem"
                 onClick={() => pickStopVariant('stop-market')}
               >
                 {t('Stop Market')}
-              </StopPanelItem>
-            </StopPanel>,
+              </MenuPanelItem>
+            </MenuPanel>,
             document.body,
           )}
       </TypeTabs>
@@ -1515,36 +1561,45 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
         </PriceInputRow>
       )}
 
-      {typeKey === 'stop-limit' && (
-        <PriceInputRow>
-          <SizeLabel>{t('TIF')}</SizeLabel>
-          <Flex flex={1} />
-          <TifSelectWrap>
-            <Select
-              options={TIF_OPTIONS.map((o) => ({
-                ...o,
-                description: t(o.description ?? ''),
-              }))}
-              defaultOptionIndex={
-                TIF_OPTIONS.findIndex(
-                  (o) =>
-                    o.value ===
-                    (draft.timeInForce === 'GTX' ? 'GTC' : (draft.timeInForce as TifValue)),
-                ) >= 0
-                  ? TIF_OPTIONS.findIndex(
-                      (o) =>
-                        o.value ===
-                        (draft.timeInForce === 'GTX' ? 'GTC' : (draft.timeInForce as TifValue)),
-                    )
-                  : 0
-              }
-              onOptionChange={(opt) =>
-                onDraftChange({ ...draft, timeInForce: opt.value as TifValue })
-              }
-            />
-          </TifSelectWrap>
-        </PriceInputRow>
-      )}
+      {typeKey === 'stop-limit' && (() => {
+        const currentTif: TifValue = draft.timeInForce === 'GTX' ? 'GTC' : (draft.timeInForce as TifValue)
+        return (
+          <PriceInputRow>
+            <SizeLabel>{t('TIF')}</SizeLabel>
+            <Flex flex={1} />
+            <TifTrigger
+              ref={tifTriggerRef}
+              type="button"
+              onClick={() => setTifMenuOpen((o) => !o)}
+              aria-haspopup="menu"
+              aria-expanded={tifMenuOpen}
+            >
+              {currentTif}
+              <ChevronDownIcon width="12px" color="text" />
+            </TifTrigger>
+            {tifMenuOpen &&
+              typeof document !== 'undefined' &&
+              createPortal(
+                <MenuPanel ref={tifPanelRef} style={{ top: tifMenuPos.top, left: tifMenuPos.left }} role="menu">
+                  {TIF_OPTIONS.map((opt) => (
+                    <MenuPanelItem
+                      key={opt.value}
+                      $active={currentTif === opt.value}
+                      role="menuitem"
+                      onClick={() => {
+                        onDraftChange({ ...draft, timeInForce: opt.value })
+                        setTifMenuOpen(false)
+                      }}
+                    >
+                      {opt.description ? `${opt.label} (${t(opt.description)})` : opt.label}
+                    </MenuPanelItem>
+                  ))}
+                </MenuPanel>,
+                document.body,
+              )}
+          </PriceInputRow>
+        )
+      })()}
 
       <SizeField>
         <SizeLabel>{t('Size')}</SizeLabel>
