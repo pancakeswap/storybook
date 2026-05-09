@@ -3393,34 +3393,10 @@ var q = V(e)`
     cursor: default;
   }
 `, ji = V.div`
-  position: relative;
-  width: 64px;
-  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${({ theme: e }) => e.colors.warning60};
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: ${({ theme: e }) => e.colors.warning10};
-  }
-  &::after {
-    content: '';
-    position: absolute;
-    inset: -16px;
-    border-radius: 50%;
-    background: ${({ theme: e }) => e.colors.warning20};
-    opacity: 0.35;
-    filter: blur(14px);
-    z-index: -1;
-  }
-  svg {
-    position: relative;
-    z-index: 1;
-  }
 `, Mi = V(D)`
   gap: 8px;
   align-items: center;
@@ -4049,6 +4025,7 @@ var q = V(e)`
 			title: "",
 			hideCloseButton: !0,
 			headerPadding: "0px",
+			headerBorderColor: "transparent",
 			bodyPadding: "32px 24px 24px",
 			minHeight: "0px",
 			onDismiss: () => N(!1),
@@ -4063,7 +4040,7 @@ var q = V(e)`
 				children: [
 					/* @__PURE__ */ W(ji, {
 						"aria-hidden": !0,
-						children: /* @__PURE__ */ W(o, { width: "32px" })
+						children: /* @__PURE__ */ W(o, { width: "40px" })
 					}),
 					/* @__PURE__ */ W(r, {
 						fontSize: "16px",
