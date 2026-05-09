@@ -5,7 +5,7 @@ import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Checkbox } from '../primitives/Checkbox'
 import { Text } from '../primitives/Text'
-import { ChevronDownIcon, CloseIcon, HistoryIcon } from '../primitives/Icons'
+import { ChevronDownIcon, CloseIcon, HistoryIcon, WarningIcon } from '../primitives/Icons'
 import Modal from '../primitives/Modal/Modal'
 import { ModalV2 } from '../primitives/Modal/ModalV2'
 import { useMatchBreakpoints } from '../contexts'
@@ -463,6 +463,43 @@ const CloseAllBtn = styled.button`
   &:disabled {
     opacity: 0.5;
     cursor: default;
+  }
+`
+
+/* ── Close-All confirm modal ─────────────────────────────────
+ * Big amber warning glyph centered above the message, with a
+ * soft radial halo behind it. Two pseudo-elements stack a
+ * filled-warning10 disc (the "puck") under a blurred warning20
+ * bloom (the glow). The icon itself is rendered on top in the
+ * brighter `warning60` to pop against the disc. */
+const WarningGlow = styled.div`
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.warning60};
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: ${({ theme }) => theme.colors.warning10};
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -16px;
+    border-radius: 50%;
+    background: ${({ theme }) => theme.colors.warning20};
+    opacity: 0.35;
+    filter: blur(14px);
+    z-index: -1;
+  }
+  svg {
+    position: relative;
+    z-index: 1;
   }
 `
 
@@ -1391,15 +1428,25 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
       onDismiss={() => setCloseAllConfirmOpen(false)}
       closeOnOverlayClick
     >
-      <Modal title={t('Close All Positions')} onDismiss={() => setCloseAllConfirmOpen(false)}>
-        <Flex flexDirection="column" style={{ gap: 16, minWidth: 320, maxWidth: 380 }}>
-          <Text fontSize="14px" color="textSubtle">
+      <Modal
+        title=""
+        hideCloseButton
+        headerPadding="0px"
+        bodyPadding="32px 24px 24px"
+        minHeight="0px"
+        onDismiss={() => setCloseAllConfirmOpen(false)}
+      >
+        <Flex flexDirection="column" alignItems="center" style={{ gap: 24, minWidth: 360, maxWidth: 420 }}>
+          <WarningGlow aria-hidden>
+            <WarningIcon width="32px" />
+          </WarningGlow>
+          <Text fontSize="16px" textAlign="center" px="8px">
             {t(
-              'This will market-close all %count% open position(s) at the current price. This action cannot be undone.',
+              'Are you sure you want to cancel all open orders, and close the all %count% position(s) by market orders?',
               { count: positions.length },
             )}
           </Text>
-          <Flex style={{ gap: 8 }}>
+          <Flex style={{ gap: 12, width: '100%' }}>
             <Button
               variant="secondary"
               scale="md"
@@ -1409,7 +1456,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
               {t('Cancel')}
             </Button>
             <Button
-              variant="danger"
+              variant="primary"
               scale="md"
               style={{ flex: 1 }}
               onClick={() => {
@@ -1417,7 +1464,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
                 onCloseAll?.()
               }}
             >
-              {t('Close All')}
+              {t('Confirm')}
             </Button>
           </Flex>
         </Flex>
