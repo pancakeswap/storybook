@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { styled } from 'styled-components'
 import { Box, Flex } from '../primitives/Box'
@@ -8,7 +8,9 @@ import { Input } from '../primitives/Input'
 import Slider from '../primitives/Slider/Slider'
 import { Text } from '../primitives/Text'
 import { AddIcon, ChevronDownIcon, InfoIcon } from '../primitives/Icons'
+import { type SelectOption } from '../primitives/Select'
 import { useMatchBreakpoints } from '../contexts'
+import { useTooltip } from '../hooks/useTooltip'
 import { BunnySlider } from './BunnySlider'
 import { PerpsPanel } from './primitives'
 import { ensureNegative, ensurePositive, useSeparatedNumberInput } from './separatedNumberInput'
@@ -366,6 +368,7 @@ const UnitPicker = styled(Button).attrs({ variant: 'text', scale: 'xs' })`
 const DashedLabelWrap = styled.span`
   position: relative;
   display: inline-flex;
+  width: fit-content;
 `
 
 // eslint-disable-next-line no-restricted-syntax -- TODO(design): missing dark/light counterpart
@@ -385,12 +388,14 @@ const DashedLabel = styled.span`
  * mode, inverted to dark surface (#08060B bg, light text) in dark mode.
  * Shadow strengthens from light to dark to keep readable elevation
  * against the darker page bg.
+ *
+ * Rendered via PortaledHoverTip → document.body so `position: fixed`
+ * (top/left set inline) escapes PerpsPanel's overflow:hidden. The arrow
+ * x-offset comes from `--tooltip-arrow-left` set per anchor so the
+ * notch points at the label even when the bubble is clamped to viewport.
  */
 const ReduceOnlyTooltip = styled.div`
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  position: fixed;
   display: flex;
   width: 200px;
   padding: 16px;
@@ -421,7 +426,7 @@ const ReduceOnlyTooltip = styled.div`
     content: '';
     position: absolute;
     top: 100%;
-    left: 50%;
+    left: var(--tooltip-arrow-left, 50%);
     transform: translateX(-50%);
     width: 0;
     height: 0;
@@ -431,6 +436,55 @@ const ReduceOnlyTooltip = styled.div`
     color: ${({ theme }) => theme.colors.tooltipInverseBg};
   }
 `
+
+/**
+ * Portals a hover tooltip to document.body, escaping overflow:hidden on
+ * PerpsPanel. Position is computed from the anchor's bounding rect:
+ * tooltip is centered on the anchor horizontally, then clamped 8px from
+ * either viewport edge; the arrow x-offset compensates so the notch
+ * still lines up with the anchor's center after clamping.
+ */
+const PortaledHoverTip: React.FC<{
+  open: boolean
+  anchorRef: React.RefObject<HTMLElement>
+  children: React.ReactNode
+}> = ({ open, anchorRef, children }) => {
+  const [pos, setPos] = useState<{ left: number; bottom: number; arrowLeft: number } | null>(null)
+
+  /* useLayoutEffect runs after DOM mutation but before paint, so the
+   * computed position is applied in the same frame the tooltip mounts —
+   * no flash at a stale location. Match the stop-menu pattern: only
+   * setState when we have a real measurement to commit; closing leaves
+   * pos stale, which is fine because the render guard below skips it. */
+  useLayoutEffect(() => {
+    if (!open || !anchorRef.current) return
+    const r = anchorRef.current.getBoundingClientRect()
+    const tooltipWidth = 200
+    const labelCenter = r.left + r.width / 2
+    const idealLeft = labelCenter - tooltipWidth / 2
+    const left = Math.max(8, Math.min(idealLeft, window.innerWidth - tooltipWidth - 8))
+    const bottom = window.innerHeight - r.top + 8
+    const arrowLeft = labelCenter - left
+    setPos({ left, bottom, arrowLeft })
+  }, [open, anchorRef])
+
+  if (!open || !pos || typeof document === 'undefined') return null
+  return createPortal(
+    <ReduceOnlyTooltip
+      role="tooltip"
+      style={
+        {
+          left: pos.left,
+          bottom: pos.bottom,
+          '--tooltip-arrow-left': `${pos.arrowLeft}px`,
+        } as React.CSSProperties
+      }
+    >
+      {children}
+    </ReduceOnlyTooltip>,
+    document.body,
+  )
+}
 
 const UnitPickerChevronWrap = styled.span`
   display: inline-flex;
@@ -515,13 +569,13 @@ const StopSourceSelect = styled.button`
  * act as the active-state tab — keeps the underline / colored-border
  * cue consistent with the other tabs.
  */
-const StopPanel = styled.div`
+const MenuPanel = styled.div`
   position: fixed;
   z-index: 9999;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: 160px;
+  min-width: 160px;
   background: ${({ theme }) => theme.colors.input};
   border-top: 1px solid ${({ theme }) => theme.colors.inputSecondary};
   border-right: 1px solid ${({ theme }) => theme.colors.inputSecondary};
@@ -534,7 +588,7 @@ const StopPanel = styled.div`
   overflow: hidden;
 `
 
-const StopPanelItem = styled.button<{ $active: boolean }>`
+const MenuPanelItem = styled.button<{ $active: boolean }>`
   background: ${({ $active, theme }) => ($active ? theme.colors.tertiary : 'transparent')};
   border: 0;
   padding: 10px 14px;
@@ -549,16 +603,78 @@ const StopPanelItem = styled.button<{ $active: boolean }>`
   }
 `
 
-const TifSelect = styled.select`
-  flex-shrink: 0;
-  background: transparent;
+type TifValue = 'GTC' | 'IOC' | 'FOK'
+type TifOption = SelectOption<TifValue> & { tooltip: string }
+const TIF_OPTIONS: ReadonlyArray<TifOption> = [
+  {
+    value: 'GTC',
+    label: 'GTC',
+    description: 'Good till canceled',
+    tooltip:
+      "Time in force · GTC (Good 'Til Canceled): The order will continue to work until the order fills or is canceled.",
+  },
+  {
+    value: 'IOC',
+    label: 'IOC',
+    description: 'Immediate or canceled',
+    tooltip:
+      'Time in force · IOC (Immediate or Cancel): The order will execute all or part immediately and cancel any unfilled portion of the order.',
+  },
+  {
+    value: 'FOK',
+    label: 'FOK',
+    description: 'Fill or Kill',
+    tooltip:
+      'Time in force · FOK (Fill or Kill): The order must be filled immediately in its entirety or not executed at all.',
+  },
+]
+
+/**
+ * Single TIF option row inside the dropdown. Pulled out so each row can
+ * own its own `useTooltip` instance — the hook can't be called inside a
+ * `.map()` body, and the tooltip body comes straight from the ticket
+ * screenshot (PAN-11856).
+ */
+const TifMenuItem: React.FC<{
+  option: TifOption
+  active: boolean
+  onSelect: (value: TifValue) => void
+  t: (key: string, options?: Record<string, string | number | undefined>) => string
+}> = ({ option, active, onSelect, t }) => {
+  const { targetRef, tooltip } = useTooltip(t(option.tooltip), { placement: 'left' })
+  return (
+    <>
+      <MenuPanelItem
+        ref={targetRef as React.Ref<HTMLButtonElement>}
+        $active={active}
+        role="menuitem"
+        onClick={() => onSelect(option.value)}
+      >
+        {option.description ? `${option.label} (${t(option.description)})` : option.label}
+      </MenuPanelItem>
+      {tooltip}
+    </>
+  )
+}
+
+/* TIF dropdown trigger — minimal text+chevron button living inside the
+ * PriceInputRow chrome. The dropdown menu itself uses the shared MenuPanel
+ * (same component as the Stop Limit / Stop Market type-tab dropdown) so
+ * the two selects look and feel identical. */
+const TifTrigger = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
   border: 0;
-  outline: 0;
+  background: transparent;
   color: ${({ theme }) => theme.colors.text};
+  font-family: inherit;
   font-size: 14px;
-  font-weight: 600;
-  font-family: Kanit, sans-serif;
   cursor: pointer;
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
 `
 
 const InputTight = styled(Input)`
@@ -1170,10 +1286,11 @@ const MobileOrderForm: React.FC<OrderFormProps> = ({
  * form — keeps the widget free of any imperative-modal coupling.
  */
 export const OrderForm: React.FC<OrderFormProps> = (props) => {
-  // Auto-responsive: switch to mobile layout when the viewport drops
-  // into the mobile breakpoint. Same pattern as Modal / MotionModal —
-  // consumer doesn't pass any flag.
-  const { isMobile } = useMatchBreakpoints()
+  // Auto-responsive: switch to mobile layout for both mobile and tablet
+  // viewports (everything below uikit's xl/968px). Same pattern as Modal
+  // / MotionModal — consumer doesn't pass any flag.
+  const { isMobile: isMobileBp, isTablet } = useMatchBreakpoints()
+  const isMobile = isMobileBp || isTablet
 
   const {
     baseAsset,
@@ -1281,9 +1398,21 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
   const stopPanelRef = useRef<HTMLDivElement>(null)
   const [stopMenuOpen, setStopMenuOpen] = useState(false)
   const [stopMenuPos, setStopMenuPos] = useState({ top: 0, left: 0 })
+  // TIF dropdown — same MenuPanel chrome as the stop-tab dropdown, just
+  // with a different trigger living inside the form's PriceInputRow.
+  const tifTriggerRef = useRef<HTMLButtonElement>(null)
+  const tifPanelRef = useRef<HTMLDivElement>(null)
+  const [tifMenuOpen, setTifMenuOpen] = useState(false)
+  const [tifMenuPos, setTifMenuPos] = useState({ top: 0, left: 0 })
   const [reduceOnlyTipOpen, setReduceOnlyTipOpen] = useState(false)
   const [tpSlTipOpen, setTpSlTipOpen] = useState(false)
   const [summaryTip, setSummaryTip] = useState<'cost' | 'liq' | 'fees' | null>(null)
+  const reduceOnlyAnchorRef = useRef<HTMLSpanElement>(null)
+  const tpSlAnchorRef = useRef<HTMLSpanElement>(null)
+  const marginAnchorRef = useRef<HTMLSpanElement>(null)
+  const liqAnchorRef = useRef<HTMLSpanElement>(null)
+  const feesAnchorRef = useRef<HTMLSpanElement>(null)
+
 
   useEffect(() => {
     if (!stopMenuOpen || !stopTabRef.current || !stopPanelRef.current) return
@@ -1311,6 +1440,35 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
   }, [stopMenuOpen])
+
+  useEffect(() => {
+    if (!tifMenuOpen || !tifTriggerRef.current || !tifPanelRef.current) return
+    const triggerRect = tifTriggerRef.current.getBoundingClientRect()
+    const panelRect = tifPanelRef.current.getBoundingClientRect()
+    const top = triggerRect.bottom + 4
+    // Right-align the panel to the trigger so it doesn't overflow when the
+    // trigger sits at the right edge of the row; clamp to the viewport.
+    const right = window.innerWidth - triggerRect.right
+    const left = Math.max(8, window.innerWidth - right - panelRect.width)
+    setTifMenuPos({ top, left })
+  }, [tifMenuOpen])
+
+  useEffect(() => {
+    if (!tifMenuOpen) return
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (
+        tifTriggerRef.current &&
+        !tifTriggerRef.current.contains(target) &&
+        tifPanelRef.current &&
+        !tifPanelRef.current.contains(target)
+      ) {
+        setTifMenuOpen(false)
+      }
+    }
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [tifMenuOpen])
 
   if (isMobile) return <MobileOrderForm {...props} />
 
@@ -1349,22 +1507,22 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
         {stopMenuOpen &&
           typeof document !== 'undefined' &&
           createPortal(
-            <StopPanel ref={stopPanelRef} style={{ top: stopMenuPos.top, left: stopMenuPos.left }} role="menu">
-              <StopPanelItem
+            <MenuPanel ref={stopPanelRef} style={{ top: stopMenuPos.top, left: stopMenuPos.left }} role="menu">
+              <MenuPanelItem
                 $active={typeKey === 'stop-limit'}
                 role="menuitem"
                 onClick={() => pickStopVariant('stop-limit')}
               >
                 {t('Stop Limit')}
-              </StopPanelItem>
-              <StopPanelItem
+              </MenuPanelItem>
+              <MenuPanelItem
                 $active={typeKey === 'stop-market'}
                 role="menuitem"
                 onClick={() => pickStopVariant('stop-market')}
               >
                 {t('Stop Market')}
-              </StopPanelItem>
-            </StopPanel>,
+              </MenuPanelItem>
+            </MenuPanel>,
             document.body,
           )}
       </TypeTabs>
@@ -1451,26 +1609,44 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
         </PriceInputRow>
       )}
 
-      {typeKey === 'stop-limit' && (
-        <PriceInputRow>
-          <SizeLabel>{t('TIF')}</SizeLabel>
-          <Flex flex={1} />
-          <TifSelect
-            value={draft.timeInForce === 'GTX' ? 'GTC' : draft.timeInForce}
-            onChange={(e) =>
-              onDraftChange({
-                ...draft,
-                timeInForce: e.target.value as 'GTC' | 'IOC' | 'FOK',
-              })
-            }
-            aria-label={t('Time in force')}
-          >
-            <option value="GTC">GTC</option>
-            <option value="IOC">IOC</option>
-            <option value="FOK">FOK</option>
-          </TifSelect>
-        </PriceInputRow>
-      )}
+      {typeKey === 'stop-limit' && (() => {
+        const currentTif: TifValue = draft.timeInForce === 'GTX' ? 'GTC' : (draft.timeInForce as TifValue)
+        return (
+          <PriceInputRow>
+            <SizeLabel>{t('TIF')}</SizeLabel>
+            <Flex flex={1} />
+            <TifTrigger
+              ref={tifTriggerRef}
+              type="button"
+              onClick={() => setTifMenuOpen((o) => !o)}
+              aria-haspopup="menu"
+              aria-expanded={tifMenuOpen}
+            >
+              {currentTif}
+              <ChevronDownIcon width="12px" color="text" />
+            </TifTrigger>
+            {tifMenuOpen &&
+              typeof document !== 'undefined' &&
+              createPortal(
+                <MenuPanel ref={tifPanelRef} style={{ top: tifMenuPos.top, left: tifMenuPos.left }} role="menu">
+                  {TIF_OPTIONS.map((opt) => (
+                    <TifMenuItem
+                      key={opt.value}
+                      option={opt}
+                      active={currentTif === opt.value}
+                      t={t}
+                      onSelect={(v) => {
+                        onDraftChange({ ...draft, timeInForce: v })
+                        setTifMenuOpen(false)
+                      }}
+                    />
+                  ))}
+                </MenuPanel>,
+                document.body,
+              )}
+          </PriceInputRow>
+        )
+      })()}
 
       <SizeField>
         <SizeLabel>{t('Size')}</SizeLabel>
@@ -1504,33 +1680,31 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
           onChange={(e) => onDraftChange({ ...draft, reduceOnly: e.target.checked })}
         />
         <DashedLabelWrap
+          ref={reduceOnlyAnchorRef}
           onMouseEnter={() => setReduceOnlyTipOpen(true)}
           onMouseLeave={() => setReduceOnlyTipOpen(false)}
         >
           <DashedLabel>{t('Reduce Only')}</DashedLabel>
-          {reduceOnlyTipOpen && (
-            <ReduceOnlyTooltip role="tooltip">
-              {t('Reduce-Only order will only reduce your position, not increase it.')}
-            </ReduceOnlyTooltip>
-          )}
         </DashedLabelWrap>
+        <PortaledHoverTip open={reduceOnlyTipOpen} anchorRef={reduceOnlyAnchorRef}>
+          {t('Reduce-Only order will only reduce your position, not increase it.')}
+        </PortaledHoverTip>
       </Flex>
 
       <Flex alignItems="center" style={{ gap: 8 }}>
         <Checkbox scale="sm" checked={draft.tpSlEnabled} onChange={toggleTpSl} />
         <DashedLabelWrap
+          ref={tpSlAnchorRef}
           onMouseEnter={() => setTpSlTipOpen(true)}
           onMouseLeave={() => setTpSlTipOpen(false)}
         >
           <DashedLabel>{t('Take Profit / Stop Loss')}</DashedLabel>
-          {tpSlTipOpen && (
-            <ReduceOnlyTooltip role="tooltip">
-              {t(
-                'Set Take Profit or Stop Loss before opening. It activates after entry. Choose Last or Mark price as the trigger.',
-              )}
-            </ReduceOnlyTooltip>
-          )}
         </DashedLabelWrap>
+        <PortaledHoverTip open={tpSlTipOpen} anchorRef={tpSlAnchorRef}>
+          {t(
+            'Set Take Profit or Stop Loss before opening. It activates after entry. Choose Last or Mark price as the trigger.',
+          )}
+        </PortaledHoverTip>
       </Flex>
 
       {draft.tpSlEnabled && (
@@ -1611,46 +1785,43 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
 
       <SummaryGrid>
         <DashedLabelWrap
+          ref={marginAnchorRef}
           onMouseEnter={() => setSummaryTip('cost')}
           onMouseLeave={() => setSummaryTip(null)}
         >
-          <SK>{t('Cost')}</SK>
-          {summaryTip === 'cost' && (
-            <ReduceOnlyTooltip role="tooltip">
-              {t('Total margin required to open this position.')}
-            </ReduceOnlyTooltip>
-          )}
+          <SK>{t('Margin')}</SK>
         </DashedLabelWrap>
+        <PortaledHoverTip open={summaryTip === 'cost'} anchorRef={marginAnchorRef}>
+          {t('Total margin required to open this position.')}
+        </PortaledHoverTip>
         <SV>{preview.cost}</SV>
         {!isStopOrder && (
           <>
             <DashedLabelWrap
+              ref={liqAnchorRef}
               onMouseEnter={() => setSummaryTip('liq')}
               onMouseLeave={() => setSummaryTip(null)}
             >
               <SK>{t('Est. Liq. Price')}</SK>
-              {summaryTip === 'liq' && (
-                <ReduceOnlyTooltip role="tooltip">
-                  {t('Total margin required to open this position.')}
-                </ReduceOnlyTooltip>
-              )}
             </DashedLabelWrap>
+            <PortaledHoverTip open={summaryTip === 'liq'} anchorRef={liqAnchorRef}>
+              {t('Estimated price at which this position will be liquidated.')}
+            </PortaledHoverTip>
             <SV>{preview.liq}</SV>
           </>
         )}
         {feeText ? (
           <>
             <DashedLabelWrap
+              ref={feesAnchorRef}
               onMouseEnter={() => setSummaryTip('fees')}
               onMouseLeave={() => setSummaryTip(null)}
             >
               <SK>{t('Fees')}</SK>
-              {summaryTip === 'fees' && (
-                <ReduceOnlyTooltip role="tooltip">
-                  {t('Trading and funding fees applied to this position.')}
-                </ReduceOnlyTooltip>
-              )}
             </DashedLabelWrap>
+            <PortaledHoverTip open={summaryTip === 'fees'} anchorRef={feesAnchorRef}>
+              {t('Trading and funding fees applied to this position.')}
+            </PortaledHoverTip>
             <SV>{feeText}</SV>
           </>
         ) : null}

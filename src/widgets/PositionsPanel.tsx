@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { css, styled, useTheme } from 'styled-components'
 import { Flex } from '../primitives/Box'
 import { Button } from '../primitives/Button'
 import { Checkbox } from '../primitives/Checkbox'
 import { Text } from '../primitives/Text'
-import { ChevronDownIcon, CloseIcon, HistoryIcon } from '../primitives/Icons'
+import { ChevronDownIcon, CloseIcon, HistoryIcon, WarningIcon } from '../primitives/Icons'
+import Modal from '../primitives/Modal/Modal'
+import { ModalV2 } from '../primitives/Modal/ModalV2'
 import { useMatchBreakpoints } from '../contexts'
 import { useTooltip } from '../hooks/useTooltip'
 import { PerpsPanel, UnderlineTab, UnderlineTabs } from './primitives'
@@ -32,6 +34,11 @@ export interface PositionRow {
    *  When omitted the tag is hidden — older consumers stay backward-
    *  compatible. PAN-11866. */
   marginType?: 'CROSS' | 'ISOLATED'
+  /** Aster `/fapi/v3/adlQuantile` value for this position's side
+   *  (0–4, low → imminent ADL). Drives the lit-bar count in the ADL
+   *  gauge. When undefined the gauge falls back to a single red marker
+   *  (Aster's resting state). PAN-11867. */
+  adlQuantile?: number
 }
 
 export interface OpenOrderRow {
@@ -301,7 +308,7 @@ const PositionsTable = styled.div`
   row-gap: 0;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
 `
 
@@ -319,7 +326,7 @@ const RowGroup = styled.div`
    * cells flush against each other (no column-gap) is what lets the
    * hover-active strip paint as one continuous bg. */
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
     transition: background 0.12s;
   }
   &:hover > * {
@@ -459,6 +466,16 @@ const CloseAllBtn = styled.button`
   }
 `
 
+/* ── Close-All confirm modal ─────────────────────────────────
+ * Plain warning glyph in `warning60` centered above the message —
+ * no disc, no halo. */
+const WarningGlow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.colors.warning60};
+`
+
 const ActionCell = styled(Flex)`
   gap: 8px;
   align-items: center;
@@ -504,17 +521,19 @@ const SideLevText = styled.span<{ $up: boolean }>`
   white-space: nowrap;
 `
 
-/* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Per the
- * design (Figma 72:12995 / 72:13051), the leftmost bar is always
- * destructive (pink) and the remaining three are the primary fill
- * color. The pink bar reads as a "this is a leveraged position"
- * marker while the white bars echo the SymbolHeader-style direction
- * indicator. */
+/* Leverage indicator — 4 vertical bars (8×2px each, 2px gap). Mirrors
+ * Aster's ADL ("auto-deleverage") gauge: lit count is driven by the
+ * server-pushed `adlQuantile` field (`/fapi/v3/adlQuantile`, 0–4 from
+ * low → imminent ADL). Lit bars are the destructive color, unlit are
+ * the neutral fill. When the consumer hasn't loaded the quantile yet
+ * we light just the leftmost bar — Aster's resting chrome.
+ * PAN-11867. */
 const LevBarRow = styled.span`
   display: inline-flex;
   align-items: center;
   gap: 2px;
   padding-top: 2px;
+  cursor: help;
 `
 
 const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
@@ -523,6 +542,21 @@ const LevBar = styled.span<{ $variant: 'destructive' | 'fill' }>`
   background: ${({ $variant, theme }) =>
     $variant === 'destructive' ? theme.colors.failure : theme.colors.text};
 `
+
+/**
+ * Map Aster's 0–4 ADL quantile to the 4-bar gauge. Confirmed against
+ * Asterdex's own JS bundle: the gauge component renders
+ * `Array(adl).fill().map(...filled)` followed by
+ * `Array(4 - adl).fill().map(...empty)` — i.e. `lit = adl` straight
+ * identity. Quantile 0 leaves every bar empty; quantile 4 fills all
+ * four. We clamp defensively in case the server ever returns an
+ * out-of-range value, and treat unknown / not-yet-loaded as 0 lit.
+ */
+const litFromAdlQuantile = (q: number | undefined): 0 | 1 | 2 | 3 | 4 => {
+  if (q === undefined || !Number.isFinite(q)) return 0
+  const clamped = Math.max(0, Math.min(4, Math.floor(q)))
+  return clamped as 0 | 1 | 2 | 3 | 4
+}
 
 const TpSlCell = styled.div`
   display: flex;
@@ -558,7 +592,7 @@ const OrdersTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
 `
 
@@ -580,7 +614,7 @@ const TradesTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${historyTableScroll}
 `
@@ -592,7 +626,7 @@ const TxTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${historyTableScroll}
 `
@@ -604,7 +638,7 @@ const OrderHistoryTable = styled.div`
   row-gap: 6px;
   font-variant-numeric: tabular-nums;
   & > * {
-    padding: 16px 12px;
+    padding: 6px 12px;
   }
   ${historyTableScroll}
 `
@@ -685,6 +719,19 @@ const Td = styled(Text).attrs({ fontSize: '14px' })`
 
 const identity = (s: string) => s
 
+// TP/SL stopPrice arrives from Aster as a string with the symbol's
+// tick-size precision baked in (e.g. "1.49900"). Routing through Number()
+// collapses trailing zeros, so we keep the raw precision and only add
+// thousand-separators around the integer part.
+const fmtStopPrice = (raw: string) => {
+  const trimmed = raw.replace(/^0+(?=\d)/, '') || '0'
+  const [intPart, fracPart] = trimmed.split('.')
+  const withSeparators = Number(intPart).toLocaleString(undefined, {
+    maximumFractionDigits: 0,
+  })
+  return fracPart ? `${withSeparators}.${fracPart}` : withSeparators
+}
+
 /**
  * Single positions-table row. Split out as a component so
  * `useMarkPriceForSymbol` can be called at a stable hook index per
@@ -749,6 +796,13 @@ const PositionTableRow: React.FC<{
   const fmtPrice = (v: number) =>
     v.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 1 })
 
+  const { targetRef: adlTipRef, tooltip: adlTipNode } = useTooltip(
+    t(
+      'This indicator shows your position in the auto-deleverage queue. If all lights are lit, in the event of a liquidation, your position may be reduced.',
+    ),
+    { placement: 'top' },
+  )
+
   return (
     <>
       {/* Symbol cell — symbol name on top, side+lev pill + tier bars below */}
@@ -758,11 +812,15 @@ const PositionTableRow: React.FC<{
           <SideLevText $up={side === 'BUY'}>
             {side === 'BUY' ? t('Buy') : t('Sell')} {p.leverage}x
           </SideLevText>
-          <LevBarRow aria-hidden>
-            {[0, 1, 2, 3].map((i) => (
-              <LevBar key={i} $variant={i === 0 ? 'destructive' : 'fill'} />
-            ))}
+          <LevBarRow ref={adlTipRef as React.RefObject<HTMLSpanElement>}>
+            {(() => {
+              const lit = litFromAdlQuantile(p.adlQuantile)
+              return [0, 1, 2, 3].map((i) => (
+                <LevBar key={i} $variant={i < lit ? 'destructive' : 'fill'} />
+              ))
+            })()}
           </LevBarRow>
+          {adlTipNode}
         </StackSub>
       </StackCell>
 
@@ -824,8 +882,8 @@ const PositionTableRow: React.FC<{
 
       {/* TP/SL cell — two muted lines, dashes when not set */}
       <TpSlCell>
-        <span>{p.tpStopPrice ? fmtPrice(Number(p.tpStopPrice)) : '--'}</span>
-        <span>{p.slStopPrice ? fmtPrice(Number(p.slStopPrice)) : '--'}</span>
+        <span>{p.tpStopPrice ? fmtStopPrice(p.tpStopPrice) : '--'}</span>
+        <span>{p.slStopPrice ? fmtStopPrice(p.slStopPrice) : '--'}</span>
       </TpSlCell>
 
       <ActionCell>
@@ -980,8 +1038,10 @@ const CloseChip = styled.button`
  * | TWAP`) and owns a full-page History sheet portal.
  */
 export const PositionsPanel: React.FC<PositionsPanelProps> = (props) => {
-  const { isMobile: isMobileBp } = useMatchBreakpoints()
-  const isMobile = props.isMobile ?? isMobileBp
+  // Default mobile variant covers both mobile and tablet viewports
+  // (everything below uikit's xl/968px); explicit `isMobile` prop wins.
+  const { isMobile: isMobileBp, isTablet } = useMatchBreakpoints()
+  const isMobile = props.isMobile ?? (isMobileBp || isTablet)
   if (isMobile) return <MobilePositionsPanel {...props} />
   return <DesktopPositionsPanel {...props} />
 }
@@ -1013,6 +1073,12 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   const tabOrder: PositionsPanelTab[] = ['positions', 'orders', 'history', 'trades', 'transactions']
   const activeIndex = tabOrder.indexOf(tab)
 
+  // Close-All confirm modal — destructive, account-wide action, so we
+  // always gate it behind a confirmation step instead of firing onCloseAll
+  // directly on click. No "don't show again" toggle: every Close All run
+  // should require an intentional confirm.
+  const [closeAllConfirmOpen, setCloseAllConfirmOpen] = useState(false)
+
   // Help-icon tooltip on the PNL (ROE%) column header. One-line variant
   // because the copy is short — keeps the bubble tight around the text.
   const { targetRef: pnlHelpRef, tooltip: pnlHelpNode } = useTooltip(
@@ -1024,6 +1090,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   // TabsHeader (see TabsChevronOverlay). No JS measurement needed.
 
   return (
+    <>
     <Card>
       <TabsHeader>
         <TabsLeft>
@@ -1089,7 +1156,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
             {onCloseAll && (
               <CloseAllBtn
                 type="button"
-                onClick={onCloseAll}
+                onClick={() => setCloseAllConfirmOpen(true)}
                 disabled={positions.length === 0}
               >
                 {t('Close All')}
@@ -1327,6 +1394,56 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
           ))}
       </Body>
     </Card>
+
+    <ModalV2
+      isOpen={closeAllConfirmOpen}
+      onDismiss={() => setCloseAllConfirmOpen(false)}
+      closeOnOverlayClick
+    >
+      <Modal
+        title=""
+        hideCloseButton
+        headerPadding="0px"
+        headerBorderColor="transparent"
+        bodyPadding="32px 24px 24px"
+        minHeight="0px"
+        onDismiss={() => setCloseAllConfirmOpen(false)}
+      >
+        <Flex flexDirection="column" alignItems="center" style={{ gap: 24, minWidth: 360, maxWidth: 420 }}>
+          <WarningGlow aria-hidden>
+            <WarningIcon width="40px" />
+          </WarningGlow>
+          <Text fontSize="16px" textAlign="center" px="8px">
+            {t(
+              'Are you sure you want to cancel all open orders, and close the all %count% position(s) by market orders?',
+              { count: positions.length },
+            )}
+          </Text>
+          <Flex style={{ gap: 12, width: '100%' }}>
+            <Button
+              variant="secondary"
+              scale="md"
+              style={{ flex: 1 }}
+              onClick={() => setCloseAllConfirmOpen(false)}
+            >
+              {t('Cancel')}
+            </Button>
+            <Button
+              variant="primary"
+              scale="md"
+              style={{ flex: 1 }}
+              onClick={() => {
+                setCloseAllConfirmOpen(false)
+                onCloseAll?.()
+              }}
+            >
+              {t('Confirm')}
+            </Button>
+          </Flex>
+        </Flex>
+      </Modal>
+    </ModalV2>
+    </>
   )
 }
 
@@ -1882,11 +1999,11 @@ const MobilePositionCard: React.FC<{
         </MobileCardCell>
         <MobileCardCell>
           <span>{t('TP')}</span>
-          <strong>{p.tpStopPrice ? Number(p.tpStopPrice).toFixed(2) : '—'}</strong>
+          <strong>{p.tpStopPrice ? fmtStopPrice(p.tpStopPrice) : '—'}</strong>
         </MobileCardCell>
         <MobileCardCell>
           <span>{t('SL')}</span>
-          <strong>{p.slStopPrice ? Number(p.slStopPrice).toFixed(2) : '—'}</strong>
+          <strong>{p.slStopPrice ? fmtStopPrice(p.slStopPrice) : '—'}</strong>
         </MobileCardCell>
       </MobileCardGrid>
       <MobileCardActions>

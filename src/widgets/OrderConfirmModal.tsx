@@ -195,7 +195,7 @@ export const OrderConfirmModal: React.FC<OrderConfirmModalProps> = ({
             <Val>{details.leverage}x</Val>
           </Row>
           <Row>
-            <Key>{t('Cost')}</Key>
+            <Key>{t('Margin')}</Key>
             <Val>{details.costUsdt ? `${details.costUsdt.toFixed(2)} ${details.quoteAsset}` : '—'}</Val>
           </Row>
           <Row>

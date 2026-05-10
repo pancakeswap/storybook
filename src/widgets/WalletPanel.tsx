@@ -137,7 +137,12 @@ export interface WalletPanelProps {
   showPnl?: boolean
   showBridge?: boolean
 
-  renderTokenIcon?: (token: { symbol: string; color?: string; network?: string }) => ReactNode
+  renderTokenIcon?: (token: {
+    symbol: string
+    color?: string
+    network?: string
+    kind?: 'spot' | 'perp'
+  }) => ReactNode
 
   labels?: WalletPanelLabels
 
@@ -1312,7 +1317,7 @@ function PositionRow({ p, renderTokenIcon }: { p: PerpPosition; renderTokenIcon?
     <TkRow>
       <TkIcon>
         {renderTokenIcon ? (
-          renderTokenIcon({ symbol: p.symbol, color: p.color })
+          renderTokenIcon({ symbol: p.symbol, color: p.color, kind: 'perp' })
         ) : (
           <TokenCircle symbol={p.symbol} color={p.color} />
         )}
@@ -1353,7 +1358,7 @@ function TokenRow({
     <TkRow>
       <TkIcon>
         {renderTokenIcon ? (
-          renderTokenIcon({ symbol: tk.symbol, color: tk.color, network: tk.network })
+          renderTokenIcon({ symbol: tk.symbol, color: tk.color, network: tk.network, kind: 'spot' })
         ) : (
           <>
             <TokenCircle symbol={tk.symbol} color={tk.color} />

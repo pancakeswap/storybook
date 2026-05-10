@@ -694,7 +694,12 @@ const LevBar = styled.div`
 `
 
 /* PCS V1 decorative bubblegum-light gradient flips between modes via the
-   levTrackBg semantic token (light pastel → dark deep-purple). */
+   levTrackBg semantic token (light pastel → dark deep-purple). The
+   `::before` fill renders the leverage indicator as a slice of a
+   full-track gradient (sized via `background-size`) — so a 10x leverage
+   shows only the green-end of the gradient and 1001x sweeps through to
+   pink, mirroring Aster's Simple-version slider (PAN-11876). Track stays
+   `overflow: visible` because the LevThumb glyph protrudes above. */
 const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   position: relative;
   height: 21px;
@@ -707,6 +712,32 @@ const LevTrack = styled.div<{ $fillPct: number; $zone: Zone }>`
   overflow: visible;
   cursor: pointer;
   touch-action: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: ${({ $fillPct }) => Math.max(0, $fillPct)}%;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+    border-top-right-radius: ${({ $fillPct }) => ($fillPct >= 99.5 ? 24 : 0)}px;
+    border-bottom-right-radius: ${({ $fillPct }) => ($fillPct >= 99.5 ? 24 : 0)}px;
+    background: linear-gradient(
+      90deg,
+      ${({ theme }) => theme.colors.success} 0%,
+      ${({ theme }) => theme.colors.primary} 12%,
+      ${({ theme }) => theme.colors.warning} 50%,
+      ${({ theme }) => theme.colors.failure} 100%
+    );
+    background-size: ${({ $fillPct }) =>
+      $fillPct > 0 ? `${(100 / $fillPct) * 100}% 100%` : '0 0'};
+    background-position: left center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 0;
+  }
 
   &[aria-disabled='true'] {
     cursor: not-allowed;

@@ -43,6 +43,8 @@ export interface SymbolHeaderProps {
   change24h?: string
   /** Raw 24h quote volume. */
   volume24h?: string
+  /** Raw open-interest in USDT notional (consumer multiplies base × mark). */
+  openInterestUsd?: string
 
   // ── Favorite ──────────────────────────────────────────────────
   favorited?: boolean
@@ -373,11 +375,11 @@ const identity = (s: string) => s
  * anchoring + outside-click / Escape dismissal stay here.
  */
 export const SymbolHeader: React.FC<SymbolHeaderProps> = (props) => {
-  // Auto-responsive: switch to mobile layout when the viewport drops
-  // into the mobile breakpoint. Same pattern as OrderForm — desktop
-  // call sites don't need to pass any flag.
-  const { isMobile } = useMatchBreakpoints()
-  if (isMobile) return <MobileSymbolHeader {...props} />
+  // Auto-responsive: switch to mobile layout for both mobile and tablet
+  // viewports (everything below uikit's xl/968px). Desktop call sites
+  // don't need to pass any flag.
+  const { isMobile, isTablet } = useMatchBreakpoints()
+  if (isMobile || isTablet) return <MobileSymbolHeader {...props} />
   return <DesktopSymbolHeader {...props} />
 }
 
@@ -393,6 +395,7 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   nextFundingTime,
   change24h,
   volume24h,
+  openInterestUsd,
   favorited = false,
   onToggleFavorite,
   renderMarketsDropdown,
@@ -610,6 +613,13 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
           <StatLabel>{t('24h Volume (USDT)')}</StatLabel>
           <StatValue>{formatVolume(volume24h)}</StatValue>
         </Stat>
+
+        {openInterestUsd ? (
+          <Stat role="listitem">
+            <StatLabel>{t('Open Interest (USDT)')}</StatLabel>
+            <StatValue>{formatVolume(openInterestUsd)}</StatValue>
+          </Stat>
+        ) : null}
       </Stats>
     </Root>
   )

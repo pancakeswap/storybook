@@ -6,6 +6,7 @@ import { AssetModeModal } from './AssetModeModal';
 import { AssetModeModalProps } from './AssetModeModal';
 import { Bucket } from './WalletPanel';
 import { default as default_2 } from 'react';
+import { IsolatedPositionMigration } from './AssetModeModal';
 import { IStyledComponent } from 'styled-components';
 import { MarginModeModal } from './MarginModeModal';
 import { MarginModeModalProps } from './MarginModeModal';
@@ -186,6 +187,16 @@ export declare interface ChartPanelProps {
      * 220 to match the original mobile-perps mockup.
      */
     mobileMinHeight?: number;
+    /**
+     * Lock the rendered variant instead of switching on viewport. Use this
+     * when the parent already owns the desktop↔mobile decision and needs
+     * the chart's React subtree to stay stable across viewport changes —
+     * critical for chart libraries that don't survive an unmount/remount
+     * cycle (e.g. TradingView's paid Charting Library, whose module-level
+     * state breaks after `widget.remove()`). When omitted, falls back to
+     * `useMatchBreakpoints()` and switches automatically.
+     */
+    variant?: 'mobile' | 'desktop';
 }
 
 /**
@@ -352,6 +363,8 @@ export declare interface EnableTradingModalProps {
  */
 export declare type EnableTradingPhase = 'link-wallet' | 'authorize-agent' | 'checking-status' | 'done';
 
+export { IsolatedPositionMigration }
+
 export declare const LeverageModal: default_2.FC<LeverageModalProps>;
 
 export declare interface LeverageModalProps {
@@ -364,10 +377,23 @@ export declare interface LeverageModalProps {
     minLeverage?: number;
     maxLeverage?: number;
     /**
-     * USDT (or quote) balance available for new positions. Used to display
-     * the "Maximum position at current leverage" preview line.
+     * Returns the maximum new notional (USDT) the user can open at the
+     * given draft leverage — the "Remaining openable notional value" line.
+     * Called with the current slider value as the user drags so the
+     * preview stays in sync; return `undefined` while inputs (brackets,
+     * positions, open orders, OI map) are still loading.
+     *
+     * Caller-owned formula. Aster's UI uses two clamps:
+     *   `min(bracketCap − usedNotional, oiRemaining[ceil(leverage)])`
+     * where `bracketCap` is the per-tier `notionalCap` for the chosen
+     * leverage (binds at HIGH leverage), `usedNotional` is existing
+     * position + unfilled open-order notional on the symbol, and
+     * `oiRemaining` is a platform-wide open-interest budget per leverage
+     * tier (binds at LOW leverage where bracket caps are huge). Wallet
+     * balance is intentionally NOT factored in — this preview describes
+     * venue risk-control headroom, not margin sufficiency. PAN-11910.
      */
-    availableBalance: number;
+    remainingOpenableAtLeverage: (leverage: number) => number | undefined;
     /**
      * Called when the user clicks Confirm with their chosen leverage. The
      * consumer is responsible for the async write back to the venue, error
@@ -1137,6 +1163,11 @@ export declare interface PositionRow {
      *  When omitted the tag is hidden — older consumers stay backward-
      *  compatible. PAN-11866. */
     marginType?: 'CROSS' | 'ISOLATED';
+    /** Aster `/fapi/v3/adlQuantile` value for this position's side
+     *  (0–4, low → imminent ADL). Drives the lit-bar count in the ADL
+     *  gauge. When undefined the gauge falls back to a single red marker
+     *  (Aster's resting state). PAN-11867. */
+    adlQuantile?: number;
 }
 
 /** History sheet inner-tab (mobile only). */
@@ -1400,6 +1431,8 @@ export declare interface SymbolHeaderProps {
     change24h?: string;
     /** Raw 24h quote volume. */
     volume24h?: string;
+    /** Raw open-interest in USDT notional (consumer multiplies base × mark). */
+    openInterestUsd?: string;
     favorited?: boolean;
     onToggleFavorite?: () => void;
     /**
