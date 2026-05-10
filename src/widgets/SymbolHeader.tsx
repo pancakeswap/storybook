@@ -84,19 +84,49 @@ export interface SymbolHeaderProps {
   t?: (key: string) => string
 }
 
+/* Outer shell that anchors the right-edge chevron-fade overlay so the
+   chevron stays pinned to the visible viewport edge regardless of how
+   far the inner row has been scrolled. Border + chrome live here so
+   the scroll container inside can be a clean overflow surface. */
+const RootShell = styled.div`
+  position: relative;
+  background: ${({ theme }) => theme.colors.backgroundAlt};
+  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+  flex-shrink: 0;
+`
+
 const Root = styled(Flex)`
   align-items: center;
   gap: 24px;
   padding: 12px;
-  background: ${({ theme }) => theme.colors.backgroundAlt};
-  border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
   font-variant-numeric: tabular-nums;
   overflow-x: auto;
   scrollbar-width: none;
-  flex-shrink: 0;
   &::-webkit-scrollbar {
     display: none;
   }
+`
+
+/* Right-edge chevron-fade — visible only when the row overflows AND
+   has not been scrolled to the end. Mirrors SimpleTickerCard's
+   StatsChevron. The 90deg gradient fades the row's content so the
+   chevron icon reads against the underlying card surface, matching
+   Figma 2127:29248's masked Fill. */
+const ScrollChevron = styled.span<{ $visible: boolean }>`
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: inline-flex;
+  width: 48px;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  background: linear-gradient(90deg, transparent 0%, ${({ theme }) => theme.colors.backgroundAlt} 40%);
+  pointer-events: none;
+  opacity: ${({ $visible }) => ($visible ? 1 : 0)};
+  transition: opacity 0.15s;
 `
 
 const PairPill = styled(Flex)`
@@ -426,6 +456,30 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  // Right-edge chevron-fade visibility — true only when the row
+  // overflows AND has not been scrolled to the end, matching the
+  // SimpleTickerCard pattern. Tracks both scroll position and size
+  // changes (parent column shrinks when the orderbook reflows on
+  // smaller viewports).
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [showScrollChevron, setShowScrollChevron] = useState(false)
+  useEffect(() => {
+    const node = scrollRef.current
+    if (!node) return undefined
+    const check = () => {
+      const hasOverflow = node.scrollWidth > node.clientWidth + 1
+      const atEnd = node.scrollLeft + node.clientWidth >= node.scrollWidth - 1
+      setShowScrollChevron(hasOverflow && !atEnd)
+    }
+    check()
+    const ro = new ResizeObserver(check)
+    ro.observe(node)
+    node.addEventListener('scroll', check, { passive: true })
+    return () => {
+      ro.disconnect()
+      node.removeEventListener('scroll', check)
+    }
+  }, [])
 
   // Anchor the portal to the trigger's bounding rect. Recompute on
   // scroll / resize so the panel tracks the pill if the page scrolls
@@ -496,7 +550,8 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
   }
 
   return (
-    <Root aria-label={`${symbol} ticker`}>
+    <RootShell aria-label={`${symbol} ticker`}>
+    <Root ref={scrollRef}>
       <PairPill>
         {onToggleFavorite && (
           <StarBtn
@@ -622,6 +677,12 @@ const DesktopSymbolHeader: React.FC<SymbolHeaderProps> = ({
         ) : null}
       </Stats>
     </Root>
+    <ScrollChevron $visible={showScrollChevron} aria-hidden>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M7.05 14.95 12 10 7.05 5.05 8.46 3.64 14.83 10l-6.37 6.36z" />
+      </svg>
+    </ScrollChevron>
+    </RootShell>
   )
 }
 

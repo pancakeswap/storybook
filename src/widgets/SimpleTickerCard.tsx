@@ -355,7 +355,7 @@ const StatsWrap = styled.div`
 
 const Stats = styled(Flex)`
   align-items: center;
-  gap: 24px;
+  gap: 32px;
   height: 56px;
   flex-shrink: 0;
 `

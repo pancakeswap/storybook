@@ -103,6 +103,9 @@ export type { EnableTradingModalProps, EnableTradingPhase } from './EnableTradin
 export { SimpleBetPanel } from './SimpleBetPanel'
 export type { SimpleBetPanelProps } from './SimpleBetPanel'
 
+export { SimpleLeverage } from './SimpleLeverage'
+export type { SimpleLeverageProps } from './SimpleLeverage'
+
 export { SimpleTickerCard } from './SimpleTickerCard'
 export type { SimpleTickerCardProps } from './SimpleTickerCard'
 

@@ -1311,7 +1311,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
               <Th>{t('Price')}</Th>
               <Th>{t('Quantity')}</Th>
               <Th>{t('Fee')}</Th>
-              <Th>{t('Realized profit')}</Th>
+              <Th>{t('Realized PNL')}</Th>
               {tradeHistory.map((tr) => {
                 const sideColor = tr.side === 'BUY' ? theme.colors.success : theme.colors.failure
                 const profitUp = tr.realizedProfit.startsWith('+')
@@ -1345,15 +1345,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
                             onClick={() => onShareTrade(tr)}
                             aria-label={t('Share trade')}
                           >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                              <path
-                                d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                            <ShareGlyph />
                           </ShareBtn>
                         )}
                       </Flex>
@@ -1615,6 +1607,15 @@ const MobileCardActions = styled.div`
   display: flex;
   gap: 8px;
   margin-top: 4px;
+`
+
+/* Position card's bottom action row — TP/SL + Close. The two buttons
+   share the row equally with an 8px gap so they read as a paired
+   primary/secondary action set, matching the Figma mobile spec. */
+const MobilePositionActions = styled(MobileCardActions)`
+  & > button {
+    flex: 1 1 0;
+  }
 `
 
 /** Wrapper that strips the desktop card chrome — the mobile page already
@@ -2006,7 +2007,7 @@ const MobilePositionCard: React.FC<{
           <strong>{p.slStopPrice ? fmtStopPrice(p.slStopPrice) : '—'}</strong>
         </MobileCardCell>
       </MobileCardGrid>
-      <MobileCardActions>
+      <MobilePositionActions>
         <Button
           scale="xs"
           variant="tertiary"
@@ -2024,7 +2025,7 @@ const MobilePositionCard: React.FC<{
         >
           {t('Close')}
         </Button>
-      </MobileCardActions>
+      </MobilePositionActions>
     </MobileCard>
   )
 }
