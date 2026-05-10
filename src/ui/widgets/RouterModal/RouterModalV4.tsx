@@ -143,7 +143,7 @@ export function RouterModalV4({ route, onClose }: RouterModalV4Props) {
             }}
           >
             <Text bold fontSize="15px">
-              {route.dst.amount}
+              {route.dst.amount} {route.dst.token}
             </Text>
             <Text fontSize="11px" color="textSubtle">
               {route.dst.usd}

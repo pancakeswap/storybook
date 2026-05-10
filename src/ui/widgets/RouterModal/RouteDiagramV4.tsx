@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { styled, useTheme } from "styled-components";
+import { useTheme as useAppTheme } from "../../ThemeProvider";
 import { SOURCE_COLORS } from "./tokens";
 import { TokenChip } from "./TokenChip";
 import type { LegV4, RouteV4, SourceName, TokenSymbol } from "./types";
@@ -135,14 +137,14 @@ function TokenStop({ token }: TokenStopProps) {
 }
 
 const TooltipBox = styled.div`
-  position: absolute;
+  position: fixed;
   background: ${({ theme }) => theme.colors.backgroundAlt};
   border: 1px solid ${({ theme }) => theme.colors.cardBorder};
   border-radius: 12px;
   padding: 10px 12px;
   box-shadow: ${({ theme }) => theme.shadows.tooltip};
   min-width: 220px;
-  z-index: 50;
+  z-index: 9999;
   pointer-events: none;
   font-family: "Kanit", sans-serif;
 `;
@@ -254,8 +256,10 @@ interface BuiltBranchV4 {
 export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
   const [hover, setHover] = useState<HoverState | null>(null);
   const theme = useTheme() as {
-    colors: { text: string; backgroundAlt: string; inputSecondary: string };
+    colors: { text: string; backgroundAlt: string };
   };
+  const { theme: themeName } = useAppTheme();
+  const themeDark = themeName === "dark";
 
   const W = 512;
   const padX = 24;
@@ -313,7 +317,7 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route]);
 
-  const pathStroke = theme.colors.inputSecondary;
+  const pathStroke = themeDark ? "#55496E" : "#D7CAEC";
   const labelText = theme.colors.text;
   const labelBg = theme.colors.backgroundAlt;
 
@@ -361,7 +365,7 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
               <path
                 d={b.d}
                 fill="none"
-                stroke="url(#rd-v4-grad)"
+                stroke={isHover ? "#7645D9" : "url(#rd-v4-grad)"}
                 strokeWidth={isHover ? 3.5 : 2.5}
                 strokeLinecap="round"
                 markerEnd="url(#rd-v4-arr)"
@@ -436,7 +440,15 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
             return (
               <div
                 key={`hot-${li}`}
-                onMouseEnter={() => setHover({ branchIdx: bi, legIdx: li, x: h.x, y: h.y })}
+                onMouseEnter={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  setHover({
+                    branchIdx: bi,
+                    legIdx: li,
+                    x: r.left + r.width / 2,
+                    y: r.top + r.height / 2,
+                  });
+                }}
                 onMouseLeave={() => setHover(null)}
                 style={{
                   position: "absolute",
@@ -456,10 +468,15 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
       ))}
 
       {hover &&
-        (() => {
-          const leg = branches[hover.branchIdx].legs[hover.legIdx];
-          return <PoolBreakdownTooltip leg={leg} x={hover.x} y={hover.y} />;
-        })()}
+        typeof document !== "undefined" &&
+        createPortal(
+          <PoolBreakdownTooltip
+            leg={branches[hover.branchIdx].legs[hover.legIdx]}
+            x={hover.x}
+            y={hover.y}
+          />,
+          document.body,
+        )}
     </DiagramRoot>
   );
 }
