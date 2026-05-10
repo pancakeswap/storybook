@@ -20,6 +20,8 @@ import { SimpleBetPanelProps } from './SimpleBetPanel';
 import { SimpleChartCard } from './SimpleChartCard';
 import { SimpleChartCardProps } from './SimpleChartCard';
 import { SimpleHistoryRow } from './SimplePositionsCard';
+import { SimpleLeverage } from './SimpleLeverage';
+import { SimpleLeverageProps } from './SimpleLeverage';
 import { SimplePositionDirection } from './SimplePositionsCard';
 import { SimplePositionLiqStatus } from './SimplePositionsCard';
 import { SimplePositionRow } from './SimplePositionsCard';
@@ -1364,6 +1366,10 @@ export { SimpleChartCard }
 export { SimpleChartCardProps }
 
 export { SimpleHistoryRow }
+
+export { SimpleLeverage }
+
+export { SimpleLeverageProps }
 
 export { SimplePositionDirection }
 
