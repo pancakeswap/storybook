@@ -1,60 +1,101 @@
-import { styled } from "styled-components";
-import { Card, CardBody, CardFooter, CardHeader, IconButton, Text } from "../../components";
+import { useState } from "react";
+import { styled, useTheme } from "styled-components";
+import { Card, CardBody, CardFooter, CardHeader, Text } from "../../components";
 import { HelpIcon, RefreshIcon } from "../../Icons";
+import { SOURCE_COLORS } from "./tokens";
 import { TokenChip } from "./TokenChip";
 import { RouteDiagramV4 } from "./RouteDiagramV4";
-import type { RouteV4 } from "./types";
+import type { LegV4, RouteV4, SourceName } from "./types";
 
 const ModalCard = styled(Card)`
-  width: 560px;
-  max-width: 100%;
+  width: 100%;
+  min-width: 360px;
+  max-width: 575px;
   font-family: "Kanit", sans-serif;
 `;
 
-const HeaderInner = styled(CardHeader)`
-  padding: 20px 24px;
+const DragHandle = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  padding: 10px 0 6px;
 `;
 
-const HeaderTitle = styled.div`
+const DragPill = styled.div`
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: ${({ theme }) => theme.colors.cardBorder};
+`;
+
+const HeaderInner = styled(CardHeader)`
+  padding: 12px 20px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
 `;
 
-const CloseButton = styled(IconButton)`
-  width: 24px;
-  height: 24px;
-  padding: 0;
+const DetailWrap = styled.div`
+  margin: 0 20px 8px;
+  padding: 12px 14px;
+  background: ${({ theme }) => theme.colors.cardSecondary};
+  border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+  border-radius: 12px;
 `;
 
-const SummaryRow = styled.div`
-  padding: 14px 24px 0;
+const DetailTitle = styled.div`
+  font-family: "Kanit", sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: ${({ theme }) => theme.colors.textSubtle};
+  margin-bottom: 8px;
+`;
+
+const DetailRow = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+  font-size: 13px;
+  font-family: "Kanit", sans-serif;
+`;
+
+const DetailPct = styled.span`
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: ${({ theme }) => theme.colors.text};
+`;
+
+const SummaryRow = styled.div`
+  padding: 14px 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 `;
 
 const SummarySide = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 `;
 
 const SummaryDivider = styled.div`
   flex: 1;
-  margin: 0 12px;
+  margin: 0 8px;
   height: 1px;
   border-top: 1px dashed ${({ theme }) => theme.colors.cardBorder};
 `;
 
 const SubtitleRow = styled.div`
-  padding: 8px 24px 4px;
+  padding: 8px 20px 4px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 `;
 
 const SubtitleText = styled(Text)`
@@ -70,15 +111,16 @@ const RefreshedText = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 `;
 
 const DiagramArea = styled.div`
-  padding: 8px 24px 16px;
+  padding: 8px 20px 16px;
   overflow-x: auto;
 `;
 
 const FooterArea = styled(CardFooter)`
-  padding: 12px 24px 18px;
+  padding: 12px 20px 18px;
 `;
 
 const StatLine = styled.div`
@@ -101,12 +143,55 @@ const HintBox = styled.div`
   line-height: 1.45;
 `;
 
-interface RouterModalV4Props {
+function MobileSourceDot({ source }: { source: SourceName }) {
+  const c = SOURCE_COLORS[source];
+  const id = `mdot-${source.replace(/\s+/g, "")}`;
+  return (
+    <svg width={12} height={12} viewBox="0 0 14 14" style={{ display: "block", flexShrink: 0 }}>
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={c.from} />
+          <stop offset="100%" stopColor={c.to} />
+        </linearGradient>
+      </defs>
+      <circle cx="7" cy="7" r="6" fill={`url(#${id})`} stroke="rgba(255,255,255,0.6)" strokeWidth="0.7" />
+    </svg>
+  );
+}
+
+function MobileDetailPanel({ leg }: { leg: LegV4 }) {
+  const theme = useTheme() as { colors: { text: string; textSubtle: string } };
+  return (
+    <DetailWrap>
+      <DetailTitle>
+        {leg.pair[0]} / {leg.pair[1]} · liquidity sources
+      </DetailTitle>
+      {leg.pools.map((p, i) => (
+        <DetailRow key={i}>
+          <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <MobileSourceDot source={p.source} />
+            <span style={{ color: theme.colors.text, fontWeight: 500 }}>
+              {p.source}
+              <span style={{ color: theme.colors.textSubtle, fontWeight: 400 }}>
+                {" "}
+                ({p.fee})
+              </span>
+            </span>
+          </span>
+          <DetailPct>{p.pct}%</DetailPct>
+        </DetailRow>
+      ))}
+    </DetailWrap>
+  );
+}
+
+interface RouterModalV4MobileProps {
   route: RouteV4;
   onClose?: () => void;
 }
 
-export function RouterModalV4({ route, onClose }: RouterModalV4Props) {
+export function RouterModalV4Mobile({ route, onClose }: RouterModalV4MobileProps) {
+  const [activeLeg, setActiveLeg] = useState<LegV4 | null>(null);
   const totalPools = route.branches.reduce(
     (a, b) => a + b.legs.reduce((x, l) => x + l.pools.length, 0),
     0,
@@ -114,24 +199,21 @@ export function RouterModalV4({ route, onClose }: RouterModalV4Props) {
 
   return (
     <ModalCard>
+      <DragHandle role="button" aria-label="Close" onClick={onClose}>
+        <DragPill />
+      </DragHandle>
+
       <HeaderInner variant="pale">
-        <HeaderTitle>
-          <Text bold fontSize="20px">
-            Route
-          </Text>
-          <HelpIcon width="18px" color="textSubtle" />
-        </HeaderTitle>
-        <CloseButton variant="text" scale="sm" onClick={onClose} aria-label="Close">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M18.3002 5.71022C17.9102 5.32022 17.2802 5.32022 16.8902 5.71022L12.0002 10.5902L7.11022 5.70021C6.72022 5.31021 6.09021 5.31021 5.70021 5.70021C5.31021 6.09021 5.31021 6.72022 5.70021 7.11022L10.5902 12.0002L5.70021 16.8902C5.31021 17.2802 5.31021 17.9102 5.70021 18.3002C6.09021 18.6902 6.72022 18.6902 7.11022 18.3002L12.0002 13.4102L16.8902 18.3002C17.2802 18.6902 17.9102 18.6902 18.3002 18.3002C18.6902 17.9102 18.6902 17.2802 18.3002 16.8902L13.4102 12.0002L18.3002 7.11022C18.6802 6.73022 18.6802 6.09022 18.3002 5.71022V5.71022Z" fill="#B8ADD2" />
-          </svg>
-        </CloseButton>
+        <Text bold fontSize="20px">
+          Route
+        </Text>
+        <HelpIcon width="18px" color="textSubtle" />
       </HeaderInner>
 
       <SummaryRow>
         <SummarySide>
           <TokenChip token={route.src.token} size={28} />
-          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
+          <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1, minWidth: 0 }}>
             <Text bold fontSize="15px">
               {route.src.amount} {route.src.token}
             </Text>
@@ -148,6 +230,7 @@ export function RouterModalV4({ route, onClose }: RouterModalV4Props) {
               flexDirection: "column",
               lineHeight: 1.1,
               alignItems: "flex-end",
+              minWidth: 0,
             }}
           >
             <Text bold fontSize="15px">
@@ -170,8 +253,10 @@ export function RouterModalV4({ route, onClose }: RouterModalV4Props) {
       </SubtitleRow>
 
       <DiagramArea>
-        <RouteDiagramV4 route={route} />
+        <RouteDiagramV4 route={route} mobile onActiveChange={setActiveLeg} />
       </DiagramArea>
+
+      {activeLeg && <MobileDetailPanel leg={activeLeg} />}
 
       <CardBody style={{ padding: 0 }} />
 

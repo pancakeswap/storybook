@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { styled, useTheme } from "styled-components";
 import { useTheme as useAppTheme } from "../../ThemeProvider";
@@ -226,8 +226,21 @@ const DiagramRoot = styled.div<{ $w: number; $h: number }>`
   height: ${(p) => p.$h}px;
 `;
 
+const ScaleWrap = styled.div<{ $h: number }>`
+  width: 100%;
+  height: ${(p) => p.$h}px;
+  overflow: hidden;
+`;
+
+const ScaleInner = styled.div<{ $scale: number }>`
+  transform-origin: top left;
+  transform: scale(${(p) => p.$scale});
+`;
+
 interface RouteDiagramV4Props {
   route: RouteV4;
+  mobile?: boolean;
+  onActiveChange?: (leg: LegV4 | null) => void;
 }
 
 interface HoverState {
@@ -253,8 +266,16 @@ interface BuiltBranchV4 {
   y: number;
 }
 
-export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
-  const [hover, setHover] = useState<HoverState | null>(null);
+export function RouteDiagramV4({ route, mobile = false, onActiveChange }: RouteDiagramV4Props) {
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const [scale, setScale] = useState(1);
+  const [hover, setHoverState] = useState<HoverState | null>(null);
+  const setHover = (next: HoverState | null) => {
+    setHoverState(next);
+    if (mobile && onActiveChange) {
+      onActiveChange(next ? route.branches[next.branchIdx].legs[next.legIdx] : null);
+    }
+  };
   const theme = useTheme() as {
     colors: { text: string; backgroundAlt: string };
   };
@@ -262,6 +283,26 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
   const themeDark = themeName === "dark";
 
   const W = 512;
+  useLayoutEffect(() => {
+    if (!mobile) {
+      setScale(1);
+      return;
+    }
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.getBoundingClientRect().width;
+      setScale(w > 0 ? Math.min(1, w / W) : 1);
+    };
+    update();
+    if (typeof ResizeObserver !== "undefined") {
+      const ro = new ResizeObserver(update);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [mobile]);
   const padX = 24;
   const srcX = padX + 24;
   const dstX = W - padX - 24;
@@ -332,8 +373,12 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
       return { leg, x: p0.x + (p1.x - p0.x) * t, y: p0.y + (p1.y - p0.y) * t };
     });
 
-  return (
-    <DiagramRoot $w={W} $h={H}>
+  const diagram = (
+    <DiagramRoot
+      $w={W}
+      $h={H}
+      onClick={mobile ? () => setHover(null) : undefined}
+    >
       <svg width={W} height={H} style={{ position: "absolute", inset: 0, overflow: "visible" }}>
         <defs>
           <linearGradient id="rd-v4-grad" x1="0" y1="0" x2="1" y2="0">
@@ -437,19 +482,35 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
           })}
           {legHotspots(b, bi).map((h, li) => {
             const isHover = hover?.branchIdx === bi && hover?.legIdx === li;
+            const activate = (el: HTMLElement) => {
+              const r = el.getBoundingClientRect();
+              setHover({
+                branchIdx: bi,
+                legIdx: li,
+                x: r.left + r.width / 2,
+                y: r.top + r.height / 2,
+              });
+            };
+            const desktopHandlers = mobile
+              ? {}
+              : {
+                  onMouseEnter: (e: React.MouseEvent<HTMLDivElement>) => activate(e.currentTarget),
+                  onMouseLeave: () => setHover(null),
+                };
+            const mobileHandlers = mobile
+              ? {
+                  onClick: (e: React.MouseEvent<HTMLDivElement>) => {
+                    e.stopPropagation();
+                    if (isHover) setHover(null);
+                    else activate(e.currentTarget);
+                  },
+                }
+              : {};
             return (
               <div
                 key={`hot-${li}`}
-                onMouseEnter={(e) => {
-                  const r = e.currentTarget.getBoundingClientRect();
-                  setHover({
-                    branchIdx: bi,
-                    legIdx: li,
-                    x: r.left + r.width / 2,
-                    y: r.top + r.height / 2,
-                  });
-                }}
-                onMouseLeave={() => setHover(null)}
+                {...desktopHandlers}
+                {...mobileHandlers}
                 style={{
                   position: "absolute",
                   left: h.x,
@@ -467,7 +528,8 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
         </div>
       ))}
 
-      {hover &&
+      {!mobile &&
+        hover &&
         typeof document !== "undefined" &&
         createPortal(
           <PoolBreakdownTooltip
@@ -478,5 +540,13 @@ export function RouteDiagramV4({ route }: RouteDiagramV4Props) {
           document.body,
         )}
     </DiagramRoot>
+  );
+
+  if (!mobile) return diagram;
+
+  return (
+    <ScaleWrap ref={wrapRef} $h={H * scale}>
+      <ScaleInner $scale={scale}>{diagram}</ScaleInner>
+    </ScaleWrap>
   );
 }

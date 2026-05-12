@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { fn } from "storybook/test";
-import { RouterModalV4, SAMPLE_ROUTE_V4 } from "./RouterModal";
+import { RouterModalV4, RouterModalV4Mobile, SAMPLE_ROUTE_V4 } from "./RouterModal";
 
 const meta: Meta = {
   title: "Widgets/RouterModal",
@@ -17,6 +17,17 @@ type StoryV4 = StoryObj<typeof RouterModalV4>;
 export const V4: StoryV4 = {
   name: "v4 — merged routes with leg badges",
   render: (args) => <RouterModalV4 {...args} />,
+  args: {
+    route: SAMPLE_ROUTE_V4,
+    onClose: fn(),
+  },
+};
+
+type StoryMobile = StoryObj<typeof RouterModalV4Mobile>;
+
+export const V4Mobile: StoryMobile = {
+  name: "mobile",
+  render: (args) => <RouterModalV4Mobile {...args} />,
   args: {
     route: SAMPLE_ROUTE_V4,
     onClose: fn(),

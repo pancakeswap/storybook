@@ -10,6 +10,8 @@ export interface CardHeaderProps extends SpaceProps {
 const CardHeader = styled.div<CardHeaderProps>`
   background: ${({ theme, variant = "default" }) => theme.card.cardHeaderBackground[variant]};
   border-radius: ${({ theme }) => `${theme.radii.card} ${theme.radii.card} 0 0`};
+  border-bottom: ${({ theme, variant = "default" }) =>
+    variant === "pale" ? `1px solid ${theme.colors.cardBorder}` : "none"};
   padding: 24px;
   ${space}
 `;
