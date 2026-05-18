@@ -284,16 +284,23 @@ const Body = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 40px;
-  background-image: linear-gradient(
-    153.75deg,
-    #e5fdff 0%,
-    #f3efff 100%
-  );
+  /* Bubblegum gradient — values mirror design-system/tokens.ts
+     (lightColors.gradientBubblegum / darkColors.gradientBubblegum). The
+     design system only exposes a single-color CSS var for bubblegum, so the
+     gradient is hardcoded and switched on <html class="dark">. */
+  background-image: linear-gradient(139.73deg, #e5fdff 0%, #f3efff 100%);
+
+  html.dark & {
+    background-image: linear-gradient(139.73deg, #313d5c 0%, #3d2a54 100%);
+  }
 `
 
 const Container = styled.div`
   width: 70vw;
-  max-width: 70vw;
+  /* Cap at the combined max-widths of the two columns (540 + 16 gap + 480)
+     so the content centers horizontally on wide viewports instead of leaving
+     leftover space on the right. */
+  max-width: 1036px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -316,12 +323,14 @@ const TwoCol = styled.div`
 const LeftCol = styled.div`
   flex: 1 0 0%;
   min-width: 0;
+  max-width: 540px;
   height: 70vh;
 `
 
 const RightCol = styled.div`
   flex: 1 0 0%;
   min-width: 0;
+  max-width: 480px;
 `
 
 // ── Page ─────────────────────────────────────────────────────
