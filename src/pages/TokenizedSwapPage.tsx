@@ -9,13 +9,15 @@ import {
   type SwapTokenSide,
 } from '../widgets/TokenizedSwapForm'
 import { Heading } from '../primitives/Heading'
-import { PreTitle } from '../primitives/Text'
+import { PreTitle, Text } from '../primitives/Text'
 import {
   SearchIcon,
   BellIcon,
   CogIcon,
   ChevronDownIcon,
+  ChevronUpIcon,
 } from '../primitives/Icons'
+import { BottomDrawer } from '../primitives/Modal'
 
 /**
  * Page-level layout for the Tokenized Swap experience (Figma 22416-2164).
@@ -72,6 +74,17 @@ function cleanName(raw: string): string {
     .replace(/\s*\(Ondo\s+Tokenized\)/gi, '')
     .replace(/^Ondo\s+/i, '')
     .trim()
+}
+
+function changeColor(pct: number) {
+  if (pct > 0) return 'success' as const
+  if (pct < 0) return 'failure' as const
+  return 'textSubtle' as const
+}
+
+function formatPct(pct: number) {
+  const sign = pct > 0 ? '+' : ''
+  return `${sign}${pct.toFixed(2)}%`
 }
 
 function toAsset(t: RemoteToken, category: AssetCategory): AssetWithCategory {
@@ -293,17 +306,31 @@ const Body = styled.div`
   html.dark & {
     background-image: linear-gradient(139.73deg, #313d5c 0%, #3d2a54 100%);
   }
+
+  /* Figma 29:14337 / 4:7291 — mobile + tablet (<968): drop side padding to
+     16px so the Swap section can fill the viewport with a 16px gutter. */
+  @media (max-width: 967px) {
+    padding: 40px 16px;
+  }
 `
 
 const Container = styled.div`
-  width: 70vw;
-  /* Cap at the combined max-widths of the two columns (540 + 16 gap + 480)
-     so the content centers horizontally on wide viewports instead of leaving
-     leftover space on the right. */
-  max-width: 1036px;
+  /* Figma 29:4118 — locked at 834px from viewport ≥968 (in practice ≥914,
+     since the Body has 40px padding on each side). Below that, shrink to
+     fit so we never overflow on mobile. No media query — width clamps
+     against viewport size directly, which avoids the breakpoint-vs-iframe
+     mismatch we hit with @media (min-width: 968px). */
+  width: 834px;
+  max-width: calc(100vw - 80px);
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  /* Figma 29:14337 / 4:7291 — fill Body width minus 16px gutters at <968. */
+  @media (max-width: 967px) {
+    width: 100%;
+    max-width: 100%;
+  }
 `
 
 const HeaderRow = styled.div`
@@ -311,6 +338,11 @@ const HeaderRow = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+
+  /* Figma 29:14337 / 4:7291 — page header is desktop-only. */
+  @media (max-width: 967px) {
+    display: none;
+  }
 `
 
 const TwoCol = styled.div`
@@ -318,6 +350,12 @@ const TwoCol = styled.div`
   align-items: flex-start;
   gap: 16px;
   width: 100%;
+
+  /* Figma 29:14337 / 4:7291 — single column. LeftCol is hidden, so this
+     is mostly a safety net. Stacks vertically if both ever render. */
+  @media (max-width: 967px) {
+    flex-direction: column;
+  }
 `
 
 const LeftCol = styled.div`
@@ -325,12 +363,121 @@ const LeftCol = styled.div`
   min-width: 0;
   max-width: 540px;
   height: 70vh;
+
+  /* Token list table fixed at 382px on every desktop viewport (≥968) — 20px
+     wider than the Figma 362, shifted from the swap form to give the list
+     row more breathing room. 382 + 16 (gap) + 436 = 834 (Container). */
+  @media (min-width: 960px) {
+    flex: 0 0 382px;
+    width: 382px;
+    max-width: 382px;
+  }
+
+  /* 968-1199 also pins height to match the Figma 472px frame. */
+  @media (min-width: 960px) and (max-width: 1199px) {
+    height: 472px;
+  }
+
+  /* Figma 29:14337 / 4:7291 — inline list is hidden at <968. Replaced
+     visually by the selected-asset banner + bottom-sheet picker. */
+  @media (max-width: 967px) {
+    display: none;
+  }
 `
 
 const RightCol = styled.div`
   flex: 1 0 0%;
   min-width: 0;
   max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  /* Swap form fixed at 436px on every desktop viewport (≥968) — 20px
+     narrower than Figma's 456, shifted to the token list. 382 + 16 (gap)
+     + 436 = 834 (Container width). */
+  @media (min-width: 960px) {
+    flex: 0 0 436px;
+    width: 436px;
+    max-width: 436px;
+  }
+
+  /* Figma 29:14337 / 4:7291 — swap form fills full width at <968. */
+  @media (max-width: 967px) {
+    max-width: 100%;
+    width: 100%;
+  }
+`
+
+// ── Selected-asset banner (figma 29:14365 mobile/tablet) ─────
+// Mobile/tablet only. Replaces the inline TokenizedAssetsList — tapping
+// it opens a BottomDrawer that hosts the same TokenizedAssetsList.
+
+const Banner = styled.button`
+  display: none;
+
+  @media (max-width: 967px) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    background: ${({ theme }) => theme.colors.card};
+    border: 1px solid ${({ theme }) => theme.colors.cardBorder};
+    border-bottom: 2px solid ${({ theme }) => theme.colors.cardBorder};
+    border-radius: 24px;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+    text-align: left;
+    transition: background 0.12s;
+    &:hover { background: ${({ theme }) => theme.colors.backgroundAlt}; }
+  }
+`
+
+const BannerLogo = styled.div`
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.disabled};
+  overflow: hidden;
+  flex-shrink: 0;
+`
+
+const BannerLogoImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`
+
+const BannerInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  line-height: 1.5;
+  min-width: 0;
+`
+
+const BannerPriceCol = styled.div`
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+`
+
+const BannerChevron = styled.span`
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.primary};
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 `
 
 // ── Page ─────────────────────────────────────────────────────
@@ -350,6 +497,8 @@ export function TokenizedSwapPage({
   const [favorites, setFavorites] = useState<Set<string>>(() => new Set())
   const [toAmount, setToAmount] = useState('0.0')
   const [fromAmount, setFromAmount] = useState('0.0')
+  /* Bottom-sheet asset picker visibility — mobile/tablet only (figma 37:15548). */
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   useEffect(() => {
     const ctrl = new AbortController()
@@ -399,13 +548,18 @@ export function TokenizedSwapPage({
 
   const visibleAssets = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return allAssets
+    const filtered = allAssets
       .filter((a) => (filter === 'All' ? true : a.category === filter))
       .filter((a) => {
         if (!q) return true
         return a.name.toLowerCase().includes(q) || a.symbol.toLowerCase().includes(q)
       })
       .map((a) => ({ ...a, favorite: favorites.has(a.id) }))
+    // Pin favorites to the top of every tab. Stable: within each group the
+    // upstream volume-sorted order is preserved.
+    const favs = filtered.filter((a) => a.favorite)
+    const rest = filtered.filter((a) => !a.favorite)
+    return [...favs, ...rest]
   }, [allAssets, filter, query, favorites])
 
   const selectedAsset = allAssets.find((a) => a.id === selectedId) ?? allAssets[0]
@@ -510,6 +664,41 @@ export function TokenizedSwapPage({
               />
             </LeftCol>
             <RightCol>
+              {selectedAsset && (
+                <Banner
+                  type="button"
+                  aria-label="Open asset picker"
+                  aria-expanded={drawerOpen}
+                  onClick={() => setDrawerOpen(true)}
+                >
+                  <BannerLogo>
+                    {selectedAsset.logoUrls?.find(Boolean) && (
+                      <BannerLogoImg src={selectedAsset.logoUrls.find(Boolean)} alt="" />
+                    )}
+                  </BannerLogo>
+                  <BannerInfo>
+                    <Heading scale="md">{selectedAsset.name}</Heading>
+                    <Text
+                      bold
+                      fontSize="12px"
+                      color="textSubtle"
+                      textTransform="uppercase"
+                      style={{ letterSpacing: '0.24px' }}
+                    >
+                      {selectedAsset.symbol}
+                    </Text>
+                  </BannerInfo>
+                  <BannerPriceCol>
+                    <Text bold fontSize="20px">{selectedAsset.price}</Text>
+                    <Text fontSize="14px" color={changeColor(selectedAsset.changePct)}>
+                      {formatPct(selectedAsset.changePct)}
+                    </Text>
+                  </BannerPriceCol>
+                  <BannerChevron aria-hidden>
+                    <ChevronUpIcon width="20px" height="20px" />
+                  </BannerChevron>
+                </Banner>
+              )}
               <TokenizedSwapForm
                 toSide={toSide}
                 fromSide={fromSide}
@@ -525,6 +714,38 @@ export function TokenizedSwapPage({
           </TwoCol>
         </Container>
       </Body>
+
+      <BottomDrawer
+        isOpen={drawerOpen}
+        setIsOpen={setDrawerOpen}
+        hideCloseButton
+        drawerContainerStyle={{ height: '80vh' }}
+        content={
+          <TokenizedAssetsList
+            searchQuery={query}
+            onSearchChange={setQuery}
+            searchPlaceholder="Search Tokens / Pools"
+            filters={FILTERS}
+            filterCounts={filterCounts}
+            activeFilter={filter}
+            onFilterChange={(next) => setFilter(next as Filter)}
+            assets={visibleAssets}
+            selectedAssetId={selectedId}
+            onAssetClick={(id) => {
+              setSelectedId(id)
+              setDrawerOpen(false)
+            }}
+            onFavoriteToggle={(id) =>
+              setFavorites((prev) => {
+                const next = new Set(prev)
+                if (next.has(id)) next.delete(id)
+                else next.add(id)
+                return next
+              })
+            }
+          />
+        }
+      />
     </Root>
   )
 }
