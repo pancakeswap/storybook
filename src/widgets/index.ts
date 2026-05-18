@@ -99,3 +99,9 @@ export type {
   SimplePositionDirection,
   SimplePositionLiqStatus,
 } from './SimplePositionsCard'
+
+export { TokenizedAssetsList } from './TokenizedAssetsList'
+export type { TokenizedAssetsListProps, TokenizedAsset } from './TokenizedAssetsList'
+
+export { TokenizedSwapForm } from './TokenizedSwapForm'
+export type { TokenizedSwapFormProps, SwapTokenSide } from './TokenizedSwapForm'
