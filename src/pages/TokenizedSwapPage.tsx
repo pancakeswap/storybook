@@ -326,10 +326,19 @@ const Container = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  /* Figma 29:14337 / 4:7291 — fill Body width minus 16px gutters at <968. */
-  @media (max-width: 967px) {
+  /* Mobile (<790) — fill body content (viewport - 32, since Body padding
+     drops to 16 L/R at <968). */
+  @media (max-width: 789px) {
     width: 100%;
     max-width: 100%;
+  }
+
+  /* Figma 52:27803 — tablet (790-967): pin to 758px (= 371 + 16 + 371) so
+     the header text and the two columns stay aligned, and Body's
+     align-items: center keeps the whole block centered horizontally. */
+  @media (min-width: 790px) and (max-width: 967px) {
+    width: 758px;
+    max-width: 758px;
   }
 `
 
@@ -339,21 +348,26 @@ const HeaderRow = styled.div`
   justify-content: space-between;
   width: 100%;
 
-  /* Figma 29:14337 / 4:7291 — page header is desktop-only. */
-  @media (max-width: 967px) {
+  /* Figma 4:7291 — page header is hidden only on small mobile (<790).
+     The tablet design 52:27803 keeps the header visible. */
+  @media (max-width: 789px) {
     display: none;
   }
 `
 
 const TwoCol = styled.div`
   display: flex;
-  align-items: flex-start;
+  /* Stretch the two columns to the same height so the token list bottom-
+     aligns with the swap form + slippage stack across every two-column
+     viewport (tablet 790-967 and desktop ≥968). RightCol drives the
+     height with its natural content (~467px). */
+  align-items: stretch;
   gap: 16px;
   width: 100%;
 
-  /* Figma 29:14337 / 4:7291 — single column. LeftCol is hidden, so this
-     is mostly a safety net. Stacks vertically if both ever render. */
-  @media (max-width: 967px) {
+  /* Single-column only on small mobile (<790). Tablet (790-967) and
+     desktop (≥968) keep the two-column row layout per Figma 52:27803. */
+  @media (max-width: 789px) {
     flex-direction: column;
   }
 `
@@ -362,25 +376,36 @@ const LeftCol = styled.div`
   flex: 1 0 0%;
   min-width: 0;
   max-width: 540px;
-  height: 70vh;
+  /* Pin to a sensible default so the inner list (which would otherwise
+     fill its natural height of many rows) doesn't push the column past
+     the swap form. 488 matches the tablet figma 52:27803, which is the
+     largest defined target. TwoCol's align-items: stretch then ensures
+     RightCol matches this height too, keeping both columns bottom-aligned. */
+  height: 488px;
 
-  /* Token list table fixed at 382px on every desktop viewport (≥968) — 20px
-     wider than the Figma 362, shifted from the swap form to give the list
-     row more breathing room. 382 + 16 (gap) + 436 = 834 (Container). */
-  @media (min-width: 960px) {
+  /* Desktop (≥968) — token list fixed at 382px. 382 + 16 (gap) + 436 = 834. */
+  @media (min-width: 968px) {
     flex: 0 0 382px;
     width: 382px;
     max-width: 382px;
   }
 
-  /* 968-1199 also pins height to match the Figma 472px frame. */
-  @media (min-width: 960px) and (max-width: 1199px) {
+  /* Figma 29:4118 (968-1199) — TwoCol height = 472. */
+  @media (min-width: 968px) and (max-width: 1199px) {
     height: 472px;
   }
 
-  /* Figma 29:14337 / 4:7291 — inline list is hidden at <968. Replaced
-     visually by the selected-asset banner + bottom-sheet picker. */
-  @media (max-width: 967px) {
+  /* Figma 52:27803 — tablet (790-967): 371px wide × 488px tall. */
+  @media (min-width: 790px) and (max-width: 967px) {
+    flex: 0 0 371px;
+    width: 371px;
+    max-width: 371px;
+    height: 488px;
+  }
+
+  /* Figma 4:7291 — mobile (<790): inline list hidden, replaced by the
+     selected-asset banner + bottom-sheet picker. */
+  @media (max-width: 789px) {
     display: none;
   }
 `
@@ -393,17 +418,23 @@ const RightCol = styled.div`
   flex-direction: column;
   gap: 16px;
 
-  /* Swap form fixed at 436px on every desktop viewport (≥968) — 20px
-     narrower than Figma's 456, shifted to the token list. 382 + 16 (gap)
-     + 436 = 834 (Container width). */
-  @media (min-width: 960px) {
+  /* Desktop (≥968) — swap form fixed at 436px. 382 + 16 + 436 = 834. */
+  @media (min-width: 968px) {
     flex: 0 0 436px;
     width: 436px;
     max-width: 436px;
   }
 
-  /* Figma 29:14337 / 4:7291 — swap form fills full width at <968. */
-  @media (max-width: 967px) {
+  /* Figma 52:27803 — tablet (790-967): two-column with 371px wide swap
+     section. Matches LeftCol so the two columns are equal-width. */
+  @media (min-width: 790px) and (max-width: 967px) {
+    flex: 0 0 371px;
+    width: 371px;
+    max-width: 371px;
+  }
+
+  /* Figma 4:7291 — mobile (<790): swap form fills full width. */
+  @media (max-width: 789px) {
     max-width: 100%;
     width: 100%;
   }
@@ -416,7 +447,10 @@ const RightCol = styled.div`
 const Banner = styled.button`
   display: none;
 
-  @media (max-width: 967px) {
+  /* Selected-asset banner is only used on the small-mobile pattern (<790).
+     At 790-967 the tablet design 52:27803 shows the inline TokenizedAssetsList
+     again, so we don't need the banner there. */
+  @media (max-width: 789px) {
     display: flex;
     align-items: center;
     gap: 8px;
