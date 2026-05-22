@@ -4,7 +4,7 @@ import { Card } from '../primitives/Card'
 import { Text } from '../primitives/Text'
 import { Heading } from '../primitives/Heading'
 import { Input } from '../primitives/Input'
-import { SearchIcon, StarLineIcon, StarFillIcon } from '../primitives/Icons'
+import { SearchIcon, StarLineIcon, StarFillIcon, CloseIcon } from '../primitives/Icons'
 
 /**
  * Stateless tokenized-assets browser used on the Tokenized Swap page (Figma
@@ -47,6 +47,14 @@ export interface TokenizedAssetsListProps {
   selectedAssetId?: string
   onAssetClick?: (id: string) => void
   onFavoriteToggle?: (id: string) => void
+  /** Optional title rendered above the search field — used when the list is
+   *  hosted inside a modal (Figma 83:50720). */
+  title?: string
+  /** When provided, a close button is rendered next to the title. */
+  onClose?: () => void
+  /** Forwarded to the action-sheet grabber so the consumer can implement
+   *  drag-to-dismiss behavior. */
+  onGrabberPointerDown?: (e: React.PointerEvent<HTMLButtonElement>) => void
 }
 
 const ListRoot = styled(Card)`
@@ -70,6 +78,70 @@ const Head = styled.div`
   flex-direction: column;
   gap: 8px;
   padding: 24px 24px 8px;
+`
+
+const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 30px;
+
+  /* Action-sheet mode (narrow): grabber replaces the title bar. */
+  @media (max-width: 799px) {
+    display: none;
+  }
+`
+
+// Grabber gets a fat invisible hit-area so the visible 36×4 pill stays
+// crisp while remaining easy to grab on touch (40+ px target).
+const GrabberWrap = styled.button`
+  display: none;
+  width: 100%;
+  margin: -8px 0 0;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  &:active { cursor: grabbing; }
+
+  @media (max-width: 799px) {
+    display: flex;
+    justify-content: center;
+  }
+`
+
+const GrabberPill = styled.span`
+  display: block;
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: ${({ theme }) => theme.colors.textSubtle};
+  opacity: 0.3;
+`
+
+const TitleText = styled.h2`
+  margin: 0;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.5;
+  letter-spacing: -0.2px;
+  color: ${({ theme }) => theme.colors.text};
+`
+
+const TitleClose = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  cursor: pointer;
+  &:hover { color: ${({ theme }) => theme.colors.textSubtle}; }
 `
 
 const FilterRow = styled.div`
@@ -306,10 +378,32 @@ export const TokenizedAssetsList: React.FC<TokenizedAssetsListProps> = ({
   selectedAssetId,
   onAssetClick,
   onFavoriteToggle,
+  title,
+  onClose,
+  onGrabberPointerDown,
 }) => {
   return (
     <ListRoot>
       <Head>
+        {title && (
+          <GrabberWrap
+            type="button"
+            aria-label="Drag to dismiss"
+            onPointerDown={onGrabberPointerDown}
+          >
+            <GrabberPill aria-hidden />
+          </GrabberWrap>
+        )}
+        {title && (
+          <TitleRow>
+            <TitleText>{title}</TitleText>
+            {onClose && (
+              <TitleClose type="button" aria-label="Close" onClick={onClose}>
+                <CloseIcon width="20px" height="20px" />
+              </TitleClose>
+            )}
+          </TitleRow>
+        )}
         <SearchField>
           <SearchIcon width="24px" height="24px" />
           <Input
