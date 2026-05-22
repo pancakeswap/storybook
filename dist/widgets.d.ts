@@ -14,6 +14,18 @@ import { SimplePositionsCardProps } from './SimplePositionsCard';
 import { SimplePositionsTab } from './SimplePositionsCard';
 import { SimpleTickerCard } from './SimpleTickerCard';
 import { SimpleTickerCardProps } from './SimpleTickerCard';
+import { StockCandle } from './StockChartCard';
+import { StockChartCard } from './StockChartCard';
+import { StockChartCardProps } from './StockChartCard';
+import { StockChartType } from './StockChartCard';
+import { StockInfoCard } from './StockInfoCard';
+import { StockInfoCardProps } from './StockInfoCard';
+import { StockPositionRow } from './StockPositionsCard';
+import { StockPositionsCard } from './StockPositionsCard';
+import { StockPositionsCardProps } from './StockPositionsCard';
+import { StockPositionsTab } from './StockPositionsCard';
+import { StockTimeRange } from './StockChartCard';
+import { StockTransactionRow } from './StockPositionsCard';
 import { SwapTokenSide } from './TokenizedSwapForm';
 import { Theme } from 'styled-system';
 import { TLengthStyledSystem } from 'styled-system';
@@ -1121,6 +1133,30 @@ export { SimpleTickerCard }
 export { SimpleTickerCardProps }
 
 export declare type SizeUnit = 'BASE' | 'QUOTE';
+
+export { StockCandle }
+
+export { StockChartCard }
+
+export { StockChartCardProps }
+
+export { StockChartType }
+
+export { StockInfoCard }
+
+export { StockInfoCardProps }
+
+export { StockPositionRow }
+
+export { StockPositionsCard }
+
+export { StockPositionsCardProps }
+
+export { StockPositionsTab }
+
+export { StockTimeRange }
+
+export { StockTransactionRow }
 
 declare type StopPriceSource = 'MARK' | 'LAST';
 
