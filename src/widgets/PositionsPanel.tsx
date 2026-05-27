@@ -68,6 +68,9 @@ export interface TradeHistoryRow {
   price: string
   /** Pre-formatted quantity, e.g. '30 USDT' or '0.012 BTC'. */
   quantity: string
+  /** Pre-formatted executed value (price × quantity). Derived from
+   *  price × quantity when omitted. */
+  executedValue?: string
   /** Pre-formatted fee with unit. */
   fee: string
   /** Pre-formatted realized P&L (signed), e.g. '+0.01 USDT'. */
@@ -607,14 +610,34 @@ const historyTableScroll = css`
   overflow-y: auto;
 `
 
+// Executed value = price × quantity, formatted in the quote asset.
+function executedValueFor(tr: TradeHistoryRow): string {
+  if (tr.executedValue) return tr.executedValue
+  const price = Number(tr.price.replace(/[^0-9.]/g, '')) || 0
+  const qty = Number(tr.quantity.replace(/[^0-9.]/g, '')) || 0
+  const value = price * qty
+  return `${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USDT`
+}
+
 const TradesTable = styled.div`
   display: grid;
-  grid-template-columns: 148px 156px 1fr 1fr 1fr 1fr;
+  /* Even 7-column split so the row reads balanced edge-to-edge. */
+  grid-template-columns: repeat(7, 1fr);
   column-gap: 0;
-  row-gap: 6px;
+  row-gap: 2px;
   font-variant-numeric: tabular-nums;
   & > * {
     padding: 6px 12px;
+  }
+  /* Tighter body rows than the shared RowGroup default (6px) — Time and
+     Symbol are single-line here, so the rows don't need the taller pad. */
+  & ${RowGroup} > * {
+    padding: 4px 12px;
+  }
+  /* Drop the shared row-hover highlight here — it read as an odd partial
+     band on the trade-history rows. */
+  & ${RowGroup}:hover > * {
+    background: transparent;
   }
   ${historyTableScroll}
 `
@@ -646,21 +669,25 @@ const OrderHistoryTable = styled.div`
 /** Stacked date / time cell — the figma renders these on two lines. */
 const StackedTime = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  gap: 6px;
   font-size: 14px;
   line-height: 1.5;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
   & > span:last-child {
     color: ${({ theme }) => theme.colors.textSubtle};
   }
 `
 
-/** Stacked symbol / side cell used in Trade History. */
+/** Symbol + side cell used in Trade History — single line. */
 const StackedSymbol = styled.div`
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  gap: 6px;
   font-size: 14px;
   line-height: 1.5;
+  white-space: nowrap;
 `
 
 const ShareBtn = styled.button`
@@ -673,7 +700,7 @@ const ShareBtn = styled.button`
   justify-content: center;
   width: 21px;
   height: 21px;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.colors.primary};
   transition: opacity 0.12s;
   &:hover:not(:disabled) {
     opacity: 0.7;
@@ -1071,7 +1098,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
   t = identity,
 }) => {
   const theme = useTheme()
-  const tabOrder: PositionsPanelTab[] = ['positions', 'orders', 'history', 'trades', 'transactions']
+  const tabOrder: PositionsPanelTab[] = ['positions', 'orders', 'history', 'trades']
   const activeIndex = tabOrder.indexOf(tab)
 
   // Close-All confirm modal — destructive, account-wide action, so we
@@ -1111,9 +1138,6 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
             </UnderlineTab>
             <UnderlineTab>
               {t('Trade History')} ({tradeHistory.length})
-            </UnderlineTab>
-            <UnderlineTab>
-              {t('Transaction History')} ({transactionHistory.length})
             </UnderlineTab>
           </UnderlineTabs>
           <TabsChevronOverlay data-overlay aria-hidden>
@@ -1311,6 +1335,7 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
               <Th>{t('Symbol')}</Th>
               <Th>{t('Price')}</Th>
               <Th>{t('Quantity')}</Th>
+              <Th>{t('Executed Value')}</Th>
               <Th>{t('Fee')}</Th>
               <Th>{t('Realized profit')}</Th>
               {tradeHistory.map((tr) => {
@@ -1327,13 +1352,14 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
                     <Td as="div">
                       <StackedSymbol>
                         <span>{tr.symbol}</span>
-                        <span style={{ color: sideColor, fontSize: 12 }}>
+                        <span style={{ color: sideColor }}>
                           {tr.side === 'BUY' ? t('Buy') : t('Sell')}
                         </span>
                       </StackedSymbol>
                     </Td>
                     <Td>{tr.price}</Td>
                     <Td>{tr.quantity}</Td>
+                    <Td>{executedValueFor(tr)}</Td>
                     <Td>{tr.fee}</Td>
                     <Td as="div">
                       <Flex alignItems="center" style={{ gap: 8 }}>
@@ -1346,13 +1372,10 @@ const DesktopPositionsPanel: React.FC<PositionsPanelProps> = ({
                             onClick={() => onShareTrade(tr)}
                             aria-label={t('Share trade')}
                           >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 21 21" fill="none" aria-hidden="true">
                               <path
-                                d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                                d="M14.5833 13.3927C14.0661 13.3927 13.6033 13.6036 13.2494 13.9339L8.39708 11.0172C8.43111 10.8556 8.45833 10.6939 8.45833 10.5252C8.45833 10.3566 8.43111 10.1949 8.39708 10.0333L13.195 7.14472C13.5625 7.49613 14.0457 7.714 14.5833 7.714C15.7131 7.714 16.625 6.77223 16.625 5.60557C16.625 4.4389 15.7131 3.49713 14.5833 3.49713C13.4536 3.49713 12.5417 4.4389 12.5417 5.60557C12.5417 5.77424 12.5689 5.93589 12.6029 6.09753L7.805 8.98609C7.4375 8.63468 6.95431 8.41681 6.41667 8.41681C5.28694 8.41681 4.375 9.35858 4.375 10.5252C4.375 11.6919 5.28694 12.6337 6.41667 12.6337C6.95431 12.6337 7.4375 12.4158 7.805 12.0644L12.6506 14.9881C12.6165 15.1357 12.5961 15.2903 12.5961 15.4449C12.5961 16.5764 13.4876 17.4971 14.5833 17.4971C15.679 17.4971 16.5706 16.5764 16.5706 15.4449C16.5706 14.3134 15.679 13.3927 14.5833 13.3927Z"
+                                fill="currentColor"
                               />
                             </svg>
                           </ShareBtn>
