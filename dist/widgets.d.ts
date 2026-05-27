@@ -1595,6 +1595,9 @@ export declare interface TradeHistoryRow {
     price: string;
     /** Pre-formatted quantity, e.g. '30 USDT' or '0.012 BTC'. */
     quantity: string;
+    /** Pre-formatted executed value (price × quantity). Derived from
+     *  price × quantity when omitted. */
+    executedValue?: string;
     /** Pre-formatted fee with unit. */
     fee: string;
     /** Pre-formatted realized P&L (signed), e.g. '+0.01 USDT'. */
