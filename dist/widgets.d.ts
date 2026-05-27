@@ -1,4 +1,7 @@
 import { ActionItem } from './WalletPanel';
+import { AiCopilotPanel } from './AiCopilotPanel';
+import { AiCopilotPanelProps } from './AiCopilotPanel';
+import { AiCopilotTab } from './AiCopilotPanel';
 import { AssetMode } from './AssetModeModal';
 import { AssetModeButton } from './AssetModeButton';
 import { AssetModeButtonProps } from './AssetModeButton';
@@ -10,7 +13,14 @@ import { IsolatedPositionMigration } from './AssetModeModal';
 import { IStyledComponent } from 'styled-components';
 import { MarginModeModal } from './MarginModeModal';
 import { MarginModeModalProps } from './MarginModeModal';
+import { OptionPickerModal } from './OptionPickerModal';
+import { OptionPickerModalProps } from './OptionPickerModal';
 import { PerpStatsData } from './WalletPanel';
+import { PickerOption } from './OptionPickerModal';
+import { QuickOrderDirection } from './QuickOrderPanel';
+import { QuickOrderPanel } from './QuickOrderPanel';
+import { QuickOrderPanelProps } from './QuickOrderPanel';
+import { QuickOrderType } from './QuickOrderPanel';
 import { ResponsiveValue } from 'styled-system';
 import { SharePnlModal } from './SharePnlModal';
 import { SharePnlModalProps } from './SharePnlModal';
@@ -31,6 +41,8 @@ import { SimpleTickerCardProps } from './SimpleTickerCard';
 import { Theme } from 'styled-system';
 import { tierFromPnlPct } from './SharePnlModal';
 import { TLengthStyledSystem } from 'styled-system';
+import { TradeIdea } from './AiCopilotPanel';
+import { TradeIdeaDirection } from './AiCopilotPanel';
 import { WalletData } from './WalletPanel';
 import { WalletPanel } from './WalletPanel';
 import { WalletPanelLabels } from './WalletPanel';
@@ -96,6 +108,12 @@ export declare type AccountPanelState = {
 };
 
 export { ActionItem }
+
+export { AiCopilotPanel }
+
+export { AiCopilotPanelProps }
+
+export { AiCopilotTab }
 
 export { AssetMode }
 
@@ -484,6 +502,10 @@ export declare interface OpenOrderRow {
     executedQty: string;
     status: string;
 }
+
+export { OptionPickerModal }
+
+export { OptionPickerModalProps }
 
 /**
  * Live depth book — bid/ask ladder with heatbar backgrounds, price-step
@@ -1141,6 +1163,8 @@ onTransitionEndCapture?: default_2.TransitionEventHandler<HTMLDivElement> | unde
 
 export { PerpStatsData }
 
+export { PickerOption }
+
 export declare interface PositionRow {
     /** Stable React key — consumer typically uses `${symbol}-${positionSide}`. */
     id: string;
@@ -1304,6 +1328,14 @@ export declare type PositionsPanelTab = 'positions' | 'orders' | 'history' | 'tr
 | 'assets'
 /** Mobile-only — TWAP orders, no desktop equivalent yet. */
 | 'twap';
+
+export { QuickOrderDirection }
+
+export { QuickOrderPanel }
+
+export { QuickOrderPanelProps }
+
+export { QuickOrderType }
 
 export declare interface RecentTradeRow {
     /** Stable React key — usually the trade id from the venue. */
@@ -1568,6 +1600,10 @@ export declare interface TradeHistoryRow {
     /** Pre-formatted realized P&L (signed), e.g. '+0.01 USDT'. */
     realizedProfit: string;
 }
+
+export { TradeIdea }
+
+export { TradeIdeaDirection }
 
 export declare interface TransactionHistoryRow {
     /** Stable React key — typically the txId. */
