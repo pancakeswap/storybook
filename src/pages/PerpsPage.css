@@ -77,7 +77,15 @@
 }
 
 /* ── OrderBook sits directly in pp-top (no wrapper needed) ── */
-/* ob-root width set in OrderBook.css (280px); stretches to pp-top height */
+/* OrderBook panel: fixed 320px, matching the pp-right trading panel.
+   It renders a styled PerpsPanel (dynamic class), so target pp-top's
+   non-chart child rather than a fixed class. Also carries the left
+   stroke separating it from the chart column (mirrors pp-right). */
+.pp-top > :not(.pp-left) {
+  width: 320px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--pcs-colors-card-border);
+}
 
 /* ── Positions table — grows to fill remaining pp-main height ─ */
 .pp-trading-wrap {
@@ -90,7 +98,7 @@
 
 /* ── Right panel: OrderPanel + AccountPanel, full height ───── */
 .pp-right {
-  width: 288px;
+  width: 320px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;

@@ -79,6 +79,15 @@ export type { ChartPanelProps } from './ChartPanel'
 export { BookTradesPanel } from './BookTradesPanel'
 export type { BookTradesPanelProps, BookTradesTab } from './BookTradesPanel'
 
+export { AiCopilotPanel } from './AiCopilotPanel'
+export type { AiCopilotPanelProps, AiCopilotTab, TradeIdea, TradeIdeaDirection } from './AiCopilotPanel'
+
+export { QuickOrderPanel } from './QuickOrderPanel'
+export type { QuickOrderPanelProps, QuickOrderDirection, QuickOrderType } from './QuickOrderPanel'
+
+export { OptionPickerModal } from './OptionPickerModal'
+export type { OptionPickerModalProps, PickerOption } from './OptionPickerModal'
+
 export { OrderForm } from './OrderForm'
 export type {
   OrderFormProps,
