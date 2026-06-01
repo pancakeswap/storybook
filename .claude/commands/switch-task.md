@@ -12,17 +12,41 @@ If there ARE local changes:
 - If user chooses **Save changes**: stage all changes and create a commit with a message summarizing the changes, then proceed.
 - If user chooses **Drop changes**: run `git checkout -- .` and `git clean -fd` to discard changes, then proceed.
 
-## Step 2: List task branches
-Run `git branch --list 'feat/*'` and also `git branch --list 'fix/*'` to get all task branches. Also include any other non-main branches from `git branch`.
+## Step 2: Fetch remote and list task branches
+First, fetch all remote branches:
+```
+git fetch --all
+```
+
+Then list all non-main branches (both local and remote). Use `git branch -a` to find all branches. Include any `feat/*`, `fix/*`, `chore/*`, or other non-main branches. For remote-only branches, show them without the `remotes/origin/` prefix.
 
 Present the branches to the user using AskUserQuestion: "Which task do you want to switch to?" with each branch as an option. Show the branch name as the label and the last commit message as the description (use `git log -1 --format='%s' <branch>` for each).
 
 ## Step 3: Switch to selected branch
+Before switching, snapshot the current lockfile hash so we can detect dependency changes:
+```
+LOCK_BEFORE=$(git rev-parse HEAD:pnpm-lock.yaml 2>/dev/null || echo "none")
+```
+
+Then switch:
 ```
 git checkout <selected-branch>
 ```
 
-## Step 4: Start Storybook if not running
+## Step 4: Install dependencies if changed
+Compare the lockfile hash after checkout:
+```
+LOCK_AFTER=$(git rev-parse HEAD:pnpm-lock.yaml 2>/dev/null || echo "none")
+```
+
+If `LOCK_BEFORE` ≠ `LOCK_AFTER`, run:
+```
+pnpm install
+```
+
+Also run `pnpm install` if `node_modules/` does not exist.
+
+## Step 5: Start Storybook if not running
 Check if Storybook is already running:
 ```
 lsof -i :6006
@@ -30,7 +54,7 @@ lsof -i :6006
 
 If NOT running, start it in the background:
 ```
-npm run storybook
+pnpm storybook
 ```
 
 ## Step 5: Confirm
