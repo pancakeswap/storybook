@@ -1,0 +1,1 @@
+{"version":3,"file":"motionDomAnimation-hxpdgrzq.js","names":[],"sources":["../../src/primitives/Modal/motionDomAnimation.ts"],"sourcesContent":["import { domAnimation } from \"framer-motion\";\n\nexport default domAnimation;\n"],"mappings":";;AAEA,IAAA,IAAe"}
