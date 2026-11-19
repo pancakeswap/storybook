@@ -1,0 +1,1 @@
+{"version":3,"file":"motionDomAnimation-CaFUBSLN.js","names":["domAnimation","motionDomAnimation_default"],"sources":["../../src/primitives/Modal/motionDomAnimation.ts"],"sourcesContent":["import { domAnimation } from \"framer-motion\";\n\nexport default domAnimation;\n"],"mappings":";;AAEA,IAAAC,IAAeD"}
